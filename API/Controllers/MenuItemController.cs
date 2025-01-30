@@ -20,8 +20,7 @@ public class MenuItemController(IMenuItemService menuItemService) : BaseApiContr
 
     [HttpGet("category/{categoryId}")]
     public async Task<IActionResult> GetMenuItemsByCategory(Guid categoryId, [FromQuery] Guid? tagId) =>
-    HandleResult(await menuItemService.GetMenuItemsByCategory(categoryId, tagId));
-
+        HandleResult(await menuItemService.GetMenuItemsByCategory(categoryId, tagId));
 
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateMenuItem([FromBody] MenuItemUpdateDto menuItemUpdateDto, Guid id) =>

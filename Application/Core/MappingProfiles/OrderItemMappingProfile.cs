@@ -23,6 +23,10 @@ public class OrderItemMappingProfile : Profile
                 Price = ingredient.Ingredient.Price
             }).ToList()));
 
+        CreateMap<OrderItem, OrderItemsListDto>()
+            .ForMember(dest => dest.MenuItemName, opt => opt.MapFrom(src => src.MenuItem.Name))
+            .ForMember(dest => dest.Ingredients, opt => opt.MapFrom(src => src.OrderItemIngredients));
+
         CreateMap<OrderItemCreateDto, OrderItem>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
             .ForMember(dest => dest.OrderId, opt => opt.Ignore())

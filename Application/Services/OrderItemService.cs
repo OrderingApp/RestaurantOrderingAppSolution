@@ -143,24 +143,25 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IMapper
         }
     }
 
-    public async Task<ResultDto<List<OrderItemReadDto>>> GetAllOrderItems()
+    public async Task<ResultDto<List<OrderItemsListDto>>> GetAllOrderItems(Guid orderId)
     {
         try
         {
             var orderItems = await orderingContext.OrderItems
+                .Where(oi => oi.OrderId == orderId)
                 .Include(oi => oi.MenuItem)
                 .Include(oi => oi.OrderItemIngredients)
                     .ThenInclude(oii => oii.Ingredient)
                 .ToListAsync();
 
-            var orderItemsDto = mapper.Map<List<OrderItemReadDto>>(orderItems);
+            var orderItemsDto = mapper.Map<List<OrderItemsListDto>>(orderItems);
 
-            return ResultDto<List<OrderItemReadDto>>
+            return ResultDto<List<OrderItemsListDto>>
                 .Success(orderItemsDto, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
-            return ResultDto<List<OrderItemReadDto>>
+            return ResultDto<List<OrderItemsListDto>>
                 .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
         }
     }

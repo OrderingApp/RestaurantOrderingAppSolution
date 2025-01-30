@@ -19,9 +19,9 @@ public class OrderItemController(IOrderItemService orderItemService) : BaseApiCo
     public async Task<IActionResult> GetOrderItem(Guid id) =>
         HandleResult(await orderItemService.GetOrderItem(id));
 
-    [HttpGet]
-    public async Task<IActionResult> GetAllOrderItems() =>
-        HandleResult(await orderItemService.GetAllOrderItems());
+    [HttpGet("{orderId}/order-items")]
+    public async Task<IActionResult> GetAllOrderItems(Guid orderId) =>
+        HandleResult(await orderItemService.GetAllOrderItems(orderId));
 
     [HttpPut("{orderId}/order-items/{orderItemId}/apply-discount")]
     public async Task<IActionResult> ApplyOrderItemDiscount(decimal discount, Guid orderId, Guid orderItemId) =>

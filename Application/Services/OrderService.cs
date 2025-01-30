@@ -293,6 +293,9 @@ public class OrderService(RestaurantOrderingContext orderingContext, IMapper map
                 .Where(o => o.OrderType == orderType && o.OrderStatus == OrderStatus.Ongoing)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.MenuItem)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.OrderItemIngredients)
+                        .ThenInclude(oii => oii.Ingredient)
                 .Include(o => o.CustomerInformation)
                 .ToListAsync();
 
