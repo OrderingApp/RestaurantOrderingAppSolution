@@ -37,6 +37,10 @@ public class OrderController(IOrderService orderService) : BaseApiController
     public async Task<IActionResult> GetAllOrders([FromQuery] OrderStatus? orderStatus, [FromQuery] PaymentStatus? paymentStatus) =>
         HandleResult(await orderService.GetAllOrders(orderStatus, paymentStatus));
 
+    [HttpGet("type/{orderType}/ongoing")]
+    public async Task<IActionResult> GetOngoingOrdersByType(OrderType orderType) =>
+        HandleResult(await orderService.GetOngoingOrdersByType(orderType));
+
     [HttpPut("{orderId}/apply-discount")]
     public async Task<IActionResult> ApplyOrderDiscount(decimal discount, Guid orderId) =>
         HandleResult(await orderService.ApplyOrderDiscount(discount, orderId));

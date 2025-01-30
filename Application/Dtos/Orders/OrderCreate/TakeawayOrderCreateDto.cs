@@ -4,7 +4,7 @@ namespace Application.Dtos.Orders.OrderCreate;
 
 public class TakeawayOrderCreateDto
 {
-    public DateTime OrderDateTime { get; set; } = DateTime.UtcNow;
+    public DateTime OrderDateTime { get; set; }
     public string PhoneNumber { get; set; } = null!;
     public string? AdditionalInstructions { get; set; }
 

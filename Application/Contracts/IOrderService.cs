@@ -15,6 +15,7 @@ public interface IOrderService
     Task<ResultDto<OrderReadDto>> SplitBill(SplitBillDto splitBillDto, Guid orderId);
     Task<ResultDto<OrderReadDto>> GetOrder(Guid id);
     Task<ResultDto<List<OrderReadDto>>> GetAllOrders(OrderStatus? orderStatus, PaymentStatus? paymentStatus);
+    Task<ResultDto<List<OrderReadDto>>> GetOngoingOrdersByType(OrderType orderType);
     Task<ResultDto<OrderReadDto>> ApplyOrderDiscount(decimal discountPercentage, Guid orderId);
     Task<ResultDto<OrderReadDto>> ChangeOrderTable(Guid orderId, Guid newTableId);
     Task<ResultDto<OrderReadDto>> UpdateOrderStatus(OrderStatus newStatus, Guid id);

@@ -17,7 +17,7 @@ public class RestaurantOrderingContextFactory : IDesignTimeDbContextFactory<Rest
 
 public class RestaurantOrderingContext : DbContext
 {
-    public RestaurantOrderingContext(DbContextOptions options) : base(options)
+    public RestaurantOrderingContext(DbContextOptions<RestaurantOrderingContext> options) : base(options)
     {
     }
 

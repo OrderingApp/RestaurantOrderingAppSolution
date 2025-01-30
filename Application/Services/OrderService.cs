@@ -285,6 +285,28 @@ public class OrderService(RestaurantOrderingContext orderingContext, IMapper map
         }
     }
 
+    public async Task<ResultDto<List<OrderReadDto>>> GetOngoingOrdersByType(OrderType orderType)
+    {
+        try
+        {
+            var orders = await orderingContext.Orders
+                .Where(o => o.OrderType == orderType && o.OrderStatus == OrderStatus.Ongoing)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.MenuItem)
+                .Include(o => o.CustomerInformation)
+                .ToListAsync();
+
+            var orderDtos = mapper.Map<List<OrderReadDto>>(orders);
+
+            return ResultDto<List<OrderReadDto>>.Success(orderDtos, HttpStatusCode.OK);
+        }
+        catch (Exception ex)
+        {
+            return ResultDto<List<OrderReadDto>>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+        }
+    }
+
+
     public async Task<ResultDto<OrderReadDto>> ApplyOrderDiscount(decimal discountPercentage, Guid orderId)
     {
         try
