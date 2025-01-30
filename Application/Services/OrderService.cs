@@ -365,41 +365,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IMapper map
         }
     }
 
-    public async Task<ResultDto<OrderReadDto>> ApplyOrderItemDiscount(decimal discountPercentage, Guid orderId, Guid orderItemId)
-    {
-        try
-        {
-            var order = await orderingContext.Orders
-                .Include(o => o.OrderItems)
-                .FirstOrDefaultAsync(o => o.Id == orderId);
-
-            if (order == null)
-                return ResultDto<OrderReadDto>.Failure("Order not found.", HttpStatusCode.NotFound);
-
-            var item = order.OrderItems.FirstOrDefault(oi => oi.Id == orderItemId);
-            if (item == null)
-                return ResultDto<OrderReadDto>.Failure("Order item not found.", HttpStatusCode.NotFound);
-
-            if (discountPercentage < 0 || discountPercentage > 100)
-                return ResultDto<OrderReadDto>.Failure("Invalid discount percentage.", HttpStatusCode.BadRequest);
-
-            item.Discount = discountPercentage;
-
-            item.Price = item.Price * (1 - discountPercentage / 100);
-
-            order.TotalAmount = RecalculateOrderTotal(order);
-
-            await orderingContext.SaveChangesAsync();
-
-            var updatedOrder = mapper.Map<OrderReadDto>(order);
-            return ResultDto<OrderReadDto>.Success(updatedOrder, HttpStatusCode.OK);
-        }
-        catch (Exception ex)
-        {
-            return ResultDto<OrderReadDto>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
-        }
-    }
-
     public async Task<ResultDto<OrderReadDto>> ChangeOrderTable(Guid orderId, Guid newTableId)
     {
         try
@@ -481,7 +446,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IMapper map
                 .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
         }
     }
-
 
     public async Task<ResultDto<OrderReadDto>> UpdateOrderType(OrderType newOrderType, OrderUpdateTypeDto updateTypeDto, Guid orderId)
     {
