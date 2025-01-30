@@ -334,8 +334,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IMapper map
         }
     }
 
-
-
     public async Task<ResultDto<OrderReadDto>> ApplyOrderDiscount(decimal discountPercentage, Guid orderId)
     {
         try

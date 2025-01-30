@@ -76,6 +76,27 @@ public class ReservationService(RestaurantOrderingContext orderingContext, IMapp
         }
     }
 
+    public async Task<ResultDto<List<ReservationReadDto>>> GetReservationsByDate(DateTime date)
+    {
+        try
+        {
+            var reservations = await orderingContext.Reservations
+                .Where(r => r.ReservationDateTime.Date == date.Date)
+                .Include(r => r.Table)
+                .ToListAsync();
+
+            var reservationDtos = mapper.Map<List<ReservationReadDto>>(reservations);
+
+            return ResultDto<List<ReservationReadDto>>
+                .Success(reservationDtos, HttpStatusCode.OK);
+        }
+        catch (Exception ex)
+        {
+            return ResultDto<List<ReservationReadDto>>
+                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+        }
+    }
+
     public async Task<ResultDto<ReservationReadDto>> AssignTableToReservation(Guid reservationId, Guid tableId)
     {
         try

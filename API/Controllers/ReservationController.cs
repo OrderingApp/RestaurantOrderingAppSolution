@@ -18,6 +18,10 @@ public class ReservationController(IReservationService reservationService) : Bas
     public async Task<IActionResult> GetAllReservations() =>
         HandleResult(await reservationService.GetAllReservations());
 
+    [HttpGet("by-date")]
+    public async Task<IActionResult> GetReservationsByDate([FromQuery] DateTime date) =>
+        HandleResult(await reservationService.GetReservationsByDate(date));
+
     [HttpPut("{reservationId}/table/{tableId}")]
     public async Task<IActionResult> AssignTableToReservation(Guid reservationId, Guid tableId) =>
         HandleResult(await reservationService.AssignTableToReservation(reservationId, tableId));
