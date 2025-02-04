@@ -98,16 +98,12 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             deliveryOrder.OrderItems = await PopulateOrderItemsAsync(deliveryOrderDto.OrderItems, deliveryOrder.Id);
             deliveryOrder.TotalAmount = deliveryOrder.OrderItems.Sum(oi => oi.Price * oi.Quantity);
 
-            await orderingContext.Orders.AddAsync(deliveryOrder);
+            var result = await orderingContext.Orders.AddAsync(deliveryOrder);
             await orderingContext.SaveChangesAsync();
 
             var orderReadDto = mapper.Map<OrderReadDto>(deliveryOrder);
 
-            var orderCreatedEvent = new DeliveryOrderCreatedEvent
-            {
-                AdditionalInstructions = deliveryOrderDto.AdditionalInstructions,
-            };
-
+            var orderCreatedEvent = mapper.Map<DeliveryOrderCreatedEvent>(result.Entity);
             await eventHandlerService.HandleEventAsync(orderCreatedEvent);
 
             return ResultDto<OrderReadDto>
