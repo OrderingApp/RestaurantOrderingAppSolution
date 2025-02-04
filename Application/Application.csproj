@@ -9,7 +9,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Infrastructure.Database\Infrastructure.Database.csproj" />
+    <ProjectReference Include="..\RestaurantOrdering.Events.Application\RestaurantOrdering.Events.Application.csproj" />
     <ProjectReference Include="..\RestaurantOrdering.Events.Domain\RestaurantOrdering.Events.Domain.csproj" />
+    <ProjectReference Include="..\RestaurantOrdering.Events.Infrastructure.Database\RestaurantOrdering.Events.Infrastructure.Database.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

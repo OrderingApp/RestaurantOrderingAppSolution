@@ -1,5 +1,6 @@
 ﻿using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
+using RestaurantOrdering.Events.Domain;
 using RestaurantOrdering.Events.Infrastructure.Database;
 
 namespace API.Extensions;
@@ -28,9 +29,12 @@ public static class DatabaseExtensions
 
         try
         {
-            var context = services.GetRequiredService<RestaurantOrderingContext>();
-            await context.Database.MigrateAsync();
-            await Seed.SeedData(context);
+            var restaurantOrderingContext = services.GetRequiredService<RestaurantOrderingContext>();
+            await restaurantOrderingContext.Database.MigrateAsync();
+            await Seed.SeedData(restaurantOrderingContext);
+
+            var eventsDatabaseContext = services.GetRequiredService<EventsDatabaseContext>();
+            await eventsDatabaseContext.Database.MigrateAsync();
         }
         catch (Exception ex)
         {

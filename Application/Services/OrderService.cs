@@ -7,11 +7,15 @@ using AutoMapper;
 using Domain;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
+using RestaurantOrdering.Events.Application.Contracts;
+using RestaurantOrdering.Events.Domain;
+using RestaurantOrdering.Events.Domain.Orders;
 using System.Net;
+using System.Text.Json;
 
 namespace Application.Services;
 
-public class OrderService(RestaurantOrderingContext orderingContext, IMapper mapper) : IOrderService
+public class OrderService(RestaurantOrderingContext orderingContext, IEventHandlerService eventHandlerService, IMapper mapper) : IOrderService
 {
     public async Task<ResultDto<OrderReadDto>> CreateDineInOrder(DineInOrderCreateDto dineInOrderDto)
     {
@@ -99,19 +103,12 @@ public class OrderService(RestaurantOrderingContext orderingContext, IMapper map
 
             var orderReadDto = mapper.Map<OrderReadDto>(deliveryOrder);
 
-            //var orderCreatedEvent = new DeliveryOrderCreatedEvent
-            //{
-            //    AdditionalInstructions = deliveryOrderDto.AdditionalInstructions,
-            //};
+            var orderCreatedEvent = new DeliveryOrderCreatedEvent
+            {
+                AdditionalInstructions = deliveryOrderDto.AdditionalInstructions,
+            };
 
-            //await eventsDatabaseContext.EventContexts.AddAsync(new EventContext
-            //{
-            //    CorrelationId = Guid.NewGuid(),
-            //    DateTime = DateTime.Now,
-            //    EventType = nameof(DeliveryOrderCreatedEvent),
-            //    Id = Guid.NewGuid(),
-            //    PayloadJson = JsonSerializer.Serialize(orderCreatedEvent)
-            //});
+            await eventHandlerService.HandleEventAsync(orderCreatedEvent);
 
             return ResultDto<OrderReadDto>
                 .Success(orderReadDto, HttpStatusCode.Created);
