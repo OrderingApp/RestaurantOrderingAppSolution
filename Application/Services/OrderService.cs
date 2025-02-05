@@ -11,10 +11,7 @@ using RestaurantOrdering.Events.Application.Contracts;
 using RestaurantOrdering.Events.Domain.Orders.CreatingOrder;
 using RestaurantOrdering.Events.Domain.Orders.DiscountsOrder;
 using RestaurantOrdering.Events.Domain.Orders.ModificationsOrder;
-using RestaurantOrdering.Events.Domain.Orders.ModificationsOrder.StatusUpdates;
-using RestaurantOrdering.Events.Domain.Orders.ModificationsOrder.TypeUpdates;
 using RestaurantOrdering.Events.Domain.Orders.PaymentsOrder;
-using RestaurantOrdering.Events.Domain.Orders.PaymentsOrder.PaymentStatusUpdates;
 using System.Net;
 
 namespace Application.Services;
@@ -140,12 +137,14 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             if (order.PaymentStatus == PaymentStatus.Paid)
                 return ResultDto<OrderReadDto>.Failure("Order is already fully paid.", HttpStatusCode.BadRequest);
 
+            var previousOrderPaymentStatus = order.PaymentStatus;
+
             order.PaymentStatus = PaymentStatus.Paid;
             await orderingContext.SaveChangesAsync();
 
             var updatedOrder = mapper.Map<OrderReadDto>(order);
 
-            var orderPaidEvent = mapper.Map<OrderPaymentStatusPaidEvent>(order);
+            var orderPaidEvent = mapper.Map<OrderPaymentStatusChangedEvent>((order, previousOrderPaymentStatus));
             await eventHandlerService.HandleEventAsync(orderPaidEvent);
 
             return ResultDto<OrderReadDto>.Success(updatedOrder, HttpStatusCode.OK);
@@ -449,18 +448,13 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 return ResultDto<OrderReadDto>
                     .Failure("Order not found", HttpStatusCode.NotFound);
 
+            var previousOrderStatus = order.OrderStatus;
+
             order.OrderStatus = newStatus;
             await orderingContext.SaveChangesAsync();
 
-            switch(newStatus)
-            {
-                case OrderStatus.Cancelled:
-                    await eventHandlerService.HandleEventAsync(mapper.Map<OrderStatusCancelledEvent>(order)); break;
-                case OrderStatus.Finished:
-                    await eventHandlerService.HandleEventAsync(mapper.Map<OrderStatusFinishedEvent>(order)); break;
-                case OrderStatus.Ongoing:
-                    await eventHandlerService.HandleEventAsync(mapper.Map<OrderStatusOngoingEvent>(order)); break;
-            }
+            var orderStatusChangedEvent = mapper.Map<OrderStatusChangedEvent>((order, previousOrderStatus));
+            await eventHandlerService.HandleEventAsync(orderStatusChangedEvent);
 
             var updatedOrderDto = mapper.Map<OrderReadDto>(order);
             return ResultDto<OrderReadDto>
@@ -488,6 +482,8 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             if (order.OrderType == newOrderType)
                 return ResultDto<OrderReadDto>.Failure("Order type is already set to the requested type.", HttpStatusCode.BadRequest);
 
+            var previousOrderType = order.OrderType;
+
             switch (newOrderType)
             {
                 case OrderType.DineIn:
@@ -507,18 +503,10 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             }
 
             order.OrderType = newOrderType;
-
             await orderingContext.SaveChangesAsync();
 
-            switch (newOrderType)
-            {
-                case OrderType.DineIn:
-                    await eventHandlerService.HandleEventAsync(mapper.Map<OrderTypeDineInEvent>(order)); break;
-                case OrderType.Takeaway:
-                    await eventHandlerService.HandleEventAsync(mapper.Map<OrderTypeTakeawayEvent>(order)); break;
-                case OrderType.Delivery:
-                    await eventHandlerService.HandleEventAsync(mapper.Map<OrderTypeDeliveryEvent>(order)); break;
-            }
+            var orderTypeChangeEvent = mapper.Map<OrderTypeChangeEvent>((order, previousOrderType));
+            await eventHandlerService.HandleEventAsync(orderTypeChangeEvent);
 
             var updatedOrderDto = mapper.Map<OrderReadDto>(order);
             return ResultDto<OrderReadDto>.Success(updatedOrderDto, HttpStatusCode.OK);

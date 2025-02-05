@@ -3,10 +3,7 @@ using Domain;
 using RestaurantOrdering.Events.Domain.Orders.CreatingOrder;
 using RestaurantOrdering.Events.Domain.Orders.DiscountsOrder;
 using RestaurantOrdering.Events.Domain.Orders.ModificationsOrder;
-using RestaurantOrdering.Events.Domain.Orders.ModificationsOrder.StatusUpdates;
-using RestaurantOrdering.Events.Domain.Orders.ModificationsOrder.TypeUpdates;
 using RestaurantOrdering.Events.Domain.Orders.PaymentsOrder;
-using RestaurantOrdering.Events.Domain.Orders.PaymentsOrder.PaymentStatusUpdates;
 
 namespace Application.Core.EventsMapping.Orders;
 
@@ -21,9 +18,6 @@ public class OrdersEventsMappingProfile : Profile
         CreateMap<Order, DineInOrderCreatedEvent>()
             .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<Order, OrderPaymentStatusPaidEvent>()
-            .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
-
         CreateMap<Order, OrderSplitBillEvent>()
             .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
 
@@ -33,18 +27,19 @@ public class OrdersEventsMappingProfile : Profile
         CreateMap<Order, OrderDiscountAppliedEvent>()
             .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<Order, OrderStatusCancelledEvent>()
-            .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
-        CreateMap<Order, OrderStatusFinishedEvent>()
-            .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
-        CreateMap<Order, OrderStatusOngoingEvent>()
-           .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
+        CreateMap<(Order order, PaymentStatus previousOrderPaymentStatus), OrderPaymentStatusChangedEvent>()
+           .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.order.Id))
+           .ForMember(dest => dest.From, opt => opt.MapFrom(src => src.previousOrderPaymentStatus))
+           .ForMember(dest => dest.To, opt => opt.MapFrom(src => src.order.PaymentStatus));
 
-        CreateMap<Order, OrderTypeTakeawayEvent>()
-            .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
-        CreateMap<Order, OrderTypeDineInEvent>()
-            .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
-        CreateMap<Order, OrderTypeDeliveryEvent>()
-           .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
+        CreateMap<(Order order, OrderStatus previousOrderStatus), OrderStatusChangedEvent>()
+           .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.order.Id))
+           .ForMember(dest => dest.From, opt => opt.MapFrom(src => src.previousOrderStatus))
+           .ForMember(dest => dest.To, opt => opt.MapFrom(src => src.order.OrderStatus));
+
+        CreateMap<(Order order, OrderType previousOrderType), OrderTypeChangeEvent>()
+            .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.order.Id))
+            .ForMember(dest => dest.From, opt => opt.MapFrom(src => src.previousOrderType))
+            .ForMember(dest => dest.To, opt => opt.MapFrom(src => src.order.OrderType));
     }
 }
