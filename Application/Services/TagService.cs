@@ -5,11 +5,13 @@ using AutoMapper;
 using Domain;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
+using RestaurantOrdering.Events.Application.Contracts;
+using RestaurantOrdering.Events.Domain.Tags;
 using System.Net;
 
 namespace Application.Services;
 
-public class TagService(RestaurantOrderingContext orderingContext, IMapper mapper) : ITagService
+public class TagService(RestaurantOrderingContext orderingContext, IEventHandlerService eventHandlerService, IMapper mapper) : ITagService
 {
     public async Task<ResultDto<TagReadDto>> CreateTag(TagCreateDto tagCreateDto)
     {
@@ -21,6 +23,9 @@ public class TagService(RestaurantOrderingContext orderingContext, IMapper mappe
             await orderingContext.SaveChangesAsync();
 
             var createdTag = mapper.Map<TagReadDto>(tag);
+
+            var tagCreatedEvent = mapper.Map<TagCreatedEvent>(tag);
+            await eventHandlerService.HandleEventAsync(tagCreatedEvent);
 
             return ResultDto<TagReadDto>
                 .Success(createdTag, HttpStatusCode.Created);
@@ -89,6 +94,9 @@ public class TagService(RestaurantOrderingContext orderingContext, IMapper mappe
 
             var updatedTag = mapper.Map<TagReadDto>(tag);
 
+            var tagUpdatedEvent = mapper.Map<TagUpdatedEvent>(tag);
+            await eventHandlerService.HandleEventAsync(tagUpdatedEvent);
+
             return ResultDto<TagReadDto>
                 .Success(updatedTag, HttpStatusCode.OK);
         }
@@ -112,6 +120,9 @@ public class TagService(RestaurantOrderingContext orderingContext, IMapper mappe
             tag.IsDeleted = true;
             tag.IsUsed = false;
             await orderingContext.SaveChangesAsync();
+
+            var tagDeletedEvent = mapper.Map<TagDeletedEvent>(tag);
+            await eventHandlerService.HandleEventAsync(tagDeletedEvent);
 
             return ResultDto<bool>.Success(true, HttpStatusCode.OK);
         }

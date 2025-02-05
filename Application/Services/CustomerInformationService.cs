@@ -7,6 +7,7 @@ using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using RestaurantOrdering.Events.Application;
 using RestaurantOrdering.Events.Application.Contracts;
+using RestaurantOrdering.Events.Domain.CustomerInformations;
 using RestaurantOrdering.Events.Domain.Orders.CreatingOrder;
 using System.Net;
 
@@ -33,7 +34,7 @@ public class CustomerInformationService(RestaurantOrderingContext orderingContex
             var result = await orderingContext.CustomerInformation.AddAsync(customerInformation);
             await orderingContext.SaveChangesAsync();
 
-            var customerInformationCreatedEvent = mapper.Map<DineInOrderCreatedEvent>(result.Entity);
+            var customerInformationCreatedEvent = mapper.Map<CustomerInformationCreatedEvent>(result.Entity);
             await eventHandlerService.HandleEventAsync(customerInformationCreatedEvent);
 
             var customerInformationDto = mapper.Map<CustomerInformationReadDto>(customerInformation);
@@ -109,6 +110,9 @@ public class CustomerInformationService(RestaurantOrderingContext orderingContex
 
             var updatedCustomerInformationDto = mapper.Map<CustomerInformationReadDto>(customerInformation);
 
+            var customerInformationUpdatedEvent = mapper.Map<CustomerInformationUpdatedEvent>(customerInformation);
+            await eventHandlerService.HandleEventAsync(customerInformationUpdatedEvent);
+
             return ResultDto<CustomerInformationReadDto>
                 .Success(updatedCustomerInformationDto, HttpStatusCode.OK);
         }
@@ -134,6 +138,9 @@ public class CustomerInformationService(RestaurantOrderingContext orderingContex
 
             orderingContext.CustomerInformation.Remove(customerInformation);
             await orderingContext.SaveChangesAsync();
+
+            var customerInformationDeletedEvent = mapper.Map<CustomerInformationDeletedEvent>(customerInformation);
+            await eventHandlerService.HandleEventAsync(customerInformationDeletedEvent);
 
             return ResultDto<bool>
                 .Success(true, HttpStatusCode.OK);

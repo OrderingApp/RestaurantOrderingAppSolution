@@ -5,11 +5,14 @@ using AutoMapper;
 using Domain;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
+using RestaurantOrdering.Events.Application;
+using RestaurantOrdering.Events.Application.Contracts;
+using RestaurantOrdering.Events.Domain.Reservations;
 using System.Net;
 
 namespace Application.Services;
 
-public class ReservationService(RestaurantOrderingContext orderingContext, IMapper mapper) : IReservationService
+public class ReservationService(RestaurantOrderingContext orderingContext, IEventHandlerService eventHandlerService, IMapper mapper) : IReservationService
 {
     public async Task<ResultDto<ReservationReadDto>> CreateReservation(ReservationCreateDto reservationCreate)
     {
@@ -21,6 +24,9 @@ public class ReservationService(RestaurantOrderingContext orderingContext, IMapp
             await orderingContext.SaveChangesAsync();
 
             var createdReservation = mapper.Map<ReservationReadDto>(reservation);
+
+            var reservationCreatedEvent = mapper.Map<ReservationCreatedEvent>(reservation);
+            await eventHandlerService.HandleEventAsync(reservationCreatedEvent);
 
             return ResultDto<ReservationReadDto>
                 .Success(createdReservation, HttpStatusCode.Created);
@@ -124,6 +130,9 @@ public class ReservationService(RestaurantOrderingContext orderingContext, IMapp
 
             await orderingContext.SaveChangesAsync();
 
+            var tableAssignedEvent = mapper.Map<TableAssignedToReservationEvent>((reservation, tableId));
+            await eventHandlerService.HandleEventAsync(tableAssignedEvent);
+
             var updatedReservationDto = mapper.Map<ReservationReadDto>(reservation);
 
             return ResultDto<ReservationReadDto>
@@ -152,6 +161,9 @@ public class ReservationService(RestaurantOrderingContext orderingContext, IMapp
 
             var updatedReservationDto = mapper.Map<ReservationReadDto>(reservation);
 
+            var reservationUpdatedEvent = mapper.Map<ReservationUpdatedEvent>(reservation);
+            await eventHandlerService.HandleEventAsync(reservationUpdatedEvent);
+
             return ResultDto<ReservationReadDto>
                 .Success(updatedReservationDto, HttpStatusCode.OK);
         }
@@ -175,6 +187,9 @@ public class ReservationService(RestaurantOrderingContext orderingContext, IMapp
 
             orderingContext.Reservations.Remove(reservation);
             await orderingContext.SaveChangesAsync();
+
+            var reservationDeletedEvent = mapper.Map<ReservationDeletedEvent>(reservation);
+            await eventHandlerService.HandleEventAsync(reservationDeletedEvent);
 
             return ResultDto<bool>
                 .Success(true, HttpStatusCode.NoContent);

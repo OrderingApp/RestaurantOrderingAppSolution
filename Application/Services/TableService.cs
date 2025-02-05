@@ -5,12 +5,13 @@ using AutoMapper;
 using Domain;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
+using RestaurantOrdering.Events.Application.Contracts;
+using RestaurantOrdering.Events.Domain.Tables;
 using System.Net;
-using System.Text.Json;
 
 namespace Application.Services;
 
-public class TableService(RestaurantOrderingContext orderingContext, IMapper mapper) : ITableService
+public class TableService(RestaurantOrderingContext orderingContext, IEventHandlerService eventHandlerService, IMapper mapper) : ITableService
 {
     public async Task<ResultDto<TableReadDto>> CreateTable(TableCreateDto tableCreateDto)
     {
@@ -23,6 +24,9 @@ public class TableService(RestaurantOrderingContext orderingContext, IMapper map
 
             var createdTableDto = mapper.Map<TableReadDto>(table);
 
+            var tableCreatedEvent = mapper.Map<TableCreatedEvent>(table);
+            await eventHandlerService.HandleEventAsync(tableCreatedEvent);
+
             return ResultDto<TableReadDto>
                 .Success(createdTableDto, HttpStatusCode.Created);
         }
@@ -30,21 +34,6 @@ public class TableService(RestaurantOrderingContext orderingContext, IMapper map
         {
             return ResultDto<TableReadDto>
                 .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
-        }
-        finally 
-        {
-            var serializeDto = JsonSerializer.Serialize(tableCreateDto);
-
-            var @event = new Event
-            {
-                CorrelationId = Guid.NewGuid(),
-                DateTime = DateTime.Now,
-                Payload = JsonDocument.Parse(serializeDto),
-                EventType = nameof(TableCreateDto)
-            };
-
-            await orderingContext.Events.AddAsync(@event);
-            await orderingContext.SaveChangesAsync();
         }
     }
 
@@ -109,6 +98,9 @@ public class TableService(RestaurantOrderingContext orderingContext, IMapper map
 
             var updatedTable = mapper.Map<TableReadDto>(tableToUpdate);
 
+            var tableUpdatedEvent = mapper.Map<TableUpdatedEvent>(tableToUpdate);
+            await eventHandlerService.HandleEventAsync(tableUpdatedEvent);
+
             return ResultDto<TableReadDto>
                 .Success(updatedTable, HttpStatusCode.OK);
         }
@@ -140,6 +132,9 @@ public class TableService(RestaurantOrderingContext orderingContext, IMapper map
 
             var updatedTableOccupancy = mapper.Map<TableReadDto>(table);
 
+            var tableOccupancyUpdatedEvent = mapper.Map<TableOccupancyUpdatedEvent>((table, tableOccupancyDto.IsOccupied));
+            await eventHandlerService.HandleEventAsync(tableOccupancyUpdatedEvent);
+
             return ResultDto<TableReadDto>
                 .Success(updatedTableOccupancy, HttpStatusCode.OK);
         }
@@ -164,6 +159,9 @@ public class TableService(RestaurantOrderingContext orderingContext, IMapper map
 
             orderingContext.Tables.Update(table);
             await orderingContext.SaveChangesAsync();
+
+            var tableDeletedEvent = mapper.Map<TableDeletedEvent>(table);
+            await eventHandlerService.HandleEventAsync(tableDeletedEvent);
 
             return ResultDto<bool>
                 .Success(true, HttpStatusCode.OK);

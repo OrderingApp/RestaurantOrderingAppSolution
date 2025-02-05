@@ -7,11 +7,14 @@ using AutoMapper;
 using Domain;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
+using RestaurantOrdering.Events.Application.Contracts;
+using RestaurantOrdering.Events.Domain.MenuItems;
+using RestaurantOrdering.Events.Domain.OrderItems;
 using System.Net;
 
 namespace Application.Services;
 
-public class OrderItemService(RestaurantOrderingContext orderingContext, IMapper mapper) : IOrderItemService
+public class OrderItemService(RestaurantOrderingContext orderingContext, IEventHandlerService eventHandlerService, IMapper mapper) : IOrderItemService
 {
     public async Task<ResultDto<OrderReadDto>> AddOrderItems(IEnumerable<OrderItemCreateDto> orderItemDtos, Guid orderId)
     {
@@ -56,6 +59,9 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IMapper
                     order.TotalAmount += orderItem.Price * orderItem.Quantity;
                 }
             }
+
+            var orderItemsAddedEvent = mapper.Map<MenuItemCreatedEvent>(order);
+            await eventHandlerService.HandleEventAsync(orderItemsAddedEvent);
 
             await orderingContext.SaveChangesAsync();
 
@@ -144,6 +150,9 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IMapper
 
             await orderingContext.SaveChangesAsync();
 
+            var orderItemDiscountEvent = mapper.Map<OrderItemDiscountAppliedEvent>((item, discountPercentage));
+            await eventHandlerService.HandleEventAsync(orderItemDiscountEvent);
+
             var updatedOrder = mapper.Map<OrderReadDto>(order);
             return ResultDto<OrderReadDto>.Success(updatedOrder, HttpStatusCode.OK);
         }
@@ -212,6 +221,9 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IMapper
 
             await orderingContext.SaveChangesAsync();
 
+            var orderItemUpdatedEvent = mapper.Map<OrderItemUpdatedEvent>(orderItem);
+            await eventHandlerService.HandleEventAsync(orderItemUpdatedEvent);
+
             var updatedOrderItem = mapper.Map<OrderItemReadDto>(orderItem);
 
             return ResultDto<OrderItemReadDto>
@@ -236,6 +248,9 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IMapper
 
             orderingContext.OrderItems.Remove(orderItem);
             await orderingContext.SaveChangesAsync();
+
+            var orderItemDeletedEvent = mapper.Map<OrderItemDeletedEvent>(orderItem);
+            await eventHandlerService.HandleEventAsync(orderItemDeletedEvent);
 
             return ResultDto<bool>
                 .Success(true, HttpStatusCode.OK);

@@ -5,11 +5,13 @@ using AutoMapper;
 using Domain;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
+using RestaurantOrdering.Events.Application.Contracts;
+using RestaurantOrdering.Events.Domain.MenuCategories;
 using System.Net;
 
 namespace Application.Services;
 
-public class MenuCategoryService(RestaurantOrderingContext orderingContext, IMapper mapper) : IMenuCategoryService
+public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEventHandlerService eventHandlerService, IMapper mapper) : IMenuCategoryService
 {
     public async Task<ResultDto<MenuCategoryReadDto>> CreateMenuCategory(MenuCategoryCreateDto menuCategoryCreateDto)
     {
@@ -21,6 +23,9 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IMap
             await orderingContext.SaveChangesAsync();
 
             var createdMenuCategory = mapper.Map<MenuCategoryReadDto>(menuCategory);
+
+            var menuCategoryCreatedEvent = mapper.Map<MenuCategoryCreatedEvent>(menuCategory);
+            await eventHandlerService.HandleEventAsync(menuCategoryCreatedEvent);
 
             return ResultDto<MenuCategoryReadDto>
                 .Success(createdMenuCategory, HttpStatusCode.Created);
@@ -91,6 +96,9 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IMap
 
             var updatedMenuCategory = mapper.Map<MenuCategoryReadDto>(menuCategoryToUpdate);
 
+            var menuCategoryUpdatedEvent = mapper.Map<MenuCategoryUpdatedEvent>(menuCategoryToUpdate);
+            await eventHandlerService.HandleEventAsync(menuCategoryUpdatedEvent);
+
             return ResultDto<MenuCategoryReadDto>
                 .Success(updatedMenuCategory, HttpStatusCode.OK);
         }
@@ -114,6 +122,9 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IMap
             menuCategory.IsUsed = false;
 
             await orderingContext.SaveChangesAsync();
+
+            var menuCategoryDeletedEvent = mapper.Map<MenuCategoryDeletedEvent>(menuCategory);
+            await eventHandlerService.HandleEventAsync(menuCategoryDeletedEvent);
 
             return ResultDto<bool>
                 .Success(true, HttpStatusCode.OK);

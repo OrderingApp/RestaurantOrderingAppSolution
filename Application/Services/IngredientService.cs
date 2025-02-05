@@ -5,11 +5,14 @@ using AutoMapper;
 using Domain;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
+using RestaurantOrdering.Events.Application;
+using RestaurantOrdering.Events.Application.Contracts;
+using RestaurantOrdering.Events.Domain.Ingredients;
 using System.Net;
 
 namespace Application.Services;
 
-public class IngredientService(RestaurantOrderingContext orderingContext, IMapper mapper) : IIngredientService
+public class IngredientService(RestaurantOrderingContext orderingContext, IEventHandlerService eventHandlerService, IMapper mapper) : IIngredientService
 {
     public async Task<ResultDto<IngredientReadDto>> CreateIngredient(IngredientCreateDto ingredientCreateDto)
     {
@@ -21,6 +24,9 @@ public class IngredientService(RestaurantOrderingContext orderingContext, IMappe
             await orderingContext.SaveChangesAsync();
 
             var createdIngredient = mapper.Map<IngredientReadDto>(ingredient);
+
+            var ingredientCreatedEvent = mapper.Map<IngredientCreatedEvent>(ingredient);
+            await eventHandlerService.HandleEventAsync(ingredientCreatedEvent);
 
             return ResultDto<IngredientReadDto>
                 .Success(createdIngredient, HttpStatusCode.Created);
@@ -89,6 +95,9 @@ public class IngredientService(RestaurantOrderingContext orderingContext, IMappe
 
             var updatedIngredientDto = mapper.Map<IngredientReadDto>(ingredient);
 
+            var ingredientUpdatedEvent = mapper.Map<IngredientUpdatedEvent>(ingredient);
+            await eventHandlerService.HandleEventAsync(ingredientUpdatedEvent);
+
             return ResultDto<IngredientReadDto>
                 .Success(updatedIngredientDto, HttpStatusCode.OK);
         }
@@ -112,6 +121,9 @@ public class IngredientService(RestaurantOrderingContext orderingContext, IMappe
             ingredient.IsDeleted = true;
             ingredient.IsUsed = false;
             await orderingContext.SaveChangesAsync();
+
+            var ingredientDeletedEvent = mapper.Map<IngredientDeletedEvent>(ingredient);
+            await eventHandlerService.HandleEventAsync(ingredientDeletedEvent);
 
             return ResultDto<bool>
                 .Success(true, HttpStatusCode.OK);

@@ -32,7 +32,6 @@ public class RestaurantOrderingContext : DbContext
     public DbSet<OrderItemIngredient> OrderItemIngredients { get; set; }
     public DbSet<CustomerInformation> CustomerInformation { get; set; }
     public DbSet<Reservation> Reservations { get; set; }
-    public DbSet<Event> Events { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -140,7 +139,5 @@ public class RestaurantOrderingContext : DbContext
             .HasOne(oii => oii.Ingredient)
             .WithMany(i => i.OrderItemIngredients)
             .HasForeignKey(oii => oii.IngredientId);
-
-        modelBuilder.Entity<Event>();
     }
 }
