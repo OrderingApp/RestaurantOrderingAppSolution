@@ -1,6 +1,4 @@
-﻿using Domain;
-
-namespace RestaurantOrdering.Events.Domain.Orders;
+﻿namespace RestaurantOrdering.Events.Domain.Orders.CreatingOrder;
 
 public class DeliveryOrderCreatedEvent : BaseEvent
 {

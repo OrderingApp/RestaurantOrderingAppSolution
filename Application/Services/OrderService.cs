@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using RestaurantOrdering.Events.Application.Contracts;
 using RestaurantOrdering.Events.Domain;
 using RestaurantOrdering.Events.Domain.Orders;
+using RestaurantOrdering.Events.Domain.Orders.CreatingOrder;
 using System.Net;
 using System.Text.Json;
 
@@ -71,10 +72,13 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             takeawayOrder.OrderItems = await PopulateOrderItemsAsync(takeawayOrderDto.OrderItems, takeawayOrder.Id);
             takeawayOrder.TotalAmount = takeawayOrder.OrderItems.Sum(oi => oi.Price * oi.Quantity);
 
-            await orderingContext.Orders.AddAsync(takeawayOrder);
+            var result = await orderingContext.Orders.AddAsync(takeawayOrder);
             await orderingContext.SaveChangesAsync();
 
             var orderReadDto = mapper.Map<OrderReadDto>(takeawayOrder);
+
+            var orderCreatedEvent = mapper.Map<TakeawayOrderCreatedEvent>(result.Entity);
+            await eventHandlerService.HandleEventAsync(orderCreatedEvent);
 
             return ResultDto<OrderReadDto>
                 .Success(orderReadDto, HttpStatusCode.Created);
