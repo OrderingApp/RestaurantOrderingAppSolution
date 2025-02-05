@@ -8,11 +8,14 @@ using Domain;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using RestaurantOrdering.Events.Application.Contracts;
-using RestaurantOrdering.Events.Domain;
-using RestaurantOrdering.Events.Domain.Orders;
 using RestaurantOrdering.Events.Domain.Orders.CreatingOrder;
+using RestaurantOrdering.Events.Domain.Orders.DiscountsOrder;
+using RestaurantOrdering.Events.Domain.Orders.ModificationsOrder;
+using RestaurantOrdering.Events.Domain.Orders.ModificationsOrder.StatusUpdates;
+using RestaurantOrdering.Events.Domain.Orders.ModificationsOrder.TypeUpdates;
+using RestaurantOrdering.Events.Domain.Orders.PaymentsOrder;
+using RestaurantOrdering.Events.Domain.Orders.PaymentsOrder.PaymentStatusUpdates;
 using System.Net;
-using System.Text.Json;
 
 namespace Application.Services;
 
@@ -41,10 +44,13 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             dineInOrder.OrderItems = await PopulateOrderItemsAsync(dineInOrderDto.OrderItems, dineInOrder.Id);
             dineInOrder.TotalAmount = dineInOrder.OrderItems.Sum(oi => oi.Price * oi.Quantity);
 
-            await orderingContext.Orders.AddAsync(dineInOrder);
+            var result = await orderingContext.Orders.AddAsync(dineInOrder);
             await orderingContext.SaveChangesAsync();
 
             var createdOrderDto = mapper.Map<OrderReadDto>(dineInOrder);
+
+            var orderCreatedEvent = mapper.Map<DineInOrderCreatedEvent>(result.Entity);
+            await eventHandlerService.HandleEventAsync(orderCreatedEvent);
 
             return ResultDto<OrderReadDto>
                 .Success(createdOrderDto, HttpStatusCode.Created);
@@ -138,6 +144,10 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             await orderingContext.SaveChangesAsync();
 
             var updatedOrder = mapper.Map<OrderReadDto>(order);
+
+            var orderPaidEvent = mapper.Map<OrderPaymentStatusPaidEvent>(order);
+            await eventHandlerService.HandleEventAsync(orderPaidEvent);
+
             return ResultDto<OrderReadDto>.Success(updatedOrder, HttpStatusCode.OK);
         }
         catch (Exception ex)
@@ -207,9 +217,11 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
 
             newOrder.TotalAmount = newOrder.OrderItems.Sum(item => item.Price * item.Quantity);
 
-            await orderingContext.Orders.AddAsync(newOrder);
+            var result = await orderingContext.Orders.AddAsync(newOrder);
             await orderingContext.SaveChangesAsync();
 
+            var orderSplitEvent = mapper.Map<OrderSplitBillEvent>(result.Entity);
+            await eventHandlerService.HandleEventAsync(orderSplitEvent);
 
             return ResultDto<OrderReadDto>.Success(null, HttpStatusCode.Created);
         }
@@ -354,6 +366,10 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             await orderingContext.SaveChangesAsync();
 
             var updatedOrder = mapper.Map<OrderReadDto>(order);
+
+            var orderDiscountEvent = mapper.Map<OrderDiscountAppliedEvent>(order);
+            await eventHandlerService.HandleEventAsync(orderDiscountEvent);
+
             return ResultDto<OrderReadDto>.Success(updatedOrder, HttpStatusCode.OK);
         }
         catch (Exception ex)
@@ -408,6 +424,9 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
 
             var updatedOrderDto = mapper.Map<OrderReadDto>(order);
 
+            var orderTableChangeEvent = mapper.Map<OrderTableChangedEvent>(order);
+            await eventHandlerService.HandleEventAsync(orderTableChangeEvent);
+
             return ResultDto<OrderReadDto>
                 .Success(updatedOrderDto, HttpStatusCode.OK);
         }
@@ -432,6 +451,16 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
 
             order.OrderStatus = newStatus;
             await orderingContext.SaveChangesAsync();
+
+            switch(newStatus)
+            {
+                case OrderStatus.Cancelled:
+                    await eventHandlerService.HandleEventAsync(mapper.Map<OrderStatusCancelledEvent>(order)); break;
+                case OrderStatus.Finished:
+                    await eventHandlerService.HandleEventAsync(mapper.Map<OrderStatusFinishedEvent>(order)); break;
+                case OrderStatus.Ongoing:
+                    await eventHandlerService.HandleEventAsync(mapper.Map<OrderStatusOngoingEvent>(order)); break;
+            }
 
             var updatedOrderDto = mapper.Map<OrderReadDto>(order);
             return ResultDto<OrderReadDto>
@@ -480,6 +509,16 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             order.OrderType = newOrderType;
 
             await orderingContext.SaveChangesAsync();
+
+            switch (newOrderType)
+            {
+                case OrderType.DineIn:
+                    await eventHandlerService.HandleEventAsync(mapper.Map<OrderTypeDineInEvent>(order)); break;
+                case OrderType.Takeaway:
+                    await eventHandlerService.HandleEventAsync(mapper.Map<OrderTypeTakeawayEvent>(order)); break;
+                case OrderType.Delivery:
+                    await eventHandlerService.HandleEventAsync(mapper.Map<OrderTypeDeliveryEvent>(order)); break;
+            }
 
             var updatedOrderDto = mapper.Map<OrderReadDto>(order);
             return ResultDto<OrderReadDto>.Success(updatedOrderDto, HttpStatusCode.OK);
