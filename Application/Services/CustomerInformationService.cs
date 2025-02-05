@@ -5,11 +5,14 @@ using AutoMapper;
 using Domain;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
+using RestaurantOrdering.Events.Application;
+using RestaurantOrdering.Events.Application.Contracts;
+using RestaurantOrdering.Events.Domain.Orders.CreatingOrder;
 using System.Net;
 
 namespace Application.Services;
 
-public class CustomerInformationService(RestaurantOrderingContext orderingContext, IMapper mapper) : ICustomerInformationService
+public class CustomerInformationService(RestaurantOrderingContext orderingContext, IEventHandlerService eventHandlerService, IMapper mapper) : ICustomerInformationService
 {
     public async Task<ResultDto<CustomerInformationReadDto>> CreateCustomerInformation(CustomerInformationCreateDto customerInformationCreateDto, Guid orderId)
     {
@@ -27,8 +30,11 @@ public class CustomerInformationService(RestaurantOrderingContext orderingContex
             var customerInformation = mapper.Map<CustomerInformation>(customerInformationCreateDto);
             customerInformation.OrderId = orderId;
 
-            await orderingContext.CustomerInformation.AddAsync(customerInformation);
+            var result = await orderingContext.CustomerInformation.AddAsync(customerInformation);
             await orderingContext.SaveChangesAsync();
+
+            var customerInformationCreatedEvent = mapper.Map<DineInOrderCreatedEvent>(result.Entity);
+            await eventHandlerService.HandleEventAsync(customerInformationCreatedEvent);
 
             var customerInformationDto = mapper.Map<CustomerInformationReadDto>(customerInformation);
 

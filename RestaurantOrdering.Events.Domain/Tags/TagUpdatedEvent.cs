@@ -1,0 +1,8 @@
+﻿namespace RestaurantOrdering.Events.Domain.Tags;
+
+public class TagUpdatedEvent : BaseEvent
+{
+    public Guid TagId { get; set; }
+
+    public override string GetEventType() => nameof(TagUpdatedEvent);
+}

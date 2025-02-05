@@ -9,6 +9,7 @@ using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using RestaurantOrdering.Events.Application.Contracts;
 using RestaurantOrdering.Events.Domain.Orders.CreatingOrder;
+using RestaurantOrdering.Events.Domain.Orders.DeleteOrder;
 using RestaurantOrdering.Events.Domain.Orders.DiscountsOrder;
 using RestaurantOrdering.Events.Domain.Orders.ModificationsOrder;
 using RestaurantOrdering.Events.Domain.Orders.PaymentsOrder;
@@ -531,11 +532,14 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                     .Failure("order not found", HttpStatusCode.NotFound);
             }
 
-            orderingContext.Orders.Remove(orderToDelete);
+            var result = orderingContext.Orders.Remove(orderToDelete);
             await orderingContext.SaveChangesAsync();
 
+            var orderDeletedEvent = mapper.Map<OrderDeletedEvent>(result);
+            await eventHandlerService.HandleEventAsync(orderDeletedEvent);
+
             return ResultDto<bool>
-                .Success(true, HttpStatusCode.NoContent);
+                .Success(true, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain;
 using RestaurantOrdering.Events.Domain.Orders.CreatingOrder;
+using RestaurantOrdering.Events.Domain.Orders.DeleteOrder;
 using RestaurantOrdering.Events.Domain.Orders.DiscountsOrder;
 using RestaurantOrdering.Events.Domain.Orders.ModificationsOrder;
 using RestaurantOrdering.Events.Domain.Orders.PaymentsOrder;
@@ -25,6 +26,9 @@ public class OrdersEventsMappingProfile : Profile
             .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
 
         CreateMap<Order, OrderDiscountAppliedEvent>()
+            .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
+
+        CreateMap<Order, OrderDeletedEvent>()
             .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
 
         CreateMap<(Order order, PaymentStatus previousOrderPaymentStatus), OrderPaymentStatusChangedEvent>()

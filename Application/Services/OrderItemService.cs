@@ -13,54 +13,6 @@ namespace Application.Services;
 
 public class OrderItemService(RestaurantOrderingContext orderingContext, IMapper mapper) : IOrderItemService
 {
-    public async Task<ResultDto<OrderReadDto>> AddOrderItem(OrderItemCreateDto orderItemDto, Guid orderId)
-    {
-        try
-        {
-            var order = await orderingContext.Orders
-                .Include(o => o.OrderItems)
-                .FirstOrDefaultAsync(o => o.Id == orderId);
-
-            if (order == null)
-                return ResultDto<OrderReadDto>
-                    .Failure("Order not found.", HttpStatusCode.NotFound);
-
-            var menuItem = await orderingContext.MenuItems
-                .FirstOrDefaultAsync(mi => mi.Id == orderItemDto.MenuItemId);
-
-            if (menuItem == null)
-                return ResultDto<OrderReadDto>
-                    .Failure($"MenuItem with ID {orderItemDto.MenuItemId} not found.", HttpStatusCode.BadRequest);
-
-            var existingItem = order.OrderItems.FirstOrDefault(oi => oi.MenuItemId == orderItemDto.MenuItemId);
-            if (existingItem != null)
-            {
-                existingItem.Quantity += orderItemDto.Quantity;
-                order.TotalAmount += menuItem.Price * orderItemDto.Quantity;
-            }
-            else
-            {
-                var orderItem = mapper.Map<OrderItem>(orderItemDto);
-                orderItem.Price = menuItem.Price;
-                orderItem.OrderId = orderId;
-
-                await orderingContext.OrderItems.AddAsync(orderItem);
-                order.TotalAmount += orderItem.Price * orderItem.Quantity;
-            }
-
-            await orderingContext.SaveChangesAsync();
-
-            var updatedOrderDto = mapper.Map<OrderReadDto>(order);
-            return ResultDto<OrderReadDto>
-                .Success(updatedOrderDto, HttpStatusCode.OK);
-        }
-        catch (Exception ex)
-        {
-            return ResultDto<OrderReadDto>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
-        }
-    }
-
     public async Task<ResultDto<OrderReadDto>> AddOrderItems(IEnumerable<OrderItemCreateDto> orderItemDtos, Guid orderId)
     {
         try
