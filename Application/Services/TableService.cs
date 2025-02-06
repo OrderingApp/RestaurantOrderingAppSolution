@@ -43,7 +43,9 @@ public class TableService(RestaurantOrderingContext orderingContext, IEventHandl
         {
             var table = await orderingContext.Tables
                 .Include(t => t.Orders)
-                .ThenInclude(o => o.OrderItems)
+                    .ThenInclude(o => o.OrderItems)
+                .Include(o => o.Orders)
+                    .ThenInclude(p => p.Payments)
                 .FirstOrDefaultAsync(t => t.Id == id && t.IsUsed && !t.IsDeleted);
 
             if (table == null)
