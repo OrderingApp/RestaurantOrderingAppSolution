@@ -124,58 +124,26 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         }
     }
 
-    //public async Task<ResultDto<OrderReadDto>> PayOrder(PaymentMethod paymentMethod, Guid orderId)
-    //{
-    //    try
-    //    {
-    //        var order = await orderingContext.Orders
-    //            .Include(o => o.OrderItems)
-    //            .FirstOrDefaultAsync(o => o.Id == orderId);
-
-    //        if (order == null)
-    //            return ResultDto<OrderReadDto>.Failure("Order not found.", HttpStatusCode.NotFound);
-
-    //        if (order.PaymentStatus == PaymentStatus.Paid)
-    //            return ResultDto<OrderReadDto>.Failure("Order is already fully paid.", HttpStatusCode.BadRequest);
-
-    //        var previousOrderPaymentStatus = order.PaymentStatus;
-
-    //        order.PaymentStatus = PaymentStatus.Paid;
-    //        await orderingContext.SaveChangesAsync();
-
-    //        var updatedOrder = mapper.Map<OrderReadDto>(order);
-
-    //        var orderPaidEvent = mapper.Map<OrderPaymentStatusChangedEvent>((order, previousOrderPaymentStatus));
-    //        await eventHandlerService.HandleEventAsync(orderPaidEvent);
-
-    //        return ResultDto<OrderReadDto>.Success(updatedOrder, HttpStatusCode.OK);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return ResultDto<OrderReadDto>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
-    //    }
-    //}
-
-    public async Task<ResultDto<OrderReadDto>> SplitBill(SplitBillDto splitBillDto, Guid orderId)
+    public async Task<ResultDto<OrderReadDto>> SplitOrder(SplitOrderDto splitOrderDto, Guid orderId)
     {
         try
         {
+            //TO FIX
+
             var originalOrder = await orderingContext.Orders
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.MenuItem)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.OrderItemIngredients)
                         .ThenInclude(oii => oii.Ingredient)
+                .Include(o => o.Payments)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
 
             if (originalOrder == null)
                 return ResultDto<OrderReadDto>.Failure("Order not found.", HttpStatusCode.NotFound);
 
-            //if (originalOrder.PaymentStatus == PaymentStatus.Paid || originalOrder.PaymentStatus == PaymentStatus.Cancelled)
-            //    return ResultDto<OrderReadDto>.Failure("Cannot split a fully paid or canceled order.", HttpStatusCode.BadRequest);
-
             var itemsToSplit = originalOrder.OrderItems
-                .Where(oi => splitBillDto.OrderItemIds.Contains(oi.Id))
+                .Where(oi => splitOrderDto.OrderItemIds.Contains(oi.Id))
                 .ToList();
 
             if (!itemsToSplit.Any())
@@ -186,7 +154,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 Id = Guid.NewGuid(),
                 OrderDateTime = DateTime.UtcNow,
                 OrderStatus = originalOrder.OrderStatus,
-                //PaymentStatus = PaymentStatus.Pending,
                 TableId = originalOrder.TableId,
                 OrderType = originalOrder.OrderType,
                 OrderItems = new List<OrderItem>()
@@ -209,18 +176,41 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 };
 
                 newOrder.OrderItems.Add(newItem);
-
                 originalOrder.OrderItems.Remove(item);
             }
 
             originalOrder.TotalAmount = originalOrder.OrderItems.Sum(item => item.Price * item.Quantity);
-
             newOrder.TotalAmount = newOrder.OrderItems.Sum(item => item.Price * item.Quantity);
 
-            var result = await orderingContext.Orders.AddAsync(newOrder);
+            if (originalOrder.Payments.Any())
+            {
+                var totalPaid = originalOrder.Payments.Where(p => p.PaymentStatus == PaymentStatus.Paid).Sum(p => p.Amount);
+                var splitRatio = newOrder.TotalAmount / (originalOrder.TotalAmount + newOrder.TotalAmount);
+
+                foreach (var payment in originalOrder.Payments.ToList())
+                {
+                    var splitPaymentAmount = payment.Amount * splitRatio;
+
+                    var newPayment = new Payment
+                    {
+                        Id = Guid.NewGuid(),
+                        OrderId = newOrder.Id,
+                        Amount = splitPaymentAmount,
+                        PaymentMethod = payment.PaymentMethod,
+                        PaymentStatus = payment.PaymentStatus,
+                        PaidAt = payment.PaidAt
+                    };
+
+                    orderingContext.Payments.Add(newPayment);
+
+                    payment.Amount -= splitPaymentAmount;
+                }
+            }
+
+            orderingContext.Orders.Add(newOrder);
             await orderingContext.SaveChangesAsync();
 
-            var orderSplitEvent = mapper.Map<OrderSplitBillEvent>(result.Entity);
+            var orderSplitEvent = mapper.Map<OrderSplitBillEvent>(newOrder);
             await eventHandlerService.HandleEventAsync(orderSplitEvent);
 
             return ResultDto<OrderReadDto>.Success(null, HttpStatusCode.Created);
@@ -230,6 +220,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             return ResultDto<OrderReadDto>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
         }
     }
+
 
     public async Task<ResultDto<OrderReadDto>> GetOrder(Guid id)
     {

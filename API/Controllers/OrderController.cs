@@ -20,13 +20,9 @@ public class OrderController(IOrderService orderService) : BaseApiController
     public async Task<IActionResult> CreateDeliveryOrder([FromBody] DeliveryOrderCreateDto deliveryOrderDto) =>
         HandleResult(await orderService.CreateDeliveryOrder(deliveryOrderDto));
 
-    //[HttpPost("{orderId}/pay")]
-    //public async Task<IActionResult> PayOrder([FromQuery] PaymentMethod paymentMethod, Guid orderId) =>
-    //    HandleResult(await orderService.PayOrder(paymentMethod, orderId));
-
     [HttpPost("{orderId}/split")]
-    public async Task<IActionResult> SplitBill([FromBody] SplitBillDto splitBillDto, Guid orderId) =>
-        HandleResult(await orderService.SplitBill(splitBillDto, orderId));
+    public async Task<IActionResult> SplitOrder([FromBody] SplitOrderDto splitOrderDto, Guid orderId) =>
+        HandleResult(await orderService.SplitOrder(splitOrderDto, orderId));
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetOrder(Guid id) =>
