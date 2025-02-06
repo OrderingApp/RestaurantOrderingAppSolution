@@ -22,6 +22,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<ITagService, TagService>();
         services.AddScoped<ICustomerInformationService, CustomerInformationService>();
         services.AddScoped<IReservationService, ReservationService>();
+        services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IEventHandlerService, EventHandlerService>();
 
         // FluentValidation
