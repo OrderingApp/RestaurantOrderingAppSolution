@@ -11,7 +11,6 @@ public class OrderReadDto
     public decimal Discount { get; set; }
     public string OrderStatus { get; set; } = null!;
     public string OrderType { get; set; } = null!;
-    public string PaymentStatus { get; set; } = null!;
 
     public Guid? TableId { get; set; }
     public CustomerInformationReadDto? CustomerInformation { get; set; }

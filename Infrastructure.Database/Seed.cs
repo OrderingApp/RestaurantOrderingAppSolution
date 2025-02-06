@@ -68,7 +68,6 @@ public class Seed
                     OrderDateTime = DateTime.UtcNow,
                     OrderStatus = OrderStatus.Ongoing,
                     OrderType = OrderType.DineIn,
-                    PaymentMethod = PaymentMethod.Card,
                     TableId = tables[0].Id,
                     CustomerInformation = new CustomerInformation
                     {
@@ -84,7 +83,6 @@ public class Seed
                     OrderDateTime = DateTime.UtcNow.AddHours(-2),
                     OrderStatus = OrderStatus.Ongoing,
                     OrderType = OrderType.Delivery,
-                    PaymentMethod = PaymentMethod.Cash,
                     CustomerInformation = new CustomerInformation
                     {
                         Id = Guid.NewGuid(),

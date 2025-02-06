@@ -13,7 +13,6 @@ public class OrderMappingProfile : Profile
             .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems))
             .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.OrderStatus.ToString()))
             .ForMember(dest => dest.OrderType, opt => opt.MapFrom(src => src.OrderType.ToString()))
-            .ForMember(dest => dest.PaymentStatus, opt => opt.MapFrom(src => src.PaymentStatus.ToString()))
             .ForMember(dest => dest.CustomerInformation, opt => opt.MapFrom(src => src.CustomerInformation));
 
         CreateMap<Order, OrderSummaryDto>()

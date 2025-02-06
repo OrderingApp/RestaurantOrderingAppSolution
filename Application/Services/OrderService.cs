@@ -124,37 +124,37 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         }
     }
 
-    public async Task<ResultDto<OrderReadDto>> PayOrder(PaymentMethod paymentMethod, Guid orderId)
-    {
-        try
-        {
-            var order = await orderingContext.Orders
-                .Include(o => o.OrderItems)
-                .FirstOrDefaultAsync(o => o.Id == orderId);
+    //public async Task<ResultDto<OrderReadDto>> PayOrder(PaymentMethod paymentMethod, Guid orderId)
+    //{
+    //    try
+    //    {
+    //        var order = await orderingContext.Orders
+    //            .Include(o => o.OrderItems)
+    //            .FirstOrDefaultAsync(o => o.Id == orderId);
 
-            if (order == null)
-                return ResultDto<OrderReadDto>.Failure("Order not found.", HttpStatusCode.NotFound);
+    //        if (order == null)
+    //            return ResultDto<OrderReadDto>.Failure("Order not found.", HttpStatusCode.NotFound);
 
-            if (order.PaymentStatus == PaymentStatus.Paid)
-                return ResultDto<OrderReadDto>.Failure("Order is already fully paid.", HttpStatusCode.BadRequest);
+    //        if (order.PaymentStatus == PaymentStatus.Paid)
+    //            return ResultDto<OrderReadDto>.Failure("Order is already fully paid.", HttpStatusCode.BadRequest);
 
-            var previousOrderPaymentStatus = order.PaymentStatus;
+    //        var previousOrderPaymentStatus = order.PaymentStatus;
 
-            order.PaymentStatus = PaymentStatus.Paid;
-            await orderingContext.SaveChangesAsync();
+    //        order.PaymentStatus = PaymentStatus.Paid;
+    //        await orderingContext.SaveChangesAsync();
 
-            var updatedOrder = mapper.Map<OrderReadDto>(order);
+    //        var updatedOrder = mapper.Map<OrderReadDto>(order);
 
-            var orderPaidEvent = mapper.Map<OrderPaymentStatusChangedEvent>((order, previousOrderPaymentStatus));
-            await eventHandlerService.HandleEventAsync(orderPaidEvent);
+    //        var orderPaidEvent = mapper.Map<OrderPaymentStatusChangedEvent>((order, previousOrderPaymentStatus));
+    //        await eventHandlerService.HandleEventAsync(orderPaidEvent);
 
-            return ResultDto<OrderReadDto>.Success(updatedOrder, HttpStatusCode.OK);
-        }
-        catch (Exception ex)
-        {
-            return ResultDto<OrderReadDto>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
-        }
-    }
+    //        return ResultDto<OrderReadDto>.Success(updatedOrder, HttpStatusCode.OK);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return ResultDto<OrderReadDto>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+    //    }
+    //}
 
     public async Task<ResultDto<OrderReadDto>> SplitBill(SplitBillDto splitBillDto, Guid orderId)
     {
@@ -171,8 +171,8 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             if (originalOrder == null)
                 return ResultDto<OrderReadDto>.Failure("Order not found.", HttpStatusCode.NotFound);
 
-            if (originalOrder.PaymentStatus == PaymentStatus.Paid || originalOrder.PaymentStatus == PaymentStatus.Cancelled)
-                return ResultDto<OrderReadDto>.Failure("Cannot split a fully paid or canceled order.", HttpStatusCode.BadRequest);
+            //if (originalOrder.PaymentStatus == PaymentStatus.Paid || originalOrder.PaymentStatus == PaymentStatus.Cancelled)
+            //    return ResultDto<OrderReadDto>.Failure("Cannot split a fully paid or canceled order.", HttpStatusCode.BadRequest);
 
             var itemsToSplit = originalOrder.OrderItems
                 .Where(oi => splitBillDto.OrderItemIds.Contains(oi.Id))
@@ -186,7 +186,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 Id = Guid.NewGuid(),
                 OrderDateTime = DateTime.UtcNow,
                 OrderStatus = originalOrder.OrderStatus,
-                PaymentStatus = PaymentStatus.Pending,
+                //PaymentStatus = PaymentStatus.Pending,
                 TableId = originalOrder.TableId,
                 OrderType = originalOrder.OrderType,
                 OrderItems = new List<OrderItem>()
@@ -260,7 +260,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         }
     }
 
-    public async Task<ResultDto<List<OrderReadDto>>> GetAllOrders(OrderStatus? orderStatus, PaymentStatus? paymentStatus)
+    public async Task<ResultDto<List<OrderReadDto>>> GetAllOrders(OrderStatus? orderStatus)
     {
         try
         {
@@ -273,11 +273,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             if (orderStatus.HasValue)
             {
                 query = query.Where(o => o.OrderStatus == orderStatus.Value);
-            }
-
-            if (paymentStatus.HasValue)
-            {
-                query = query.Where(o => o.PaymentStatus == paymentStatus.Value);
             }
 
             var orders = await query.ToListAsync();
@@ -616,7 +611,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
 
         if (order.CustomerInformation != null)
         {
-            orderingContext.CustomerInformation.Remove(order.CustomerInformation);
+            orderingContext.CustomerInformations.Remove(order.CustomerInformation);
             order.CustomerInformation = null;
         }
 
@@ -642,14 +637,14 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 PhoneNumber = phoneNumber,
                 AdditionalInstructions = additionalInstructions
             };
-            orderingContext.CustomerInformation.Add(order.CustomerInformation);
+            orderingContext.CustomerInformations.Add(order.CustomerInformation);
         }
         else
         {
             order.CustomerInformation.PhoneNumber = phoneNumber;
             order.CustomerInformation.AdditionalInstructions = additionalInstructions;
             order.CustomerInformation.Address = null;
-            orderingContext.CustomerInformation.Update(order.CustomerInformation);
+            orderingContext.CustomerInformations.Update(order.CustomerInformation);
         }
     }
 
@@ -669,14 +664,14 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 AdditionalInstructions = additionalInstructions,
                 Address = address
             };
-            orderingContext.CustomerInformation.Add(order.CustomerInformation);
+            orderingContext.CustomerInformations.Add(order.CustomerInformation);
         }
         else
         {
             order.CustomerInformation.PhoneNumber = phoneNumber;
             order.CustomerInformation.AdditionalInstructions = additionalInstructions;
             order.CustomerInformation.Address = address;
-            orderingContext.CustomerInformation.Update(order.CustomerInformation);
+            orderingContext.CustomerInformations.Update(order.CustomerInformation);
         }
     }
 

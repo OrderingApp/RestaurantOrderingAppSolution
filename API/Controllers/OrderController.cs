@@ -21,9 +21,9 @@ public class OrderController(IOrderService orderService) : BaseApiController
     public async Task<IActionResult> CreateDeliveryOrder([FromBody] DeliveryOrderCreateDto deliveryOrderDto) =>
         HandleResult(await orderService.CreateDeliveryOrder(deliveryOrderDto));
 
-    [HttpPost("{orderId}/pay")]
-    public async Task<IActionResult> PayOrder([FromQuery] PaymentMethod paymentMethod, Guid orderId) =>
-        HandleResult(await orderService.PayOrder(paymentMethod, orderId));
+    //[HttpPost("{orderId}/pay")]
+    //public async Task<IActionResult> PayOrder([FromQuery] PaymentMethod paymentMethod, Guid orderId) =>
+    //    HandleResult(await orderService.PayOrder(paymentMethod, orderId));
 
     [HttpPost("{orderId}/split")]
     public async Task<IActionResult> SplitBill([FromBody] SplitBillDto splitBillDto, Guid orderId) =>
@@ -34,8 +34,8 @@ public class OrderController(IOrderService orderService) : BaseApiController
         HandleResult(await orderService.GetOrder(id));
 
     [HttpGet]
-    public async Task<IActionResult> GetAllOrders([FromQuery] OrderStatus? orderStatus, [FromQuery] PaymentStatus? paymentStatus) =>
-        HandleResult(await orderService.GetAllOrders(orderStatus, paymentStatus));
+    public async Task<IActionResult> GetAllOrders([FromQuery] OrderStatus? orderStatus) =>
+        HandleResult(await orderService.GetAllOrders(orderStatus));
 
     [HttpGet("type/{orderType}/ongoing")]
     public async Task<IActionResult> GetOngoingOrdersByType(OrderType orderType) =>

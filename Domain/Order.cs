@@ -4,13 +4,13 @@ public class Order
 {
     public Guid Id { get; set; }
     public DateTime OrderDateTime { get; set; } = DateTime.UtcNow;
-    public decimal TotalAmount { get; set; } = 0;
 
+    public decimal TotalAmount { get; set; } = 0;
     public decimal Discount { get; set; } = 0;
 
     public OrderStatus OrderStatus { get; set; } = OrderStatus.Ongoing;
 
-    public required OrderType OrderType { get; set; }
+    public OrderType OrderType { get; set; }
 
     public List<OrderItem> OrderItems { get; set; } = new();
 
@@ -19,6 +19,8 @@ public class Order
 
     public Guid? CustomerInformationId { get; set; }
     public CustomerInformation? CustomerInformation { get; set; }
+
+    public List<Payment> Payments { get; set; } = new();
 }
 
 public enum OrderStatus

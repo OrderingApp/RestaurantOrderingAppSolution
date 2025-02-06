@@ -31,11 +31,6 @@ public class OrdersEventsMappingProfile : Profile
         CreateMap<Order, OrderDeletedEvent>()
             .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<(Order order, PaymentStatus previousOrderPaymentStatus), OrderPaymentStatusChangedEvent>()
-           .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.order.Id))
-           .ForMember(dest => dest.From, opt => opt.MapFrom(src => src.previousOrderPaymentStatus))
-           .ForMember(dest => dest.To, opt => opt.MapFrom(src => src.order.PaymentStatus));
-
         CreateMap<(Order order, OrderStatus previousOrderStatus), OrderStatusChangedEvent>()
            .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.order.Id))
            .ForMember(dest => dest.From, opt => opt.MapFrom(src => src.previousOrderStatus))

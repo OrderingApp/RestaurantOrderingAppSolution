@@ -30,8 +30,9 @@ public class RestaurantOrderingContext : DbContext
     public DbSet<MenuItemTag> MenuItemTags { get; set; }
     public DbSet<Ingredient> Ingredients { get; set; }
     public DbSet<OrderItemIngredient> OrderItemIngredients { get; set; }
-    public DbSet<CustomerInformation> CustomerInformation { get; set; }
+    public DbSet<CustomerInformation> CustomerInformations { get; set; }
     public DbSet<Reservation> Reservations { get; set; }
+    public DbSet<Payment> Payments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -46,17 +47,24 @@ public class RestaurantOrderingContext : DbContext
             );
 
         modelBuilder.Entity<Order>()
-            .Property(o => o.PaymentStatus)
+            .Property(o => o.OrderType)
+            .HasConversion(
+                ot => ot.ToString(),
+                ot => (OrderType)Enum.Parse(typeof(OrderType), ot)
+            );
+
+        modelBuilder.Entity<Payment>()
+            .Property(p => p.PaymentStatus)
             .HasConversion(
                 ps => ps.ToString(),
                 ps => (PaymentStatus)Enum.Parse(typeof(PaymentStatus), ps)
             );
 
-        modelBuilder.Entity<Order>()
-            .Property(o => o.OrderType)
+        modelBuilder.Entity<Payment>()
+            .Property(p => p.PaymentMethod)
             .HasConversion(
-                ot => ot.ToString(),
-                ot => (OrderType)Enum.Parse(typeof(OrderType), ot)
+                pm => pm.ToString(),
+                pm => (PaymentMethod)Enum.Parse(typeof(PaymentMethod), pm)
             );
 
         modelBuilder.Entity<Ingredient>()
@@ -77,6 +85,13 @@ public class RestaurantOrderingContext : DbContext
             .HasOne(o => o.CustomerInformation)
             .WithOne(ci => ci.Order)
             .HasForeignKey<CustomerInformation>(ci => ci.OrderId);
+
+        // One-To-Many Order and Payments relationship
+        modelBuilder.Entity<Order>()
+            .HasMany(o => o.Payments)
+            .WithOne(p => p.Order)
+            .HasForeignKey(oi => oi.OrderId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         // OrderItem and MenuItem relationship
         modelBuilder.Entity<OrderItem>()

@@ -11,10 +11,10 @@ public interface IOrderService
     Task<ResultDto<OrderReadDto>> CreateDineInOrder(DineInOrderCreateDto dineInOrderDto);
     Task<ResultDto<OrderReadDto>> CreateTakeawayOrder(TakeawayOrderCreateDto takeawayOrderDto);
     Task<ResultDto<OrderReadDto>> CreateDeliveryOrder(DeliveryOrderCreateDto deliveryOrderDto);
-    Task<ResultDto<OrderReadDto>> PayOrder(PaymentMethod paymentMethod, Guid orderId);
+    //Task<ResultDto<OrderReadDto>> PayOrder(PaymentMethod paymentMethod, Guid orderId);
     Task<ResultDto<OrderReadDto>> SplitBill(SplitBillDto splitBillDto, Guid orderId);
     Task<ResultDto<OrderReadDto>> GetOrder(Guid id);
-    Task<ResultDto<List<OrderReadDto>>> GetAllOrders(OrderStatus? orderStatus, PaymentStatus? paymentStatus);
+    Task<ResultDto<List<OrderReadDto>>> GetAllOrders(OrderStatus? orderStatus);
     Task<ResultDto<List<OrderReadDto>>> GetOngoingOrdersByType(OrderType orderType);
     Task<ResultDto<List<OrderReadDto>>> GetOngoingOrdersForTable(Guid tableId);
     Task<ResultDto<OrderReadDto>> ApplyOrderDiscount(decimal discountPercentage, Guid orderId);

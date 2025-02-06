@@ -31,7 +31,7 @@ public class CustomerInformationService(RestaurantOrderingContext orderingContex
             var customerInformation = mapper.Map<CustomerInformation>(customerInformationCreateDto);
             customerInformation.OrderId = orderId;
 
-            var result = await orderingContext.CustomerInformation.AddAsync(customerInformation);
+            var result = await orderingContext.CustomerInformations.AddAsync(customerInformation);
             await orderingContext.SaveChangesAsync();
 
             var customerInformationCreatedEvent = mapper.Map<CustomerInformationCreatedEvent>(result.Entity);
@@ -53,7 +53,7 @@ public class CustomerInformationService(RestaurantOrderingContext orderingContex
     {
         try
         {
-            var customerInformation = await orderingContext.CustomerInformation
+            var customerInformation = await orderingContext.CustomerInformations
                 .FirstOrDefaultAsync(ci => ci.Id == id);
 
             if (customerInformation == null)
@@ -78,7 +78,7 @@ public class CustomerInformationService(RestaurantOrderingContext orderingContex
     {
         try
         {
-            var customerInformations = await orderingContext.CustomerInformation.ToListAsync();
+            var customerInformations = await orderingContext.CustomerInformations.ToListAsync();
 
             var customerInformationsDto = mapper.Map<List<CustomerInformationReadDto>>(customerInformations);
 
@@ -96,7 +96,7 @@ public class CustomerInformationService(RestaurantOrderingContext orderingContex
     {
         try
         {
-            var customerInformation = await orderingContext.CustomerInformation
+            var customerInformation = await orderingContext.CustomerInformations
                 .FirstOrDefaultAsync(ci => ci.Id == id);
 
             if (customerInformation == null)
@@ -127,7 +127,7 @@ public class CustomerInformationService(RestaurantOrderingContext orderingContex
     {
         try
         {
-            var customerInformation = await orderingContext.CustomerInformation
+            var customerInformation = await orderingContext.CustomerInformations
                 .FirstOrDefaultAsync(ci => ci.Id == id);
 
             if (customerInformation == null)
@@ -136,7 +136,7 @@ public class CustomerInformationService(RestaurantOrderingContext orderingContex
                     .Failure("Customer information not found.", HttpStatusCode.NotFound);
             }
 
-            orderingContext.CustomerInformation.Remove(customerInformation);
+            orderingContext.CustomerInformations.Remove(customerInformation);
             await orderingContext.SaveChangesAsync();
 
             var customerInformationDeletedEvent = mapper.Map<CustomerInformationDeletedEvent>(customerInformation);
