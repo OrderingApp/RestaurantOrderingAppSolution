@@ -1,0 +1,10 @@
+@API_HostAddress = http://localhost:5000/api
+
+###
+
+// To get a specific customer's information by their ID.
+
+GET {{API_HostAddress}}/CustomerInformation/EF10FCA7-D8E7-4A27-BA22-50314B804A78
+Accept: application/json
+
+###

@@ -1,0 +1,46 @@
+@API_HostAddress = http://localhost:5000/api
+
+###
+
+// To get a specific order by its ID.
+
+GET {{API_HostAddress}}/Order/03b1ec06-9ef1-498e-ac64-2402906b6372
+Accept: application/json
+
+###
+
+###
+
+// To get all orders (without filtering by status).
+
+GET {{API_HostAddress}}/Order
+Accept: application/json
+
+###
+
+###
+
+// To get all orders filtered by status (e.g., only "Ongoing" orders).
+
+GET {{API_HostAddress}}/Order?orderStatus=Ongoing
+Accept: application/json
+
+###
+
+###
+
+// To get all Finished orders.
+
+GET {{API_HostAddress}}/Order?orderStatus=Finished
+Accept: application/json
+
+###
+
+###
+
+// To get all cancelled orders.
+
+GET {{API_HostAddress}}/Order?orderStatus=Cancelled
+Accept: application/json
+
+###

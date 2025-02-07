@@ -1,0 +1,15 @@
+@API_HostAddress = http://localhost:5000/api
+
+###
+
+// To create a new menu category.
+
+POST {{API_HostAddress}}/MenuCategory
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Appetizers"
+}
+
+###

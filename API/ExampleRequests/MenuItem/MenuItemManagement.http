@@ -1,0 +1,25 @@
+@API_HostAddress = http://localhost:5000/api
+
+// To update an existing menu item.
+
+PUT {{API_HostAddress}}/MenuItem/f17610d5-9e2c-48c3-acf2-b6f7e56b0d25
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "BBQ Chicken Pizza",
+  "description": "Grilled chicken, BBQ sauce, and red onions",
+  "price": 12.50,
+  "tagIds": [
+    "5D5243FB-32C0-4414-8653-61087B18F80B"
+  ]
+}
+
+###
+
+// To delete an existing menu item.
+
+DELETE {{API_HostAddress}}/MenuItem/f17610d5-9e2c-48c3-acf2-b6f7e56b0d25
+Accept: application/json
+
+###

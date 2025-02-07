@@ -15,9 +15,6 @@ public class IngredientUpdateDtoValidator : AbstractValidator<IngredientUpdateDt
         RuleFor(x => x.Price)
             .GreaterThanOrEqualTo(0).WithMessage("Price must be a non-negative value.");
 
-        RuleFor(x => x.IngredientType)
-            .IsInEnum().WithMessage("Invalid ingredient type.");
-
         RuleFor(x => x.IsUsed)
             .NotNull().WithMessage("IsUsed flag is required.");
     }

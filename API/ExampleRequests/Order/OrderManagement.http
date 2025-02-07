@@ -1,0 +1,175 @@
+@API_HostAddress = http://localhost:5000/api
+
+// Use this for order example you need to copy Id
+POST {{API_HostAddress}}/Order/dinein
+Content-Type: application/json
+Accept: application/json
+
+{
+  "orderDateTime": "2026-02-07T12:00:00Z",
+  "tableId": "C9B75583-CAB5-457B-B87B-C89B9E2E6A36",
+  "orderItems": [
+    {
+      "menuItemId": "AF7FD522-493E-4987-ABB0-4CDE845745AD",
+      "specialInstructions": "No onions, extra cheese",
+      "ingredients": [
+        {
+          "ingredientId": "DFCC60D2-E025-45FD-9FE0-BC6198335E3B",
+          "quantity": 2
+        },
+        {
+          "ingredientId": "3EBB3F19-ED25-4FE5-B17B-2FC369A4FADC",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "menuItemId": "6EDD0176-C9EF-4F10-9693-F502CD2257B6",
+      "specialInstructions": null
+    }
+  ]
+}
+
+###
+
+// Split an order by moving specific items from one order to another.
+
+POST {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/split
+Content-Type: application/json
+Accept: application/json
+
+{
+  "orderItemIds": [
+    "72a57583-87d3-4c58-9a60-988bb7a5cf9b"
+  ]
+}
+
+###
+
+// To apply a discount to an existing order.
+
+PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/apply-discount?discount=10
+Accept: application/json
+
+###
+
+// Create a Table and Extract tableId
+POST {{API_HostAddress}}/Table
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Test Table",
+  "numberOfPeople": 4
+}
+
+###
+
+
+// To change the table assigned to an order.
+
+// 1. Create a table
+// 2. Create order with created table,
+// 3. Create table and proceed with change table
+
+PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/change-table
+Content-Type: application/json
+Accept: application/json
+
+"e54c100c-1bdf-4944-826d-af3316bca0c5"
+
+###
+
+// To update the status of an order.
+
+PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/status
+Content-Type: application/json
+Accept: application/json
+
+"Finished"
+
+###
+
+// To update the type of an order, changing it from **Dine-In to Takeaway**.
+
+PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/type?newOrderType=Takeaway
+Content-Type: application/json
+Accept: application/json
+
+{
+  "phoneNumber": "123456789"
+}
+
+###
+
+// To update the type of an order, changing it from **Dine-In to Delivery**.
+
+PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/type?newOrderType=Delivery
+Content-Type: application/json
+Accept: application/json
+
+{
+  "phoneNumber": "987654321",
+  "address": "456 New Street, City",
+  "additionalInstructions": "Ring the doorbell twice."
+}
+
+###
+
+// To update the type of an order, changing it from **Delivery to Dine-In**.
+
+PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/type?newOrderType=DineIn
+Content-Type: application/json
+Accept: application/json
+
+{
+  "tableId": "e54c100c-1bdf-4944-826d-af3316bca0c5"
+}
+
+
+###
+
+// To update the type of an order, changing it from **Delivery to Takeaway**.
+
+PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/type?newOrderType=Takeaway
+Content-Type: application/json
+Accept: application/json
+
+{
+  "phoneNumber": "555666777"
+}
+
+###
+
+// To update the type of an order, changing it from **Takeaway to Dine-In**.
+
+PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/type?newOrderType=DineIn
+Content-Type: application/json
+Accept: application/json
+
+{
+  "tableId": "e54c100c-1bdf-4944-826d-af3316bca0c5"
+}
+
+###
+
+// To update the type of an order, changing it from **Takeaway to Delivery**.
+
+PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/type?newOrderType=Delivery
+Content-Type: application/json
+Accept: application/json
+
+{
+  "phoneNumber": "888999000",
+  "address": "789 Delivery Street, City",
+  "additionalInstructions": "Leave near the mailbox."
+}
+
+###
+
+// To delete an existing order.
+
+DELETE {{API_HostAddress}}/Order/fd8d1d7f-81ce-4207-8bd1-61f6467c100d
+Accept: application/json
+
+###

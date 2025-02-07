@@ -1,0 +1,29 @@
+@API_HostAddress = http://localhost:5000/api
+
+// To get a specific menu item by its ID.
+
+GET {{API_HostAddress}}/MenuItem/f17610d5-9e2c-48c3-acf2-b6f7e56b0d25
+Accept: application/json
+
+###
+
+// To get all menu items.
+
+GET {{API_HostAddress}}/MenuItem
+Accept: application/json
+
+###
+
+// To get menu items by category (without tag filtering).
+
+GET {{API_HostAddress}}/MenuItem/category/c258340a-53b5-4038-a86d-afde2a88996b
+Accept: application/json
+
+###
+
+// To get menu items by category with a specific tag.
+
+GET {{API_HostAddress}}/MenuItem/category/c258340a-53b5-4038-a86d-afde2a88996b?tagId=0B6A9800-1BF0-4A5E-8D04-A4EB28281A05
+Accept: application/json
+
+###

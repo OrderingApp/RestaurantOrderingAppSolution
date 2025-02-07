@@ -1,0 +1,17 @@
+@API_HostAddress = http://localhost:5000/api
+
+###
+
+// To update a customer's information.
+
+PUT {{API_HostAddress}}/CustomerInformation/EF10FCA7-D8E7-4A27-BA22-50314B804A78
+Content-Type: application/json
+Accept: application/json
+
+{
+  "phoneNumber": "987654321",
+  "additionalInstructions": "Deliver to the back door.",
+  "address": "123 New Street, City"
+}
+
+###

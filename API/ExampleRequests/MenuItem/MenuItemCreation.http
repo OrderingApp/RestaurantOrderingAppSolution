@@ -1,0 +1,37 @@
+@API_HostAddress = http://localhost:5000/api
+
+###
+
+// To create a new menu category.
+
+POST {{API_HostAddress}}/MenuCategory
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Appetizers"
+}
+
+###
+
+
+###
+
+// To create a new menu item.
+
+POST {{API_HostAddress}}/MenuItem
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Margherita Pizza",
+  "description": "Classic pizza with tomato, mozzarella, and basil",
+  "price": 10.99,
+  "menuCategoryId": "c258340a-53b5-4038-a86d-afde2a88996b",
+  "tagIds": [
+    "0B6A9800-1BF0-4A5E-8D04-A4EB28281A05",
+    "5D5243FB-32C0-4414-8653-61087B18F80B"
+  ]
+}
+
+###

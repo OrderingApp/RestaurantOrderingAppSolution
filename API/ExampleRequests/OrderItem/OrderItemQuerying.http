@@ -1,0 +1,17 @@
+@API_HostAddress = http://localhost:5000/api
+
+// To get a specific order item by its ID.
+
+GET {{API_HostAddress}}/OrderItem/2ce10c11-4936-42c3-a8f6-7f02e575d31f
+Accept: application/json
+
+###
+
+###
+
+// To get all order items for a specific order.
+
+GET {{API_HostAddress}}/OrderItem/21b2af68-4041-48ef-bb9b-3a21627d6777/order-items
+Accept: application/json
+
+###

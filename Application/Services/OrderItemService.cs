@@ -50,10 +50,11 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
 
             order.TotalAmount = RecalculateOrderTotal(order);
 
-            var orderItemsAddedEvent = mapper.Map<MenuItemCreatedEvent>(order);
-            await eventHandlerService.HandleEventAsync(orderItemsAddedEvent);
-
             await orderingContext.SaveChangesAsync();
+
+
+            var orderItemsAddedEvent = mapper.Map<OrderItemAddedEvent>(order);
+            await eventHandlerService.HandleEventAsync(orderItemsAddedEvent);
 
             var updatedOrderDto = mapper.Map<OrderReadDto>(order);
             return ResultDto<OrderReadDto>
@@ -232,10 +233,12 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
                 return ResultDto<bool>
                     .Failure("Order Item not found.", HttpStatusCode.NotFound);
 
+            var deletedOrderItemId = orderItem.Id;
+
             orderingContext.OrderItems.Remove(orderItem);
             await orderingContext.SaveChangesAsync();
 
-            var orderItemDeletedEvent = mapper.Map<OrderItemDeletedEvent>(orderItem);
+            var orderItemDeletedEvent = new OrderItemDeletedEvent { OrderItemId = deletedOrderItemId };
             await eventHandlerService.HandleEventAsync(orderItemDeletedEvent);
 
             return ResultDto<bool>

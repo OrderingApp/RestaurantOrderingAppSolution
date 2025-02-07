@@ -1,0 +1,30 @@
+@API_HostAddress = http://localhost:5000/api
+
+###
+
+// To add order items to an existing order.
+POST {{API_HostAddress}}/OrderItem/3796e430-5bfe-4d45-ab74-427f7ed7c813/items
+Content-Type: application/json
+Accept: application/json
+
+[
+  {
+    "menuItemId": "296de039-aa76-41c8-a481-cb671e83cff6",
+    "specialInstructions": "Extra cheese, no onions",
+    "ingredients": [
+      {
+        "ingredientId": "7185c838-ed58-4b2a-b439-acbff28fecfb",
+        "quantity": 2
+      },
+      {
+        "ingredientId": "b8461e8e-bbb1-4fff-8ace-9c2460390538",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "menuItemId": "6edd0176-c9ef-4f10-9693-f502cd2257b6",
+    "specialInstructions": null,
+    "ingredients": []
+  }
+]

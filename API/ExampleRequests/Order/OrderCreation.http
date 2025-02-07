@@ -1,0 +1,106 @@
+@API_HostAddress = http://localhost:5000/api
+
+// To create one dineIn order with 2 order items. 
+// One order item with 2 extra ingredients and one without extra ingredients.
+
+POST {{API_HostAddress}}/Order/dinein
+Content-Type: application/json
+Accept: application/json
+
+{
+  "orderDateTime": "2026-02-07T12:00:00Z",
+  "tableId": "367d061a-aad9-4f38-8257-36cc71916924",
+  "orderItems": [
+    {
+      "menuItemId": "6EDD0176-C9EF-4F10-9693-F502CD2257B6",
+      "specialInstructions": "No onions, extra cheese",
+      "ingredients": [
+        {
+          "ingredientId": "B8461E8E-BBB1-4FFF-8ACE-9C2460390538",
+          "quantity": 2
+        },
+        {
+          "ingredientId": "C8F9CB59-D588-49C0-9C43-DA589ED4543C",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "menuItemId": "AF7FD522-493E-4987-ABB0-4CDE845745AD",
+      "specialInstructions": null
+    }
+  ]
+}
+
+###
+
+// To create one takeaway order with 2 order items. 
+// One order item with 2 extra ingredients and one without extra ingredients.
+
+POST {{API_HostAddress}}/Order/takeaway
+Content-Type: application/json
+Accept: application/json
+
+{
+  "orderDateTime": "2026-02-07T12:30:00Z",
+  "phoneNumber": "123456789",
+  "additionalInstructions": "Please call on arrival.",
+  "orderItems": [
+    {
+      "menuItemId": "6EDD0176-C9EF-4F10-9693-F502CD2257B6",
+      "specialInstructions": "No onions, extra cheese",
+      "ingredients": [
+        {
+          "ingredientId": "B8461E8E-BBB1-4FFF-8ACE-9C2460390538",
+          "quantity": 2
+        },
+        {
+          "ingredientId": "C8F9CB59-D588-49C0-9C43-DA589ED4543C",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "menuItemId": "AF7FD522-493E-4987-ABB0-4CDE845745AD",
+      "specialInstructions": null
+    }
+  ]
+}
+
+###
+
+// To create one delivery order with 2 order items. 
+// One order item with 2 extra ingredients and one without extra ingredients.
+
+POST {{API_HostAddress}}/Order/delivery
+Content-Type: application/json
+Accept: application/json
+
+{
+  "orderDateTime": "2026-02-07T13:00:00Z",
+  "phoneNumber": "123456789",
+  "address": "123 Main Street, City, Country",
+  "additionalInstructions": "Leave at the doorstep.",
+  "orderItems": [
+    {
+      "menuItemId": "6EDD0176-C9EF-4F10-9693-F502CD2257B6",
+      "specialInstructions": "Extra spicy",
+      "ingredients": [
+        {
+          "ingredientId": "B8461E8E-BBB1-4FFF-8ACE-9C2460390538",
+          "quantity": 2
+        },
+        {
+          "ingredientId": "C8F9CB59-D588-49C0-9C43-DA589ED4543C",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "menuItemId": "AF7FD522-493E-4987-ABB0-4CDE845745AD",
+      "specialInstructions": null
+    }
+  ]
+}
+
+###

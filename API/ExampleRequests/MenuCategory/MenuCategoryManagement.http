@@ -1,0 +1,22 @@
+@API_HostAddress = http://localhost:5000/api
+
+// To update an existing menu category.
+
+PUT {{API_HostAddress}}/MenuCategory/0135f22f-8d28-4286-98c1-1eda42816779
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Starters",
+  "isUsed": true,
+  "isDeleted": false
+}
+
+###
+
+// To delete an existing menu category.
+
+DELETE {{API_HostAddress}}/MenuCategory/0135f22f-8d28-4286-98c1-1eda42816779
+Accept: application/json
+
+###

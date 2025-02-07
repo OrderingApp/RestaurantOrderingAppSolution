@@ -1,0 +1,15 @@
+@API_HostAddress = http://localhost:5000/api
+
+// To get all ingredients.
+
+GET {{API_HostAddress}}/Ingredients
+Accept: application/json
+
+###
+
+// To get a specific ingredient by its ID.
+
+GET {{API_HostAddress}}/Ingredients/7185c838-ed58-4b2a-b439-acbff28fecfb
+Accept: application/json
+
+###

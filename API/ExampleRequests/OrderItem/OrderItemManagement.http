@@ -1,0 +1,37 @@
+@API_HostAddress = http://localhost:5000/api
+
+// To apply a discount to a specific order item.
+
+PUT {{API_HostAddress}}/OrderItem/21b2af68-4041-48ef-bb9b-3a21627d6777/order-items/2ce10c11-4936-42c3-a8f6-7f02e575d31f/apply-discount?discount=10
+Accept: application/json
+
+###
+
+###
+
+// To update an order item.
+
+PUT {{API_HostAddress}}/OrderItem/21b2af68-4041-48ef-bb9b-3a21627d6777/items/2ce10c11-4936-42c3-a8f6-7f02e575d31f
+Content-Type: application/json
+Accept: application/json
+
+{
+  "specialInstructions": "Add extra mushrooms",
+  "ingredients": [
+    {
+      "ingredientId": "7185c838-ed58-4b2a-b439-acbff28fecfb",
+      "quantity": 3
+    }
+  ]
+}
+
+###
+
+###
+
+// To delete an order item.
+
+DELETE {{API_HostAddress}}/OrderItem/2ce10c11-4936-42c3-a8f6-7f02e575d31f
+Accept: application/json
+
+###
