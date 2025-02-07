@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(RestaurantOrderingContext))]
-    partial class RestaurantOrderingContextModelSnapshot : ModelSnapshot
+    [Migration("20250207153802_CustomerInformationExpectedOrderCompletionAndOrderCompletionType")]
+    partial class CustomerInformationExpectedOrderCompletionAndOrderCompletionType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
@@ -41,9 +44,6 @@ namespace Infrastructure.Database.Migrations
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("PreferedPaymentMethod")
-                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

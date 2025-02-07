@@ -1,6 +1,6 @@
 ﻿using Application.Dtos.OrderItems;
 
-namespace Application.Dtos.Orders.OrderCreate;
+namespace Application.Dtos.Orders.OrderDineIn;
 
 public class DineInOrderCreateDto
 {

@@ -1,5 +1,7 @@
 ﻿using Application.Dtos.Orders;
-using Application.Dtos.Orders.OrderCreate;
+using Application.Dtos.Orders.OrderDelivery;
+using Application.Dtos.Orders.OrderDineIn;
+using Application.Dtos.Orders.OrderTakeAway;
 using AutoMapper;
 using Domain;
 

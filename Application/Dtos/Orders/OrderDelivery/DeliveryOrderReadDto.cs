@@ -1,27 +1,15 @@
-﻿namespace Domain;
+﻿using Domain;
 
-public class CustomerInformation
+namespace Application.Dtos.Orders.OrderDelivery;
+
+public class DeliveryOrderReadDto
 {
-    public Guid Id { get; set; }
+    public Guid DeliveryOrderId { get; set; }
     public string PhoneNumber { get; set; } = null!;
     public string? AdditionalInstructions { get; set; }
-    public string? Address { get; set; } 
+    public string Address { get; set; } = null!;
     public DateTime? ExpectedOrderCompletion { get; set; }
+
     public OrderCompletionType OrderCompletionType { get; set; } = OrderCompletionType.Immediate;
     public PreferedPaymentMethod PreferedPaymentMethod { get; set; }
-
-    public Guid OrderId { get; set; }
-    public Order? Order { get; set; }
-}
-
-public enum OrderCompletionType
-{
-    Immediate,
-    Scheduled
-}
-
-public enum PreferedPaymentMethod
-{
-    Card,
-    Cash
 }

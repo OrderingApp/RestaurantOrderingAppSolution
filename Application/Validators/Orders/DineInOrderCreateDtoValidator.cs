@@ -1,4 +1,4 @@
-﻿using Application.Dtos.Orders.OrderCreate;
+﻿using Application.Dtos.Orders.OrderDineIn;
 using FluentValidation;
 
 public class DineInOrderCreateDtoValidator : AbstractValidator<DineInOrderCreateDto>

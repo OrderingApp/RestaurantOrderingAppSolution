@@ -1,4 +1,4 @@
-﻿using Application.Dtos.Orders.OrderCreate;
+﻿using Application.Dtos.Orders.OrderTakeAway;
 using FluentValidation;
 
 public class TakeawayOrderCreateDtoValidator : AbstractValidator<TakeawayOrderCreateDto>
