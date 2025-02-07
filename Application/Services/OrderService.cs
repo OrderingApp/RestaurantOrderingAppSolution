@@ -128,8 +128,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
     {
         try
         {
-            //TO FIX
-
             var originalOrder = await orderingContext.Orders
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.MenuItem)
@@ -141,6 +139,9 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
 
             if (originalOrder == null)
                 return ResultDto<OrderReadDto>.Failure("Order not found.", HttpStatusCode.NotFound);
+
+            if (originalOrder.Payments.Any(p => p.PaymentStatus == PaymentStatus.Paid))
+                return ResultDto<OrderReadDto>.Failure("Cannot split an order that has payments.", HttpStatusCode.BadRequest);
 
             var itemsToSplit = originalOrder.OrderItems
                 .Where(oi => splitOrderDto.OrderItemIds.Contains(oi.Id))
@@ -156,56 +157,13 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 OrderStatus = originalOrder.OrderStatus,
                 TableId = originalOrder.TableId,
                 OrderType = originalOrder.OrderType,
-                OrderItems = new List<OrderItem>()
+                OrderItems = mapper.Map<List<OrderItem>>(itemsToSplit)
             };
 
-            foreach (var item in itemsToSplit)
-            {
-                var newItem = new OrderItem
-                {
-                    Id = Guid.NewGuid(),
-                    MenuItemId = item.MenuItemId,
-                    Price = item.Price,
-                    Quantity = item.Quantity,
-                    SpecialInstructions = item.SpecialInstructions,
-                    OrderItemIngredients = item.OrderItemIngredients.Select(ingredient => new OrderItemIngredient
-                    {
-                        IngredientId = ingredient.IngredientId,
-                        Quantity = ingredient.Quantity
-                    }).ToList()
-                };
+            originalOrder.OrderItems.RemoveAll(oi => itemsToSplit.Contains(oi));
 
-                newOrder.OrderItems.Add(newItem);
-                originalOrder.OrderItems.Remove(item);
-            }
-
-            originalOrder.TotalAmount = originalOrder.OrderItems.Sum(item => item.Price * item.Quantity);
-            newOrder.TotalAmount = newOrder.OrderItems.Sum(item => item.Price * item.Quantity);
-
-            if (originalOrder.Payments.Any())
-            {
-                var totalPaid = originalOrder.Payments.Where(p => p.PaymentStatus == PaymentStatus.Paid).Sum(p => p.Amount);
-                var splitRatio = newOrder.TotalAmount / (originalOrder.TotalAmount + newOrder.TotalAmount);
-
-                foreach (var payment in originalOrder.Payments.ToList())
-                {
-                    var splitPaymentAmount = payment.Amount * splitRatio;
-
-                    var newPayment = new Payment
-                    {
-                        Id = Guid.NewGuid(),
-                        OrderId = newOrder.Id,
-                        Amount = splitPaymentAmount,
-                        PaymentMethod = payment.PaymentMethod,
-                        PaymentStatus = payment.PaymentStatus,
-                        PaidAt = payment.PaidAt
-                    };
-
-                    orderingContext.Payments.Add(newPayment);
-
-                    payment.Amount -= splitPaymentAmount;
-                }
-            }
+            originalOrder.TotalAmount = Math.Max(0, originalOrder.OrderItems.Sum(item => item.Price * item.Quantity));
+            newOrder.TotalAmount = Math.Max(0, newOrder.OrderItems.Sum(item => item.Price * item.Quantity));
 
             orderingContext.Orders.Add(newOrder);
             await orderingContext.SaveChangesAsync();
@@ -220,7 +178,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             return ResultDto<OrderReadDto>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
         }
     }
-
 
     public async Task<ResultDto<OrderReadDto>> GetOrder(Guid id)
     {
