@@ -102,7 +102,6 @@ public class Seed
                     Id = Guid.NewGuid(),
                     MenuItemId = menuItems[0].Id,
                     OrderId = orders[0].Id,
-                    Quantity = 2,
                     Price = 5.00M * 2,
                     SpecialInstructions = "Extra cheese"
                 },
@@ -111,7 +110,6 @@ public class Seed
                     Id = Guid.NewGuid(),
                     MenuItemId = menuItems[2].Id,
                     OrderId = orders[1].Id,
-                    Quantity = 1,
                     Price = 15.00M,
                     SpecialInstructions = "Add extra pepperoni"
                 }

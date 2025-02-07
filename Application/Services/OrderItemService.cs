@@ -1,6 +1,5 @@
 ﻿using Application.Contracts;
 using Application.Dtos.Common;
-using Application.Dtos.OrderItemIngredients;
 using Application.Dtos.OrderItems;
 using Application.Dtos.Orders;
 using AutoMapper;
@@ -42,23 +41,14 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
                     return ResultDto<OrderReadDto>
                         .Failure($"MenuItem with ID {dto.MenuItemId} not found.", HttpStatusCode.BadRequest);
 
-                var existingItem = order.OrderItems
-                    .FirstOrDefault(oi => oi.MenuItemId == dto.MenuItemId);
-                if (existingItem != null)
-                {
-                    existingItem.Quantity += dto.Quantity;
-                    order.TotalAmount += menuItem.Price * dto.Quantity;
-                }
-                else
-                {
-                    var orderItem = mapper.Map<OrderItem>(dto);
-                    orderItem.Price = menuItem.Price;
-                    orderItem.OrderId = orderId;
+                var orderItem = mapper.Map<OrderItem>(dto);
+                orderItem.Price = menuItem.Price;
+                orderItem.OrderId = orderId;
 
-                    await orderingContext.OrderItems.AddAsync(orderItem);
-                    order.TotalAmount += orderItem.Price * orderItem.Quantity;
-                }
+                await orderingContext.OrderItems.AddAsync(orderItem);
             }
+
+            order.TotalAmount = RecalculateOrderTotal(order);
 
             var orderItemsAddedEvent = mapper.Map<MenuItemCreatedEvent>(order);
             await eventHandlerService.HandleEventAsync(orderItemsAddedEvent);
@@ -143,7 +133,6 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
                 return ResultDto<OrderReadDto>.Failure("Invalid discount percentage.", HttpStatusCode.BadRequest);
 
             item.Discount = discountPercentage;
-
             item.Price = item.Price * (1 - discountPercentage / 100);
 
             order.TotalAmount = RecalculateOrderTotal(order);
@@ -174,10 +163,7 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
                 return ResultDto<OrderItemReadDto>
                     .Failure("Order item not found.", HttpStatusCode.NotFound);
 
-            if(updateDto.Quantity > 0) 
-                orderItem.Quantity = updateDto.Quantity;
-
-            if(!string.IsNullOrWhiteSpace(updateDto.SpecialInstructions))
+            if (!string.IsNullOrWhiteSpace(updateDto.SpecialInstructions))
                 orderItem.SpecialInstructions = updateDto.SpecialInstructions;
 
             if (updateDto.Ingredients.Any())
@@ -193,14 +179,14 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
                     var existingIngredient = orderItem.OrderItemIngredients
                         .FirstOrDefault(oii => oii.IngredientId == ingredientDto.IngredientId);
 
-                    if(existingIngredient != null)
+                    if (existingIngredient != null)
                     {
                         existingIngredient.Quantity = ingredientDto.Quantity;
                     }
                     else
                     {
                         var ingredient = validIngredients.FirstOrDefault(i => i.Id == ingredientDto.IngredientId);
-                        if(ingredient != null)
+                        if (ingredient != null)
                         {
                             orderItem.OrderItemIngredients.Add(new OrderItemIngredient
                             {
@@ -264,7 +250,7 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
 
     private decimal RecalculateOrderTotal(Order order)
     {
-        var total = order.OrderItems.Sum(oi => oi.Price * oi.Quantity);
+        var total = order.OrderItems.Sum(oi => oi.Price);
 
         if (order.Discount > 0)
         {

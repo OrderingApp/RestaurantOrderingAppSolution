@@ -6,9 +6,6 @@ public class OrderItemCreateDtoValidator : AbstractValidator<OrderItemCreateDto>
     public OrderItemCreateDtoValidator()
     {
 
-        RuleFor(x => x.Quantity)
-            .GreaterThan(0).WithMessage("Quantity must be greater than zero.");
-
         RuleFor(x => x.MenuItemId)
             .NotEmpty().WithMessage("MenuItemId is required.");
 

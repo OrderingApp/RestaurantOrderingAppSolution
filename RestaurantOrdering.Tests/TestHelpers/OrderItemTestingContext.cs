@@ -9,7 +9,6 @@ public static class OrderItemTestingContext
         Id = Guid.NewGuid(),
         MenuItemId = Guid.NewGuid(),
         Price = 10,
-        Quantity = 2,
         SpecialInstructions = "Test item 1",
         OrderItemIngredients = new List<OrderItemIngredient>()
     };

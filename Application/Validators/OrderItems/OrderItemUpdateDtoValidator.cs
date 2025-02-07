@@ -7,9 +7,6 @@ public class OrderItemUpdateDtoValidator : AbstractValidator<OrderItemUpdateDto>
 {
     public OrderItemUpdateDtoValidator()
     {
-        RuleFor(x => x.Quantity)
-            .GreaterThanOrEqualTo(0).WithMessage("Quantity must be zero or greater.");
-
         RuleFor(x => x.SpecialInstructions)
             .MaximumLength(500).WithMessage("Special instructions must not exceed 500 characters.");
 

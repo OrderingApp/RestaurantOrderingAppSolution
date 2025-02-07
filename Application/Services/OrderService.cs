@@ -32,15 +32,10 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 return ResultDto<OrderReadDto>
                     .Failure("Specified table does not exist.", HttpStatusCode.BadRequest);
 
-            if (table.IsOccupied)
-                return ResultDto<OrderReadDto>
-                    .Failure("The specified table is already occupied.", HttpStatusCode.Conflict);
-
             table.IsOccupied = true;
 
-
             dineInOrder.OrderItems = await PopulateOrderItemsAsync(dineInOrderDto.OrderItems, dineInOrder.Id);
-            dineInOrder.TotalAmount = dineInOrder.OrderItems.Sum(oi => oi.Price * oi.Quantity);
+            dineInOrder.TotalAmount = dineInOrder.OrderItems.Sum(oi => oi.Price);
 
             var result = await orderingContext.Orders.AddAsync(dineInOrder);
             await orderingContext.SaveChangesAsync();
@@ -74,7 +69,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             takeawayOrder.CustomerInformation.OrderId = takeawayOrder.Id;
 
             takeawayOrder.OrderItems = await PopulateOrderItemsAsync(takeawayOrderDto.OrderItems, takeawayOrder.Id);
-            takeawayOrder.TotalAmount = takeawayOrder.OrderItems.Sum(oi => oi.Price * oi.Quantity);
+            takeawayOrder.TotalAmount = takeawayOrder.OrderItems.Sum(oi => oi.Price);
 
             var result = await orderingContext.Orders.AddAsync(takeawayOrder);
             await orderingContext.SaveChangesAsync();
@@ -104,7 +99,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             deliveryOrder.CustomerInformation.OrderId = deliveryOrder.Id;
 
             deliveryOrder.OrderItems = await PopulateOrderItemsAsync(deliveryOrderDto.OrderItems, deliveryOrder.Id);
-            deliveryOrder.TotalAmount = deliveryOrder.OrderItems.Sum(oi => oi.Price * oi.Quantity);
+            deliveryOrder.TotalAmount = deliveryOrder.OrderItems.Sum(oi => oi.Price);
 
             var result = await orderingContext.Orders.AddAsync(deliveryOrder);
             await orderingContext.SaveChangesAsync();
@@ -162,8 +157,8 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
 
             originalOrder.OrderItems.RemoveAll(oi => itemsToSplit.Contains(oi));
 
-            originalOrder.TotalAmount = Math.Max(0, originalOrder.OrderItems.Sum(item => item.Price * item.Quantity));
-            newOrder.TotalAmount = Math.Max(0, newOrder.OrderItems.Sum(item => item.Price * item.Quantity));
+            originalOrder.TotalAmount = Math.Max(0, originalOrder.OrderItems.Sum(item => item.Price));
+            newOrder.TotalAmount = Math.Max(0, newOrder.OrderItems.Sum(item => item.Price));
 
             orderingContext.Orders.Add(newOrder);
             await orderingContext.SaveChangesAsync();
@@ -342,10 +337,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             if (newTable == null)
                 return ResultDto<OrderReadDto>
                     .Failure("Specified table does not exist.", HttpStatusCode.BadRequest);
-
-            if (newTable.IsOccupied)
-                return ResultDto<OrderReadDto>
-                    .Failure("The specified table is already occupied.", HttpStatusCode.Conflict);
 
             if (order.TableId.HasValue)
             {
@@ -552,9 +543,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         if (table == null)
             throw new ArgumentException("Specified table does not exist.");
 
-        if (table.IsOccupied)
-            throw new InvalidOperationException("Specified table is already occupied.");
-
         table.IsOccupied = true;
 
         if (order.CustomerInformation != null)
@@ -634,7 +622,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
 
     private decimal RecalculateOrderTotal(Order order)
     {
-        var total = order.OrderItems.Sum(oi => oi.Price * oi.Quantity);
+        var total = order.OrderItems.Sum(oi => oi.Price);
 
         if (order.Discount > 0)
         {
