@@ -33,6 +33,7 @@
         "cypress": "^14.0.2",
         "eslint": "^9",
         "eslint-config-next": "15.1.6",
+        "eslint-plugin-prefer-arrow": "^1.2.3",
         "jsdom": "^26.0.0",
         "postcss": "^8",
         "prettier": "3.4.2",

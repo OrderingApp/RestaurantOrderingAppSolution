@@ -2,11 +2,12 @@
   "scripts": {
     "prepare": "husky",
     "lint:frontend": "npm run lint --prefix frontend",
-    "vitest:frontend": "npm run test --prefix frontend",
+    "prettier:frontend": "npm run prettier:check --prefix frontend",
+    "vitest:frontend": "npm run vitest:run --prefix frontend",
     "cypress:frontend": "npm run cypress --prefix frontend",
     "test:frontend": "npm run test --prefix frontend",
     "test:frontend:run": "npm run test:run --prefix frontend",
-    "check:frontend": "npm run lint:frontend && npm run vitest:frontend"
+    "check:frontend": "npm run prettier:frontend && npm run lint:frontend && npm run vitest:frontend"
   },
   "devDependencies": {
     "husky": "^9.1.7"

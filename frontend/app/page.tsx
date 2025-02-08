@@ -1,5 +1,7 @@
 import { Button } from '@/components/shared/Button/Index';
 
-export default function Home() {
+const Home = () => {
     return <Button />;
-}
+};
+
+export default Home;
