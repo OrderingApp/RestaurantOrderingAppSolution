@@ -1,3 +1,19 @@
-import Link from 'next/link';
+import { type ReactNode } from 'react';
 
-export const Button = () => <Link href="/about">Elo</Link>;
+type ButtonProps = {
+    onClick?: () => void;
+    className?: string;
+    children: ReactNode;
+};
+
+export const Button = ({
+    children,
+    onClick = () => {},
+    className,
+}: ButtonProps) => {
+    return (
+        <button className={`btn ${className || ''}`} onClick={() => onClick()}>
+            {children}
+        </button>
+    );
+};
