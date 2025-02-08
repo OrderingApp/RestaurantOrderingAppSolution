@@ -1,4 +1,6 @@
 using API.Extensions;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,8 +23,20 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    // Enable XML comments
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 
+    // Define basic Swagger info
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Restaurant API",
+        Version = "v1",
+        Description = "This API manages orders, menu items, tags, tables, and reservations."
+    });
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
