@@ -5,10 +5,8 @@ using AutoMapper;
 using Domain;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
-using RestaurantOrdering.Events.Application;
 using RestaurantOrdering.Events.Application.Contracts;
 using RestaurantOrdering.Events.Domain.CustomerInformations;
-using RestaurantOrdering.Events.Domain.Orders.CreatingOrder;
 using System.Net;
 
 namespace Application.Services;

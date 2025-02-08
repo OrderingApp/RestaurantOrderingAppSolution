@@ -188,8 +188,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             if (order == null)
                 return ResultDto<OrderReadDto>
                     .Failure("Order not found", HttpStatusCode.NotFound);
-
-            var orderDto = mapper.Map<OrderReadDto>(order);
+                        var orderDto = mapper.Map<OrderReadDto>(order);
 
             return ResultDto<OrderReadDto>
                 .Success(orderDto, HttpStatusCode.OK);

@@ -21,8 +21,8 @@ public class PaymentController(IPaymentService paymentService) : BaseApiControll
     [HttpPost("{orderId}")]
     [ProducesResponseType(201)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> CreatePayment([FromBody] PaymentCreateDto paymentDto, Guid orderId) =>
-        HandleResult(await paymentService.CreatePayment(paymentDto, orderId));
+    public async Task<IActionResult> AddPayment([FromBody] PaymentCreateDto paymentDto, Guid orderId) =>
+        HandleResult(await paymentService.AddPayment(paymentDto, orderId));
 
     /// <summary>
     /// Retrieves all payments for a specific order.
