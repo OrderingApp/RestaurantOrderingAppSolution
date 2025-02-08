@@ -33,7 +33,6 @@ Accept: application/json
 }
 
 ###
-
 // To create one takeaway order with 2 order items. 
 // One order item with 2 extra ingredients and one without extra ingredients.
 
@@ -45,30 +44,34 @@ Accept: application/json
   "orderDateTime": "2026-02-07T12:30:00Z",
   "phoneNumber": "123456789",
   "additionalInstructions": "Please call on arrival.",
+  "orderCompletionType": "Immediate",
+  "preferedPaymentMethod": "Cash",
+  "expectedOrderCompletion": null,
   "orderItems": [
     {
-      "menuItemId": "6EDD0176-C9EF-4F10-9693-F502CD2257B6",
+      "menuItemId": "0BD3199D-F0A5-4044-8364-208BECDE5963",
       "specialInstructions": "No onions, extra cheese",
       "ingredients": [
         {
-          "ingredientId": "B8461E8E-BBB1-4FFF-8ACE-9C2460390538",
+          "ingredientId": "5A3CAF55-301A-41E5-911C-8985DB41660B",
           "quantity": 2
         },
         {
-          "ingredientId": "C8F9CB59-D588-49C0-9C43-DA589ED4543C",
+          "ingredientId": "878DD702-A80C-4A29-B831-9EE98C3B6906",
           "quantity": 1
         }
       ]
     },
     {
-      "menuItemId": "AF7FD522-493E-4987-ABB0-4CDE845745AD",
-      "specialInstructions": null
+      "menuItemId": "69FE84B9-DCBC-49BD-BDE4-0993A9E39345",
+      "specialInstructions": null,
+      "ingredients": []
     }
   ]
 }
 
-###
 
+###
 // To create one delivery order with 2 order items. 
 // One order item with 2 extra ingredients and one without extra ingredients.
 
@@ -81,26 +84,31 @@ Accept: application/json
   "phoneNumber": "123456789",
   "address": "123 Main Street, City, Country",
   "additionalInstructions": "Leave at the doorstep.",
+  "orderCompletionType": "Immediate",
+  "preferedPaymentMethod": "Card",
+  "expectedOrderCompletion": null,
   "orderItems": [
     {
-      "menuItemId": "6EDD0176-C9EF-4F10-9693-F502CD2257B6",
+      "menuItemId": "0BD3199D-F0A5-4044-8364-208BECDE5963",
       "specialInstructions": "Extra spicy",
       "ingredients": [
         {
-          "ingredientId": "B8461E8E-BBB1-4FFF-8ACE-9C2460390538",
+          "ingredientId": "5A3CAF55-301A-41E5-911C-8985DB41660B",
           "quantity": 2
         },
         {
-          "ingredientId": "C8F9CB59-D588-49C0-9C43-DA589ED4543C",
+          "ingredientId": "878DD702-A80C-4A29-B831-9EE98C3B6906",
           "quantity": 1
         }
       ]
     },
     {
-      "menuItemId": "AF7FD522-493E-4987-ABB0-4CDE845745AD",
-      "specialInstructions": null
+      "menuItemId": "69FE84B9-DCBC-49BD-BDE4-0993A9E39345",
+      "specialInstructions": null,
+      "ingredients": []
     }
   ]
 }
+
 
 ###

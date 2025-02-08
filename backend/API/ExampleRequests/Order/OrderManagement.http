@@ -111,11 +111,13 @@ Accept: application/json
 {
   "phoneNumber": "987654321",
   "address": "456 New Street, City",
-  "additionalInstructions": "Ring the doorbell twice."
+  "additionalInstructions": "Ring the doorbell twice.",
+  "orderCompletionType": "Immediate",
+  "preferedPaymentMethod": "Card",
+  "expectedOrderCompletion": null
 }
 
 ###
-
 // To update the type of an order, changing it from **Delivery to Dine-In**.
 
 PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/type?newOrderType=DineIn
@@ -131,13 +133,18 @@ Accept: application/json
 
 // To update the type of an order, changing it from **Delivery to Takeaway**.
 
-PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/type?newOrderType=Takeaway
+PUT {{API_HostAddress}}/Order/c687376e-56ae-4be8-85c8-04d67e986e4c/type?newOrderType=Takeaway
 Content-Type: application/json
 Accept: application/json
 
 {
-  "phoneNumber": "555666777"
+  "phoneNumber": "555666777",
+  "additionalInstructions": "I'll pick it up at 1:00 PM.",
+  "orderCompletionType": "Immediate",
+  "preferedPaymentMethod": "Cash",
+  "expectedOrderCompletion": null
 }
+
 
 ###
 
@@ -155,15 +162,19 @@ Accept: application/json
 
 // To update the type of an order, changing it from **Takeaway to Delivery**.
 
-PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/type?newOrderType=Delivery
+PUT {{API_HostAddress}}/Order/c687376e-56ae-4be8-85c8-04d67e986e4c/type?newOrderType=Delivery
 Content-Type: application/json
 Accept: application/json
 
 {
   "phoneNumber": "888999000",
   "address": "789 Delivery Street, City",
-  "additionalInstructions": "Leave near the mailbox."
+  "additionalInstructions": "Leave near the mailbox.",
+  "orderCompletionType": "Immediate",
+  "preferedPaymentMethod": "Card",
+  "expectedOrderCompletion": null
 }
+
 
 ###
 

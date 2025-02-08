@@ -188,7 +188,9 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             if (order == null)
                 return ResultDto<OrderReadDto>
                     .Failure("Order not found", HttpStatusCode.NotFound);
-                        var orderDto = mapper.Map<OrderReadDto>(order);
+
+            var orderDto = mapper.Map<OrderReadDto>(order);
+
 
             return ResultDto<OrderReadDto>
                 .Success(orderDto, HttpStatusCode.OK);
@@ -571,7 +573,11 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             order.CustomerInformation = new CustomerInformation
             {
                 PhoneNumber = phoneNumber,
-                AdditionalInstructions = additionalInstructions
+                AdditionalInstructions = additionalInstructions,
+                OrderId = order.Id,
+                OrderCompletionType = OrderCompletionType.Immediate,
+                PreferedPaymentMethod = PreferedPaymentMethod.Cash,
+                ExpectedOrderCompletion = null
             };
             orderingContext.CustomerInformations.Add(order.CustomerInformation);
         }
@@ -580,6 +586,10 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             order.CustomerInformation.PhoneNumber = phoneNumber;
             order.CustomerInformation.AdditionalInstructions = additionalInstructions;
             order.CustomerInformation.Address = null;
+            order.CustomerInformation.OrderCompletionType = OrderCompletionType.Immediate;
+            order.CustomerInformation.PreferedPaymentMethod = PreferedPaymentMethod.Cash;
+            order.CustomerInformation.ExpectedOrderCompletion = null;
+
             orderingContext.CustomerInformations.Update(order.CustomerInformation);
         }
     }
@@ -596,9 +606,13 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         {
             order.CustomerInformation = new CustomerInformation
             {
+                OrderId = order.Id,
                 PhoneNumber = phoneNumber,
                 AdditionalInstructions = additionalInstructions,
-                Address = address
+                Address = address,
+                OrderCompletionType = OrderCompletionType.Immediate,
+                PreferedPaymentMethod = PreferedPaymentMethod.Cash,
+                ExpectedOrderCompletion = null
             };
             orderingContext.CustomerInformations.Add(order.CustomerInformation);
         }
@@ -607,6 +621,10 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             order.CustomerInformation.PhoneNumber = phoneNumber;
             order.CustomerInformation.AdditionalInstructions = additionalInstructions;
             order.CustomerInformation.Address = address;
+            order.CustomerInformation.OrderCompletionType = OrderCompletionType.Immediate;
+            order.CustomerInformation.PreferedPaymentMethod = PreferedPaymentMethod.Cash;
+            order.CustomerInformation.ExpectedOrderCompletion = null;
+
             orderingContext.CustomerInformations.Update(order.CustomerInformation);
         }
     }
