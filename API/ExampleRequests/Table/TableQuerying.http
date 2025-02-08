@@ -1,0 +1,13 @@
+@API_HostAddress = http://localhost:5000/api
+
+// To get a specific table by its ID.
+GET {{API_HostAddress}}/Table/3fe3e456-28ff-4d1a-8747-2654243f9794
+Accept: application/json
+
+###
+// To get all tables.
+
+GET {{API_HostAddress}}/Table
+Accept: application/json
+
+###

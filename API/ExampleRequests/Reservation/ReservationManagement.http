@@ -1,0 +1,29 @@
+@API_HostAddress = http://localhost:5000/api
+
+// To assign a table to a reservation.
+
+PUT {{API_HostAddress}}/Reservation/e5923a9a-b482-4955-83de-13bc5180b9d8/table/CD226385-8F34-4ADF-BD08-9C812B4763A0
+Accept: application/json
+
+###
+
+// To update an existing reservation.
+
+PUT {{API_HostAddress}}/Reservation/e5923a9a-b482-4955-83de-13bc5180b9d8
+Content-Type: application/json
+Accept: application/json
+
+{
+  "reservationDateTime": "2025-02-11T20:00:00Z",
+  "numberOfPeople": 5,
+  "tableId": "F960CF2D-2529-4E0B-A3E5-1E691AE9CAC3"
+}
+
+###
+
+// To delete an existing reservation.
+
+DELETE {{API_HostAddress}}/Reservation/e5923a9a-b482-4955-83de-13bc5180b9d8
+Accept: application/json
+
+###

@@ -1,0 +1,32 @@
+@API_HostAddress = http://localhost:5000/api
+
+// To update an existing table.
+
+PUT {{API_HostAddress}}/Table/21b2af68-4041-48ef-bb9b-3a21627d6777
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Family Table",
+  "numberOfPeople": 6,
+  "isUsed": true
+}
+
+###
+// To update the occupancy status of a table.
+
+PUT {{API_HostAddress}}/Table/21b2af68-4041-48ef-bb9b-3a21627d6777/updateOccupancy
+Content-Type: application/json
+Accept: application/json
+
+{
+  "isOccupied": true
+}
+
+###
+// To delete an existing table.
+
+DELETE {{API_HostAddress}}/Table/21b2af68-4041-48ef-bb9b-3a21627d6777
+Accept: application/json
+
+###

@@ -1,0 +1,21 @@
+@API_HostAddress = http://localhost:5000/api
+
+###
+// To get a specific reservation by its ID.
+
+GET {{API_HostAddress}}/Reservation/e5923a9a-b482-4955-83de-13bc5180b9d8
+Accept: application/json
+
+###
+// To get all reservations.
+
+GET {{API_HostAddress}}/Reservation
+Accept: application/json
+
+###
+// To get reservations for a specific date.
+
+GET {{API_HostAddress}}/Reservation/by-date?date=2025-02-10
+Accept: application/json
+
+###
