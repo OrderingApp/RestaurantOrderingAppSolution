@@ -24,7 +24,7 @@ public class PaymentService(RestaurantOrderingContext orderingContext, IEventHan
             if (order == null)
                 return ResultDto<PaymentReadDto>.Failure("Order not found", HttpStatusCode.NotFound);
 
-            var totalPaid = order.Payments.Where(p => p.PaymentStatus == PaymentStatus.Paid).Sum(p => p.Amount);
+            var totalPaid = order.Payments.Sum(p => p.Amount);
 
             if (totalPaid + paymentDto.Amount > order.TotalAmount)
                 return ResultDto<PaymentReadDto>.Failure("Payment exceeds order total.", HttpStatusCode.BadRequest);
@@ -34,6 +34,12 @@ public class PaymentService(RestaurantOrderingContext orderingContext, IEventHan
 
             orderingContext.Payments.Add(payment);
             await orderingContext.SaveChangesAsync();
+
+            if (totalPaid + payment.Amount >= order.TotalAmount)
+            {
+                order.OrderStatus = OrderStatus.Finished;
+                await orderingContext.SaveChangesAsync();
+            }
 
             var paymentReadDto = mapper.Map<PaymentReadDto>(payment);
 
@@ -68,42 +74,6 @@ public class PaymentService(RestaurantOrderingContext orderingContext, IEventHan
         catch (Exception ex)
         {
             return ResultDto<List<PaymentReadDto>>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
-        }
-    }
-
-    public async Task<ResultDto<PaymentReadDto>> UpdatePaymentStatus(PaymentStatus paymentStatus, Guid paymentId)
-    {
-        try
-        {
-            var payment = await orderingContext.Payments.FindAsync(paymentId);
-            if (payment == null)
-                return ResultDto<PaymentReadDto>.Failure("Payment not found", HttpStatusCode.NotFound);
-
-            if (payment.PaymentStatus == PaymentStatus.Paid && paymentStatus == PaymentStatus.Pending)
-                return ResultDto<PaymentReadDto>.Failure("Cannot revert a paid payment to pending.", HttpStatusCode.BadRequest);
-
-            if(payment.PaymentStatus == PaymentStatus.Cancelled)
-            return ResultDto<PaymentReadDto>.Failure("Cannot update a cancelled payment.", HttpStatusCode.BadRequest);
-
-            var previousPaymentStatus = payment.PaymentStatus;
-
-            payment.PaymentStatus = paymentStatus;
-            if (paymentStatus == PaymentStatus.Paid)
-                payment.PaidAt = DateTime.UtcNow;
-
-            await orderingContext.SaveChangesAsync();
-
-            var paymentReadDto = mapper.Map<PaymentReadDto>(payment);
-
-            var statusChangedEvent = mapper.Map<PaymentStatusChangedEvent>((payment, previousPaymentStatus));
-            await eventHandlerService.HandleEventAsync(statusChangedEvent);
-
-            return ResultDto<PaymentReadDto>.Success(paymentReadDto, HttpStatusCode.OK);
-        }
-        catch (Exception ex)
-        {
-            return ResultDto<PaymentReadDto>
                 .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
         }
     }

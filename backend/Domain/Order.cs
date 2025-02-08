@@ -26,6 +26,7 @@ public class Order
 public enum OrderStatus
 {
     Ongoing,
+    PendingPayment,
     Finished,
     Cancelled
 }

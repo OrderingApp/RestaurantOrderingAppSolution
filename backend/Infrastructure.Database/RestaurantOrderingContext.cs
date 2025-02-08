@@ -54,13 +54,6 @@ public class RestaurantOrderingContext : DbContext
             );
 
         modelBuilder.Entity<Payment>()
-            .Property(p => p.PaymentStatus)
-            .HasConversion(
-                ps => ps.ToString(),
-                ps => (PaymentStatus)Enum.Parse(typeof(PaymentStatus), ps)
-            );
-
-        modelBuilder.Entity<Payment>()
             .Property(p => p.PaymentMethod)
             .HasConversion(
                 pm => pm.ToString(),

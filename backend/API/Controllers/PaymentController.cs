@@ -34,20 +34,4 @@ public class PaymentController(IPaymentService paymentService) : BaseApiControll
     [ProducesResponseType(200)]
     public async Task<IActionResult> GetAllOrderPayments(Guid orderId) =>
         HandleResult(await paymentService.GetAllOrderPayments(orderId));
-
-    /// <summary>
-    /// Updates the status of a specific payment.
-    /// </summary>
-    /// <param name="paymentId">The ID of the payment to update.</param>
-    /// <param name="paymentStatus">The new status of the payment.</param>
-    /// <returns>The updated payment status.</returns>
-    /// <response code="200">If the update was successful.</response>
-    /// <response code="400">If the request is invalid.</response>
-    /// <response code="404">If the payment is not found.</response>
-    [HttpPatch("{paymentId}/status")]
-    [ProducesResponseType(200)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(404)]
-    public async Task<IActionResult> UpdatePaymentStatus([FromBody] PaymentStatus paymentStatus, Guid paymentId) =>
-        HandleResult(await paymentService.UpdatePaymentStatus(paymentStatus, paymentId));
 }

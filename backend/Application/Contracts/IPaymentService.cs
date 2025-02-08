@@ -8,5 +8,4 @@ public interface IPaymentService
 {
     Task<ResultDto<PaymentReadDto>> CreatePayment(PaymentCreateDto paymentDto, Guid orderId);
     Task<ResultDto<List<PaymentReadDto>>> GetAllOrderPayments(Guid orderId);
-    Task<ResultDto<PaymentReadDto>> UpdatePaymentStatus(PaymentStatus paymentStatus, Guid paymentId);
 }

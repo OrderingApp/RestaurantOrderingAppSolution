@@ -11,7 +11,6 @@ public class PaymentMappingProfile : Profile
         CreateMap<Payment, PaymentReadDto>();
 
         CreateMap<PaymentCreateDto, Payment>()
-            .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
-            .ForMember(dest => dest.PaymentStatus, opt => opt.MapFrom(_ => PaymentStatus.Pending));
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()));
     }
 }

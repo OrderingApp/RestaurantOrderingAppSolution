@@ -137,9 +137,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             if (originalOrder == null)
                 return ResultDto<OrderReadDto>.Failure("Order not found.", HttpStatusCode.NotFound);
 
-            if (originalOrder.Payments.Any(p => p.PaymentStatus == PaymentStatus.Paid))
-                return ResultDto<OrderReadDto>.Failure("Cannot split an order that has payments.", HttpStatusCode.BadRequest);
-
             var itemsToSplit = originalOrder.OrderItems
                 .Where(oi => splitOrderDto.OrderItemIds.Contains(oi.Id))
                 .ToList();
