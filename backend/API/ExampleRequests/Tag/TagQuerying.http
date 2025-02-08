@@ -1,0 +1,13 @@
+@API_HostAddress = http://localhost:5000/api
+
+// To get all tags.
+GET {{API_HostAddress}}/Tags
+Accept: application/json
+
+###
+// To get a specific tag by its ID.
+
+GET {{API_HostAddress}}/Tags/f78f23dd-33b4-4669-a27c-d70880f3cd2d
+Accept: application/json
+
+###

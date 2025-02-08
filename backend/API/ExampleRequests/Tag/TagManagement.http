@@ -1,0 +1,19 @@
+@API_HostAddress = http://localhost:5000/api
+
+// To update an existing tag.
+PUT {{API_HostAddress}}/Tags/f78f23dd-33b4-4669-a27c-d70880f3cd2d
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Extra Spicy",
+  "isUsed": true
+}
+
+###
+// To delete an existing tag.
+
+DELETE {{API_HostAddress}}/Tags/f78f23dd-33b4-4669-a27c-d70880f3cd2d
+Accept: application/json
+
+###
