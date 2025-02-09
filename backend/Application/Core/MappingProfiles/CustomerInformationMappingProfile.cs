@@ -11,9 +11,6 @@ public class CustomerInformationMappingProfile : Profile
         // Mapping from Domain to Read DTO
         CreateMap<CustomerInformation, CustomerInformationReadDto>();
 
-        // Mapping from Create DTO to Domain
-        CreateMap<CustomerInformationCreateDto, CustomerInformation>();
-
         // Mapping from Update DTO to Domain
         CreateMap<CustomerInformationUpdateDto, CustomerInformation>();
     }

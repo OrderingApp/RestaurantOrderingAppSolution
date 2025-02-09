@@ -13,7 +13,7 @@ namespace Application.Services;
 
 public class PaymentService(RestaurantOrderingContext orderingContext, IEventHandlerService eventHandlerService, IMapper mapper) : IPaymentService
 {
-    public async Task<ResultDto<PaymentReadDto>> CreatePayment(PaymentCreateDto paymentDto, Guid orderId)
+    public async Task<ResultDto<PaymentReadDto>> AddPayment(PaymentCreateDto paymentDto, Guid orderId)
     {
         try
         {
@@ -23,6 +23,9 @@ public class PaymentService(RestaurantOrderingContext orderingContext, IEventHan
 
             if (order == null)
                 return ResultDto<PaymentReadDto>.Failure("Order not found", HttpStatusCode.NotFound);
+
+            if (order.OrderStatus != OrderStatus.PendingPayment)
+                return ResultDto<PaymentReadDto>.Failure("Order must be in Pending Payment status to add payment.", HttpStatusCode.BadRequest);
 
             var totalPaid = order.Payments.Sum(p => p.Amount);
 
@@ -35,6 +38,7 @@ public class PaymentService(RestaurantOrderingContext orderingContext, IEventHan
             orderingContext.Payments.Add(payment);
             await orderingContext.SaveChangesAsync();
 
+            // If fully paid, update status to Finished
             if (totalPaid + payment.Amount >= order.TotalAmount)
             {
                 order.OrderStatus = OrderStatus.Finished;

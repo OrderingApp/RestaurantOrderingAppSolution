@@ -1,5 +1,4 @@
 ﻿using Application.Dtos.Common;
-using Application.Dtos.OrderItems;
 using Application.Dtos.Orders;
 using Application.Dtos.Orders.OrderDelivery;
 using Application.Dtos.Orders.OrderDineIn;
@@ -17,6 +16,8 @@ public interface IOrderService
     Task<ResultDto<OrderReadDto>> GetOrder(Guid id);
     Task<ResultDto<List<OrderReadDto>>> GetAllOrders(OrderStatus? orderStatus);
     Task<ResultDto<List<OrderReadDto>>> GetOngoingOrdersByType(OrderType orderType);
+    Task<ResultDto<List<TakeawayOrderSummaryReadDto>>> GetOngoingOrdersForTakeaway();
+    Task<ResultDto<List<DeliveryOrderSummaryReadDto>>> GetOngoingOrdersForDelivery();
     Task<ResultDto<List<OrderReadDto>>> GetOngoingOrdersForTable(Guid tableId);
     Task<ResultDto<OrderReadDto>> ApplyOrderDiscount(decimal discountPercentage, Guid orderId);
     Task<ResultDto<OrderReadDto>> ChangeOrderTable(Guid orderId, Guid newTableId);

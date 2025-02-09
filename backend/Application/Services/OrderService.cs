@@ -191,6 +191,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
 
             var orderDto = mapper.Map<OrderReadDto>(order);
 
+
             return ResultDto<OrderReadDto>
                 .Success(orderDto, HttpStatusCode.OK);
 
@@ -253,6 +254,58 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         catch (Exception ex)
         {
             return ResultDto<List<OrderReadDto>>
+                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+        }
+    }
+
+    public async Task<ResultDto<List<TakeawayOrderSummaryReadDto>>> GetOngoingOrdersForTakeaway()
+    {
+        try
+        {
+            var orders = await orderingContext.Orders
+                .Where(o => o.OrderType == OrderType.Takeaway && o.OrderStatus == OrderStatus.Ongoing)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.MenuItem)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.OrderItemIngredients)
+                        .ThenInclude(oii => oii.Ingredient)
+                .Include(o => o.CustomerInformation)
+                .ToListAsync();
+
+            var orderDtos = mapper.Map<List<TakeawayOrderSummaryReadDto>>(orders);
+
+            return ResultDto<List<TakeawayOrderSummaryReadDto>>
+                .Success(orderDtos, HttpStatusCode.OK);
+        }
+        catch (Exception ex)
+        {
+            return ResultDto<List<TakeawayOrderSummaryReadDto>>
+                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+        }
+    }
+
+    public async Task<ResultDto<List<DeliveryOrderSummaryReadDto>>> GetOngoingOrdersForDelivery()
+    {
+        try
+        {
+            var orders = await orderingContext.Orders
+                .Where(o => o.OrderType == OrderType.Delivery && o.OrderStatus == OrderStatus.Ongoing)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.MenuItem)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.OrderItemIngredients)
+                        .ThenInclude(oii => oii.Ingredient)
+                .Include(o => o.CustomerInformation)
+                .ToListAsync();
+
+            var orderDtos = mapper.Map<List<DeliveryOrderSummaryReadDto>>(orders);
+
+            return ResultDto<List<DeliveryOrderSummaryReadDto>>
+                .Success(orderDtos, HttpStatusCode.OK);
+        }
+        catch (Exception ex)
+        {
+            return ResultDto<List<DeliveryOrderSummaryReadDto>>
                 .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
         }
     }
@@ -572,7 +625,11 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             order.CustomerInformation = new CustomerInformation
             {
                 PhoneNumber = phoneNumber,
-                AdditionalInstructions = additionalInstructions
+                AdditionalInstructions = additionalInstructions,
+                OrderId = order.Id,
+                OrderCompletionType = OrderCompletionType.Immediate,
+                PreferedPaymentMethod = PreferedPaymentMethod.Cash,
+                ExpectedOrderCompletion = null
             };
             orderingContext.CustomerInformations.Add(order.CustomerInformation);
         }
@@ -581,6 +638,10 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             order.CustomerInformation.PhoneNumber = phoneNumber;
             order.CustomerInformation.AdditionalInstructions = additionalInstructions;
             order.CustomerInformation.Address = null;
+            order.CustomerInformation.OrderCompletionType = OrderCompletionType.Immediate;
+            order.CustomerInformation.PreferedPaymentMethod = PreferedPaymentMethod.Cash;
+            order.CustomerInformation.ExpectedOrderCompletion = null;
+
             orderingContext.CustomerInformations.Update(order.CustomerInformation);
         }
     }
@@ -597,9 +658,13 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         {
             order.CustomerInformation = new CustomerInformation
             {
+                OrderId = order.Id,
                 PhoneNumber = phoneNumber,
                 AdditionalInstructions = additionalInstructions,
-                Address = address
+                Address = address,
+                OrderCompletionType = OrderCompletionType.Immediate,
+                PreferedPaymentMethod = PreferedPaymentMethod.Cash,
+                ExpectedOrderCompletion = null
             };
             orderingContext.CustomerInformations.Add(order.CustomerInformation);
         }
@@ -608,6 +673,10 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             order.CustomerInformation.PhoneNumber = phoneNumber;
             order.CustomerInformation.AdditionalInstructions = additionalInstructions;
             order.CustomerInformation.Address = address;
+            order.CustomerInformation.OrderCompletionType = OrderCompletionType.Immediate;
+            order.CustomerInformation.PreferedPaymentMethod = PreferedPaymentMethod.Cash;
+            order.CustomerInformation.ExpectedOrderCompletion = null;
+
             orderingContext.CustomerInformations.Update(order.CustomerInformation);
         }
     }
