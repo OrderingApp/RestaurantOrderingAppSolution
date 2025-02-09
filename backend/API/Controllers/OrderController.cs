@@ -123,6 +123,17 @@ public class OrderController(IOrderService orderService) : BaseApiController
         HandleResult(await orderService.ChangeOrderTable(orderId, newTableId));
 
     /// <summary>
+    /// Closes an order and processes revenue.
+    /// </summary>
+    /// <param name="orderCloseDto">The order details to close.</param>
+    /// <returns>Returns success if the order is closed.</returns>
+    [HttpPost("close")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CloseOrder([FromBody] OrderCloseDto orderCloseDto) =>
+        HandleResult(await orderService.CloseOrder(orderCloseDto));
+
+    /// <summary>
     /// Updates the status of an order.
     /// </summary>
     /// <param name="id">The order ID.</param>

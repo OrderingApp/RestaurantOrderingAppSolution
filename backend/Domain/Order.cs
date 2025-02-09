@@ -27,7 +27,7 @@ public enum OrderStatus
 {
     Ongoing,
     PendingPayment,
-    Finished,
+    Closed,
     Cancelled
 }
 
