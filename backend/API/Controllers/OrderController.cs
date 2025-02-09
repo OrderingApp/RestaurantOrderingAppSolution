@@ -82,6 +82,25 @@ public class OrderController(IOrderService orderService) : BaseApiController
         HandleResult(await orderService.GetAllOrders(orderStatus));
 
     /// <summary>
+    /// Retrieves all ongoing takeaway orders.
+    /// </summary>
+    /// <returns>A list of ongoing takeaway orders.</returns>
+    [HttpGet("takeawayOrders")]
+    [ProducesResponseType(200)]
+    public async Task<IActionResult> GetOngoingOrdersForTakeaway() =>
+        HandleResult(await orderService.GetOngoingOrdersForTakeaway());
+
+    /// <summary>
+    /// Retrieves all ongoing delivery orders.
+    /// </summary>
+    /// <returns>A list of ongoing delivery orders.</returns>
+    [HttpGet("deliveryOrders")]
+    [ProducesResponseType(200)]
+    public async Task<IActionResult> GetOngoingOrdersForDelivery() =>
+        HandleResult(await orderService.GetOngoingOrdersForDelivery());
+
+
+    /// <summary>
     /// Applies a discount to an existing order.
     /// </summary>
     /// <param name="orderId">The ID of the order.</param>

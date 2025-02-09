@@ -258,6 +258,58 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         }
     }
 
+    public async Task<ResultDto<List<TakeawayOrderSummaryReadDto>>> GetOngoingOrdersForTakeaway()
+    {
+        try
+        {
+            var orders = await orderingContext.Orders
+                .Where(o => o.OrderType == OrderType.Takeaway && o.OrderStatus == OrderStatus.Ongoing)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.MenuItem)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.OrderItemIngredients)
+                        .ThenInclude(oii => oii.Ingredient)
+                .Include(o => o.CustomerInformation)
+                .ToListAsync();
+
+            var orderDtos = mapper.Map<List<TakeawayOrderSummaryReadDto>>(orders);
+
+            return ResultDto<List<TakeawayOrderSummaryReadDto>>
+                .Success(orderDtos, HttpStatusCode.OK);
+        }
+        catch (Exception ex)
+        {
+            return ResultDto<List<TakeawayOrderSummaryReadDto>>
+                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+        }
+    }
+
+    public async Task<ResultDto<List<DeliveryOrderSummaryReadDto>>> GetOngoingOrdersForDelivery()
+    {
+        try
+        {
+            var orders = await orderingContext.Orders
+                .Where(o => o.OrderType == OrderType.Delivery && o.OrderStatus == OrderStatus.Ongoing)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.MenuItem)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.OrderItemIngredients)
+                        .ThenInclude(oii => oii.Ingredient)
+                .Include(o => o.CustomerInformation)
+                .ToListAsync();
+
+            var orderDtos = mapper.Map<List<DeliveryOrderSummaryReadDto>>(orders);
+
+            return ResultDto<List<DeliveryOrderSummaryReadDto>>
+                .Success(orderDtos, HttpStatusCode.OK);
+        }
+        catch (Exception ex)
+        {
+            return ResultDto<List<DeliveryOrderSummaryReadDto>>
+                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+        }
+    }
+
     public async Task<ResultDto<List<OrderReadDto>>> GetOngoingOrdersForTable(Guid tableId)
     {
         try

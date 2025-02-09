@@ -1,11 +1,10 @@
 ﻿using Application.Dtos.CustomerInformations;
 
-namespace Application.Dtos.Orders.OrderTakeAway;
+namespace Application.Dtos.Orders.OrderDelivery;
 
-public class TakeawayOrderSummaryReadDto
+public class DeliveryOrderSummaryReadDto
 {
-    public Guid TakeawayOrderId { get; set; }
+    public Guid DeliveryOrderId { get; set; }
     public decimal OrderTotal { get; set; }
-
     public CustomerInformationReadDto? CustomerInformation { get; set; }
 }
