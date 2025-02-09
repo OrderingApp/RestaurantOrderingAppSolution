@@ -31,7 +31,8 @@ public class OrderItemMappingProfile : Profile
             .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
             .ForMember(dest => dest.OrderId, opt => opt.Ignore())
             .ForMember(dest => dest.Price, opt => opt.Ignore())
-            .ForMember(dest => dest.MenuItemId, opt => opt.MapFrom(src => src.MenuItemId));
+            .ForMember(dest => dest.MenuItemId, opt => opt.MapFrom(src => src.MenuItemId))
+            .ForMember(dest => dest.OrderItemIngredients, opt => opt.MapFrom(src => src.Ingredients));
 
         CreateMap<OrderItemUpdateDto, OrderItem>();
 
@@ -39,6 +40,9 @@ public class OrderItemMappingProfile : Profile
             .ForMember(dest => dest.IngredientName, opt => opt.MapFrom(src => src.Ingredient.Name))
             .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Ingredient.Price));
 
-        CreateMap<OrderItemIngredientAddDto, OrderItemIngredient>();
+        CreateMap<OrderItemIngredientAddDto, OrderItemIngredient>()
+            .ForMember(dest => dest.OrderItemId, opt => opt.Ignore())
+            .ForMember(dest => dest.IngredientId, opt => opt.MapFrom(src => src.IngredientId))
+            .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity));
     }
 }

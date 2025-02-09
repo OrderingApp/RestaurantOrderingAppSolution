@@ -25,14 +25,14 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
     {
         try
         {
-            var dineInOrder = mapper.Map<Order>(dineInOrderDto);
-
             var table = await orderingContext.Tables
                 .FirstOrDefaultAsync(t => t.Id == dineInOrderDto.TableId);
 
             if (table == null)
                 return ResultDto<OrderReadDto>
                     .Failure("Specified table does not exist.", HttpStatusCode.BadRequest);
+
+            var dineInOrder = mapper.Map<Order>(dineInOrderDto);
 
             table.IsOccupied = true;
 
@@ -61,14 +61,11 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
     {
         try
         {
-            var takeawayOrder = mapper.Map<Order>(takeawayOrderDto);
-
-            if(string.IsNullOrWhiteSpace(takeawayOrderDto.PhoneNumber))
+            if (string.IsNullOrWhiteSpace(takeawayOrderDto.CustomerInformation.PhoneNumber))
                 return ResultDto<OrderReadDto>
                     .Failure("Phone number is required for takeaway orders.", HttpStatusCode.BadRequest);
 
-            takeawayOrder.CustomerInformation = mapper.Map<CustomerInformation>(takeawayOrderDto);
-            takeawayOrder.CustomerInformation.OrderId = takeawayOrder.Id;
+            var takeawayOrder = mapper.Map<Order>(takeawayOrderDto);
 
             takeawayOrder.OrderItems = await PopulateOrderItemsAsync(takeawayOrderDto.OrderItems, takeawayOrder.Id);
             takeawayOrder.TotalAmount = takeawayOrder.OrderItems.Sum(oi => oi.Price);
@@ -95,10 +92,16 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
     {
         try
         {
-            var deliveryOrder = mapper.Map<Order>(deliveryOrderDto);
 
-            deliveryOrder.CustomerInformation = mapper.Map<CustomerInformation>(deliveryOrderDto);
-            deliveryOrder.CustomerInformation.OrderId = deliveryOrder.Id;
+            if (string.IsNullOrWhiteSpace(deliveryOrderDto.CustomerInformation.PhoneNumber))
+                return ResultDto<OrderReadDto>
+                    .Failure("Phone number is required for delivery orders.", HttpStatusCode.BadRequest);
+
+            if (string.IsNullOrWhiteSpace(deliveryOrderDto.CustomerInformation.Address))
+                return ResultDto<OrderReadDto>
+                    .Failure("Address is required for delivery orders.", HttpStatusCode.BadRequest);
+
+            var deliveryOrder = mapper.Map<Order>(deliveryOrderDto);
 
             deliveryOrder.OrderItems = await PopulateOrderItemsAsync(deliveryOrderDto.OrderItems, deliveryOrder.Id);
             deliveryOrder.TotalAmount = deliveryOrder.OrderItems.Sum(oi => oi.Price);
@@ -219,32 +222,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             }
 
             var orders = await query.ToListAsync();
-
-            var orderDtos = mapper.Map<List<OrderReadDto>>(orders);
-
-            return ResultDto<List<OrderReadDto>>
-                .Success(orderDtos, HttpStatusCode.OK);
-        }
-        catch (Exception ex)
-        {
-            return ResultDto<List<OrderReadDto>>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
-        }
-    }
-
-    public async Task<ResultDto<List<OrderReadDto>>> GetOngoingOrdersByType(OrderType orderType)
-    {
-        try
-        {
-            var orders = await orderingContext.Orders
-                .Where(o => o.OrderType == orderType && o.OrderStatus == OrderStatus.Ongoing)
-                .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.MenuItem)
-                .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.OrderItemIngredients)
-                        .ThenInclude(oii => oii.Ingredient)
-                .Include(o => o.CustomerInformation)
-                .ToListAsync();
 
             var orderDtos = mapper.Map<List<OrderReadDto>>(orders);
 
@@ -538,48 +515,57 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
 
     private async Task<List<OrderItem>> PopulateOrderItemsAsync(IEnumerable<OrderItemCreateDto> orderItemDtos, Guid orderId)
     {
-        var menuItemIds = orderItemDtos
-            .Select(oi => oi.MenuItemId)
-            .Distinct();
+        var menuItemIds = orderItemDtos.Select(oi => oi.MenuItemId).Distinct();
         var menuItems = await orderingContext.MenuItems
             .Where(mi => menuItemIds.Contains(mi.Id))
             .ToDictionaryAsync(mi => mi.Id);
 
-        var ingredientIds = orderItemDtos
-            .SelectMany(oi => oi.Ingredients.Select(i => i.IngredientId))
-            .Distinct();
+        var ingredientIds = orderItemDtos.SelectMany(oi => oi.Ingredients.Select(i => i.IngredientId)).Distinct();
         var ingredients = await orderingContext.Ingredients
             .Where(ing => ingredientIds.Contains(ing.Id))
             .ToDictionaryAsync(ing => ing.Id);
 
         var orderItems = new List<OrderItem>();
+
         foreach (var itemDto in orderItemDtos)
         {
             if (!menuItems.TryGetValue(itemDto.MenuItemId, out var menuItem))
-            {
                 throw new KeyNotFoundException($"MenuItem with ID {itemDto.MenuItemId} not found.");
-            }
 
-            var orderItem = mapper.Map<OrderItem>(itemDto);
-            orderItem.Price = menuItem.Price;
-            orderItem.OrderId = orderId;
+            var orderItem = new OrderItem
+            {
+                Id = Guid.NewGuid(),
+                OrderId = orderId,
+                MenuItemId = itemDto.MenuItemId,
+                SpecialInstructions = itemDto.SpecialInstructions,
+                Price = menuItem.Price,
+                OrderItemIngredients = new List<OrderItemIngredient>()
+            };
 
             foreach (var ingredientDto in itemDto.Ingredients)
             {
                 if (!ingredients.TryGetValue(ingredientDto.IngredientId, out var ingredient))
-                {
                     throw new KeyNotFoundException($"Ingredient with ID {ingredientDto.IngredientId} not found.");
-                }
 
-                var orderItemIngredient = new OrderItemIngredient
+                var existingIngredient = orderItem.OrderItemIngredients
+                    .FirstOrDefault(i => i.IngredientId == ingredient.Id);
+
+                if (existingIngredient == null)
                 {
-                    IngredientId = ingredient.Id,
-                    Quantity = ingredientDto.Quantity,
-                    OrderItemId = orderItem.Id
-                };
+                    var orderItemIngredient = new OrderItemIngredient
+                    {
+                        IngredientId = ingredient.Id,
+                        Quantity = ingredientDto.Quantity
+                    };
 
-                orderItem.OrderItemIngredients.Add(orderItemIngredient);
-                orderItem.Price += ingredient.Price * ingredientDto.Quantity;
+                    orderItem.OrderItemIngredients.Add(orderItemIngredient);
+                    orderItem.Price += ingredient.Price * ingredientDto.Quantity;
+                }
+                else
+                {
+                    existingIngredient.Quantity += ingredientDto.Quantity;
+                    orderItem.Price += ingredient.Price * ingredientDto.Quantity;
+                }
             }
 
             orderItems.Add(orderItem);
@@ -587,6 +573,8 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
 
         return orderItems;
     }
+
+
 
     private async Task HandleDineInTransition(Order order, Guid? tableId)
     {

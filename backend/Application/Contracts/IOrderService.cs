@@ -15,7 +15,6 @@ public interface IOrderService
     Task<ResultDto<OrderReadDto>> SplitOrder(SplitOrderDto splitOrderDto, Guid orderId);
     Task<ResultDto<OrderReadDto>> GetOrder(Guid id);
     Task<ResultDto<List<OrderReadDto>>> GetAllOrders(OrderStatus? orderStatus);
-    Task<ResultDto<List<OrderReadDto>>> GetOngoingOrdersByType(OrderType orderType);
     Task<ResultDto<List<TakeawayOrderSummaryReadDto>>> GetOngoingOrdersForTakeaway();
     Task<ResultDto<List<DeliveryOrderSummaryReadDto>>> GetOngoingOrdersForDelivery();
     Task<ResultDto<List<OrderReadDto>>> GetOngoingOrdersForTable(Guid tableId);

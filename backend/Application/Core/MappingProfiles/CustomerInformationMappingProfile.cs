@@ -8,10 +8,11 @@ public class CustomerInformationMappingProfile : Profile
 {
     public CustomerInformationMappingProfile()
     {
-        // Mapping from Domain to Read DTO
+        CreateMap<CustomerInformationCreateDto, CustomerInformation>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()));
+
         CreateMap<CustomerInformation, CustomerInformationReadDto>();
 
-        // Mapping from Update DTO to Domain
         CreateMap<CustomerInformationUpdateDto, CustomerInformation>();
     }
 }
