@@ -33,6 +33,9 @@ public class RestaurantOrderingContext : DbContext
     public DbSet<CustomerInformation> CustomerInformations { get; set; }
     public DbSet<Reservation> Reservations { get; set; }
     public DbSet<Payment> Payments { get; set; }
+    public DbSet<MenuItemSale> MenuItemSales { get; set; }
+    public DbSet<SalesRevenue> SalesRevenues { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -5,6 +5,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using RestaurantOrdering.Events.Application;
 using RestaurantOrdering.Events.Application.Contracts;
+using RestaurantOrdering.Events.Infrastructure.Database;
 
 namespace API.Extensions;
 
@@ -24,6 +25,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IReservationService, ReservationService>();
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IEventHandlerService, EventHandlerService>();
+        services.AddScoped<IEventContextMiddleware, EventContextMiddleware>();
 
         // FluentValidation
         services.AddFluentValidationAutoValidation();
