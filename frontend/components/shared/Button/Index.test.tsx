@@ -1,19 +1,41 @@
-import { render, fireEvent, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { Button } from './Index'; // Adjust the import based on the Button component's export type
+import { render, screen, waitFor } from '@testing-library/react';
+import { userEvent } from '@testing-library/user-event';
+
+import { Button } from './Index';
+import { createDelayedMock } from '@/utils/helpers/test-helpers';
 
 describe('Button Component', () => {
-    it('renders the button correctly', () => {
-        render(<Button>Click Me 1</Button>);
-        const button = screen.getByText('Click Me 1');
-        expect(button).not.toBeNull();
+    it('handles regular onClick callback', async () => {
+        const handleClick = vi.fn();
+        render(<Button onClick={handleClick}>Click Me</Button>);
+
+        await userEvent.click(screen.getByRole('button', { name: 'Click Me' }));
+
+        expect(handleClick).toHaveBeenCalledOnce();
     });
 
-    it('handles click events', () => {
-        const handleClick = vi.fn();
-        render(<Button onClick={handleClick}>Click Me 2</Button>);
-        const button = screen.getByText('Click Me 2');
-        fireEvent.click(button);
+    it('handles server action callback', async () => {
+        const handleClick = vi.fn().mockResolvedValue(undefined);
+        render(<Button action={handleClick}>Click Me</Button>);
+
+        await userEvent.click(screen.getByRole('button', { name: 'Click Me' }));
+
         expect(handleClick).toHaveBeenCalledOnce();
+
+        await expect(handleClick()).resolves.not.toThrow();
+    });
+
+    it('is disabled only when action is in loading state', async () => {
+        const handleClick = createDelayedMock(1);
+        render(<Button action={handleClick}>Click Me</Button>);
+        const button = screen.getByRole('button', { name: 'Click Me' });
+
+        await userEvent.click(button);
+
+        expect(button).toBeDisabled();
+
+        await waitFor(() => expect(handleClick).toHaveBeenCalledOnce());
+        await waitFor(() => expect(button).not.toBeDisabled());
     });
 });

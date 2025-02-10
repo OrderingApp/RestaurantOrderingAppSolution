@@ -1,7 +1,3 @@
-import { Button } from '@/components/shared/Button/Index';
-
-const Home = () => {
-    return <Button>Button test</Button>;
-};
+const Home = () => <h1>Home</h1>;
 
 export default Home;

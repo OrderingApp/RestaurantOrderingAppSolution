@@ -1,18 +1,45 @@
-import { type ReactNode } from 'react';
+'use client';
+
+import { useState, type ReactNode, type MouseEvent } from 'react';
 
 type ButtonProps = {
-    onClick?: () => void;
-    className?: string;
     children: ReactNode;
-};
+    className?: string;
+    disabled?: boolean;
+} & (
+    | { onClick: (e?: MouseEvent<HTMLButtonElement>) => void; action?: never }
+    | { action: () => Promise<void>; onClick?: never }
+);
 
 export const Button = ({
     children,
-    onClick = () => {},
-    className,
+    onClick,
+    action,
+    className = '',
+    disabled = false,
+    ...props
 }: ButtonProps) => {
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleClick = async (e: MouseEvent<HTMLButtonElement>) => {
+        if (onClick) return onClick(e);
+
+        setIsLoading(true);
+
+        try {
+            await action();
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
-        <button className={`btn ${className || ''}`} onClick={() => onClick()}>
+        <button
+            className={`btn ${className}`}
+            onClick={handleClick}
+            disabled={disabled || isLoading}
+            {...props}
+        >
             {children}
         </button>
     );
