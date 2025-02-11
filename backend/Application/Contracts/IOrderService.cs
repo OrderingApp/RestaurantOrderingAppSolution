@@ -20,7 +20,7 @@ public interface IOrderService
     Task<ResultDto<List<OrderReadDto>>> GetOngoingOrdersForTable(Guid tableId);
     Task<ResultDto<OrderReadDto>> ApplyOrderDiscount(decimal discountPercentage, Guid orderId);
     Task<ResultDto<OrderReadDto>> ChangeOrderTable(Guid orderId, Guid newTableId);
-    Task<ResultDto<OrderReadDto>> CloseOrder(OrderCloseDto orderCloseDto);
+    Task<ResultDto<OrderReadDto>> CloseOrder(Guid id);
     Task<ResultDto<OrderReadDto>> UpdateOrderStatus(OrderStatus newStatus, Guid id);
     Task<ResultDto<OrderReadDto>> UpdateOrderType(OrderType newOrderType, OrderUpdateTypeDto updateTypeDto, Guid orderId);
     Task<ResultDto<bool>> DeleteOrder(Guid id);

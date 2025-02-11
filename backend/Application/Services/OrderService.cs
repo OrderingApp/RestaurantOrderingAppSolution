@@ -410,7 +410,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             var order = await orderingContext.Orders
                 .Include(o => o.OrderItems)
                 .Include(o => o.Payments)
-                .FirstOrDefaultAsync(o => o.Id == orderCloseDto.Id);
+                .FirstOrDefaultAsync(o => o.Id == id);
 
             if (order == null)
                 return ResultDto<OrderReadDto>.Failure("Order not found.", HttpStatusCode.NotFound);
@@ -418,7 +418,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             if (order.OrderStatus == OrderStatus.Closed)
                 return ResultDto<OrderReadDto>.Failure("Order is already closed.", HttpStatusCode.BadRequest);
 
-            var totalPaid = orderCloseDto.Payments.Sum(p => p.Amount);
+            var totalPaid = order.Payments.Sum(p => p.Amount);
             if (totalPaid < order.TotalAmount - order.Discount)
                 return ResultDto<OrderReadDto>.Failure("Payments do not fully cover the order total.", HttpStatusCode.BadRequest);
 
@@ -426,7 +426,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
 
             await orderingContext.SaveChangesAsync();
 
-            var orderClosedEvent = mapper.Map<OrderClosedEvent>(orderCloseDto);
+            var orderClosedEvent = mapper.Map<OrderClosedEvent>(order);
             await eventHandlerService.HandleEventAsync(orderClosedEvent);
 
             var orderReadDto = mapper.Map<OrderReadDto>(order);
