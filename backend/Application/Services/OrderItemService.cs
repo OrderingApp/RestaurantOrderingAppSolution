@@ -7,7 +7,6 @@ using Domain;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using RestaurantOrdering.Events.Application.Contracts;
-using RestaurantOrdering.Events.Domain.MenuItems;
 using RestaurantOrdering.Events.Domain.OrderItems;
 using System.Net;
 
