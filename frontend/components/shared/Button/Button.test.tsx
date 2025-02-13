@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
-import { Button } from './Index';
+import { Button } from './Button';
 import { createDelayedMock } from '@/utils/helpers/test-helpers';
 
 describe('Button Component', () => {
@@ -36,6 +36,6 @@ describe('Button Component', () => {
         expect(button).toBeDisabled();
 
         await waitFor(() => expect(handleClick).toHaveBeenCalledOnce());
-        await waitFor(() => expect(button).not.toBeDisabled());
+        await waitFor(() => expect(button).toBeEnabled());
     });
 });

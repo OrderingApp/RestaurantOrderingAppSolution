@@ -44,3 +44,7 @@ export const Button = ({
         </button>
     );
 };
+
+//TODO: add a loading spinner before {children} if disabled, maybe accept a spinner? flag to do so only when needed
+
+// <img src="https://bazaikon.com/naszapaczka/{name} />

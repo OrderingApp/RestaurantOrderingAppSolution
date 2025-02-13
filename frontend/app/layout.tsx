@@ -1,5 +1,9 @@
+import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+
+import QueryProvider from '@/providers/queryProvider';
+
 import './globals.css';
 
 const geistSans = Geist({
@@ -20,17 +24,21 @@ export const metadata: Metadata = {
 const RootLayout = ({
     children,
 }: Readonly<{
-    children: React.ReactNode;
+    children: ReactNode;
 }>) => {
     return (
         <html lang="en">
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
-                {children}
+                <QueryProvider>{children}</QueryProvider>
             </body>
         </html>
     );
 };
 
 export default RootLayout;
+//TODO: add constants for html lang, metaData title etc.
+// change fonts
+
+//TODO: add dehydration/hydration from tanstack-query
