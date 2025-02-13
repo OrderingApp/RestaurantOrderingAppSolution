@@ -1,11 +1,14 @@
 'use client';
 
 import { useState, type ReactNode, type MouseEvent } from 'react';
+import clsx from 'clsx';
 
 type ButtonProps = {
     children: ReactNode;
     className?: string;
     disabled?: boolean;
+    variant?: 'primary' | 'success' | 'danger' | 'outline';
+    size?: 'sm' | 'md' | 'lg';
 } & (
     | { onClick: (e?: MouseEvent<HTMLButtonElement>) => void; action?: never }
     | { action: () => Promise<void>; onClick?: never }
@@ -15,6 +18,8 @@ export const Button = ({
     children,
     onClick,
     action,
+    variant = 'primary',
+    size = 'md',
     className = '',
     disabled = false,
     ...props
@@ -33,14 +38,33 @@ export const Button = ({
         }
     };
 
+    const variantClasses = {
+        primary: 'bg-[#2B5162] text-white',
+        success: 'bg-[#2B622F] text-white',
+        danger: 'bg-[#F20707] text-white ',
+        outline: 'bg-white shadow-lg text-black border border-gray-200',
+    };
+
+    const sizeClasses = {
+        sm: 'px-2 py-1 text-sm',
+        md: 'px-4 py-2 text-base',
+        lg: 'px-6 py-3 text-lg',
+    };
+
     return (
         <button
-            className={`btn ${className}`}
+            className={clsx(
+                'rounded-md transition-all duration-200',
+                variantClasses[variant],
+                sizeClasses[size],
+                { 'opacity-50 cursor-not-allowed': disabled || isLoading },
+                className
+            )}
             onClick={handleClick}
             disabled={disabled || isLoading}
             {...props}
         >
-            {children}
+            {isLoading ? 'Loading...' : children}
         </button>
     );
 };
