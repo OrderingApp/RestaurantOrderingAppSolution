@@ -19,8 +19,7 @@ namespace Infrastructure.Database.Migrations
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Price = table.Column<decimal>(type: "TEXT", nullable: false),
                     IsUsed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
-                    IngredientType = table.Column<int>(type: "INTEGER", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -42,15 +41,28 @@ namespace Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SalesRevenues",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Ammount = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SalesRevenues", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Tables",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    NumberOfPeople = table.Column<int>(type: "INTEGER", nullable: false),
-                    IsOccupied = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Capacity = table.Column<int>(type: "INTEGER", nullable: false),
                     IsUsed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
+                    TableStatus = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -101,9 +113,10 @@ namespace Infrastructure.Database.Migrations
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     OrderDateTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "TEXT", nullable: false),
-                    OrderStatus = table.Column<int>(type: "INTEGER", nullable: false),
-                    OrderType = table.Column<int>(type: "INTEGER", nullable: false),
-                    PaymentMethod = table.Column<int>(type: "INTEGER", nullable: true),
+                    Discount = table.Column<decimal>(type: "TEXT", nullable: false),
+                    DeliveryPrice = table.Column<decimal>(type: "TEXT", nullable: true),
+                    OrderStatus = table.Column<string>(type: "TEXT", nullable: false),
+                    OrderType = table.Column<string>(type: "TEXT", nullable: false),
                     TableId = table.Column<Guid>(type: "TEXT", nullable: true),
                     CustomerInformationId = table.Column<Guid>(type: "TEXT", nullable: true)
                 },
@@ -119,23 +132,46 @@ namespace Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MenuItemTags",
+                name: "Reservations",
                 columns: table => new
                 {
-                    MenuItemId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "TEXT", nullable: false),
+                    Surname = table.Column<string>(type: "TEXT", nullable: false),
+                    ReservationDateTime = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    SeatsNeeded = table.Column<int>(type: "INTEGER", nullable: false),
+                    IsAssigned = table.Column<bool>(type: "INTEGER", nullable: false),
+                    TableId = table.Column<Guid>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reservations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Reservations_Tables_TableId",
+                        column: x => x.TableId,
+                        principalTable: "Tables",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "IngredientTagRel",
+                columns: table => new
+                {
+                    IngredientId = table.Column<Guid>(type: "TEXT", nullable: false),
                     TagId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MenuItemTags", x => new { x.MenuItemId, x.TagId });
+                    table.PrimaryKey("PK_IngredientTagRel", x => new { x.IngredientId, x.TagId });
                     table.ForeignKey(
-                        name: "FK_MenuItemTags_MenuItems_MenuItemId",
-                        column: x => x.MenuItemId,
-                        principalTable: "MenuItems",
+                        name: "FK_IngredientTagRel_Ingredients_IngredientId",
+                        column: x => x.IngredientId,
+                        principalTable: "Ingredients",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_MenuItemTags_Tags_TagId",
+                        name: "FK_IngredientTagRel_Tags_TagId",
                         column: x => x.TagId,
                         principalTable: "Tags",
                         principalColumn: "Id",
@@ -143,20 +179,67 @@ namespace Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CustomerInformation",
+                name: "MenuItemIngredientRels",
+                columns: table => new
+                {
+                    MenuItemId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    IngredientId = table.Column<Guid>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MenuItemIngredientRels", x => new { x.MenuItemId, x.IngredientId });
+                    table.ForeignKey(
+                        name: "FK_MenuItemIngredientRels_Ingredients_IngredientId",
+                        column: x => x.IngredientId,
+                        principalTable: "Ingredients",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MenuItemIngredientRels_MenuItems_MenuItemId",
+                        column: x => x.MenuItemId,
+                        principalTable: "MenuItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MenuItemSales",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Ammount = table.Column<int>(type: "INTEGER", nullable: false),
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    MenuItemId = table.Column<Guid>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MenuItemSales", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MenuItemSales_MenuItems_MenuItemId",
+                        column: x => x.MenuItemId,
+                        principalTable: "MenuItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CustomerInformations",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     PhoneNumber = table.Column<string>(type: "TEXT", nullable: false),
                     AdditionalInstructions = table.Column<string>(type: "TEXT", nullable: true),
                     Address = table.Column<string>(type: "TEXT", nullable: true),
+                    ExpectedOrderCompletion = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    OrderCompletionType = table.Column<int>(type: "INTEGER", nullable: false),
+                    PreferredPaymentMethod = table.Column<int>(type: "INTEGER", nullable: false),
                     OrderId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CustomerInformation", x => x.Id);
+                    table.PrimaryKey("PK_CustomerInformations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CustomerInformation_Orders_OrderId",
+                        name: "FK_CustomerInformations_Orders_OrderId",
                         column: x => x.OrderId,
                         principalTable: "Orders",
                         principalColumn: "Id",
@@ -169,9 +252,9 @@ namespace Infrastructure.Database.Migrations
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Price = table.Column<decimal>(type: "TEXT", nullable: false),
-                    Quantity = table.Column<int>(type: "INTEGER", nullable: false),
+                    Discount = table.Column<decimal>(type: "TEXT", nullable: false),
                     SpecialInstructions = table.Column<string>(type: "TEXT", nullable: true),
-                    OrderItemStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
                     OrderId = table.Column<Guid>(type: "TEXT", nullable: false),
                     MenuItemId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
@@ -193,11 +276,34 @@ namespace Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Payments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Amount = table.Column<decimal>(type: "TEXT", nullable: false),
+                    PaidAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsRefunded = table.Column<bool>(type: "INTEGER", nullable: false),
+                    PaymentMethod = table.Column<string>(type: "TEXT", nullable: false),
+                    OrderId = table.Column<Guid>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Payments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Payments_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OrderItemIngredients",
                 columns: table => new
                 {
                     OrderItemId = table.Column<Guid>(type: "TEXT", nullable: false),
                     IngredientId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Price = table.Column<decimal>(type: "TEXT", nullable: false),
                     Quantity = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
@@ -218,10 +324,20 @@ namespace Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CustomerInformation_OrderId",
-                table: "CustomerInformation",
+                name: "IX_CustomerInformations_OrderId",
+                table: "CustomerInformations",
                 column: "OrderId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_IngredientTagRel_TagId",
+                table: "IngredientTagRel",
+                column: "TagId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MenuItemIngredientRels_IngredientId",
+                table: "MenuItemIngredientRels",
+                column: "IngredientId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MenuItems_MenuCategoryId",
@@ -229,9 +345,9 @@ namespace Infrastructure.Database.Migrations
                 column: "MenuCategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MenuItemTags_TagId",
-                table: "MenuItemTags",
-                column: "TagId");
+                name: "IX_MenuItemSales_MenuItemId",
+                table: "MenuItemSales",
+                column: "MenuItemId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderItemIngredients_IngredientId",
@@ -252,19 +368,44 @@ namespace Infrastructure.Database.Migrations
                 name: "IX_Orders_TableId",
                 table: "Orders",
                 column: "TableId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payments_OrderId",
+                table: "Payments",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reservations_TableId",
+                table: "Reservations",
+                column: "TableId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CustomerInformation");
+                name: "CustomerInformations");
 
             migrationBuilder.DropTable(
-                name: "MenuItemTags");
+                name: "IngredientTagRel");
+
+            migrationBuilder.DropTable(
+                name: "MenuItemIngredientRels");
+
+            migrationBuilder.DropTable(
+                name: "MenuItemSales");
 
             migrationBuilder.DropTable(
                 name: "OrderItemIngredients");
+
+            migrationBuilder.DropTable(
+                name: "Payments");
+
+            migrationBuilder.DropTable(
+                name: "Reservations");
+
+            migrationBuilder.DropTable(
+                name: "SalesRevenues");
 
             migrationBuilder.DropTable(
                 name: "Tags");

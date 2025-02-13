@@ -34,8 +34,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
 
             var dineInOrder = mapper.Map<Order>(dineInOrderDto);
 
-            table.IsOccupied = true;
-
             dineInOrder.OrderItems = await PopulateOrderItemsAsync(dineInOrderDto.OrderItems, dineInOrder.Id);
             dineInOrder.TotalAmount = dineInOrder.OrderItems.Sum(oi => oi.Price);
 
@@ -132,8 +130,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.MenuItem)
                 .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.OrderItemIngredients)
-                        .ThenInclude(oii => oii.Ingredient)
                 .Include(o => o.Payments)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
 
@@ -187,8 +183,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.MenuItem)
                 .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.OrderItemIngredients)
-                    .ThenInclude(oii => oii.Ingredient)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (order == null)
@@ -247,8 +241,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.MenuItem)
                 .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.OrderItemIngredients)
-                        .ThenInclude(oii => oii.Ingredient)
                 .Include(o => o.CustomerInformation)
                 .ToListAsync();
 
@@ -273,8 +265,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.MenuItem)
                 .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.OrderItemIngredients)
-                        .ThenInclude(oii => oii.Ingredient)
                 .Include(o => o.CustomerInformation)
                 .ToListAsync();
 
@@ -370,18 +360,18 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 return ResultDto<OrderReadDto>
                     .Failure("Specified table does not exist.", HttpStatusCode.BadRequest);
 
-            if (order.TableId.HasValue)
-            {
-                var currentTable = await orderingContext.Tables.FirstOrDefaultAsync(t => t.Id == order.TableId);
-                if (currentTable != null)
-                {
-                    currentTable.IsOccupied = false;
-                    orderingContext.Tables.Update(currentTable);
-                }
-            }
+            //if (order.TableId.HasValue)
+            //{
+            //    var currentTable = await orderingContext.Tables.FirstOrDefaultAsync(t => t.Id == order.TableId);
+            //    if (currentTable != null)
+            //    {
+            //        currentTable.IsOccupied = false;
+            //        orderingContext.Tables.Update(currentTable);
+            //    }
+            //}
 
-            newTable.IsOccupied = true;
-            order.TableId = newTableId;
+            //newTable.IsOccupied = true;
+            //order.TableId = newTableId;
 
             orderingContext.Orders.Update(order);
             orderingContext.Tables.Update(newTable);
@@ -567,49 +557,48 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
 
         var orderItems = new List<OrderItem>();
 
-        foreach (var itemDto in orderItemDtos)
-        {
-            if (!menuItems.TryGetValue(itemDto.MenuItemId, out var menuItem))
-                throw new KeyNotFoundException($"MenuItem with ID {itemDto.MenuItemId} not found.");
+        //foreach (var itemDto in orderItemDtos)
+        //{
+        //    if (!menuItems.TryGetValue(itemDto.MenuItemId, out var menuItem))
+        //        throw new KeyNotFoundException($"MenuItem with ID {itemDto.MenuItemId} not found.");
 
-            var orderItem = new OrderItem
-            {
-                Id = Guid.NewGuid(),
-                OrderId = orderId,
-                MenuItemId = itemDto.MenuItemId,
-                SpecialInstructions = itemDto.SpecialInstructions,
-                Price = menuItem.Price,
-                OrderItemIngredients = new List<OrderItemIngredient>()
-            };
+        //    var orderItem = new OrderItem
+        //    {
+        //        Id = Guid.NewGuid(),
+        //        OrderId = orderId,
+        //        MenuItemId = itemDto.MenuItemId,
+        //        SpecialInstructions = itemDto.SpecialInstructions,
+        //        Price = menuItem.Price,
+        //    };
 
-            foreach (var ingredientDto in itemDto.Ingredients)
-            {
-                if (!ingredients.TryGetValue(ingredientDto.IngredientId, out var ingredient))
-                    throw new KeyNotFoundException($"Ingredient with ID {ingredientDto.IngredientId} not found.");
+        //    foreach (var ingredientDto in itemDto.Ingredients)
+        //    {
+        //        if (!ingredients.TryGetValue(ingredientDto.IngredientId, out var ingredient))
+        //            throw new KeyNotFoundException($"Ingredient with ID {ingredientDto.IngredientId} not found.");
 
-                var existingIngredient = orderItem.OrderItemIngredients
-                    .FirstOrDefault(i => i.IngredientId == ingredient.Id);
+        //        var existingIngredient = orderItem.OrderItemIngredients
+        //            .FirstOrDefault(i => i.IngredientId == ingredient.Id);
 
-                if (existingIngredient == null)
-                {
-                    var orderItemIngredient = new OrderItemIngredient
-                    {
-                        IngredientId = ingredient.Id,
-                        Quantity = ingredientDto.Quantity
-                    };
+        //        if (existingIngredient == null)
+        //        {
+        //            var orderItemIngredient = new MenuItemIngredientRel
+        //            {
+        //                IngredientId = ingredient.Id,
+        //                Quantity = ingredientDto.Quantity
+        //            };
 
-                    orderItem.OrderItemIngredients.Add(orderItemIngredient);
-                    orderItem.Price += ingredient.Price * ingredientDto.Quantity;
-                }
-                else
-                {
-                    existingIngredient.Quantity += ingredientDto.Quantity;
-                    orderItem.Price += ingredient.Price * ingredientDto.Quantity;
-                }
-            }
+        //            orderItem.OrderItemIngredients.Add(orderItemIngredient);
+        //            orderItem.Price += ingredient.Price * ingredientDto.Quantity;
+        //        }
+        //        else
+        //        {
+        //            existingIngredient.Quantity += ingredientDto.Quantity;
+        //            orderItem.Price += ingredient.Price * ingredientDto.Quantity;
+        //        }
+        //    }
 
-            orderItems.Add(orderItem);
-        }
+        //    orderItems.Add(orderItem);
+        //}
 
         return orderItems;
     }
@@ -624,8 +613,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         var table = await orderingContext.Tables.FirstOrDefaultAsync(t => t.Id == tableId);
         if (table == null)
             throw new ArgumentException("Specified table does not exist.");
-
-        table.IsOccupied = true;
 
         if (order.CustomerInformation != null)
         {
@@ -656,7 +643,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 AdditionalInstructions = additionalInstructions,
                 OrderId = order.Id,
                 OrderCompletionType = OrderCompletionType.Immediate,
-                PreferedPaymentMethod = PreferedPaymentMethod.Cash,
+                PreferredPaymentMethod = PreferredPaymentMethod.Cash,
                 ExpectedOrderCompletion = null
             };
             orderingContext.CustomerInformations.Add(order.CustomerInformation);
@@ -667,7 +654,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             order.CustomerInformation.AdditionalInstructions = additionalInstructions;
             order.CustomerInformation.Address = null;
             order.CustomerInformation.OrderCompletionType = OrderCompletionType.Immediate;
-            order.CustomerInformation.PreferedPaymentMethod = PreferedPaymentMethod.Cash;
+            order.CustomerInformation.PreferredPaymentMethod = PreferredPaymentMethod.Cash;
             order.CustomerInformation.ExpectedOrderCompletion = null;
 
             orderingContext.CustomerInformations.Update(order.CustomerInformation);
@@ -691,7 +678,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 AdditionalInstructions = additionalInstructions,
                 Address = address,
                 OrderCompletionType = OrderCompletionType.Immediate,
-                PreferedPaymentMethod = PreferedPaymentMethod.Cash,
+                PreferredPaymentMethod = PreferredPaymentMethod.Cash,
                 ExpectedOrderCompletion = null
             };
             orderingContext.CustomerInformations.Add(order.CustomerInformation);
@@ -702,7 +689,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             order.CustomerInformation.AdditionalInstructions = additionalInstructions;
             order.CustomerInformation.Address = address;
             order.CustomerInformation.OrderCompletionType = OrderCompletionType.Immediate;
-            order.CustomerInformation.PreferedPaymentMethod = PreferedPaymentMethod.Cash;
+            order.CustomerInformation.PreferredPaymentMethod = PreferredPaymentMethod.Cash;
             order.CustomerInformation.ExpectedOrderCompletion = null;
 
             orderingContext.CustomerInformations.Update(order.CustomerInformation);
@@ -711,11 +698,11 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
 
     private async Task ClearTableOccupancy(Guid tableId)
     {
-        var table = await orderingContext.Tables.FirstOrDefaultAsync(t => t.Id == tableId);
-        if (table != null)
-        {
-            table.IsOccupied = false;
-        }
+        //var table = await orderingContext.Tables.FirstOrDefaultAsync(t => t.Id == tableId);
+        //if (table != null)
+        //{
+        //    table.IsOccupied = false;
+        //}
     }
 
     private decimal RecalculateOrderTotal(Order order)

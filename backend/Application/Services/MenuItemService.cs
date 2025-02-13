@@ -19,21 +19,21 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
         {
             var menuItem = mapper.Map<MenuItem>(menuItemCreateDto);
 
-            if (menuItemCreateDto.TagIds.Any())
-            {
-                var validTags = await orderingContext.Tags
-                    .Where(t => menuItemCreateDto.TagIds.Contains(t.Id))
-                    .ToListAsync();
+            //if (menuItemCreateDto.TagIds.Any())
+            //{
+            //    var validTags = await orderingContext.Tags
+            //        .Where(t => menuItemCreateDto.TagIds.Contains(t.Id))
+            //        .ToListAsync();
 
-                foreach (var tag in validTags)
-                {
-                    menuItem.MenuItemTags.Add(new MenuItemTag
-                    {
-                        MenuItemId = menuItem.Id,
-                        TagId = tag.Id
-                    });
-                }
-            }
+            //    foreach (var tag in validTags)
+            //    {
+            //        menuItem.MenuItemTags.Add(new MenuItemTagRel
+            //        {
+            //            MenuItemId = menuItem.Id,
+            //            TagId = tag.Id
+            //        });
+            //    }
+            //}
 
             await orderingContext.MenuItems.AddAsync(menuItem);
             await orderingContext.SaveChangesAsync();
@@ -58,8 +58,6 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
         try
         {
             var menuItems = await orderingContext.MenuItems
-                .Include(mi => mi.MenuItemTags)
-                .ThenInclude(mt => mt.Tag)
                 .ToListAsync();
 
             var menuItemDtos = mapper.Map<List<MenuItemReadDto>>(menuItems);
@@ -98,20 +96,13 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
         }
     }
 
-    public async Task<ResultDto<List<MenuItemReadDto>>> GetMenuItemsByCategory(Guid categoryId, Guid? tagId)
+    public async Task<ResultDto<List<MenuItemReadDto>>> GetMenuItemsByCategory(Guid categoryId)
     {
         try
         {
             var query = orderingContext.MenuItems
                 .Where(mi => mi.MenuCategoryId == categoryId && !mi.IsDeleted)
-                .Include(mi => mi.MenuItemTags)
-                    .ThenInclude(mt => mt.Tag)
                 .AsQueryable();
-
-            if (tagId.HasValue)
-            {
-                query = query.Where(mi => mi.MenuItemTags.Any(mt => mt.TagId == tagId.Value));
-            }
 
             var menuItems = await query.ToListAsync();
 
@@ -132,7 +123,6 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
         try
         {
             var menuItem = await orderingContext.MenuItems
-                .Include(mi => mi.MenuItemTags)
                 .FirstOrDefaultAsync(mi => mi.Id == id);
 
             if (menuItem == null)
@@ -141,23 +131,21 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
 
             mapper.Map(menuItemUpdateDto, menuItem);
 
-            menuItem.MenuItemTags.Clear();
+            //if (menuItemUpdateDto.TagIds.Any())
+            //{
+            //    var validTags = await orderingContext.Tags
+            //        .Where(t => menuItemUpdateDto.TagIds.Contains(t.Id))
+            //        .ToListAsync();
 
-            if (menuItemUpdateDto.TagIds.Any())
-            {
-                var validTags = await orderingContext.Tags
-                    .Where(t => menuItemUpdateDto.TagIds.Contains(t.Id))
-                    .ToListAsync();
-
-                foreach (var tag in validTags)
-                {
-                    menuItem.MenuItemTags.Add(new MenuItemTag
-                    {
-                        MenuItemId = menuItem.Id,
-                        TagId = tag.Id
-                    });
-                }
-            }
+            //    foreach (var tag in validTags)
+            //    {
+            //        menuItem.MenuItemTags.Add(new MenuItemTagRel
+            //        {
+            //            MenuItemId = menuItem.Id,
+            //            TagId = tag.Id
+            //        });
+            //    }
+            //}
 
             await orderingContext.SaveChangesAsync();
 

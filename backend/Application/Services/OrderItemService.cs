@@ -98,8 +98,8 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
             var orderItems = await orderingContext.OrderItems
                 .Where(oi => oi.OrderId == orderId)
                 .Include(oi => oi.MenuItem)
-                .Include(oi => oi.OrderItemIngredients)
-                    .ThenInclude(oii => oii.Ingredient)
+                //.Include(oi => oi.OrderItemIngredients)
+                //    .ThenInclude(oii => oii.Ingredient)
                 .ToListAsync();
 
             var orderItemsDto = mapper.Map<List<OrderItemsListDto>>(orderItems);
@@ -156,7 +156,7 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
         try
         {
             var orderItem = await orderingContext.OrderItems
-                .Include(oi => oi.OrderItemIngredients)
+                //.Include(oi => oi.OrderItemIngredients)
                 .FirstOrDefaultAsync(oi => oi.Id == orderItemId && oi.OrderId == orderId);
 
             if (orderItem == null)
@@ -166,44 +166,44 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
             if (!string.IsNullOrWhiteSpace(updateDto.SpecialInstructions))
                 orderItem.SpecialInstructions = updateDto.SpecialInstructions;
 
-            if (updateDto.Ingredients.Any())
-            {
-                var validIngredients = await orderingContext.Ingredients
-                    .Where(i => updateDto.Ingredients
-                        .Select(oi => oi.IngredientId)
-                        .Contains(i.Id) && !i.IsDeleted)
-                    .ToListAsync();
+            //if (updateDto.Ingredients.Any())
+            //{
+            //    var validIngredients = await orderingContext.Ingredients
+            //        .Where(i => updateDto.Ingredients
+            //            .Select(oi => oi.IngredientId)
+            //            .Contains(i.Id) && !i.IsDeleted)
+            //        .ToListAsync();
 
-                foreach (var ingredientDto in updateDto.Ingredients)
-                {
-                    var existingIngredient = orderItem.OrderItemIngredients
-                        .FirstOrDefault(oii => oii.IngredientId == ingredientDto.IngredientId);
+            //    foreach (var ingredientDto in updateDto.Ingredients)
+            //    {
+            //        var existingIngredient = orderItem.OrderItemIngredients
+            //            .FirstOrDefault(oii => oii.IngredientId == ingredientDto.IngredientId);
 
-                    if (existingIngredient != null)
-                    {
-                        existingIngredient.Quantity = ingredientDto.Quantity;
-                    }
-                    else
-                    {
-                        var ingredient = validIngredients.FirstOrDefault(i => i.Id == ingredientDto.IngredientId);
-                        if (ingredient != null)
-                        {
-                            orderItem.OrderItemIngredients.Add(new OrderItemIngredient
-                            {
-                                IngredientId = ingredient.Id,
-                                Quantity = ingredientDto.Quantity,
-                                OrderItemId = orderItem.Id
-                            });
-                        }
-                    }
-                }
+            //        if (existingIngredient != null)
+            //        {
+            //            existingIngredient.Quantity = ingredientDto.Quantity;
+            //        }
+            //        else
+            //        {
+            //            var ingredient = validIngredients.FirstOrDefault(i => i.Id == ingredientDto.IngredientId);
+            //            if (ingredient != null)
+            //            {
+            //                orderItem.OrderItemIngredients.Add(new MenuItemIngredientRel
+            //                {
+            //                    IngredientId = ingredient.Id,
+            //                    Quantity = ingredientDto.Quantity,
+            //                    OrderItemId = orderItem.Id
+            //                });
+            //            }
+            //        }
+            //    }
 
-                var ingredientIdsToKeep = updateDto.Ingredients
-                    .Select(dto => dto.IngredientId)
-                    .ToList();
+            //    var ingredientIdsToKeep = updateDto.Ingredients
+            //        .Select(dto => dto.IngredientId)
+            //        .ToList();
 
-                orderItem.OrderItemIngredients.RemoveAll(oii => !ingredientIdsToKeep.Contains(oii.IngredientId));
-            }
+            //    orderItem.OrderItemIngredients.RemoveAll(oii => !ingredientIdsToKeep.Contains(oii.IngredientId));
+            //}
 
             await orderingContext.SaveChangesAsync();
 

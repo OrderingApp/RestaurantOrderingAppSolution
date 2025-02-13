@@ -10,7 +10,7 @@ public class MenuItem
     public bool IsDeleted { get; set; } = false;
 
     public Guid MenuCategoryId { get; set; }
-    public MenuCategory? MenuCategory { get; set; }
+    public MenuCategory MenuCategory { get; set; } = null!;
 
-    public List<MenuItemTag> MenuItemTags { get; set; } = new List<MenuItemTag>();
+    public List<MenuItemIngredientRel> MenuItemIngredientRels { get; set; } = new();
 }

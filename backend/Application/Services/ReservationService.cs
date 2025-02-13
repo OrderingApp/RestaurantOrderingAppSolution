@@ -120,10 +120,6 @@ public class ReservationService(RestaurantOrderingContext orderingContext, IEven
                 return ResultDto<ReservationReadDto>
                     .Failure("Table not found.", HttpStatusCode.NotFound);
 
-            if (table.IsOccupied)
-                return ResultDto<ReservationReadDto>
-                    .Failure("Table is already occupied.", HttpStatusCode.Conflict);
-
             reservation.IsAssigned = true;
             reservation.TableId = tableId;
 
