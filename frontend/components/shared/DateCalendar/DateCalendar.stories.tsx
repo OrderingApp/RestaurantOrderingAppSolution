@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { userEvent, within, expect } from '@storybook/test';
 import DateCalendar from './DateCalendar';
 
 const meta: Meta<typeof DateCalendar> = {
@@ -72,6 +73,19 @@ type Story = StoryObj<typeof DateCalendar>;
 export const Primary: Story = {
     args: {
         variant: 'primary',
-        language: 'pl',
+        language: 'en',
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+
+        // Check if the calendar is rendered
+        expect(await canvas.findByTestId('date-calendar')).toBeInTheDocument();
+
+        // Simulate a user clicking on a date (e.g., 14th)
+        const dateButton = await canvas.findByTestId('date-14Feb2025'); // Use the full date
+        await userEvent.click(dateButton);
+
+        // Verify if the selected date is updated
+        expect(dateButton).toHaveClass('bg-[#2B5162]'); // Modify based on actual selected class
     },
 };

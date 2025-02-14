@@ -10,8 +10,8 @@ type ButtonProps = {
     variant?: 'primary' | 'success' | 'danger' | 'outline';
     size?: 'sm' | 'md' | 'lg';
 } & (
-    | { onClick: (e?: MouseEvent<HTMLButtonElement>) => void; action?: never }
-    | { action: () => Promise<void>; onClick?: never }
+    | { onClick?: (e?: MouseEvent<HTMLButtonElement>) => void; action?: never }
+    | { action?: () => Promise<void>; onClick?: never }
 );
 
 export const Button = ({
@@ -31,9 +31,13 @@ export const Button = ({
 
         setIsLoading(true);
 
-        try {
-            await action();
-        } finally {
+        if (action) {
+            try {
+                await action();
+            } finally {
+                setIsLoading(false);
+            }
+        } else {
             setIsLoading(false);
         }
     };
@@ -48,13 +52,13 @@ export const Button = ({
     const sizeClasses = {
         sm: 'px-2 py-1 text-sm',
         md: 'px-4 py-2 text-base',
-        lg: 'px-6 py-3 text-lg',
+        lg: 'px-6 py-6 text-2xl rounded-3xl',
     };
 
     return (
         <button
             className={clsx(
-                'rounded-md transition-all duration-200',
+                ' transition-all duration-200',
                 variantClasses[variant],
                 sizeClasses[size],
                 { 'opacity-50 cursor-not-allowed': disabled || isLoading },

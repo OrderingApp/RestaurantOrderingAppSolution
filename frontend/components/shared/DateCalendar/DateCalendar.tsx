@@ -98,13 +98,8 @@ const DateCalendar: React.FC<DateCalendarProps> = ({
                 year:
                     formattedDate.find((part) => part.type === 'year')?.value ||
                     '',
-                fullDate: `${current.getDate()}${current.toLocaleString(
-                    language,
-                    {
-                        month: 'short',
-                    }
-                )}${current.getFullYear()}`,
-                fullDateFormatted: current,
+                fullDate: `${current.getDate()}${current.toLocaleString(language, { month: 'short' })}${current.getFullYear()}`,
+                fullDateFormatted: new Date(current.getTime()),
             };
 
             generatedDates.push(dateObj);
@@ -144,38 +139,56 @@ const DateCalendar: React.FC<DateCalendarProps> = ({
     };
 
     return (
-        <Slider ref={sliderRef} {...sliderSettings}>
-            {dates.map((date, index) => (
-                <div
-                    key={date.fullDate}
-                    className={clsx(
-                        'rounded-md cursor-pointer text-center ',
-                        sizeClasses[size].container,
-                        selectedDate === date.fullDate
-                            ? variantStyles[variant].selected
-                            : variantStyles[variant].unselected,
-                        className
-                    )}
-                    onClick={() =>
-                        handleDateSelect(
-                            date.fullDate,
-                            date.fullDateFormatted,
-                            index
-                        )
-                    }
-                >
-                    <p className={clsx(sizeClasses[size].text, classNameText)}>
-                        {date.date}
-                    </p>
-                    <p className={clsx(sizeClasses[size].text, classNameText)}>
-                        {date.day}
-                    </p>
-                    <p className={clsx(sizeClasses[size].text, classNameText)}>
-                        {date.month} {date.year}
-                    </p>
-                </div>
-            ))}
-        </Slider>
+        <div data-testid="date-calendar">
+            <Slider ref={sliderRef} {...sliderSettings}>
+                {dates.map((date, index) => (
+                    <div
+                        data-testid={`date-${date.fullDate}`}
+                        key={date.fullDate}
+                        className={clsx(
+                            'rounded-md cursor-pointer text-center ',
+                            sizeClasses[size].container,
+                            selectedDate === date.fullDate
+                                ? variantStyles[variant].selected
+                                : variantStyles[variant].unselected,
+                            className
+                        )}
+                        onClick={() =>
+                            handleDateSelect(
+                                date.fullDate,
+                                date.fullDateFormatted,
+                                index
+                            )
+                        }
+                    >
+                        <p
+                            className={clsx(
+                                sizeClasses[size].text,
+                                classNameText
+                            )}
+                        >
+                            {date.date}
+                        </p>
+                        <p
+                            className={clsx(
+                                sizeClasses[size].text,
+                                classNameText
+                            )}
+                        >
+                            {date.day}
+                        </p>
+                        <p
+                            className={clsx(
+                                sizeClasses[size].text,
+                                classNameText
+                            )}
+                        >
+                            {date.month} {date.year}
+                        </p>
+                    </div>
+                ))}
+            </Slider>
+        </div>
     );
 };
 
