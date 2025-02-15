@@ -13,12 +13,11 @@ type FormValues = {
     time: string;
     phone: number;
 };
-
 const ReservationForm = () => {
     const {
         handleSubmit,
         register,
-        formState: { errors, isSubmitting },
+        formState: { errors },
     } = useForm<FormValues>({
         resolver: zodResolver(reservationSchema),
     });

@@ -60,56 +60,55 @@ const Input = ({
     onChange,
     props,
     errors,
-}: InputProps) => {
-    let inputIcon = icon ? true : false;
-    return (
-        <div className={`flex flex-col relative`}>
-            {label && (
-                <label
-                    htmlFor={id}
-                    className={clsx(
-                        'pl-2 font-semibold text-black',
-                        variantClasses[variant].label,
-                        sizeClasses[size].label,
-                        labelClassName
-                    )}
-                >
-                    {label}
-                </label>
-            )}
-            <input
-                id={id}
-                type={type}
-                placeholder={placeholder}
-                onChange={onChange}
-                autoCapitalize={autoCapitalize}
-                autoCorrect={autoCorrect}
-                disabled={disabled}
-                {...props}
+}: InputProps) => (
+    <div className="flex flex-col relative">
+        {label && (
+            <label
+                htmlFor={id}
                 className={clsx(
-                    'px-4  w-40 py-2 shadow-sm text-black rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500',
-                    variantClasses[variant].input,
-                    sizeClasses[size].input,
-                    inputClassName
+                    'pl-2 font-semibold text-black',
+                    variantClasses[variant].label,
+                    sizeClasses[size].label,
+                    labelClassName
                 )}
-            />
-            {inputIcon && (
-                <span className="absolute top-8 right-4">{icon}</span>
-            )}
+            >
+                {label}
+            </label>
+        )}
 
-            {errors && (
-                <p
-                    className={clsx(
-                        'text-red-500 text-[10px] md:text-[12px] px-2 ',
-                        sizeClasses[size].error,
-                        errorClassName
-                    )}
-                >
-                    {errors.message}
-                </p>
+        <input
+            {...{
+                id,
+                type,
+                placeholder,
+                onChange,
+                autoCapitalize,
+                autoCorrect,
+                disabled,
+                ...props,
+            }}
+            className={clsx(
+                'px-4  w-40 py-2 shadow-sm text-black rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500',
+                variantClasses[variant].input,
+                sizeClasses[size].input,
+                inputClassName
             )}
-        </div>
-    );
-};
+        />
+
+        {icon && <span className="absolute top-8 right-4">{icon}</span>}
+
+        {errors && (
+            <p
+                className={clsx(
+                    'text-red-500 text-[10px] md:text-[12px] px-2 ',
+                    sizeClasses[size].error,
+                    errorClassName
+                )}
+            >
+                {errors.message}
+            </p>
+        )}
+    </div>
+);
 
 export default Input;

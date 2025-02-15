@@ -9,10 +9,9 @@ type ButtonProps = {
     disabled?: boolean;
     variant?: 'primary' | 'success' | 'danger' | 'outline';
     size?: 'sm' | 'md' | 'lg';
-} & (
-    | { onClick?: (e?: MouseEvent<HTMLButtonElement>) => void; action?: never }
-    | { action?: () => Promise<void>; onClick?: never }
-);
+    onClick?: (e?: MouseEvent<HTMLButtonElement>) => void;
+    action?: () => Promise<void>;
+};
 
 export const Button = ({
     children,
@@ -68,7 +67,7 @@ export const Button = ({
             disabled={disabled || isLoading}
             {...props}
         >
-            {isLoading ? 'Loading...' : children}
+            {isLoading ? 'to add spinner' : children}
         </button>
     );
 };

@@ -38,23 +38,25 @@ const sizeClasses = {
     },
 };
 
-const DateCalendar: React.FC<DateCalendarProps> = ({
+const sliderDefaultSettings = {
+    speed: 300,
+    slidesToShow: 7,
+    slidesToScroll: 7,
+    infinite: false,
+    arrows: false,
+    dots: false,
+};
+
+const DateCalendar = ({
     language = 'pl',
     endDateNumber = 2,
     variant = 'primary',
     size = 'sm',
-    sliderSettings = {
-        speed: 300,
-        slidesToShow: 7,
-        slidesToScroll: 7,
-        infinite: false,
-        arrows: false,
-        dots: false,
-    },
+    sliderSettings = sliderDefaultSettings,
     className,
     classNameText,
     onDateSelect,
-}) => {
+}: DateCalendarProps) => {
     const sliderRef = useRef<Slider | null>(null);
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [dates, setDates] = useState<
@@ -72,8 +74,8 @@ const DateCalendar: React.FC<DateCalendarProps> = ({
         const startDate = new Date();
         const endDate = new Date();
         endDate.setMonth(endDate.getMonth() + endDateNumber);
-        let generatedDates = [];
-        let current = new Date(startDate);
+        const generatedDates = [];
+        const current = new Date(startDate);
 
         while (current <= endDate) {
             const options: Intl.DateTimeFormatOptions = {
