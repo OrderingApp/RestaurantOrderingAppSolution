@@ -38,13 +38,6 @@ public class PaymentService(RestaurantOrderingContext orderingContext, IEventHan
             orderingContext.Payments.Add(payment);
             await orderingContext.SaveChangesAsync();
 
-            // If fully paid, update status to Finished
-            if (totalPaid + payment.Amount >= order.TotalAmount)
-            {
-                order.OrderStatus = OrderStatus.Finished;
-                await orderingContext.SaveChangesAsync();
-            }
-
             var paymentReadDto = mapper.Map<PaymentReadDto>(payment);
 
             var paymentCreatedEvent = mapper.Map<PaymentCreatedEvent>(payment);

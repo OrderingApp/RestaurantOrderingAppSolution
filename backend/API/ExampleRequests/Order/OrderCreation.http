@@ -33,8 +33,8 @@ Accept: application/json
 }
 
 ###
-// To create one takeaway order with 2 order items. 
-// One order item with 2 extra ingredients and one without extra ingredients.
+# To create one takeaway order with 2 order items.
+# One order item with 2 extra ingredients and one without extra ingredients.
 
 POST {{API_HostAddress}}/Order/takeaway
 Content-Type: application/json
@@ -42,11 +42,13 @@ Accept: application/json
 
 {
   "orderDateTime": "2026-02-07T12:30:00Z",
-  "phoneNumber": "123456789",
-  "additionalInstructions": "Please call on arrival.",
-  "orderCompletionType": "Immediate",
-  "preferedPaymentMethod": "Cash",
-  "expectedOrderCompletion": null,
+  "customerInformation": {
+    "phoneNumber": "123456789",
+    "additionalInstructions": "Please call on arrival.",
+    "orderCompletionType": "Immediate",
+    "preferedPaymentMethod": "Cash",
+    "expectedOrderCompletion": null
+  },
   "orderItems": [
     {
       "menuItemId": "0BD3199D-F0A5-4044-8364-208BECDE5963",
@@ -72,8 +74,8 @@ Accept: application/json
 
 
 ###
-// To create one delivery order with 2 order items. 
-// One order item with 2 extra ingredients and one without extra ingredients.
+# To create one delivery order with 2 order items.
+# One order item with 2 extra ingredients and one without extra ingredients.
 
 POST {{API_HostAddress}}/Order/delivery
 Content-Type: application/json
@@ -81,12 +83,14 @@ Accept: application/json
 
 {
   "orderDateTime": "2026-02-07T13:00:00Z",
-  "phoneNumber": "123456789",
-  "address": "123 Main Street, City, Country",
-  "additionalInstructions": "Leave at the doorstep.",
-  "orderCompletionType": "Immediate",
-  "preferedPaymentMethod": "Card",
-  "expectedOrderCompletion": null,
+  "customerInformation": {
+    "phoneNumber": "123456789",
+    "address": "123 Main Street, City, Country",
+    "additionalInstructions": "Leave at the doorstep.",
+    "orderCompletionType": "Immediate",
+    "preferedPaymentMethod": "Card",
+    "expectedOrderCompletion": null
+  },
   "orderItems": [
     {
       "menuItemId": "0BD3199D-F0A5-4044-8364-208BECDE5963",
@@ -109,6 +113,7 @@ Accept: application/json
     }
   ]
 }
+
 
 
 ###

@@ -5,11 +5,11 @@ public class Order
     public Guid Id { get; set; }
     public DateTime OrderDateTime { get; set; } = DateTime.UtcNow;
 
-    public decimal TotalAmount { get; set; } = 0;
-    public decimal Discount { get; set; } = 0;
+    public decimal TotalAmount { get; set; }
+    public decimal Discount { get; set; }
+    public decimal? DeliveryPrice { get; set; }
 
     public OrderStatus OrderStatus { get; set; } = OrderStatus.Ongoing;
-
     public OrderType OrderType { get; set; }
 
     public List<OrderItem> OrderItems { get; set; } = new();
@@ -27,7 +27,7 @@ public enum OrderStatus
 {
     Ongoing,
     PendingPayment,
-    Finished,
+    Closed,
     Cancelled
 }
 

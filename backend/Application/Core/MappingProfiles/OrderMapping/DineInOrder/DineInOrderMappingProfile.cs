@@ -24,6 +24,7 @@ public class DineInOrderMappingProfile : Profile
             .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
             .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(_ => 0))
             .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(_ => OrderStatus.Ongoing))
-            .ForMember(dest => dest.OrderItems, opt => opt.Ignore());
+            .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems))
+            .ForMember(dest => dest.TableId, opt => opt.MapFrom(src => src.TableId));
     }
 }

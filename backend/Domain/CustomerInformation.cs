@@ -5,13 +5,14 @@ public class CustomerInformation
     public Guid Id { get; set; }
     public string PhoneNumber { get; set; } = null!;
     public string? AdditionalInstructions { get; set; }
-    public string? Address { get; set; } 
+    public string? Address { get; set; }
+
     public DateTime? ExpectedOrderCompletion { get; set; }
     public OrderCompletionType OrderCompletionType { get; set; } = OrderCompletionType.Immediate;
-    public PreferedPaymentMethod PreferedPaymentMethod { get; set; }
+    public PreferredPaymentMethod PreferredPaymentMethod { get; set; }
 
     public Guid OrderId { get; set; }
-    public Order? Order { get; set; }
+    public Order Order { get; set; } = null!;
 }
 
 public enum OrderCompletionType
@@ -20,7 +21,7 @@ public enum OrderCompletionType
     Scheduled
 }
 
-public enum PreferedPaymentMethod
+public enum PreferredPaymentMethod
 {
     Card,
     Cash

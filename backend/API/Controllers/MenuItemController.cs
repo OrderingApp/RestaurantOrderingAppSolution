@@ -48,13 +48,12 @@ public class MenuItemController(IMenuItemService menuItemService) : BaseApiContr
     /// Retrieves menu items by category.
     /// </summary>
     /// <param name="categoryId">The category ID.</param>
-    /// <param name="tagId">Optional tag filter.</param>
     /// <returns>A list of menu items in the specified category.</returns>
     /// <response code="200">Returns menu items in the category.</response>
     [HttpGet("category/{categoryId}")]
     [ProducesResponseType(200)]
-    public async Task<IActionResult> GetMenuItemsByCategory(Guid categoryId, [FromQuery] Guid? tagId) =>
-        HandleResult(await menuItemService.GetMenuItemsByCategory(categoryId, tagId));
+    public async Task<IActionResult> GetMenuItemsByCategory(Guid categoryId) =>
+        HandleResult(await menuItemService.GetMenuItemsByCategory(categoryId));
 
     /// <summary>
     /// Updates an existing menu item.

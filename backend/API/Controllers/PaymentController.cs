@@ -8,6 +8,7 @@ namespace API.Controllers;
 /// <summary>
 /// Manages payments for orders.
 /// </summary>
+[Route("/orders/{orderId}/payments/")]
 public class PaymentController(IPaymentService paymentService) : BaseApiController
 {
     /// <summary>
@@ -18,7 +19,7 @@ public class PaymentController(IPaymentService paymentService) : BaseApiControll
     /// <returns>The created payment.</returns>
     /// <response code="201">If the payment was successfully created.</response>
     /// <response code="400">If the request is invalid.</response>
-    [HttpPost("{orderId}")]
+    [HttpPost]
     [ProducesResponseType(201)]
     [ProducesResponseType(400)]
     public async Task<IActionResult> AddPayment([FromBody] PaymentCreateDto paymentDto, Guid orderId) =>
@@ -30,7 +31,7 @@ public class PaymentController(IPaymentService paymentService) : BaseApiControll
     /// <param name="orderId">The ID of the order.</param>
     /// <returns>A list of payments associated with the order.</returns>
     /// <response code="200">Returns the list of payments.</response>
-    [HttpGet("/api/orders/{orderId}/payments")]
+    [HttpGet]
     [ProducesResponseType(200)]
     public async Task<IActionResult> GetAllOrderPayments(Guid orderId) =>
         HandleResult(await paymentService.GetAllOrderPayments(orderId));

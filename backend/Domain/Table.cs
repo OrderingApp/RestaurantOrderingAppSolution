@@ -4,13 +4,25 @@ public class Table
 {
     public Guid Id { get; set; }
     public required string Name { get; set; }
-    public int NumberOfPeople { get; set; }
-    public bool IsOccupied { get; set; }
+    public int Capacity { get; set; }
 
     public bool IsUsed { get; set; } = true;
     public bool IsDeleted { get; set; } = false;
 
-    public List<Order> Orders { get; set; } = new List<Order>();
+    public List<Order> Orders { get; set; } = new();
 
-    public List<Reservation> Reservations { get; set; } = new List<Reservation>();
+    public List<Reservation> Reservations { get; set; } = new();
+
+    public TableStatus TableStatus { get; set; } = TableStatus.Available;
+}
+
+public enum TableStatus
+{
+    Available,
+    Reserved,
+    Ongoing,
+    PendingServingOrderItems,
+    OrderItemsServed,
+    PendingPayment,
+    Closed
 }

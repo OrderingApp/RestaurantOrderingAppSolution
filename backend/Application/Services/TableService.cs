@@ -123,12 +123,12 @@ public class TableService(RestaurantOrderingContext orderingContext, IEventHandl
                 return ResultDto<TableReadDto>
                     .Failure("Table not found or has been deleted.", HttpStatusCode.NotFound);
 
-            if (table.IsOccupied == tableOccupancyDto.IsOccupied)
-                return ResultDto<TableReadDto>
-                    .Failure("The table already has the requested occupancy status.", HttpStatusCode.BadRequest);
+            //if (table.IsOccupied == tableOccupancyDto.IsOccupied)
+            //    return ResultDto<TableReadDto>
+            //        .Failure("The table already has the requested occupancy status.", HttpStatusCode.BadRequest);
 
 
-            table.IsOccupied = tableOccupancyDto.IsOccupied;
+            //table.IsOccupied = tableOccupancyDto.IsOccupied;
 
             await orderingContext.SaveChangesAsync();
 
@@ -157,7 +157,7 @@ public class TableService(RestaurantOrderingContext orderingContext, IEventHandl
                     .Failure("Table not found.", HttpStatusCode.NotFound);
 
             table.IsDeleted = true;
-            table.IsOccupied = false;
+            //table.IsOccupied = false;
 
             orderingContext.Tables.Update(table);
             await orderingContext.SaveChangesAsync();
