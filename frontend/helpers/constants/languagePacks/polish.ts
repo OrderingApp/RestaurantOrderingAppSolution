@@ -1,4 +1,4 @@
-import { languagePack } from '@/utils/constants/languagePacks';
+import { languagePack } from '@/helpers/constants/languagePacks';
 
 const plPack: languagePack = {
     loginPage: {
@@ -8,9 +8,7 @@ const plPack: languagePack = {
         enter: 'wejdź',
     },
     menuBar: {
-        tables: {
-            name: 'stoliki',
-        },
+        tables: 'stoliki',
         orders: 'zamówienia',
         menu: 'karta',
         reservations: 'rezerwacje',
