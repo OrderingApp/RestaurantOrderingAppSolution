@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(RestaurantOrderingContext))]
-    [Migration("20250215135921_InitialCreate")]
+    [Migration("20250215141549_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -156,7 +156,7 @@ namespace Infrastructure.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Ammount")
+                    b.Property<int>("Amount")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("Date")
@@ -312,7 +312,7 @@ namespace Infrastructure.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("Ammount")
+                    b.Property<decimal>("Amount")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Date")

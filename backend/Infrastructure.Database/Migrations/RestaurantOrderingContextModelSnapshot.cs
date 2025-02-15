@@ -153,7 +153,7 @@ namespace Infrastructure.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Ammount")
+                    b.Property<int>("Amount")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("Date")
@@ -309,7 +309,7 @@ namespace Infrastructure.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("Ammount")
+                    b.Property<decimal>("Amount")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Date")

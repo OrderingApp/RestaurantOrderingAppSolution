@@ -164,8 +164,8 @@ public class Seed
             // ✅ SalesRevenue
             var salesRevenue = new List<SalesRevenue>
             {
-                new() { Id = Guid.NewGuid(), Ammount = 100.00M, Date = DateTime.UtcNow.Date },
-                new() { Id = Guid.NewGuid(), Ammount = 200.00M, Date = DateTime.UtcNow.Date.AddDays(-1) }
+                new() { Id = Guid.NewGuid(), Amount = 100.00M, Date = DateTime.UtcNow.Date },
+                new() { Id = Guid.NewGuid(), Amount = 200.00M, Date = DateTime.UtcNow.Date.AddDays(-1) }
             };
             await context.SalesRevenues.AddRangeAsync(salesRevenue);
 
