@@ -178,20 +178,16 @@ namespace Infrastructure.Database.Migrations
                     b.Property<Guid?>("CustomerInformationId")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal?>("DeliveryPrice")
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("Discount")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("OrderDateTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("OrderStatus")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("OrderType")
+                    b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -199,6 +195,10 @@ namespace Infrastructure.Database.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("TotalAmount")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -276,20 +276,20 @@ namespace Infrastructure.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("CapacityNeeded")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsAssigned")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("PhoneNumber")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("ReservationDateTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("SeatsNeeded")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Surname")
+                    b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -339,7 +339,7 @@ namespace Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("TableStatus")
+                    b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -460,7 +460,7 @@ namespace Infrastructure.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsMany("Domain.OrderItemIngredient", "Ingredients", b1 =>
+                    b.OwnsMany("Domain.OrderItemIngredient", "ExtraIngredients", b1 =>
                         {
                             b1.Property<Guid>("OrderItemId")
                                 .HasColumnType("TEXT");
@@ -483,17 +483,48 @@ namespace Infrastructure.Database.Migrations
 
                             b1.HasKey("OrderItemId", "Id");
 
-                            b1.ToTable("OrderItemIngredients");
+                            b1.ToTable("OrderItems_ExtraIngredients");
 
                             b1.WithOwner()
                                 .HasForeignKey("OrderItemId");
                         });
 
-                    b.Navigation("Ingredients");
+                    b.OwnsMany("Domain.OrderItemIngredient", "RemovedIngredients", b1 =>
+                        {
+                            b1.Property<Guid>("OrderItemId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasColumnType("TEXT");
+
+                            b1.Property<decimal>("Price")
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.Property<int>("Quantity")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("INTEGER")
+                                .HasDefaultValue(1);
+
+                            b1.HasKey("OrderItemId", "Id");
+
+                            b1.ToTable("OrderItems_RemovedIngredients");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OrderItemId");
+                        });
+
+                    b.Navigation("ExtraIngredients");
 
                     b.Navigation("MenuItem");
 
                     b.Navigation("Order");
+
+                    b.Navigation("RemovedIngredients");
                 });
 
             modelBuilder.Entity("Domain.Payment", b =>

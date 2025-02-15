@@ -24,7 +24,7 @@ public class PaymentService(RestaurantOrderingContext orderingContext, IEventHan
             if (order == null)
                 return ResultDto<PaymentReadDto>.Failure("Order not found", HttpStatusCode.NotFound);
 
-            if (order.OrderStatus != OrderStatus.PendingPayment)
+            if (order.Status != OrderStatus.PendingPayment)
                 return ResultDto<PaymentReadDto>.Failure("Order must be in Pending Payment status to add payment.", HttpStatusCode.BadRequest);
 
             var totalPaid = order.Payments.Sum(p => p.Amount);

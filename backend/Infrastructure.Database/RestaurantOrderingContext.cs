@@ -41,14 +41,14 @@ public class RestaurantOrderingContext : DbContext
 
         // ✅ Enum Conversions
         modelBuilder.Entity<Order>()
-            .Property(o => o.OrderStatus)
+            .Property(o => o.Status)
             .HasConversion(
                 os => os.ToString(),
                 os => (OrderStatus)Enum.Parse(typeof(OrderStatus), os)
             );
 
         modelBuilder.Entity<Order>()
-            .Property(o => o.OrderType)
+            .Property(o => o.Type)
             .HasConversion(
                 ot => ot.ToString(),
                 ot => (OrderType)Enum.Parse(typeof(OrderType), ot)
@@ -62,7 +62,7 @@ public class RestaurantOrderingContext : DbContext
             );
 
         modelBuilder.Entity<Table>()
-            .Property(t => t.TableStatus)
+            .Property(t => t.Status)
             .HasConversion(
                 ts => ts.ToString(),
                 ts => (TableStatus)Enum.Parse(typeof(TableStatus), ts)
@@ -165,12 +165,21 @@ public class RestaurantOrderingContext : DbContext
 
         // ✅ OrderItemIngredient as an owned type (Embedded inside OrderItem)
         modelBuilder.Entity<OrderItem>()
-            .OwnsMany(oi => oi.Ingredients, ingredient =>
+            .OwnsMany(oi => oi.ExtraIngredients, extra =>
             {
-                ingredient.WithOwner().HasForeignKey("OrderItemId");
-                ingredient.Property(i => i.Name).IsRequired();
-                ingredient.Property(i => i.Price).HasColumnType("decimal(18,2)");
-                ingredient.Property(i => i.Quantity).HasDefaultValue(1);
+                extra.WithOwner().HasForeignKey("OrderItemId");
+                extra.Property(i => i.Name).IsRequired();
+                extra.Property(i => i.Price).HasColumnType("decimal(18,2)");
+                extra.Property(i => i.Quantity).HasDefaultValue(1);
+            });
+
+        modelBuilder.Entity<OrderItem>()
+            .OwnsMany(oi => oi.RemovedIngredients, removed =>
+            {
+                removed.WithOwner().HasForeignKey("OrderItemId");
+                removed.Property(i => i.Name).IsRequired();
+                removed.Property(i => i.Price).HasColumnType("decimal(18,2)");
+                removed.Property(i => i.Quantity).HasDefaultValue(1);
             });
     }
 }

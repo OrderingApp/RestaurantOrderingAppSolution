@@ -149,10 +149,10 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             var newOrder = new Order
             {
                 Id = Guid.NewGuid(),
-                OrderDateTime = DateTime.UtcNow,
-                OrderStatus = originalOrder.OrderStatus,
+                DateTime = DateTime.UtcNow,
+                Status = originalOrder.Status,
                 TableId = originalOrder.TableId,
-                OrderType = originalOrder.OrderType,
+                Type = originalOrder.Type,
                 OrderItems = mapper.Map<List<OrderItem>>(itemsToSplit)
             };
 
@@ -215,7 +215,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
 
             if (orderStatus.HasValue)
             {
-                query = query.Where(o => o.OrderStatus == orderStatus.Value);
+                query = query.Where(o => o.Status == orderStatus.Value);
             }
 
             var orders = await query.ToListAsync();
@@ -237,7 +237,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         try
         {
             var orders = await orderingContext.Orders
-                .Where(o => o.OrderType == OrderType.Takeaway && o.OrderStatus == OrderStatus.Ongoing)
+                .Where(o => o.Type == OrderType.Takeaway && o.Status == OrderStatus.Ongoing)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.MenuItem)
                 .Include(o => o.OrderItems)
@@ -261,7 +261,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         try
         {
             var orders = await orderingContext.Orders
-                .Where(o => o.OrderType == OrderType.Delivery && o.OrderStatus == OrderStatus.Ongoing)
+                .Where(o => o.Type == OrderType.Delivery && o.Status == OrderStatus.Ongoing)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.MenuItem)
                 .Include(o => o.OrderItems)
@@ -285,7 +285,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         try
         {
             var ongoingOrders = await orderingContext.Orders
-                .Where(o => o.TableId == tableId && o.OrderStatus == OrderStatus.Ongoing)
+                .Where(o => o.TableId == tableId && o.Status == OrderStatus.Ongoing)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.MenuItem)
                 .Include(o => o.CustomerInformation)
@@ -405,14 +405,14 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             if (order == null)
                 return ResultDto<OrderReadDto>.Failure("Order not found.", HttpStatusCode.NotFound);
 
-            if (order.OrderStatus == OrderStatus.Closed)
+            if (order.Status == OrderStatus.Closed)
                 return ResultDto<OrderReadDto>.Failure("Order is already closed.", HttpStatusCode.BadRequest);
 
             var totalPaid = order.Payments.Sum(p => p.Amount);
             if (totalPaid < order.TotalAmount - order.Discount)
                 return ResultDto<OrderReadDto>.Failure("Payments do not fully cover the order total.", HttpStatusCode.BadRequest);
 
-            order.OrderStatus = OrderStatus.Closed;
+            order.Status = OrderStatus.Closed;
 
             await orderingContext.SaveChangesAsync();
 
@@ -442,9 +442,9 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 return ResultDto<OrderReadDto>
                     .Failure("Order not found", HttpStatusCode.NotFound);
 
-            var previousOrderStatus = order.OrderStatus;
+            var previousOrderStatus = order.Status;
 
-            order.OrderStatus = newStatus;
+            order.Status = newStatus;
             await orderingContext.SaveChangesAsync();
 
             var orderStatusChangedEvent = mapper.Map<OrderStatusChangedEvent>((order, previousOrderStatus));
@@ -473,10 +473,10 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             if (order == null)
                 return ResultDto<OrderReadDto>.Failure("Order not found.", HttpStatusCode.NotFound);
 
-            if (order.OrderType == newOrderType)
+            if (order.Type == newOrderType)
                 return ResultDto<OrderReadDto>.Failure("Order type is already set to the requested type.", HttpStatusCode.BadRequest);
 
-            var previousOrderType = order.OrderType;
+            var previousOrderType = order.Type;
 
             switch (newOrderType)
             {
@@ -496,7 +496,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                     return ResultDto<OrderReadDto>.Failure("Invalid order type.", HttpStatusCode.BadRequest);
             }
 
-            order.OrderType = newOrderType;
+            order.Type = newOrderType;
             await orderingContext.SaveChangesAsync();
 
             var orderTypeChangeEvent = mapper.Map<OrderTypeChangeEvent>((order, previousOrderType));

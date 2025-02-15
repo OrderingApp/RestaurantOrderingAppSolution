@@ -13,7 +13,7 @@ public class Table
 
     public List<Reservation> Reservations { get; set; } = new();
 
-    public TableStatus TableStatus { get; set; } = TableStatus.Available;
+    public TableStatus Status { get; set; } = TableStatus.Available;
 }
 
 public enum TableStatus

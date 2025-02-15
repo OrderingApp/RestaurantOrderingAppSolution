@@ -57,8 +57,8 @@ public class Seed
             // ✅ Tables
             var tables = new List<Table>
             {
-                new() { Id = Guid.NewGuid(), Name = "Table 1", Capacity = 4, TableStatus = TableStatus.Available, IsUsed = true, IsDeleted = false },
-                new() { Id = Guid.NewGuid(), Name = "Table 2", Capacity = 2, TableStatus = TableStatus.Ongoing, IsUsed = true, IsDeleted = false }
+                new() { Id = Guid.NewGuid(), Name = "Table 1", Capacity = 4, Status = TableStatus.Available, IsUsed = true, IsDeleted = false },
+                new() { Id = Guid.NewGuid(), Name = "Table 2", Capacity = 2, Status = TableStatus.Ongoing, IsUsed = true, IsDeleted = false }
             };
             await context.Tables.AddRangeAsync(tables);
 
@@ -68,9 +68,9 @@ public class Seed
                 new()
                 {
                     Id = Guid.NewGuid(),
-                    OrderDateTime = DateTime.UtcNow,
-                    OrderStatus = OrderStatus.Ongoing,
-                    OrderType = OrderType.DineIn,
+                    DateTime = DateTime.UtcNow,
+                    Status = OrderStatus.Ongoing,
+                    Type = OrderType.DineIn,
                     TableId = tables[0].Id,
                     CustomerInformation = new CustomerInformation
                     {
@@ -86,9 +86,9 @@ public class Seed
                 new()
                 {
                     Id = Guid.NewGuid(),
-                    OrderDateTime = DateTime.UtcNow.AddHours(-2),
-                    OrderStatus = OrderStatus.Ongoing,
-                    OrderType = OrderType.Delivery,
+                    DateTime = DateTime.UtcNow.AddHours(-2),
+                    Status = OrderStatus.Ongoing,
+                    Type = OrderType.Delivery,
                     CustomerInformation = new CustomerInformation
                     {
                         Id = Guid.NewGuid(),
@@ -115,7 +115,7 @@ public class Seed
                     Discount = 0,
                     SpecialInstructions = "Extra cheese",
                     Status = OrderItemStatus.Pending,
-                    Ingredients = new List<OrderItemIngredient>
+                    ExtraIngredients = new List<OrderItemIngredient>
                     {
                         new() { Id = Guid.NewGuid(), Name = "Mozzarella", Price = 1.5M, Quantity = 2 }
                     }
@@ -129,7 +129,7 @@ public class Seed
                     Discount = 0,
                     SpecialInstructions = "Add extra pepperoni",
                     Status = OrderItemStatus.Pending,
-                    Ingredients = new List<OrderItemIngredient>
+                    ExtraIngredients = new List<OrderItemIngredient>
                     {
                         new() { Id = Guid.NewGuid(), Name = "Pepperoni", Price = 2.0M, Quantity = 1 }
                     }
@@ -172,8 +172,8 @@ public class Seed
             // ✅ Reservations
             var reservations = new List<Reservation>
             {
-                new() { Id = Guid.NewGuid(), PhoneNumber = "123123123", Surname = "Smith", ReservationDateTime = DateTime.UtcNow.AddHours(3), SeatsNeeded = 4, IsAssigned = false },
-                new() { Id = Guid.NewGuid(), PhoneNumber = "987987987", Surname = "Johnson", ReservationDateTime = DateTime.UtcNow.AddHours(5), SeatsNeeded = 2, IsAssigned = false }
+                new() { Id = Guid.NewGuid(), PhoneNumber = "123123123", Name = "Smith", DateTime = DateTime.UtcNow.AddHours(3), CapacityNeeded = 4, IsAssigned = false },
+                new() { Id = Guid.NewGuid(), PhoneNumber = "987987987", Name = "Johnson", DateTime = DateTime.UtcNow.AddHours(5), CapacityNeeded = 2, IsAssigned = false }
             };
             await context.Reservations.AddRangeAsync(reservations);
 

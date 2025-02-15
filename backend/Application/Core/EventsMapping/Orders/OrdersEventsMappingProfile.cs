@@ -37,11 +37,11 @@ public class OrdersEventsMappingProfile : Profile
         CreateMap<(Order order, OrderStatus previousOrderStatus), OrderStatusChangedEvent>()
            .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.order.Id))
            .ForMember(dest => dest.From, opt => opt.MapFrom(src => src.previousOrderStatus))
-           .ForMember(dest => dest.To, opt => opt.MapFrom(src => src.order.OrderStatus));
+           .ForMember(dest => dest.To, opt => opt.MapFrom(src => src.order.Status));
 
         CreateMap<(Order order, OrderType previousOrderType), OrderTypeChangeEvent>()
             .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.order.Id))
             .ForMember(dest => dest.From, opt => opt.MapFrom(src => src.previousOrderType))
-            .ForMember(dest => dest.To, opt => opt.MapFrom(src => src.order.OrderType));
+            .ForMember(dest => dest.To, opt => opt.MapFrom(src => src.order.Type));
     }
 }

@@ -86,7 +86,7 @@ public class ReservationService(RestaurantOrderingContext orderingContext, IEven
         try
         {
             var reservations = await orderingContext.Reservations
-                .Where(r => r.ReservationDateTime.Date == date.Date)
+                .Where(r => r.DateTime.Date == date.Date)
                 .Include(r => r.Table)
                 .ToListAsync();
 

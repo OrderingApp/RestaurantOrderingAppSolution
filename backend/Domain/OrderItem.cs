@@ -9,7 +9,8 @@ public class OrderItem
 
     public OrderItemStatus Status { get; set; } = OrderItemStatus.Pending;
 
-    public List<OrderItemIngredient> Ingredients { get; set; } = new();
+    public List<OrderItemIngredient> ExtraIngredients { get; set; } = new();
+    public List<OrderItemIngredient> RemovedIngredients { get; set; } = new();
 
     public Guid OrderId { get; set; }
     public Order Order { get; set; } = null!;
@@ -22,7 +23,7 @@ public class OrderItemIngredient
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
-    public decimal Price { get; set; }
+    public decimal Price { get; set; } = 0;
     public int Quantity { get; set; } = 1;
 }
 
