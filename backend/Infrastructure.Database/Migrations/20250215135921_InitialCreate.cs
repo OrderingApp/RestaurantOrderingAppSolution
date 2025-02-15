@@ -155,7 +155,7 @@ namespace Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "IngredientTagRel",
+                name: "IngredientTagRels",
                 columns: table => new
                 {
                     IngredientId = table.Column<Guid>(type: "TEXT", nullable: false),
@@ -163,15 +163,15 @@ namespace Infrastructure.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_IngredientTagRel", x => new { x.IngredientId, x.TagId });
+                    table.PrimaryKey("PK_IngredientTagRels", x => new { x.IngredientId, x.TagId });
                     table.ForeignKey(
-                        name: "FK_IngredientTagRel_Ingredients_IngredientId",
+                        name: "FK_IngredientTagRels_Ingredients_IngredientId",
                         column: x => x.IngredientId,
                         principalTable: "Ingredients",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_IngredientTagRel_Tags_TagId",
+                        name: "FK_IngredientTagRels_Tags_TagId",
                         column: x => x.TagId,
                         principalTable: "Tags",
                         principalColumn: "Id",
@@ -231,8 +231,8 @@ namespace Infrastructure.Database.Migrations
                     AdditionalInstructions = table.Column<string>(type: "TEXT", nullable: true),
                     Address = table.Column<string>(type: "TEXT", nullable: true),
                     ExpectedOrderCompletion = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    OrderCompletionType = table.Column<int>(type: "INTEGER", nullable: false),
-                    PreferredPaymentMethod = table.Column<int>(type: "INTEGER", nullable: false),
+                    OrderCompletionType = table.Column<string>(type: "TEXT", nullable: false),
+                    PreferredPaymentMethod = table.Column<string>(type: "TEXT", nullable: false),
                     OrderId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -266,7 +266,7 @@ namespace Infrastructure.Database.Migrations
                         column: x => x.MenuItemId,
                         principalTable: "MenuItems",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_OrderItems_Orders_OrderId",
                         column: x => x.OrderId,
@@ -301,20 +301,15 @@ namespace Infrastructure.Database.Migrations
                 name: "OrderItemIngredients",
                 columns: table => new
                 {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     OrderItemId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    IngredientId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Price = table.Column<decimal>(type: "TEXT", nullable: false),
-                    Quantity = table.Column<int>(type: "INTEGER", nullable: false)
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Quantity = table.Column<int>(type: "INTEGER", nullable: false, defaultValue: 1)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderItemIngredients", x => new { x.OrderItemId, x.IngredientId });
-                    table.ForeignKey(
-                        name: "FK_OrderItemIngredients_Ingredients_IngredientId",
-                        column: x => x.IngredientId,
-                        principalTable: "Ingredients",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                    table.PrimaryKey("PK_OrderItemIngredients", x => new { x.OrderItemId, x.Id });
                     table.ForeignKey(
                         name: "FK_OrderItemIngredients_OrderItems_OrderItemId",
                         column: x => x.OrderItemId,
@@ -330,8 +325,8 @@ namespace Infrastructure.Database.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_IngredientTagRel_TagId",
-                table: "IngredientTagRel",
+                name: "IX_IngredientTagRels_TagId",
+                table: "IngredientTagRels",
                 column: "TagId");
 
             migrationBuilder.CreateIndex(
@@ -348,11 +343,6 @@ namespace Infrastructure.Database.Migrations
                 name: "IX_MenuItemSales_MenuItemId",
                 table: "MenuItemSales",
                 column: "MenuItemId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OrderItemIngredients_IngredientId",
-                table: "OrderItemIngredients",
-                column: "IngredientId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_MenuItemId",
@@ -387,7 +377,7 @@ namespace Infrastructure.Database.Migrations
                 name: "CustomerInformations");
 
             migrationBuilder.DropTable(
-                name: "IngredientTagRel");
+                name: "IngredientTagRels");
 
             migrationBuilder.DropTable(
                 name: "MenuItemIngredientRels");

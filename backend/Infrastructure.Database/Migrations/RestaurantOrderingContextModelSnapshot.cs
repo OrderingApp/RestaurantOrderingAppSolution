@@ -32,8 +32,9 @@ namespace Infrastructure.Database.Migrations
                     b.Property<DateTime?>("ExpectedOrderCompletion")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("OrderCompletionType")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("OrderCompletionType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("OrderId")
                         .HasColumnType("TEXT");
@@ -42,8 +43,9 @@ namespace Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("PreferredPaymentMethod")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("PreferredPaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -239,27 +241,6 @@ namespace Infrastructure.Database.Migrations
                     b.ToTable("OrderItems");
                 });
 
-            modelBuilder.Entity("Domain.OrderItemIngredient", b =>
-                {
-                    b.Property<Guid>("OrderItemId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("IngredientId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("OrderItemId", "IngredientId");
-
-                    b.HasIndex("IngredientId");
-
-                    b.ToTable("OrderItemIngredients");
-                });
-
             modelBuilder.Entity("Domain.Payment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -400,7 +381,7 @@ namespace Infrastructure.Database.Migrations
 
                     b.HasIndex("TagId");
 
-                    b.ToTable("IngredientTagRel");
+                    b.ToTable("IngredientTagRels");
                 });
 
             modelBuilder.Entity("Domain.CustomerInformation", b =>
@@ -470,7 +451,7 @@ namespace Infrastructure.Database.Migrations
                     b.HasOne("Domain.MenuItem", "MenuItem")
                         .WithMany()
                         .HasForeignKey("MenuItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Domain.Order", "Order")
@@ -479,28 +460,40 @@ namespace Infrastructure.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.OwnsMany("Domain.OrderItemIngredient", "Ingredients", b1 =>
+                        {
+                            b1.Property<Guid>("OrderItemId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasColumnType("TEXT");
+
+                            b1.Property<decimal>("Price")
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.Property<int>("Quantity")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("INTEGER")
+                                .HasDefaultValue(1);
+
+                            b1.HasKey("OrderItemId", "Id");
+
+                            b1.ToTable("OrderItemIngredients");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OrderItemId");
+                        });
+
+                    b.Navigation("Ingredients");
+
                     b.Navigation("MenuItem");
 
                     b.Navigation("Order");
-                });
-
-            modelBuilder.Entity("Domain.OrderItemIngredient", b =>
-                {
-                    b.HasOne("Domain.Ingredient", "Ingredient")
-                        .WithMany()
-                        .HasForeignKey("IngredientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.OrderItem", "OrderItem")
-                        .WithMany("Ingredients")
-                        .HasForeignKey("OrderItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Ingredient");
-
-                    b.Navigation("OrderItem");
                 });
 
             modelBuilder.Entity("Domain.Payment", b =>
@@ -567,11 +560,6 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("OrderItems");
 
                     b.Navigation("Payments");
-                });
-
-            modelBuilder.Entity("Domain.OrderItem", b =>
-                {
-                    b.Navigation("Ingredients");
                 });
 
             modelBuilder.Entity("Domain.Table", b =>

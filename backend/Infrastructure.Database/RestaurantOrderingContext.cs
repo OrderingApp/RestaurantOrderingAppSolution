@@ -9,7 +9,7 @@ public class RestaurantOrderingContextFactory : IDesignTimeDbContextFactory<Rest
     public RestaurantOrderingContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<RestaurantOrderingContext>();
-        optionsBuilder.UseSqlite("YourConnectionStringHere");
+        optionsBuilder.UseSqlite("YourConnectionStringHere"); // Replace with dynamic configuration
 
         return new RestaurantOrderingContext(optionsBuilder.Options);
     }
@@ -17,9 +17,7 @@ public class RestaurantOrderingContextFactory : IDesignTimeDbContextFactory<Rest
 
 public class RestaurantOrderingContext : DbContext
 {
-    public RestaurantOrderingContext(DbContextOptions<RestaurantOrderingContext> options) : base(options)
-    {
-    }
+    public RestaurantOrderingContext(DbContextOptions<RestaurantOrderingContext> options) : base(options) { }
 
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
@@ -29,6 +27,7 @@ public class RestaurantOrderingContext : DbContext
     public DbSet<Tag> Tags { get; set; }
     public DbSet<Ingredient> Ingredients { get; set; }
     public DbSet<MenuItemIngredientRel> MenuItemIngredientRels { get; set; }
+    public DbSet<IngredientTagRel> IngredientTagRels { get; set; }
     public DbSet<OrderItemIngredient> OrderItemIngredients { get; set; }
     public DbSet<CustomerInformation> CustomerInformations { get; set; }
     public DbSet<Reservation> Reservations { get; set; }
@@ -39,6 +38,8 @@ public class RestaurantOrderingContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // ✅ Enum Conversions
         modelBuilder.Entity<Order>()
             .Property(o => o.OrderStatus)
             .HasConversion(
@@ -59,6 +60,7 @@ public class RestaurantOrderingContext : DbContext
                 pm => pm.ToString(),
                 pm => (PaymentMethod)Enum.Parse(typeof(PaymentMethod), pm)
             );
+
         modelBuilder.Entity<Table>()
             .Property(t => t.TableStatus)
             .HasConversion(
@@ -66,31 +68,47 @@ public class RestaurantOrderingContext : DbContext
                 ts => (TableStatus)Enum.Parse(typeof(TableStatus), ts)
             );
 
+        modelBuilder.Entity<CustomerInformation>()
+            .Property(ci => ci.OrderCompletionType)
+            .HasConversion(
+                oc => oc.ToString(),
+                oc => (OrderCompletionType)Enum.Parse(typeof(OrderCompletionType), oc)
+            );
+
+        modelBuilder.Entity<CustomerInformation>()
+            .Property(ci => ci.PreferredPaymentMethod)
+            .HasConversion(
+                pm => pm.ToString(),
+                pm => (PreferredPaymentMethod)Enum.Parse(typeof(PreferredPaymentMethod), pm)
+            );
 
         // ✅ Order and OrderItem relationship (One-to-Many)
         modelBuilder.Entity<Order>()
             .HasMany(o => o.OrderItems)
             .WithOne(oi => oi.Order)
-            .HasForeignKey(oi => oi.OrderId);
+            .HasForeignKey(oi => oi.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // ✅ One-to-One: Order and CustomerInformation
         modelBuilder.Entity<Order>()
             .HasOne(o => o.CustomerInformation)
             .WithOne(ci => ci.Order)
-            .HasForeignKey<CustomerInformation>(ci => ci.OrderId);
+            .HasForeignKey<CustomerInformation>(ci => ci.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-        // ✅ One-To-Many Order and Payments relationship
+        // ✅ One-To-Many: Order and Payments
         modelBuilder.Entity<Order>()
             .HasMany(o => o.Payments)
             .WithOne(p => p.Order)
-            .HasForeignKey(oi => oi.OrderId)
+            .HasForeignKey(p => p.OrderId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // ✅ OrderItem and MenuItem relationship (Many-to-One)
         modelBuilder.Entity<OrderItem>()
             .HasOne(oi => oi.MenuItem)
             .WithMany()
-            .HasForeignKey(oi => oi.MenuItemId);
+            .HasForeignKey(oi => oi.MenuItemId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         // ✅ MenuCategory and MenuItem relationship
         modelBuilder.Entity<MenuCategory>()
@@ -120,26 +138,14 @@ public class RestaurantOrderingContext : DbContext
         modelBuilder.Entity<MenuItemIngredientRel>()
             .HasOne(mi => mi.MenuItem)
             .WithMany(m => m.MenuItemIngredientRels)
-            .HasForeignKey(mi => mi.MenuItemId);
+            .HasForeignKey(mi => mi.MenuItemId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<MenuItemIngredientRel>()
             .HasOne(mi => mi.Ingredient)
             .WithMany(i => i.MenuItemIngredientRels)
-            .HasForeignKey(mi => mi.IngredientId);
-
-        // ✅ Many-to-Many: OrderItem and Ingredient (Custom order modifications)
-        modelBuilder.Entity<OrderItemIngredient>()
-            .HasKey(oii => new { oii.OrderItemId, oii.IngredientId });
-
-        modelBuilder.Entity<OrderItemIngredient>()
-            .HasOne(oii => oii.OrderItem)
-            .WithMany(oi => oi.Ingredients)
-            .HasForeignKey(oii => oii.OrderItemId);
-
-        modelBuilder.Entity<OrderItemIngredient>()
-            .HasOne(oii => oii.Ingredient)
-            .WithMany()
-            .HasForeignKey(oii => oii.IngredientId);
+            .HasForeignKey(mi => mi.IngredientId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // ✅ Many-to-Many: Ingredient and Tag
         modelBuilder.Entity<IngredientTagRel>()
@@ -148,12 +154,23 @@ public class RestaurantOrderingContext : DbContext
         modelBuilder.Entity<IngredientTagRel>()
             .HasOne(it => it.Ingredient)
             .WithMany(i => i.IngredientTagRels)
-            .HasForeignKey(it => it.IngredientId);
+            .HasForeignKey(it => it.IngredientId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<IngredientTagRel>()
             .HasOne(it => it.Tag)
             .WithMany(t => t.IngredientTagRels)
-            .HasForeignKey(it => it.TagId);
+            .HasForeignKey(it => it.TagId)
+            .OnDelete(DeleteBehavior.Cascade);
 
+        // ✅ OrderItemIngredient as an owned type (Embedded inside OrderItem)
+        modelBuilder.Entity<OrderItem>()
+            .OwnsMany(oi => oi.Ingredients, ingredient =>
+            {
+                ingredient.WithOwner().HasForeignKey("OrderItemId");
+                ingredient.Property(i => i.Name).IsRequired();
+                ingredient.Property(i => i.Price).HasColumnType("decimal(18,2)");
+                ingredient.Property(i => i.Quantity).HasDefaultValue(1);
+            });
     }
 }

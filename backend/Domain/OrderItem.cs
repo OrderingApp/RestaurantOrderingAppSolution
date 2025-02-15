@@ -18,6 +18,14 @@ public class OrderItem
     public MenuItem MenuItem { get; set; } = null!;
 }
 
+public class OrderItemIngredient
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = null!;
+    public decimal Price { get; set; }
+    public int Quantity { get; set; } = 1;
+}
+
 public enum OrderItemStatus
 {
     Pending,
