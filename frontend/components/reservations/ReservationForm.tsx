@@ -28,7 +28,7 @@ const ReservationForm = () => {
     return (
         <div className="w-1/2 bg-white py-8 min-h-full relative">
             <h1 className="text-center text-black text-4xl font-bold py-5">
-                Stwórz Rezerwacje
+                Stwórz Rezerwacjee
             </h1>
             <form
                 className="py-2 px-8 flex flex-col justify-start gap-5 "
