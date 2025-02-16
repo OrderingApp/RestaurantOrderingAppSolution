@@ -1,7 +1,11 @@
+'use client';
+
 import LoginPage from '@/components/pages/login/Login';
 
-const isAuthenticated = false;
+const isAuthenticated = true;
 
-const Home = () => <>{isAuthenticated ? <h1>Home</h1> : <LoginPage />}</>;
+const Home = () => {
+    return <>{isAuthenticated ? <h1>test232</h1> : <LoginPage />}</>;
+};
 
 export default Home;
