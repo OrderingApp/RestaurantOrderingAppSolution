@@ -19,7 +19,7 @@ public class CustomerInformationController(ICustomerInformationService customerI
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(CustomerInformationReadDto), 200)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult> GetCustomerInformation([FromRoute] Guid id) =>
+    public async Task<ActionResult<CustomerInformationReadDto>> GetCustomerInformation([FromRoute] Guid id) =>
         HandleResult(await customerInformationService.GetCustomerInformation(id));
 
     /// <summary>
@@ -35,6 +35,6 @@ public class CustomerInformationController(ICustomerInformationService customerI
     [ProducesResponseType(typeof(CustomerInformationReadDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult> UpdateCustomerInformation([FromRoute] Guid id, [FromBody] CustomerInformationUpdateDto customerInformationUpdateDto) =>
+    public async Task<ActionResult<CustomerInformationReadDto>> UpdateCustomerInformation([FromRoute] Guid id, [FromBody] CustomerInformationUpdateDto customerInformationUpdateDto) =>
         HandleResult(await customerInformationService.UpdateCustomerInformation(id, customerInformationUpdateDto));
 }

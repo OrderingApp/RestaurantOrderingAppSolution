@@ -7,7 +7,8 @@ public interface IIngredientService
 {
     Task<ResultDto<IngredientReadDto>> CreateIngredient(IngredientCreateDto ingredientCreateDto);
     Task<ResultDto<IngredientReadDto>> GetIngredient(Guid id);
-    Task<ResultDto<List<IngredientReadDto>>> GetAllIngredients();
-    Task<ResultDto<IngredientReadDto>> UpdateIngredient(IngredientUpdateDto ingredientUpdateDto, Guid id);
+    Task<ResultDto<List<IngredientReadDto>>> GetAllIngredients(List<string>? tags = null);
+    Task<ResultDto<IngredientReadDto>> AddTagsToIngredient(Guid id, List<Guid> tagIds);
+    Task<ResultDto<IngredientReadDto>> UpdateIngredient(Guid id, IngredientUpdateDto ingredientUpdateDto);
     Task<ResultDto<bool>> DeleteIngredient(Guid id);
 }

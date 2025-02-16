@@ -1,24 +1,30 @@
 @API_HostAddress = http://localhost:5000/api
 
+### Update an existing ingredient
 
-// To update an existing ingredient.
-
-PUT {{API_HostAddress}}/Ingredients/7185c838-ed58-4b2a-b439-acbff28fecfb
+PUT {{API_HostAddress}}/Ingredients/26be6b7b-5152-49a8-8980-4ca63f0081c5
 Content-Type: application/json
 Accept: application/json
 
 {
   "name": "Cheddar",
-  "price": 3.00,
-  "ingredientType": "Meat",
+  "price": 3.0,
   "isUsed": true
 }
 
-###
 
-// To delete an existing ingredient.
+### Add tags to an ingredient
+
+POST {{API_HostAddress}}/Ingredients/26be6b7b-5152-49a8-8980-4ca63f0081c5/tags
+Content-Type: application/json
+Accept: application/json
+
+[
+    "750B354B-CA3D-42E8-899E-E4B120FF9EBC",
+    "7A544996-F421-43BB-877D-E30474875435"
+]
+
+### Delete an existing ingredient
 
 DELETE {{API_HostAddress}}/Ingredients/7185c838-ed58-4b2a-b439-acbff28fecfb
 Accept: application/json
-
-###
