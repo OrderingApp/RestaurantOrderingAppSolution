@@ -20,9 +20,7 @@ public class PaymentService(RestaurantOrderingContext orderingContext, IEventHan
             var order = await orderingContext.Orders
                 .Include(o => o.Payments)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
-            // test
-            // 123
-            // 1234
+
             if (order == null)
                 return ResultDto<PaymentReadDto>.Failure("Order not found", HttpStatusCode.NotFound);
 
