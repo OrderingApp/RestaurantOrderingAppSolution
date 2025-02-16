@@ -1,4 +1,5 @@
-﻿using Application.Dtos.MenuItems;
+﻿using Application.Dtos.Ingredients;
+using Application.Dtos.MenuItems;
 using AutoMapper;
 using Domain;
 
@@ -8,18 +9,21 @@ public class MenuItemMappingProfile : Profile
 {
     public MenuItemMappingProfile()
     {
-        CreateMap<MenuItem, MenuItemReadDto>();
+        CreateMap<MenuItem, MenuItemReadDto>()
+            .ForMember(dest => dest.Ingredients, opt => opt.MapFrom(src =>
+                src.MenuItemIngredientRels
+                    .Select(rel => new MenuItemIngredientReadDto
+                    {
+                        Id = rel.Ingredient.Id,
+                        Name = rel.Ingredient.Name,
+                    }).ToList()))
+            .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description ?? string.Empty));
 
-        //CreateMap<MenuItem, MenuItemDetailedDto>()
-        //    .ForMember(dest => dest.MenuCategoryName, opt => opt.MapFrom(src => src.MenuCategory!.Name));
+        CreateMap<MenuItemCreateDto, MenuItem>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
+            .ForMember(dest => dest.MenuItemIngredientRels, opt => opt.Ignore());
 
-        //CreateMap<MenuItemCreateDto, MenuItem>()
-        //    .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
-        //    .ForMember(dest => dest.MenuItemTags, opt => opt.Ignore())
-        //    .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(_ => false));
-
-        //CreateMap<MenuItemUpdateDto, MenuItem>()
-        //    .ForMember(dest => dest.MenuItemTags, opt => opt.Ignore())
-        //    .ForMember(dest => dest.Id, opt => opt.Ignore());
+        CreateMap<MenuItemUpdateDto, MenuItem>()
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
     }
 }

@@ -2,7 +2,7 @@
 
 // To get a specific menu item by its ID.
 
-GET {{API_HostAddress}}/MenuItem/f17610d5-9e2c-48c3-acf2-b6f7e56b0d25
+GET {{API_HostAddress}}/MenuItem/28a61cca-79af-416a-9871-68e5f38d6a6b
 Accept: application/json
 
 ###
@@ -14,16 +14,21 @@ Accept: application/json
 
 ###
 
-// To get menu items by category (without tag filtering).
+// To get menu items by category (without additional filters).
 
-GET {{API_HostAddress}}/MenuItem/category/c258340a-53b5-4038-a86d-afde2a88996b
+GET {{API_HostAddress}}/MenuItem?categoryId=d2634aae-bfe5-4139-92d2-f0d96d3b08ef
 Accept: application/json
 
 ###
 
-// To get menu items by category with a specific tag.
+// Get Menu Items by Category with Ingredients Filtering
 
-GET {{API_HostAddress}}/MenuItem/category/c258340a-53b5-4038-a86d-afde2a88996b?tagId=0B6A9800-1BF0-4A5E-8D04-A4EB28281A05
+GET {{API_HostAddress}}/MenuItem?categoryId=d2634aae-bfe5-4139-92d2-f0d96d3b08ef&ingredientIds=3f94d539-6882-40f5-a079-fa8d7091bac3&ingredientIds=a4458f4c-55d7-4bb9-9fe6-6e7b88bc96ea
 Accept: application/json
 
 ###
+
+// Get Menu Items by Category with Tag Filtering
+
+GET {{API_HostAddress}}/MenuItem?categoryId=d2634aae-bfe5-4139-92d2-f0d96d3b08ef&tags=spicy
+Accept: application/json

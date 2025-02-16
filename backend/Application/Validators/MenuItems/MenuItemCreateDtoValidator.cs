@@ -8,7 +8,7 @@ public class MenuItemCreateDtoValidator : AbstractValidator<MenuItemCreateDto>
     public MenuItemCreateDtoValidator()
     {
         RuleFor(x => x.Name)
-            .NotEmpty().WithMessage("Name is required.")
+            .NotEmpty().WithMessage("Menu item name is required.")
             .MaximumLength(100).WithMessage("Name must not exceed 100 characters.");
 
         RuleFor(x => x.Description)
@@ -16,12 +16,13 @@ public class MenuItemCreateDtoValidator : AbstractValidator<MenuItemCreateDto>
             .MaximumLength(500).WithMessage("Description must not exceed 500 characters.");
 
         RuleFor(x => x.Price)
-            .GreaterThan(0).WithMessage("Price must be greater than zero.");
+            .GreaterThanOrEqualTo(0).WithMessage("Price must be a non-negative value.");
 
         RuleFor(x => x.MenuCategoryId)
-            .NotEmpty().WithMessage("MenuCategoryId is required.");
+            .NotEmpty().WithMessage("Menu category ID is required.");
 
-        RuleForEach(x => x.TagIds)
-            .NotEmpty().WithMessage("Tag ID cannot be empty.");
+        RuleFor(x => x.IngredientIds)
+            .Must(ids => ids == null || ids.Distinct().Count() == ids.Count)
+            .WithMessage("Ingredient IDs must be unique.");
     }
 }

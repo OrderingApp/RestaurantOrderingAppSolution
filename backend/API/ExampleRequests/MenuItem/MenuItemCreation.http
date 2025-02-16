@@ -24,14 +24,14 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "name": "Margherita Pizza",
+  "name": "Margherita Pizza4",
   "description": "Classic pizza with tomato, mozzarella, and basil",
-  "price": 10.99,
-  "menuCategoryId": "c258340a-53b5-4038-a86d-afde2a88996b",
-  "tagIds": [
-    "0B6A9800-1BF0-4A5E-8D04-A4EB28281A05",
-    "5D5243FB-32C0-4414-8653-61087B18F80B"
+  "price": 13,
+  "menuCategoryId": "D2634AAE-BFE5-4139-92D2-F0D96D3B08EF",
+  "ingredientIds": [
+    "26BE6B7B-5152-49A8-8980-4CA63F0081C5"
   ]
 }
+
 
 ###
