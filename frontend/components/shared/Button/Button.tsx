@@ -40,16 +40,12 @@ const Button = ({
 
     const handleClick = async (e: MouseEvent<HTMLButtonElement>) => {
         if (onClick) return onClick(e);
-
+        if (!action) return;
         setIsLoading(true);
 
-        if (action) {
-            try {
-                await action();
-            } finally {
-                setIsLoading(false);
-            }
-        } else {
+        try {
+            await action();
+        } finally {
             setIsLoading(false);
         }
     };

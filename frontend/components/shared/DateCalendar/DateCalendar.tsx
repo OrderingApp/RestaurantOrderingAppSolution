@@ -85,13 +85,15 @@ const DateCalendar = ({
             const findDatePart = (
                 type: keyof Intl.DateTimeFormatPartTypesRegistry
             ) => formattedDate.find((part) => part.type === type)?.value || '';
-
+            const fullDateFormatted = formatter
+                .format(currentDate)
+                .replace(/\s/g, '');
             const dateObj = {
                 date: findDatePart('weekday'),
                 day: findDatePart('day'),
                 month: findDatePart('month'),
                 year: findDatePart('year'),
-                fullDate: `${currentDate.getDate()}${currentDate.toLocaleString(language, { month: 'short' })}${currentDate.getFullYear()}`,
+                fullDate: fullDateFormatted,
                 fullDateFormatted: new Date(currentDate.getTime()),
             };
 

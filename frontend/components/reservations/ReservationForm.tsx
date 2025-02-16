@@ -3,10 +3,10 @@
 import { useForm } from 'react-hook-form';
 import { reservationSchema } from '@/helpers/models/reservationForm';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Image from 'next/image';
 
 import Input from '../shared/Input/Input';
 import Button from '../shared/Button/Button';
-import Image from 'next/image';
 
 import dateSvg from '@/public/images/svg/date.svg';
 import timeSvg from '@/public/images/svg/time.svg';
