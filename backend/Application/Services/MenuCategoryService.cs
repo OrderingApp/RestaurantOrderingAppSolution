@@ -42,7 +42,7 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
         try
         {
             var menuCategories = await orderingContext.MenuCategories
-                .Include(mc => mc.MenuItems)
+                .Where(mc => mc.IsUsed && !mc.IsDeleted)
                 .ToListAsync();
 
             var menuCategoryDtos = mapper.Map<List<MenuCategoryReadDto>>(menuCategories);
@@ -62,7 +62,6 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
         try
         {
             var menuCategory = await orderingContext.MenuCategories
-                .Include(mc => mc.MenuItems)
                 .FirstOrDefaultAsync(mc => mc.Id == id);
 
             if (menuCategory == null)
@@ -81,7 +80,7 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
         }
     }
 
-    public async Task<ResultDto<MenuCategoryReadDto>> UpdateMenuCategory(MenuCategoryUpdateDto menuCategoryUpdateDto, Guid id)
+    public async Task<ResultDto<MenuCategoryReadDto>> UpdateMenuCategory(Guid id, MenuCategoryUpdateDto menuCategoryUpdateDto)
     {
         try
         {
@@ -114,9 +113,14 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
         try
         {
             var menuCategory = await orderingContext.MenuCategories.FindAsync(id);
+
             if (menuCategory == null)
                 return ResultDto<bool>
                     .Failure("MenuCategory not found.", HttpStatusCode.NotFound);
+
+            if (menuCategory.IsDeleted)
+                return ResultDto<bool>
+                    .Failure("MenuCategory has already been deleted.", HttpStatusCode.BadRequest);
 
             menuCategory.IsDeleted = true;
             menuCategory.IsUsed = false;
