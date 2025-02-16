@@ -6,6 +6,13 @@ const meta: Meta<typeof DateCalendar> = {
     title: 'Components/shared/DateCalendar',
     component: DateCalendar,
     tags: ['autodocs'],
+    parameters: {
+        docs: {
+            description: {
+                component: 'A customizable DateCalnedar component ',
+            },
+        },
+    },
     argTypes: {
         variant: {
             control: 'select',
@@ -89,3 +96,5 @@ export const Primary: Story = {
         expect(dateButton).toHaveClass('bg-[#2B5162]'); // Modify based on actual selected class
     },
 };
+
+//TODO Create some tests

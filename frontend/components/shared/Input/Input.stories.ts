@@ -27,7 +27,7 @@ const meta: Meta<typeof Input> = {
             control: 'text',
             description: 'Placeholder text displayed inside the input field.',
         },
-        size: {
+        inputSize: {
             control: { type: 'radio' },
             options: ['sm', 'md', 'lg'],
             description: 'Determines the size of the input field.',
@@ -96,7 +96,7 @@ export const Default: Story = {
         type: 'text',
         label: 'Default Input',
         placeholder: 'Enter text...',
-        size: 'sm',
+        inputSize: 'sm',
         variant: 'primary',
     },
     parameters: {
@@ -113,7 +113,7 @@ export const WithError: Story = {
         type: 'text',
         label: 'Input with Error',
         placeholder: 'Enter text...',
-        size: 'sm',
+        inputSize: 'sm',
         variant: 'primary',
         errors: { message: 'This field is required', type: 'Required' },
     },
@@ -131,7 +131,7 @@ export const Disabled: Story = {
         type: 'text',
         label: 'Disabled Input',
         placeholder: 'Cannot type here...',
-        size: 'sm',
+        inputSize: 'sm',
         variant: 'primary',
         disabled: true,
     },
@@ -144,4 +144,4 @@ export const Disabled: Story = {
     },
 };
 
-// Add some tests
+//TODO Add some tests

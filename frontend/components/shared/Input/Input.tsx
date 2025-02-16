@@ -1,22 +1,15 @@
 import clsx from 'clsx';
 
-type InputProps = {
-    id?: string;
+type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
     label?: string;
-    type: string;
-    placeholder?: string;
-    autoCapitalize?: string;
-    autoCorrect?: string;
-    disabled?: boolean;
     variant?: 'primary';
-    size?: 'sm' | 'md' | 'lg';
+    inputSize?: 'sm' | 'md' | 'lg';
     labelClassName?: string;
     inputClassName?: string;
     errorClassName?: string;
     icon?: React.ReactElement;
-    onChange?: React.ChangeEventHandler<HTMLInputElement>;
-    props?: React.HTMLAttributes<HTMLInputElement>;
     errors?: { type: string; message?: string };
+    props?: React.HTMLAttributes<HTMLInputElement>;
 };
 
 const variantClasses = {
@@ -52,12 +45,11 @@ const Input = ({
     autoCorrect = 'on',
     disabled = false,
     variant = 'primary',
-    size = 'sm',
-    labelClassName,
+    inputSize = 'sm',
     inputClassName,
+    labelClassName,
     errorClassName,
     icon,
-    onChange,
     props,
     errors,
 }: InputProps) => (
@@ -68,7 +60,7 @@ const Input = ({
                 className={clsx(
                     'pl-2 font-semibold text-black',
                     variantClasses[variant].label,
-                    sizeClasses[size].label,
+                    sizeClasses[inputSize].label,
                     labelClassName
                 )}
             >
@@ -81,7 +73,6 @@ const Input = ({
                 id,
                 type,
                 placeholder,
-                onChange,
                 autoCapitalize,
                 autoCorrect,
                 disabled,
@@ -90,7 +81,7 @@ const Input = ({
             className={clsx(
                 'px-4  w-40 py-2 shadow-sm text-black rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500',
                 variantClasses[variant].input,
-                sizeClasses[size].input,
+                sizeClasses[inputSize].input,
                 inputClassName
             )}
         />
@@ -101,7 +92,7 @@ const Input = ({
             <p
                 className={clsx(
                     'text-red-500 text-[10px] md:text-[12px] px-2 ',
-                    sizeClasses[size].error,
+                    sizeClasses[inputSize].error,
                     errorClassName
                 )}
             >
@@ -112,3 +103,5 @@ const Input = ({
 );
 
 export default Input;
+
+//TODO Make variants and sizes more flexible

@@ -1,9 +1,11 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import clsx from 'clsx';
+
+import React, { useState, useEffect, useRef } from 'react';
 
 interface DateCalendarProps {
     language?: string;
@@ -24,18 +26,9 @@ const variantStyles = {
 };
 
 const sizeClasses = {
-    sm: {
-        container: 'py-1',
-        text: 'text-sm',
-    },
-    md: {
-        container: 'py-2',
-        text: 'text-base',
-    },
-    lg: {
-        container: 'py-2',
-        text: 'text-lg',
-    },
+    sm: { container: 'py-1', text: 'text-sm' },
+    md: { container: 'py-2', text: 'text-base' },
+    lg: { container: 'py-2', text: 'text-lg' },
 };
 
 const sliderDefaultSettings = {
@@ -73,11 +66,13 @@ const DateCalendar = ({
     useEffect(() => {
         const startDate = new Date();
         const endDate = new Date();
-        endDate.setMonth(endDate.getMonth() + endDateNumber);
-        const generatedDates = [];
-        const current = new Date(startDate);
 
-        while (current <= endDate) {
+        endDate.setMonth(endDate.getMonth() + endDateNumber);
+
+        const generatedDates = [];
+        const currentDate = new Date(startDate);
+
+        while (currentDate <= endDate) {
             const options: Intl.DateTimeFormatOptions = {
                 weekday: 'short',
                 day: '2-digit',
@@ -85,48 +80,38 @@ const DateCalendar = ({
                 year: 'numeric',
             };
             const formatter = new Intl.DateTimeFormat(language, options);
-            const formattedDate = formatter.formatToParts(current);
+            const formattedDate = formatter.formatToParts(currentDate);
+
+            const findDatePart = (
+                type: keyof Intl.DateTimeFormatPartTypesRegistry
+            ) => formattedDate.find((part) => part.type === type)?.value || '';
 
             const dateObj = {
-                date:
-                    formattedDate.find((part) => part.type === 'weekday')
-                        ?.value || '',
-                day:
-                    formattedDate.find((part) => part.type === 'day')?.value ||
-                    '',
-                month:
-                    formattedDate.find((part) => part.type === 'month')
-                        ?.value || '',
-                year:
-                    formattedDate.find((part) => part.type === 'year')?.value ||
-                    '',
-                fullDate: `${current.getDate()}${current.toLocaleString(language, { month: 'short' })}${current.getFullYear()}`,
-                fullDateFormatted: new Date(current.getTime()),
+                date: findDatePart('weekday'),
+                day: findDatePart('day'),
+                month: findDatePart('month'),
+                year: findDatePart('year'),
+                fullDate: `${currentDate.getDate()}${currentDate.toLocaleString(language, { month: 'short' })}${currentDate.getFullYear()}`,
+                fullDateFormatted: new Date(currentDate.getTime()),
             };
 
             generatedDates.push(dateObj);
-            current.setDate(current.getDate() + 1);
+            currentDate.setDate(currentDate.getDate() + 1);
         }
 
         setDates(generatedDates);
 
         const today = new Date();
-        const todayFormatted = `${today.getDate()}${today.toLocaleString(
-            language,
-            {
-                month: 'short',
-            }
-        )}${today.getFullYear()}`;
+        const todayFormatted = `${today.getDate()}${today.toLocaleString(language, { month: 'short' })}${today.getFullYear()}`;
         const index = generatedDates.findIndex(
             (d) => d.fullDate === todayFormatted
         );
 
         if (index !== -1) {
             setSelectedDate(todayFormatted);
-
             setTimeout(() => sliderRef.current?.slickGoTo(index), 100);
         }
-    }, [language, endDateNumber, onDateSelect]);
+    }, [language, endDateNumber]);
 
     const handleDateSelect = (
         fullDate: string,
@@ -134,10 +119,8 @@ const DateCalendar = ({
         index: number
     ) => {
         setSelectedDate(fullDate);
-        console.log(fullDate);
-
         sliderRef.current?.slickGoTo(index);
-        if (onDateSelect) onDateSelect(fullDateFormatted);
+        onDateSelect?.(fullDateFormatted);
     };
 
     return (
@@ -148,7 +131,7 @@ const DateCalendar = ({
                         data-testid={`date-${date.fullDate}`}
                         key={date.fullDate}
                         className={clsx(
-                            'rounded-md cursor-pointer text-center ',
+                            'rounded-md cursor-pointer text-center',
                             sizeClasses[size].container,
                             selectedDate === date.fullDate
                                 ? variantStyles[variant].selected
@@ -195,3 +178,5 @@ const DateCalendar = ({
 };
 
 export default DateCalendar;
+
+//TODO Make variants more flexible

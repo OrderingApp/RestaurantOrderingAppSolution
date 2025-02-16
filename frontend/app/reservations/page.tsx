@@ -1,6 +1,5 @@
 import ReservationForm from '@/components/reservations/ReservationForm';
-
-import React from 'react';
+import DateCalendar from '@/components/shared/DateCalendar/DateCalendar';
 
 const Reservations = () => {
     return (
@@ -9,7 +8,9 @@ const Reservations = () => {
                 <aside className="w-[120px] min-h-full bg-blue-100"></aside>
                 <div className="w-full  flex">
                     <ReservationForm />
-                    <div className="w-1/2 bg-blue-100"></div>
+                    <div className="w-1/2 bg-blue-100">
+                        <DateCalendar />
+                    </div>
                 </div>
             </div>
         </section>
