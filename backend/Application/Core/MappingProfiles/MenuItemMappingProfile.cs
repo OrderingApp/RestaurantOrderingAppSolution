@@ -1,5 +1,4 @@
-﻿using Application.Dtos.Ingredients;
-using Application.Dtos.MenuItems;
+﻿using Application.Dtos.MenuItems;
 using AutoMapper;
 using Domain;
 

@@ -1,15 +1,16 @@
 ﻿using Application.Dtos.Common;
 using Application.Dtos.OrderItems;
 using Application.Dtos.Orders;
+using Domain;
 
 namespace Application.Contracts;
 
 public interface IOrderItemService
 {
-    Task<ResultDto<OrderReadDto>> AddOrderItems(IEnumerable<OrderItemCreateDto> orderItemDtos, Guid orderId);
-    Task<ResultDto<OrderItemReadDto>> GetOrderItem(Guid id);
+    Task<ResultDto<OrderReadDto>> AddOrderItems(Guid orderId, List<OrderItemCreateDto> orderItemDtos);
+    Task<ResultDto<OrderItemReadDto>> GetOrderItem(Guid orderId, Guid id);
     Task<ResultDto<List<OrderItemsListDto>>> GetAllOrderItems(Guid orderId);
-    Task<ResultDto<OrderReadDto>> ApplyOrderItemDiscount(decimal discountPercentage, Guid orderId, Guid orderItemId);
-    Task<ResultDto<OrderItemReadDto>> UpdateOrderItem(OrderItemUpdateDto updateDto, Guid orderItemId, Guid orderId);
-    Task<ResultDto<bool>> DeleteOrderItem(Guid id);
+    Task<ResultDto<OrderItemReadDto>> UpdateOrderItem(Guid orderId, Guid id, OrderItemUpdateDto updateDto);
+    Task<ResultDto<bool>> UpdateOrderItemStatus(Guid orderId, Guid id, OrderItemStatus status);
+    Task<ResultDto<bool>> DeleteOrderItem(Guid orderId, Guid id);
 }

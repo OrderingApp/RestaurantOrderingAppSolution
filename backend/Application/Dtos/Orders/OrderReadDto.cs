@@ -15,5 +15,5 @@ public class OrderReadDto
     public Guid? TableId { get; set; }
     public CustomerInformationReadDto? CustomerInformation { get; set; }
 
-    public List<OrderItemSummaryDto> OrderItems { get; set; } = new List<OrderItemSummaryDto>();
+    public List<OrderItemReadDto> OrderItems { get; set; } = new();
 }

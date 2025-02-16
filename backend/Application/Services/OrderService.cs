@@ -550,10 +550,10 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             .Where(mi => menuItemIds.Contains(mi.Id))
             .ToDictionaryAsync(mi => mi.Id);
 
-        var ingredientIds = orderItemDtos.SelectMany(oi => oi.Ingredients.Select(i => i.IngredientId)).Distinct();
-        var ingredients = await orderingContext.Ingredients
-            .Where(ing => ingredientIds.Contains(ing.Id))
-            .ToDictionaryAsync(ing => ing.Id);
+        //var ingredientIds = orderItemDtos.SelectMany(oi => oi.Ingredients.Select(i => i.IngredientId)).Distinct();
+        //var ingredients = await orderingContext.Ingredients
+        //    .Where(ing => ingredientIds.Contains(ing.Id))
+        //    .ToDictionaryAsync(ing => ing.Id);
 
         var orderItems = new List<OrderItem>();
 

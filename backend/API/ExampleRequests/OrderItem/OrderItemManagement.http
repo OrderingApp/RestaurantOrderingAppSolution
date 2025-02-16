@@ -1,37 +1,46 @@
-@API_HostAddress = http://localhost:5000/api
-
-// To apply a discount to a specific order item.
-
-PUT {{API_HostAddress}}/OrderItem/21b2af68-4041-48ef-bb9b-3a21627d6777/order-items/2ce10c11-4936-42c3-a8f6-7f02e575d31f/apply-discount?discount=10
-Accept: application/json
-
-###
+@API_HostAddress = http://localhost:5000
 
 ###
 
 // To update an order item.
 
-PUT {{API_HostAddress}}/OrderItem/21b2af68-4041-48ef-bb9b-3a21627d6777/items/2ce10c11-4936-42c3-a8f6-7f02e575d31f
+PUT {{API_HostAddress}}/orders/e67b14cd-40bc-4088-ba5f-51406b40f87b/order-items/8e7325e9-bca4-4e71-8e67-767bbd121fba
 Content-Type: application/json
 Accept: application/json
 
 {
   "specialInstructions": "Add extra mushrooms",
-  "ingredients": [
+  "discount": 10.00,
+  "extraIngredients": [
     {
-      "ingredientId": "7185c838-ed58-4b2a-b439-acbff28fecfb",
+      "ingredientId": "20a15b68-b2ae-4053-87b2-264eef92cc54",
       "quantity": 3
+    }
+  ],
+  "removedIngredients": [
+    {
+      "ingredientId": "3f94d539-6882-40f5-a079-fa8d7091bac3"
     }
   ]
 }
 
+
 ###
+// Update Order Item Status
+
+PATCH {{API_HostAddress}}/orders/E67B14CD-40BC-4088-BA5F-51406B40F87B/order-items/8e7325e9-bca4-4e71-8e67-767bbd121fba/status
+Content-Type: application/json
+Accept: application/json
+
+"Served"
+
 
 ###
 
 // To delete an order item.
 
-DELETE {{API_HostAddress}}/OrderItem/2ce10c11-4936-42c3-a8f6-7f02e575d31f
+DELETE {{API_HostAddress}}/orders/E67B14CD-40BC-4088-BA5F-51406B40F87B/order-items/8e7325e9-bca4-4e71-8e67-767bbd121fba
 Accept: application/json
+
 
 ###

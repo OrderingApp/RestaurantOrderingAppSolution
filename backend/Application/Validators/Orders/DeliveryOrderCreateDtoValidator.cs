@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Orders.OrderDelivery;
+using Application.Validators;
 using FluentValidation;
 
 public class DeliveryOrderCreateDtoValidator : AbstractValidator<DeliveryOrderCreateDto>

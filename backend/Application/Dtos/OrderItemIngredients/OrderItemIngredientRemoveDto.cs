@@ -1,7 +1,6 @@
 ﻿namespace Application.Dtos.OrderItemIngredients;
 
-public class OrderItemIngredientAddDto
+public class OrderItemIngredientRemoveDto
 {
     public Guid IngredientId { get; set; }
-    public int Quantity { get; set; } = 1;
 }

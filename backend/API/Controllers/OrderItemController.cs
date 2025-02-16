@@ -1,5 +1,7 @@
 ﻿using Application.Contracts;
 using Application.Dtos.OrderItems;
+using Application.Dtos.Orders;
+using Domain;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -19,23 +21,24 @@ public class OrderItemController(IOrderItemService orderItemService) : BaseApiCo
     /// <response code="201">If the order items were successfully added.</response>
     /// <response code="400">If the request is invalid.</response>
     [HttpPost]
-    [ProducesResponseType(201)]
+    [ProducesResponseType(typeof(OrderReadDto), 201)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> AddOrderItems([FromBody] IEnumerable<OrderItemCreateDto> orderItemDtos, Guid orderId) =>
-        HandleResult(await orderItemService.AddOrderItems(orderItemDtos, orderId));
+    public async Task<ActionResult<OrderReadDto>> AddOrderItems([FromRoute] Guid orderId, [FromBody] List<OrderItemCreateDto> orderItemDtos) =>
+        HandleResult(await orderItemService.AddOrderItems(orderId, orderItemDtos));
 
     /// <summary>
     /// Retrieves a specific order item by ID.
     /// </summary>
+    /// <param name="orderId">The order ID.</param>
     /// <param name="id">The unique order item ID.</param>
     /// <returns>The requested order item.</returns>
     /// <response code="200">Returns the order item.</response>
     /// <response code="404">If the order item is not found.</response>
     [HttpGet("{id}")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(OrderItemReadDto), 200)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> GetOrderItem(Guid id) =>
-        HandleResult(await orderItemService.GetOrderItem(id));
+    public async Task<ActionResult<OrderItemReadDto>> GetOrderItem([FromRoute] Guid orderId, [FromRoute] Guid id) =>
+        HandleResult(await orderItemService.GetOrderItem(orderId, id));
 
     /// <summary>
     /// Retrieves all items in a specific order.
@@ -44,24 +47,9 @@ public class OrderItemController(IOrderItemService orderItemService) : BaseApiCo
     /// <returns>A list of order items.</returns>
     /// <response code="200">Returns the list of order items.</response>
     [HttpGet]
-    [ProducesResponseType(200)]
-    public async Task<IActionResult> GetAllOrderItems(Guid orderId) =>
+    [ProducesResponseType(typeof(List<OrderItemsListDto>), 200)]
+    public async Task<ActionResult<List<OrderItemsListDto>>> GetAllOrderItems([FromRoute] Guid orderId) =>
         HandleResult(await orderItemService.GetAllOrderItems(orderId));
-
-    /// <summary>
-    /// Applies a discount to a specific order item.
-    /// </summary>
-    /// <param name="orderId">The ID of the order containing the item.</param>
-    /// <param name="orderItemId">The ID of the order item.</param>
-    /// <param name="discount">The discount percentage to apply.</param>
-    /// <returns>The updated order item with the discount applied.</returns>
-    /// <response code="200">If the discount was applied successfully.</response>
-    /// <response code="400">If the request is invalid.</response>
-    [HttpPut("apply-discount")]
-    [ProducesResponseType(200)]
-    [ProducesResponseType(400)]
-    public async Task<IActionResult> ApplyOrderItemDiscount(decimal discount, Guid orderId, Guid orderItemId) =>
-        HandleResult(await orderItemService.ApplyOrderItemDiscount(discount, orderId, orderItemId));
 
     /// <summary>
     /// Updates an order item.
@@ -74,15 +62,33 @@ public class OrderItemController(IOrderItemService orderItemService) : BaseApiCo
     /// <response code="400">If the request is invalid.</response>
     /// <response code="404">If the order item is not found.</response>
     [HttpPut("{id}")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(OrderItemReadDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> UpdateOrderItem([FromBody] OrderItemUpdateDto updateDto, Guid id, Guid orderId) =>
-        HandleResult(await orderItemService.UpdateOrderItem(updateDto, id, orderId));
+    public async Task<ActionResult<OrderItemReadDto>> UpdateOrderItem([FromRoute] Guid orderId, [FromRoute] Guid id, [FromBody] OrderItemUpdateDto updateDto) =>
+        HandleResult(await orderItemService.UpdateOrderItem(orderId, id, updateDto));
+
+    /// <summary>
+    /// Updates the status of an order item.
+    /// </summary>
+    /// <param name="orderId">The order ID.</param>
+    /// <param name="id">The order item ID.</param>
+    /// <param name="status">The new order item status.</param>
+    /// <returns>Success or failure.</returns>
+    /// <response code="200">If the update was successful.</response>
+    /// <response code="400">If the request is invalid.</response>
+    /// <response code="404">If the order item is not found.</response>
+    [HttpPatch("{id}/status")]
+    [ProducesResponseType(typeof(bool), 200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public async Task<ActionResult<bool>> UpdateOrderItemStatus([FromRoute] Guid orderId, [FromRoute] Guid id, [FromBody] OrderItemStatus status) =>
+        HandleResult(await orderItemService.UpdateOrderItemStatus(orderId, id, status));
 
     /// <summary>
     /// Deletes an order item.
     /// </summary>
+    /// <param name="orderId">The ID of the order.</param>
     /// <param name="id">The ID of the order item to delete.</param>
     /// <returns>No content.</returns>
     /// <response code="204">If the deletion was successful.</response>
@@ -90,6 +96,6 @@ public class OrderItemController(IOrderItemService orderItemService) : BaseApiCo
     [HttpDelete("{id}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> DeleteOrderItem(Guid id) =>
-        HandleResult(await orderItemService.DeleteOrderItem(id));
+    public async Task<IActionResult> DeleteOrderItem([FromRoute] Guid orderId, [FromRoute] Guid id) =>
+        HandleResult(await orderItemService.DeleteOrderItem(orderId, id));
 }

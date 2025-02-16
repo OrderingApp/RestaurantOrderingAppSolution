@@ -1,4 +1,5 @@
-﻿using Application.Dtos.OrderItemIngredients;
+﻿using Application.Dtos.MenuItems;
+using Application.Dtos.OrderItemIngredients;
 
 namespace Application.Dtos.OrderItems;
 
@@ -9,10 +10,8 @@ public class OrderItemReadDto
     public string? SpecialInstructions { get; set; }
     public decimal Discount { get; set; }
 
-    public List<OrderItemIngredientReadDto> Ingredients { get; set; } = new List<OrderItemIngredientReadDto>();
+    public List<OrderItemIngredientReadDto> ExtraIngredients { get; set; } = new();
+    public List<OrderItemIngredientReadDto> RemovedIngredients { get; set; } = new();
 
-    public Guid OrderId { get; set; }
-    public Guid MenuItemId { get; set; }
-
-    public string? MenuItemName { get; set; }
+    public MenuItemReadDto MenuItem { get; set; } = null!;
 }
