@@ -1,7 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { reservationSchema } from '@/utils/models/reservationForm';
+import { reservationSchema } from '@/helpers/models/reservationForm';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import Input from '../shared/Input/Input';
