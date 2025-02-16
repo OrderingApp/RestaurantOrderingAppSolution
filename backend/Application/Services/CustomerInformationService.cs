@@ -16,8 +16,7 @@ public class CustomerInformationService(RestaurantOrderingContext orderingContex
     {
         try
         {
-            var customerInformation = await orderingContext.CustomerInformations
-                .FirstOrDefaultAsync(ci => ci.Id == id);
+            var customerInformation = await orderingContext.CustomerInformations.FindAsync(id);
 
             if (customerInformation == null)
             {
@@ -37,12 +36,11 @@ public class CustomerInformationService(RestaurantOrderingContext orderingContex
         }
     }
 
-    public async Task<ResultDto<CustomerInformationReadDto>> UpdateCustomerInformation(CustomerInformationUpdateDto customerInformationUpdateDto, Guid id)
+    public async Task<ResultDto<CustomerInformationReadDto>> UpdateCustomerInformation(Guid id, CustomerInformationUpdateDto customerInformationUpdateDto)
     {
         try
         {
-            var customerInformation = await orderingContext.CustomerInformations
-                .FirstOrDefaultAsync(ci => ci.Id == id);
+            var customerInformation = await orderingContext.CustomerInformations.FindAsync(id);
 
             if (customerInformation == null)
             {
@@ -51,6 +49,7 @@ public class CustomerInformationService(RestaurantOrderingContext orderingContex
             }
 
             mapper.Map(customerInformationUpdateDto, customerInformation);
+            orderingContext.Entry(customerInformation).State = EntityState.Modified;
             await orderingContext.SaveChangesAsync();
 
             var updatedCustomerInformationDto = mapper.Map<CustomerInformationReadDto>(customerInformation);

@@ -4,7 +4,7 @@
 
 // To update a customer's information.
 
-PUT {{API_HostAddress}}/CustomerInformation/EF10FCA7-D8E7-4A27-BA22-50314B804A78
+PUT {{API_HostAddress}}/CustomerInformation/4402E7A0-1D66-4A85-87A3-D39BF06A1724
 Content-Type: application/json
 Accept: application/json
 
