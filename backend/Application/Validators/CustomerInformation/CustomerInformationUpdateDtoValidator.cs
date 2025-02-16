@@ -9,7 +9,7 @@ public class CustomerInformationUpdateDtoValidator : AbstractValidator<CustomerI
     {
         RuleFor(x => x.PhoneNumber)
             .NotEmpty().WithMessage("Phone number is required.")
-            .Matches(@"^\d+$").WithMessage("Phone number must contain only digits.")
+            .Matches(@"^\+?[1-9]\d{8,14}$").WithMessage("Invalid phone number format.")
             .Length(9, 15).WithMessage("Phone number must be between 9 and 15 digits.");
 
         RuleFor(x => x.Address)

@@ -13,6 +13,7 @@ public class CustomerInformationMappingProfile : Profile
 
         CreateMap<CustomerInformation, CustomerInformationReadDto>();
 
-        CreateMap<CustomerInformationUpdateDto, CustomerInformation>();
+        CreateMap<CustomerInformationUpdateDto, CustomerInformation>()
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
     }
 }
