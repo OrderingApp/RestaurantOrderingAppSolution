@@ -8,7 +8,7 @@ namespace API.Controllers;
 /// <summary>
 /// Manages payments for orders.
 /// </summary>
-[Route("/orders/{orderId}/payments/")]
+[Route("orders/{orderId}/payments")]
 public class PaymentController(IPaymentService paymentService) : BaseApiController
 {
     /// <summary>

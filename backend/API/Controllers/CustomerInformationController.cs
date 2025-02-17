@@ -7,6 +7,7 @@ namespace API.Controllers;
 /// <summary>
 /// Manages customer information, including retrieval and updates.
 /// </summary>
+[Route("api/customers/{id}/information")]
 public class CustomerInformationController(ICustomerInformationService customerInformationService) : BaseApiController
 {
     /// <summary>
@@ -16,7 +17,7 @@ public class CustomerInformationController(ICustomerInformationService customerI
     /// <returns>The customer information.</returns>
     /// <response code="200">Returns the customer information.</response>
     /// <response code="404">If the customer is not found.</response>
-    [HttpGet("{id}")]
+    [HttpGet]
     [ProducesResponseType(typeof(CustomerInformationReadDto), 200)]
     [ProducesResponseType(404)]
     public async Task<ActionResult<CustomerInformationReadDto>> GetCustomerInformation([FromRoute] Guid id) =>
@@ -31,7 +32,7 @@ public class CustomerInformationController(ICustomerInformationService customerI
     /// <response code="200">If the update was successful.</response>
     /// <response code="400">If the request is invalid.</response>
     /// <response code="404">If the customer is not found.</response>
-    [HttpPut("{id}")]
+    [HttpPut]
     [ProducesResponseType(typeof(CustomerInformationReadDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]

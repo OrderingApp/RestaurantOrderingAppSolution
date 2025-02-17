@@ -114,7 +114,7 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
         }
     }
 
-    public async Task<ResultDto<List<OrderItemsListDto>>> GetAllOrderItems(Guid orderId)
+    public async Task<ResultDto<List<OrderItemsListDto>>> GetOrderItems(Guid orderId)
     {
         try
         {

@@ -7,7 +7,7 @@ namespace API.Controllers;
 /// <summary>
 /// Manages table reservations.
 /// </summary>
-/// 
+[Route("api/reservations")]
 public class ReservationController(IReservationService reservationService) : BaseApiController
 {
     /// <summary>
@@ -64,7 +64,7 @@ public class ReservationController(IReservationService reservationService) : Bas
     /// <response code="200">If the table was assigned successfully.</response>
     /// <response code="400">If the request is invalid.</response>
     /// <response code="404">If the reservation or table is not found.</response>
-    [HttpPut("{reservationId}/table/{tableId}")]
+    [HttpPut("{reservationId}/table")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]

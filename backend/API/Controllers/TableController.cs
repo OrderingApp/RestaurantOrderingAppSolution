@@ -7,6 +7,7 @@ namespace API.Controllers;
 /// <summary>
 /// Manages tables in the restaurant.
 /// </summary>
+[Route("api/tables")]
 public class TableController(ITableService tableService) : BaseApiController
 {
     /// <summary>
@@ -69,7 +70,7 @@ public class TableController(ITableService tableService) : BaseApiController
     /// <response code="200">If the update was successful.</response>
     /// <response code="400">If the request is invalid.</response>
     /// <response code="404">If the table is not found.</response>
-    [HttpPut("{id}/updateOccupancy")]
+    [HttpPut("{id}/occupancy")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]

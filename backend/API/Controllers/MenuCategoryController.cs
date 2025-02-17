@@ -7,6 +7,7 @@ namespace API.Controllers;
 /// <summary>
 /// Manages menu categories.
 /// </summary>
+[Route("api/menu-categories")]
 public class MenuCategoryController(IMenuCategoryService menuCategoryService) : BaseApiController
 {
     /// <summary>
@@ -40,10 +41,10 @@ public class MenuCategoryController(IMenuCategoryService menuCategoryService) : 
     /// Retrieves all menu categories.
     /// </summary>
     /// <returns>A list of menu categories.</returns>
-    [HttpGet("menu-categories")]
+    [HttpGet]
     [ProducesResponseType(typeof(List<MenuCategoryReadDto>), 200)]
-    public async Task<ActionResult<List<MenuCategoryReadDto>>> GetAllMenuCategories() =>
-        HandleResult(await menuCategoryService.GetAllMenuCategories());
+    public async Task<ActionResult<List<MenuCategoryReadDto>>> GetMenuCategories() =>
+        HandleResult(await menuCategoryService.GetMenuCategories());
 
     /// <summary>
     /// Updates an existing menu category.

@@ -11,6 +11,7 @@ namespace API.Controllers;
 /// <summary>
 /// Manages orders including dine-in, takeaway, and delivery.
 /// </summary>
+[Route("api/orders")]
 public class OrderController(IOrderService orderService) : BaseApiController
 {
     /// <summary>
@@ -85,7 +86,7 @@ public class OrderController(IOrderService orderService) : BaseApiController
     /// Retrieves all ongoing takeaway orders.
     /// </summary>
     /// <returns>A list of ongoing takeaway orders.</returns>
-    [HttpGet("takeawayOrders")]
+    [HttpGet("takeaway-orders")]
     [ProducesResponseType(200)]
     public async Task<IActionResult> GetOngoingOrdersForTakeaway() =>
         HandleResult(await orderService.GetOngoingOrdersForTakeaway());
@@ -94,7 +95,7 @@ public class OrderController(IOrderService orderService) : BaseApiController
     /// Retrieves all ongoing delivery orders.
     /// </summary>
     /// <returns>A list of ongoing delivery orders.</returns>
-    [HttpGet("deliveryOrders")]
+    [HttpGet("delivery-orders")]
     [ProducesResponseType(200)]
     public async Task<IActionResult> GetOngoingOrdersForDelivery() =>
         HandleResult(await orderService.GetOngoingOrdersForDelivery());

@@ -37,26 +37,6 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
         }
     }
 
-    public async Task<ResultDto<List<MenuCategoryReadDto>>> GetAllMenuCategories()
-    {
-        try
-        {
-            var menuCategories = await orderingContext.MenuCategories
-                .Where(mc => mc.IsUsed && !mc.IsDeleted)
-                .ToListAsync();
-
-            var menuCategoryDtos = mapper.Map<List<MenuCategoryReadDto>>(menuCategories);
-
-            return ResultDto<List<MenuCategoryReadDto>>
-                .Success(menuCategoryDtos, HttpStatusCode.OK);
-        }
-        catch (Exception ex)
-        {
-            return ResultDto<List<MenuCategoryReadDto>>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
-        }
-    }
-
     public async Task<ResultDto<MenuCategoryReadDto>> GetMenuCategory(Guid id)
     {
         try
@@ -76,6 +56,26 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
         catch (Exception ex)
         {
             return ResultDto<MenuCategoryReadDto>
+                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+        }
+    }
+
+    public async Task<ResultDto<List<MenuCategoryReadDto>>> GetMenuCategories()
+    {
+        try
+        {
+            var menuCategories = await orderingContext.MenuCategories
+                .Where(mc => mc.IsUsed && !mc.IsDeleted)
+                .ToListAsync();
+
+            var menuCategoryDtos = mapper.Map<List<MenuCategoryReadDto>>(menuCategories);
+
+            return ResultDto<List<MenuCategoryReadDto>>
+                .Success(menuCategoryDtos, HttpStatusCode.OK);
+        }
+        catch (Exception ex)
+        {
+            return ResultDto<List<MenuCategoryReadDto>>
                 .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
         }
     }

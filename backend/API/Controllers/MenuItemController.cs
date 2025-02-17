@@ -7,6 +7,7 @@ namespace API.Controllers;
 /// <summary>
 /// Manages menu items.
 /// </summary>
+[Route("api/menu-items")]
 public class MenuItemController(IMenuItemService menuItemService) : BaseApiController
 {
     /// <summary>
@@ -44,11 +45,11 @@ public class MenuItemController(IMenuItemService menuItemService) : BaseApiContr
     /// <returns>A list of menu items matching the filters.</returns>
     [HttpGet]
     [ProducesResponseType(typeof(List<MenuItemReadDto>), 200)]
-    public async Task<ActionResult<List<MenuItemReadDto>>> GetFilteredMenuItems(
+    public async Task<ActionResult<List<MenuItemReadDto>>> GetMenuItems(
         [FromQuery] Guid? categoryId = null,
         [FromQuery] List<Guid>? ingredientIds = null,
         [FromQuery] List<string>? tags = null) =>
-        HandleResult(await menuItemService.GetFilteredMenuItems(categoryId, ingredientIds, tags));
+        HandleResult(await menuItemService.GetMenuItems(categoryId, ingredientIds, tags));
 
     /// <summary>
     /// Updates an existing menu item.

@@ -37,7 +37,7 @@ public class IngredientService(RestaurantOrderingContext orderingContext, IEvent
         }
     }
 
-    public async Task<ResultDto<List<IngredientReadDto>>> GetAllIngredients(List<string>? tags = null)
+    public async Task<ResultDto<List<IngredientReadDto>>> GetIngredients(List<string>? tags = null)
     {
         try
         {

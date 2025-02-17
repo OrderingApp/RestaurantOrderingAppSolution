@@ -9,7 +9,7 @@ namespace API.Controllers;
 /// <summary>
 /// Manages order items within an order.
 /// </summary>
-[Route("/orders/{orderId}/order-items/")]
+[Route("api/orders/{orderId}/order-items")]
 public class OrderItemController(IOrderItemService orderItemService) : BaseApiController
 {
     /// <summary>
@@ -48,8 +48,8 @@ public class OrderItemController(IOrderItemService orderItemService) : BaseApiCo
     /// <response code="200">Returns the list of order items.</response>
     [HttpGet]
     [ProducesResponseType(typeof(List<OrderItemsListDto>), 200)]
-    public async Task<ActionResult<List<OrderItemsListDto>>> GetAllOrderItems([FromRoute] Guid orderId) =>
-        HandleResult(await orderItemService.GetAllOrderItems(orderId));
+    public async Task<ActionResult<List<OrderItemsListDto>>> GetOrderItems([FromRoute] Guid orderId) =>
+        HandleResult(await orderItemService.GetOrderItems(orderId));
 
     /// <summary>
     /// Updates an order item.

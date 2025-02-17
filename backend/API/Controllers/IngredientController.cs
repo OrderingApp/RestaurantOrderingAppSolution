@@ -7,6 +7,7 @@ namespace API.Controllers;
 /// <summary>
 /// Manages ingredients in the system.
 /// </summary>
+[Route("api/ingredients")]
 public class IngredientsController(IIngredientService ingredientService) : BaseApiController
 {
     /// <summary>
@@ -23,15 +24,6 @@ public class IngredientsController(IIngredientService ingredientService) : BaseA
         HandleResult(await ingredientService.CreateIngredient(ingredientCreateDto));
 
     /// <summary>
-    /// Retrieves all ingredients.
-    /// </summary>
-    /// <returns>A list of all available ingredients.</returns>
-    [HttpGet]
-    [ProducesResponseType(typeof(List<IngredientReadDto>), 200)]
-    public async Task<ActionResult<List<IngredientReadDto>>> GetAllIngredients([FromQuery] List<string>? tags = null) =>
-        HandleResult(await ingredientService.GetAllIngredients(tags));
-
-    /// <summary>
     /// Retrieves a specific ingredient by ID.
     /// </summary>
     /// <param name="id">The unique ingredient ID.</param>
@@ -45,6 +37,15 @@ public class IngredientsController(IIngredientService ingredientService) : BaseA
         HandleResult(await ingredientService.GetIngredient(id));
 
     /// <summary>
+    /// Retrieves all ingredients.
+    /// </summary>
+    /// <returns>A list of all available ingredients.</returns>
+    [HttpGet]
+    [ProducesResponseType(typeof(List<IngredientReadDto>), 200)]
+    public async Task<ActionResult<List<IngredientReadDto>>> GetIngredients([FromQuery] List<string>? tags = null) =>
+        HandleResult(await ingredientService.GetIngredients(tags));
+
+    /// <summary>
     /// Adds tags to an ingredient.
     /// </summary>
     /// <param name="id">The unique ingredient ID.</param>
@@ -52,7 +53,7 @@ public class IngredientsController(IIngredientService ingredientService) : BaseA
     /// <returns>The updated ingredient with assigned tags.</returns>
     /// <response code="200">If tags were successfully added.</response>
     /// <response code="404">If the ingredient is not found.</response>
-    [HttpPost("{id}/tags")]
+    [HttpPut("{id}/tags")]
     [ProducesResponseType(typeof(IngredientReadDto), 200)]
     [ProducesResponseType(404)]
     public async Task<ActionResult<IngredientReadDto>> AddTagsToIngredient([FromRoute] Guid id, [FromBody] List<Guid> tagIds) =>

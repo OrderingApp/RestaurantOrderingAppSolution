@@ -79,7 +79,7 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
         }
     }
 
-    public async Task<ResultDto<List<MenuItemReadDto>>> GetFilteredMenuItems(Guid? categoryId = null, List<Guid>? ingredientIds = null, List<string>? tags = null)
+    public async Task<ResultDto<List<MenuItemReadDto>>> GetMenuItems(Guid? categoryId = null, List<Guid>? ingredientIds = null, List<string>? tags = null)
     {
         try
         {
