@@ -3,19 +3,21 @@
 @tailwind utilities;
 
 :root {
-    --background: #ffffff;
-    --foreground: #171717;
-}
+    /* Typography */
+    --serif: 'Pharmount Personal Use Only', serif;
+    --sans: 'Arial', sans-serif;
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background: #0a0a0a;
-        --foreground: #ededed;
-    }
+    /* Colors */
+    --primary: #2b5162;
+    --secondary: #008080;
+    --tertiary: #334046;
+    --danger: #fb2c1a;
+    --brown: #cd5700;
+    --white: #fff;
+    --black: #000;
 }
 
 body {
-    color: var(--foreground);
-    background: var(--background);
     font-family: Arial, Helvetica, sans-serif;
+    color: var(--black);
 }

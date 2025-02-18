@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 
 import { LanguageTypes } from '@/helpers/constants/languagePacks';
 import { langKey } from '@/helpers/constants/keys';
@@ -10,9 +10,18 @@ type LanguageContextType = {
     setLanguage: (language: LanguageTypes) => void;
 };
 
-export const LanguageContext = createContext<LanguageContextType | undefined>(
+const LanguageContext = createContext<LanguageContextType | undefined>(
     undefined
 );
+
+export const useLanguage = () => {
+    const ctx = useContext(LanguageContext);
+
+    if (!ctx)
+        throw new Error('useLanguage must be used within a LanguageProvider');
+
+    return ctx;
+};
 
 const LanguageProvider = ({
     language,

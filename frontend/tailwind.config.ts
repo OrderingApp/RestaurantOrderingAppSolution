@@ -8,9 +8,22 @@ export default {
     ],
     theme: {
         extend: {
+            backgroundImage: {
+                'page-gradient':
+                    'linear-gradient(135deg, #2C5364 0%, #0F2027 100%)',
+            },
             colors: {
-                background: 'var(--background)',
-                foreground: 'var(--foreground)',
+                primary: 'var(--primary)',
+                secondary: 'var(--secondary)',
+                tertiary: 'var(--tertiary)',
+                danger: 'var(--danger)',
+                brown: 'var(--brown)',
+                white: 'var(--white)',
+                black: 'var(--black)',
+            },
+            fontFamily: {
+                serif: 'var(--serif)',
+                sans: 'var(--sans)',
             },
         },
     },

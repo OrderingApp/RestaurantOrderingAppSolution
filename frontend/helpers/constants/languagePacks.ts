@@ -15,11 +15,16 @@ export const supportedLanguages: LanguageTypes[] = Object.keys(
 ) as LanguageTypes[];
 
 export interface languagePack {
+    metadata: {
+        title: string;
+        description: string;
+    };
     loginPage: {
         appName: string;
-        login: string;
-        password: string;
-        enter: string;
+        form: loginPageFormFields & {
+            submit: string;
+            errors: loginPageFormFields;
+        };
     };
     menuBar: {
         tables: string;
@@ -29,6 +34,31 @@ export interface languagePack {
         endDay: string;
         settings: string;
     };
+    createReservationPage: {
+        createReservation: string;
+        chooseReservation: string;
+        form: createReservationPageFormFields & {
+            submit: string;
+            errors: Omit<createReservationPageFormFields, 'personalData'> & {
+                personalData: {
+                    min: string;
+                    max: string;
+                };
+            };
+        };
+    };
+}
+
+interface loginPageFormFields {
+    login: string;
+    password: string;
+}
+interface createReservationPageFormFields {
+    personalData: string;
+    noOfPeople: string;
+    date: string;
+    time: string;
+    phone: string;
 }
 
 export default languagePacks;

@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
 import Button from './Button';
-import { createDelayedMock } from '@/helpers/utils/test-utils';
+import { createDelayedMock } from '@/helpers/utils/test-helpers';
 
 describe('Button Component', () => {
     it('handles regular onClick callback', async () => {

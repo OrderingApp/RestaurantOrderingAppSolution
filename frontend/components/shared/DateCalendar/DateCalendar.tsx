@@ -1,102 +1,145 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
-import Slider, { type Settings as SliderSettings } from 'react-slick';
+import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import clsx from 'clsx';
 
-import useLanguage from '@/helpers/hooks/useLanguage';
+import React, { useState, useEffect, useRef } from 'react';
 
-import DateItem from './components/DateItem/DateItem';
-import { formatDate, generateDates } from '@/helpers/utils/dates';
-import { type ComponentStyles } from '@/helpers/types/ui-types';
-
-interface DateCalendarProps extends Partial<ComponentStyles> {
+interface DateCalendarProps {
+    language?: string;
     endDateNumber?: number;
-    sliderSettings?: SliderSettings;
+    variant?: 'primary';
+    size?: 'sm' | 'md' | 'lg';
+    sliderSettings?: object;
     className?: string;
     classNameText?: string;
     onDateSelect?: (date: Date) => void;
 }
 
-/**
- * A calendar component that displays a range of dates in a slider.
- *
- * @param {DateCalendarProps} props - The component props.
- * @param {number} [props.endDateNumber=2] - The number of months to display from the current date.
- * @param {string} [props.variant='primary'] - The variant of the calendar (e.g., 'primary').
- * @param {string} [props.size='sm'] - The size of the calendar (e.g., 'sm', 'md', 'lg').
- * @param {SliderSettings} [props.sliderSettings] - Custom settings for the slider.
- * @param {string} [props.className] - Additional CSS class for the calendar container.
- * @param {string} [props.classNameText] - Additional CSS class for the text inside the calendar.
- * @param {(date: Date) => void} [props.onDateSelect] - Callback function when a date is selected.
- * @returns {JSX.Element} The DateCalendar component.
- */
+const variantStyles = {
+    primary: {
+        selected: 'bg-[#2B5162] text-white',
+        unselected: 'bg-[#E2E2E2] text-[#2B5162]',
+    },
+};
+
+const sizeClasses = {
+    sm: { container: 'py-1', text: 'text-sm' },
+    md: { container: 'py-2', text: 'text-base' },
+    lg: { container: 'py-2', text: 'text-lg' },
+};
+
+const sliderDefaultSettings = {
+    speed: 300,
+    slidesToShow: 7,
+    slidesToScroll: 7,
+    infinite: false,
+    arrows: false,
+    dots: false,
+};
+
 const DateCalendar = ({
+    language = 'pl',
     endDateNumber = 2,
     variant = 'primary',
     size = 'sm',
-    sliderSettings = {},
+    sliderSettings = sliderDefaultSettings,
     className,
     classNameText,
     onDateSelect,
 }: DateCalendarProps) => {
     const sliderRef = useRef<Slider | null>(null);
-    const { language } = useLanguage();
-    const [selectedDate, setSelectedDate] = useState<string>();
+    const [selectedDate, setSelectedDate] = useState<string | null>(null);
+    const [dates, setDates] = useState<
+        {
+            date: string;
+            day: string;
+            month: string;
+            year: string;
+            fullDate: string;
+            fullDateFormatted: Date;
+        }[]
+    >([]);
 
-    const dates = useMemo(() => {
-        const currentDate = new Date();
+    useEffect(() => {
+        const startDate = new Date();
         const endDate = new Date();
 
         endDate.setMonth(endDate.getMonth() + endDateNumber);
 
-        return generateDates(currentDate, endDate, language);
-    }, [language, endDateNumber]);
+        const generatedDates = [];
+        const currentDate = new Date(startDate);
 
-    useEffect(() => {
+        while (currentDate <= endDate) {
+            const options: Intl.DateTimeFormatOptions = {
+                weekday: 'short',
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+            };
+            const formatter = new Intl.DateTimeFormat(language, options);
+            const formattedDate = formatter.formatToParts(currentDate);
+
+            const findDatePart = (
+                type: keyof Intl.DateTimeFormatPartTypesRegistry
+            ) => formattedDate.find((part) => part.type === type)?.value || '';
+            const fullDateFormatted = formatter
+                .format(currentDate)
+                .replace(/\s/g, '');
+            const dateObj = {
+                date: findDatePart('weekday'),
+                day: findDatePart('day'),
+                month: findDatePart('month'),
+                year: findDatePart('year'),
+                fullDate: fullDateFormatted,
+                fullDateFormatted: new Date(currentDate.getTime()),
+            };
+
+            generatedDates.push(dateObj);
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        setDates(generatedDates);
+
         const today = new Date();
-        const todayFormatted = formatDate(today, language).fullDate;
+        const todayFormatted = `${today.getDate()}${today.toLocaleString(language, { month: 'short' })}${today.getFullYear()}`;
+        const index = generatedDates.findIndex(
+            (d) => d.fullDate === todayFormatted
+        );
 
-        setSelectedDate(todayFormatted);
-    }, [language]);
-
-    useEffect(() => {
-        if (!sliderRef.current || !selectedDate) return;
-
-        const index = dates.findIndex((d) => d.fullDate === selectedDate);
-
-        if (index !== -1) sliderRef.current.slickGoTo(index);
-    }, [dates, selectedDate]);
+        if (index !== -1) {
+            setSelectedDate(todayFormatted);
+            setTimeout(() => sliderRef.current?.slickGoTo(index), 100);
+        }
+    }, [language, endDateNumber]);
 
     const handleDateSelect = (
         fullDate: string,
         fullDateFormatted: Date,
         index: number
     ) => {
+        setSelectedDate(fullDate);
         sliderRef.current?.slickGoTo(index);
         onDateSelect?.(fullDateFormatted);
-
-        setSelectedDate(fullDate);
     };
 
     return (
         <div data-testid="date-calendar">
-            <Slider
-                ref={sliderRef}
-                {...{ ...sliderDefaultSettings, ...sliderSettings }}
-            >
+            <Slider ref={sliderRef} {...sliderSettings}>
                 {dates.map((date, index) => (
-                    <DateItem
+                    <div
+                        data-testid={`date-${date.fullDate}`}
                         key={date.fullDate}
-                        {...{
-                            ...date,
-                            variant,
-                            size,
-                            className,
-                            classNameText,
-                        }}
-                        isSelected={selectedDate === date.fullDate}
+                        className={clsx(
+                            'rounded-md cursor-pointer text-center',
+                            sizeClasses[size].container,
+                            selectedDate === date.fullDate
+                                ? variantStyles[variant].selected
+                                : variantStyles[variant].unselected,
+                            className
+                        )}
                         onClick={() =>
                             handleDateSelect(
                                 date.fullDate,
@@ -104,20 +147,36 @@ const DateCalendar = ({
                                 index
                             )
                         }
-                    />
+                    >
+                        <p
+                            className={clsx(
+                                sizeClasses[size].text,
+                                classNameText
+                            )}
+                        >
+                            {date.date}
+                        </p>
+                        <p
+                            className={clsx(
+                                sizeClasses[size].text,
+                                classNameText
+                            )}
+                        >
+                            {date.day}
+                        </p>
+                        <p
+                            className={clsx(
+                                sizeClasses[size].text,
+                                classNameText
+                            )}
+                        >
+                            {date.month} {date.year}
+                        </p>
+                    </div>
                 ))}
             </Slider>
         </div>
     );
-};
-
-const sliderDefaultSettings: SliderSettings = {
-    speed: 300,
-    slidesToShow: 7,
-    slidesToScroll: 7,
-    infinite: false,
-    arrows: false,
-    dots: false,
 };
 
 export default DateCalendar;
