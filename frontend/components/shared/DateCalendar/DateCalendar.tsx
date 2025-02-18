@@ -74,7 +74,7 @@ const DateCalendar = ({
         fullDateFormatted: Date,
         index: number
     ) => {
-        sliderRef.current?.slickGoTo(index);
+        sliderRef.current?.slickGoTo(index - 3);
         onDateSelect?.(fullDateFormatted);
 
         setSelectedDate(fullDate);
