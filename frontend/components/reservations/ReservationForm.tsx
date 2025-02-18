@@ -13,12 +13,20 @@ import {
     type ReservationSchema,
 } from '@/helpers/models/reservationForm';
 
-import dateSvg from '@/public/images/svg/date.svg';
+import userSvg from '@/public/images/svg/user.svg';
+import usersSvg from '@/public/images/svg/users.svg';
+import calendarSvg from '@/public/images/svg/calendar.svg';
 import timeSvg from '@/public/images/svg/time.svg';
+import phoneSvg from '@/public/images/svg/phone.svg';
+import {
+    RESTAURANT_ClOSING_HOUR,
+    RESTAURANT_OPENING_HOUR,
+} from '@/helpers/constants/constants';
 
 const ReservationForm = () => {
     const { language } = useLanguage();
     const reservationSchema = getReservationSchema(language);
+
     const {
         createReservationPage: {
             createReservation,
@@ -33,6 +41,12 @@ const ReservationForm = () => {
     } = useForm<ReservationSchema>({
         resolver: zodResolver(reservationSchema),
     });
+
+    const today = new Date();
+    const minDateString = today.toISOString().split('T')[0];
+    const threeMonthsLater = new Date();
+    threeMonthsLater.setMonth(today.getMonth() + 3);
+    const maxDateString = threeMonthsLater.toISOString().split('T')[0];
 
     const submitFormHandler = async (data: ReservationSchema) => {
         console.log(data);
@@ -51,7 +65,8 @@ const ReservationForm = () => {
                     type="text"
                     id="personalData"
                     label={personalData}
-                    props={{ ...register('personalData') }}
+                    icon={<Image src={userSvg} alt="userIcon" />}
+                    {...register('personalData')}
                     errors={errors.personalData}
                     inputClassName="w-full"
                 />
@@ -60,18 +75,23 @@ const ReservationForm = () => {
                     type="number"
                     id="noOfPeople"
                     label={noOfPeople}
-                    props={{ ...register('noOfPeople') }}
+                    icon={<Image src={usersSvg} alt="usersIcon" />}
+                    {...register('noOfPeople')}
+                    min={1}
                     errors={errors.noOfPeople}
-                    inputClassName="w-full"
+                    inputClassName="w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
                 <Input
                     type="date"
                     id="date"
-                    icon={<Image src={dateSvg} alt="dateIcon" />}
+                    icon={<Image src={calendarSvg} alt="dateIcon" />}
                     label={date}
-                    props={{ ...register('date') }}
+                    min={minDateString}
+                    max={maxDateString}
+                    defaultValue={minDateString}
+                    {...register('date')}
                     errors={errors.date}
-                    inputClassName="w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0
+                    inputClassName="w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0 
 "
                 />
                 <Input
@@ -79,7 +99,9 @@ const ReservationForm = () => {
                     id="time"
                     icon={<Image src={timeSvg} alt="timeIcon" />}
                     label={time}
-                    props={{ ...register('time') }}
+                    min={RESTAURANT_OPENING_HOUR}
+                    max={RESTAURANT_ClOSING_HOUR}
+                    {...register('time')}
                     errors={errors.time}
                     inputClassName="w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0"
                 />
@@ -87,7 +109,8 @@ const ReservationForm = () => {
                     type="phone"
                     id="phone"
                     label={phone}
-                    props={{ ...register('phone') }}
+                    icon={<Image src={phoneSvg} alt="phoneIcon" />}
+                    {...register('phone')}
                     errors={errors.phone}
                     inputClassName="w-full"
                 />
@@ -104,5 +127,3 @@ const ReservationForm = () => {
 };
 
 export default ReservationForm;
-
-//TODO: make date without a year i guess or only accept current year + next, set curr as default, make time without pm/am, accept only actual time +x if current date, if next day etc accept all time restaurant is open?

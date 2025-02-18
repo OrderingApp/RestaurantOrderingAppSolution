@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 
 import { type ComponentStyles } from '@/helpers/types/ui-types';
+import { calendarStyles } from '@/lib/styles/calendar';
 
 interface DateItemProps extends ComponentStyles {
     date: string;
@@ -27,7 +28,7 @@ const DateItem = ({
     className,
     classNameText,
 }: DateItemProps) => {
-    const { container, text } = sizeClasses[size];
+    const { container, text } = calendarStyles.sizes[size];
 
     return (
         <div
@@ -36,8 +37,8 @@ const DateItem = ({
                 'rounded-md cursor-pointer text-center',
                 container,
                 isSelected
-                    ? variantStyles[variant].selected
-                    : variantStyles[variant].unselected,
+                    ? calendarStyles.variants[variant].selected
+                    : calendarStyles.variants[variant].unselected,
                 className
             )}
             onClick={onClick}
@@ -52,16 +53,3 @@ const DateItem = ({
 };
 
 export default DateItem;
-
-const variantStyles = {
-    primary: {
-        selected: 'bg-[#2B5162] text-white',
-        unselected: 'bg-[#E2E2E2] text-[#2B5162]',
-    },
-};
-
-const sizeClasses = {
-    sm: { container: 'py-1', text: 'text-sm' },
-    md: { container: 'py-2', text: 'text-base' },
-    lg: { container: 'py-2', text: 'text-lg' },
-};

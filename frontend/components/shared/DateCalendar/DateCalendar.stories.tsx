@@ -46,10 +46,7 @@ const meta: Meta<typeof DateCalendar> = {
             description:
                 'Custom tailwind CSS classes to apply to the text in DateCalendar item',
         },
-        language: {
-            control: 'text',
-            description: 'DateCalendar language',
-        },
+
         sliderSettings: {
             control: 'object',
             description: 'Configuration settings for the slider.',
@@ -80,7 +77,6 @@ type Story = StoryObj<typeof DateCalendar>;
 export const Primary: Story = {
     args: {
         variant: 'primary',
-        language: 'en',
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);

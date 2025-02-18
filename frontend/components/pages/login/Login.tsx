@@ -9,7 +9,7 @@ import Input from '@/components/shared/Input/Input';
 import Button from '@/components/shared/Button/Button';
 
 import languagePacks from '@/helpers/constants/languagePacks';
-import { companyName } from '@/helpers/constants/constants';
+import { COMPANY_NAME } from '@/helpers/constants/constants';
 import { getLoginSchema, type LoginSchema } from '@/helpers/models/loginForm';
 
 const Login = () => {
@@ -40,7 +40,7 @@ const Login = () => {
                 <h1
                     className={`mb-[1.0625rem] font-serif capitalize ${h1Size}`}
                 >
-                    {companyName}
+                    {COMPANY_NAME}
                 </h1>
                 <h2 className="uppercase text-xl/9 font-bold">{appName}</h2>
                 <div className="mx-[-3.5px] h-[3px] w-full bg-white"></div>
@@ -55,7 +55,7 @@ const Login = () => {
                         type="text"
                         id="login"
                         label={login}
-                        props={{ ...register('login') }}
+                        {...register('login')}
                         errors={errors.login}
                         labelClassName={labelClasses}
                         inputClassName={inputClasses}
@@ -64,7 +64,7 @@ const Login = () => {
                         type="password"
                         id="password"
                         label={password}
-                        props={{ ...register('password') }}
+                        {...register('password')}
                         errors={errors.password}
                         labelClassName={labelClasses}
                         inputClassName={inputClasses}
