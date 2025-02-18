@@ -37,9 +37,9 @@ const RootLayout = async ({
     return (
         <html lang={lang}>
             <body
-                className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased bg-page-gradient`}
+                className={`${geistSans.variable} ${geistMono.variable} flex justify-center items-center min-h-screen antialiased bg-page-gradient`}
             >
-                <div className="m-auto max-h-[48rem] max-w-[64rem]">
+                <div className="min-h-[48rem] max-w-[64rem]">
                     <QueryProvider>
                         <LanguageProvider language={lang}>
                             {children}

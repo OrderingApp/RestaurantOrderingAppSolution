@@ -84,7 +84,8 @@ const Login = () => {
 };
 
 const h1Size = 'text-[12.5rem]/[12.5rem]';
-const inputClasses = 'w-full';
+const inputClasses =
+    'w-full text-xl/7 text-white text-center font-bold bg-opacity-30';
 const labelClasses = 'text-xl/9 text-center text-white uppercase';
 
 export default Login;
