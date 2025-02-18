@@ -10,7 +10,7 @@ type LanguageContextType = {
     setLanguage: (language: LanguageTypes) => void;
 };
 
-const LanguageContext = createContext<LanguageContextType | undefined>(
+export const LanguageContext = createContext<LanguageContextType | undefined>(
     undefined
 );
 

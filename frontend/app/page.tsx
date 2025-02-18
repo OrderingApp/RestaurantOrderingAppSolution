@@ -3,7 +3,11 @@
 import LoginPage from '@/components/pages/login/Login';
 
 const Home = () => {
-    return <>{<LoginPage />}</>;
+    return (
+        <>
+            <LoginPage />
+        </>
+    );
 };
 
 export default Home;
