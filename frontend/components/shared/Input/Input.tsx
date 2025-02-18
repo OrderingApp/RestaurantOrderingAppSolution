@@ -68,6 +68,8 @@ const Input = ({
             </label>
         )}
 
+        {icon && <span className="absolute top-8 right-4">{icon}</span>}
+
         <input
             {...{
                 id,
@@ -85,8 +87,6 @@ const Input = ({
                 inputClassName
             )}
         />
-
-        {icon && <span className="absolute top-8 right-4">{icon}</span>}
 
         {errors && (
             <p
