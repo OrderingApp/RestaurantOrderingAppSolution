@@ -13,7 +13,7 @@ import {
     type ReservationSchema,
 } from '@/helpers/models/reservationForm';
 
-import dateSvg from '@/public/images/svg/date.svg';
+import calendarSvg from '@/public/images/svg/calendar.svg';
 import timeSvg from '@/public/images/svg/time.svg';
 
 const ReservationForm = () => {
@@ -67,7 +67,7 @@ const ReservationForm = () => {
                 <Input
                     type="date"
                     id="date"
-                    icon={<Image src={dateSvg} alt="dateIcon" />}
+                    icon={<Image src={calendarSvg} alt="dateIcon" />}
                     label={date}
                     props={{ ...register('date') }}
                     errors={errors.date}

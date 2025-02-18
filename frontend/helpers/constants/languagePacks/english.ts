@@ -23,7 +23,7 @@ const enPack: languagePack = {
         orders: 'orders',
         menu: 'menu',
         reservations: 'reservations',
-        endDay: 'end of day',
+        endOfDay: 'end of day',
         settings: 'settings',
     },
     createReservationPage: {

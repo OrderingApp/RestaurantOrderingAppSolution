@@ -31,7 +31,7 @@ export interface languagePack {
         orders: string;
         menu: string;
         reservations: string;
-        endDay: string;
+        endOfDay: string;
         settings: string;
     };
     createReservationPage: {

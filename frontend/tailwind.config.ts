@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import type { PluginAPI } from 'tailwindcss/types/config';
 
 export default {
     content: [
@@ -20,6 +21,7 @@ export default {
                 brown: 'var(--brown)',
                 white: 'var(--white)',
                 black: 'var(--black)',
+                'light-gray': 'var(--light-gray)',
             },
             fontFamily: {
                 serif: 'var(--serif)',
@@ -27,5 +29,9 @@ export default {
             },
         },
     },
-    plugins: [],
+    plugins: [
+        ({ addVariant }: PluginAPI) => {
+            addVariant('hocus', ['&:hover', '&:focus']);
+        },
+    ],
 } satisfies Config;
