@@ -1,11 +1,22 @@
-import { languagePack } from '@/helpers/constants/languagePacks';
+import { companyName } from '../constants';
+import { type languagePack } from '@/helpers/constants/languagePacks';
 
 const enPack: languagePack = {
+    metadata: {
+        title: `${companyName} | Ordering App`,
+        description: `Ordering application created for ${companyName}.`,
+    },
     loginPage: {
         appName: 'order application',
-        login: 'login',
-        password: 'password',
-        enter: 'enter',
+        form: {
+            login: 'login',
+            password: 'password',
+            submit: 'enter',
+            errors: {
+                login: 'Please enter at least 3 characters',
+                password: 'Please enter at least 8 characters',
+            },
+        },
     },
     menuBar: {
         tables: 'tables',
@@ -14,6 +25,28 @@ const enPack: languagePack = {
         reservations: 'reservations',
         endDay: 'end of day',
         settings: 'settings',
+    },
+    createReservationPage: {
+        createReservation: 'Create reservation',
+        chooseReservation: 'Choose reservation',
+        form: {
+            personalData: 'Personal data',
+            noOfPeople: 'Number of people',
+            date: 'Date',
+            time: 'Time',
+            phone: 'Phone number',
+            submit: 'Book a table',
+            errors: {
+                personalData: {
+                    min: 'Please enter at least 3 characters',
+                    max: 'Please enter max 30 characters',
+                },
+                noOfPeople: 'Plese enter a correct number of people',
+                date: 'Please enter a correct date',
+                time: 'Plese enter a correct time',
+                phone: 'Please enter a valid 9-digit phone number',
+            },
+        },
     },
 };
 
