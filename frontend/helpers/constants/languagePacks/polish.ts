@@ -1,10 +1,10 @@
-import { companyName } from '../constants';
+import { COMPANY_NAME } from '../constants';
 import { type languagePack } from '@/helpers/constants/languagePacks';
 
 const plPack: languagePack = {
     metadata: {
-        title: `${companyName} | Aplikacja do zamówień`,
-        description: `Aplikacja do zamówień stworzona dla ${companyName}.`,
+        title: `${COMPANY_NAME} | Aplikacja do zamówień`,
+        description: `Aplikacja do zamówień stworzona dla ${COMPANY_NAME}.`,
     },
     loginPage: {
         appName: 'aplikacja do zamówień',
@@ -23,7 +23,7 @@ const plPack: languagePack = {
         orders: 'zamówienia',
         menu: 'karta',
         reservations: 'rezerwacje',
-        endDay: 'koniec dnia',
+        endOfDay: 'koniec dnia',
         settings: 'ustawienia',
     },
     createReservationPage: {
