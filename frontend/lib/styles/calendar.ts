@@ -33,3 +33,8 @@ export const calendarStyles: {
         lg: { container: 'py-2', text: 'text-lg' },
     },
 };
+
+export interface CalendarStyles {
+    variant: keyof typeof calendarStyles.variants;
+    size: keyof typeof calendarStyles.sizes;
+}

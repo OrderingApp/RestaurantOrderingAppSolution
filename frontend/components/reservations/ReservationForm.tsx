@@ -91,7 +91,7 @@ const ReservationForm = () => {
                     defaultValue={minDateString}
                     {...register('date')}
                     errors={errors.date}
-                    inputClassName="w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0 
+                    inputClassName="w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0
 "
                 />
                 <Input
