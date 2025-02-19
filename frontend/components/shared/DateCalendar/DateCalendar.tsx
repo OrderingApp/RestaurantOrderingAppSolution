@@ -9,9 +9,9 @@ import useLanguage from '@/helpers/hooks/useLanguage';
 
 import DateItem from './components/DateItem/DateItem';
 import { formatDate, generateDates } from '@/helpers/utils/dates';
-import { type ComponentStyles } from '@/helpers/types/ui-types';
+import { type CalendarStyles } from '@/lib/styles/calendar';
 
-interface DateCalendarProps extends Partial<ComponentStyles> {
+interface DateCalendarProps extends CalendarStyles {
     endDateNumber?: number;
     sliderSettings?: SliderSettings;
     className?: string;
@@ -74,7 +74,7 @@ const DateCalendar = ({
         fullDateFormatted: Date,
         index: number
     ) => {
-        sliderRef.current?.slickGoTo(index);
+        sliderRef.current?.slickGoTo(index - 3);
         onDateSelect?.(fullDateFormatted);
 
         setSelectedDate(fullDate);

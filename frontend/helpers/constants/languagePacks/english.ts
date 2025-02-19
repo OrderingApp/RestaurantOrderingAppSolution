@@ -1,10 +1,10 @@
-import { companyName } from '../constants';
+import { COMPANY_NAME } from '../constants';
 import { type languagePack } from '@/helpers/constants/languagePacks';
 
 const enPack: languagePack = {
     metadata: {
-        title: `${companyName} | Ordering App`,
-        description: `Ordering application created for ${companyName}.`,
+        title: `${COMPANY_NAME} | Ordering App`,
+        description: `Ordering application created for ${COMPANY_NAME}.`,
     },
     loginPage: {
         appName: 'order application',
