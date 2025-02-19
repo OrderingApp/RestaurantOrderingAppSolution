@@ -8,7 +8,7 @@ import { type ReactNode } from 'react';
 
 import { useLanguage } from '@/providers/LanguageProvider';
 import languagePacks from '@/helpers/constants/languagePacks';
-import { menuBarIcons } from '@/helpers/constants/constants';
+import { MENU_BAR_ICONS } from '@/helpers/constants/constants';
 import { camelToKebab } from '@/helpers/utils/utils';
 
 const ProtectedLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
@@ -42,7 +42,7 @@ const ProtectedLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
                                         opacity
                                     )}
                                 >
-                                    <Image src={menuBarIcons[key]} alt="" />
+                                    <Image src={MENU_BAR_ICONS[key]} alt="" />
                                     {name}
                                 </Link>
                             </li>

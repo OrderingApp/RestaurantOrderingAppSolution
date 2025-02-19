@@ -1,30 +1,18 @@
 'use client';
 
 import { useState, type ReactNode, type MouseEvent } from 'react';
+
 import clsx from 'clsx';
+import btnStyles from '@/lib/styles/button';
 
 type ButtonProps = {
     children: ReactNode;
     className?: string;
     disabled?: boolean;
-    variant?: 'primary' | 'success' | 'danger' | 'outline';
-    size?: 'sm' | 'md' | 'lg' | 'xl';
+    variant?: keyof typeof btnStyles.variants;
+    size?: keyof typeof btnStyles.sizes;
     onClick?: (e?: MouseEvent<HTMLButtonElement>) => void;
     action?: () => Promise<void>;
-};
-
-const variantClasses = {
-    primary: 'bg-[#2B5162] text-white',
-    success: 'bg-[#2B622F] text-white',
-    danger: 'bg-[#F20707] text-white ',
-    outline: 'bg-white shadow-lg text-black border border-gray-200',
-};
-
-const sizeClasses = {
-    sm: 'px-2 py-1 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-6 text-2xl rounded-3xl',
-    xl: 'px-[2.125rem] py-1 text-xl rounded-full',
 };
 
 const Button = ({
@@ -57,8 +45,8 @@ const Button = ({
         <button
             className={clsx(
                 'transition-all duration-200',
-                variantClasses[variant],
-                sizeClasses[size],
+                btnStyles.variants[variant],
+                btnStyles.sizes[size],
                 { 'opacity-50 cursor-not-allowed': disabled || isLoading },
                 className
             )}

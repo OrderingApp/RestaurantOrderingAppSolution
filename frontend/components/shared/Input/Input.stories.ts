@@ -80,10 +80,6 @@ const meta: Meta<typeof Input> = {
             control: 'object',
             description: 'Displays an error message when validation fails.',
         },
-        props: {
-            control: 'object',
-            description: 'Additional input properties.',
-        },
     },
 };
 
