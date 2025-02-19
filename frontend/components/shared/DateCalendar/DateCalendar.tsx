@@ -36,7 +36,7 @@ const DateCalendar = ({
     endDateNumber = 2,
     variant = 'primary',
     size = 'sm',
-    sliderSettings = {},
+    sliderSettings = sliderDefaultSettings,
     className,
     classNameText,
     onDateSelect,
@@ -74,7 +74,9 @@ const DateCalendar = ({
         fullDateFormatted: Date,
         index: number
     ) => {
-        sliderRef.current?.slickGoTo(index - 3);
+        sliderRef.current?.slickGoTo(
+            index - Math.floor(sliderSettings.slidesToShow! / 2)
+        );
         onDateSelect?.(fullDateFormatted);
 
         setSelectedDate(fullDate);
@@ -121,5 +123,3 @@ const sliderDefaultSettings: SliderSettings = {
 };
 
 export default DateCalendar;
-
-//TODO Make variants more flexible

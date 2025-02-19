@@ -26,6 +26,11 @@ const enPack: languagePack = {
         endOfDay: 'end of day',
         settings: 'settings',
     },
+    reservationsPage: {
+        reservationTitle: 'Check Reservations',
+        createOrEditReservation: 'Create/Edit Reservation',
+        listOfReservations: 'List of reservations',
+    },
     createReservationPage: {
         createReservation: 'Create reservation',
         chooseReservation: 'Choose reservation',
