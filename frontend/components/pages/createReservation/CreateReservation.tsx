@@ -22,8 +22,6 @@ const CreateReservation = () => {
                 </h1>
                 <div className="py-2">
                     <DateCalendar
-                        size="sm"
-                        variant="primary"
                         sliderSettings={{ slidesToShow: 5, slidesToScroll: 5 }}
                     />
                 </div>

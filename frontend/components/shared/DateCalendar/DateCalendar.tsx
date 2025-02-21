@@ -36,7 +36,7 @@ const DateCalendar = ({
     endDateNumber = 2,
     variant = 'primary',
     size = 'sm',
-    sliderSettings = sliderDefaultSettings,
+    sliderSettings = {},
     className,
     classNameText,
     onDateSelect,

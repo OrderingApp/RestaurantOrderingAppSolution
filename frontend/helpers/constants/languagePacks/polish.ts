@@ -28,7 +28,7 @@ const plPack: languagePack = {
     },
     reservationsPage: {
         reservationTitle: 'Sprawdź Rezerwacje',
-        createOrEditReservation: 'Utwórz/Edytuj Rezerwacje',
+        upsertReservation: 'Utwórz/Edytuj Rezerwacje',
         listOfReservations: 'Lista rezerwacji',
     },
     createReservationPage: {

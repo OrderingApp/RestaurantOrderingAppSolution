@@ -36,7 +36,7 @@ export interface languagePack {
     };
     reservationsPage: {
         reservationTitle: string;
-        createOrEditReservation: string;
+        upsertReservation: string;
         listOfReservations: string;
     };
     createReservationPage: {

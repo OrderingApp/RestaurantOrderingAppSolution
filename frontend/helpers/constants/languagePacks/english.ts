@@ -28,7 +28,7 @@ const enPack: languagePack = {
     },
     reservationsPage: {
         reservationTitle: 'Check Reservations',
-        createOrEditReservation: 'Create/Edit Reservation',
+        upsertReservation: 'Create/Edit Reservation',
         listOfReservations: 'List of reservations',
     },
     createReservationPage: {

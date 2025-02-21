@@ -16,7 +16,7 @@ const Reservations = () => {
     const {
         reservationsPage: {
             reservationTitle,
-            createOrEditReservation,
+            upsertReservation,
             listOfReservations,
         },
     } = languagePacks[language];
@@ -36,7 +36,7 @@ const Reservations = () => {
                     className="px-8 max-w-52"
                     size="md"
                 >
-                    {createOrEditReservation}
+                    {upsertReservation}
                 </Button>
             </header>
 

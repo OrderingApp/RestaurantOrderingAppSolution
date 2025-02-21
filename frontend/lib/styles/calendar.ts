@@ -35,6 +35,6 @@ export const calendarStyles: {
 };
 
 export interface CalendarStyles {
-    variant: keyof typeof calendarStyles.variants;
-    size: keyof typeof calendarStyles.sizes;
+    variant?: keyof typeof calendarStyles.variants;
+    size?: keyof typeof calendarStyles.sizes;
 }
