@@ -69,13 +69,18 @@ const DateCalendar = ({
         if (index !== -1) sliderRef.current.slickGoTo(index);
     }, [dates, selectedDate]);
 
+    const mergedSliderSettings = {
+        ...sliderDefaultSettings,
+        ...sliderSettings,
+    };
+
     const handleDateSelect = (
         fullDate: string,
         fullDateFormatted: Date,
         index: number
     ) => {
         sliderRef.current?.slickGoTo(
-            index - Math.floor(sliderSettings.slidesToShow! / 2)
+            index - Math.floor(mergedSliderSettings.slidesToShow! / 2)
         );
         onDateSelect?.(fullDateFormatted);
 
@@ -84,10 +89,7 @@ const DateCalendar = ({
 
     return (
         <div data-testid="date-calendar">
-            <Slider
-                ref={sliderRef}
-                {...{ ...sliderDefaultSettings, ...sliderSettings }}
-            >
+            <Slider ref={sliderRef} {...mergedSliderSettings}>
                 {dates.map((date, index) => (
                     <DateItem
                         key={date.fullDate}

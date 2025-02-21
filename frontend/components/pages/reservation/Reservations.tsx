@@ -41,11 +41,7 @@ const Reservations = () => {
             </header>
 
             <div className="pb-4">
-                <DateCalendar
-                    variant="primary"
-                    size="sm"
-                    onDateSelect={handleDateSelect}
-                />
+                <DateCalendar onDateSelect={handleDateSelect} />
             </div>
 
             <main className="flex flex-col">
