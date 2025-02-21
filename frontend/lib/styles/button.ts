@@ -14,7 +14,7 @@ const btnStyles: {
     },
     sizes: {
         sm: 'px-2 py-1 text-sm',
-        md: 'px-4 py-2 text-base',
+        md: 'px-6 py-2 text-base rounded-lg',
         lg: 'px-6 py-6 text-2xl rounded-3xl',
         xl: 'px-[2.125rem] py-1 text-xl rounded-full',
     },

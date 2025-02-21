@@ -34,6 +34,11 @@ export interface languagePack {
         endOfDay: string;
         settings: string;
     };
+    reservationsPage: {
+        reservationTitle: string;
+        upsertReservation: string;
+        listOfReservations: string;
+    };
     createReservationPage: {
         createReservation: string;
         chooseReservation: string;

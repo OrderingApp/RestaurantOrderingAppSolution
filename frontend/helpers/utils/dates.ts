@@ -38,3 +38,13 @@ export const generateDates = (
 
     return generatedDates;
 };
+
+export const checkMaxAndMinDate = () => {
+    const today = new Date();
+    const threeMonthsLater = new Date();
+    threeMonthsLater.setMonth(today.getMonth() + 3);
+    const minDateString = today.toISOString().split('T')[0];
+    const maxDateString = threeMonthsLater.toISOString().split('T')[0];
+
+    return { minDateString, maxDateString };
+};

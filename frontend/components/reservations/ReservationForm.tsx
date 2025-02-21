@@ -22,11 +22,12 @@ import {
     RESTAURANT_ClOSING_HOUR,
     RESTAURANT_OPENING_HOUR,
 } from '@/helpers/constants/constants';
+import { checkMaxAndMinDate } from '@/helpers/utils/dates';
 
 const ReservationForm = () => {
     const { language } = useLanguage();
     const reservationSchema = getReservationSchema(language);
-
+    const { maxDateString, minDateString } = checkMaxAndMinDate();
     const {
         createReservationPage: {
             createReservation,
@@ -42,23 +43,17 @@ const ReservationForm = () => {
         resolver: zodResolver(reservationSchema),
     });
 
-    const today = new Date();
-    const minDateString = today.toISOString().split('T')[0];
-    const threeMonthsLater = new Date();
-    threeMonthsLater.setMonth(today.getMonth() + 3);
-    const maxDateString = threeMonthsLater.toISOString().split('T')[0];
-
     const submitFormHandler = async (data: ReservationSchema) => {
         console.log(data);
     };
 
     return (
         <div className="w-1/2 bg-white py-8 min-h-full relative">
-            <h1 className="text-center text-black text-4xl font-bold py-5">
+            <h1 className="text-center text-black text-4xl font-bold py-5 capitalize">
                 {createReservation}
             </h1>
             <form
-                className="py-2 px-8 flex flex-col justify-start gap-5 "
+                className="py-2 px-8 flex flex-col justify-start gap-5"
                 onSubmit={handleSubmit(submitFormHandler)}
             >
                 <Input
@@ -115,10 +110,7 @@ const ReservationForm = () => {
                     inputClassName="w-full"
                 />
 
-                <Button
-                    className="relative bottom-[-60] left-0 w-full"
-                    size="lg"
-                >
+                <Button className="mt-4" size="lg">
                     {submit}
                 </Button>
             </form>

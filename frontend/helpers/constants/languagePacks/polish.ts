@@ -26,6 +26,11 @@ const plPack: languagePack = {
         endOfDay: 'koniec dnia',
         settings: 'ustawienia',
     },
+    reservationsPage: {
+        reservationTitle: 'Sprawdź Rezerwacje',
+        upsertReservation: 'Utwórz/Edytuj Rezerwacje',
+        listOfReservations: 'Lista rezerwacji',
+    },
     createReservationPage: {
         createReservation: 'Stwórz rezerwację',
         chooseReservation: 'Wybierz rezerwację',

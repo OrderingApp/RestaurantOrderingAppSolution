@@ -1,18 +1,5 @@
-import ReservationForm from '@/components/reservations/ReservationForm';
-import DateCalendar from '@/components/shared/DateCalendar/DateCalendar';
+import Reservations from '@/components/pages/reservation/Reservations';
 
-const Reservations = () => {
-    return (
-        <div className="w-[95%] min-h-screen py-3 flex rounded-lg">
-            <aside className="w-[120px] min-h-full bg-blue-100"></aside>
-            <div className="w-full  flex">
-                <ReservationForm />
-                <div className="w-1/2 bg-blue-100">
-                    <DateCalendar />
-                </div>
-            </div>
-        </div>
-    );
-};
+const ReservationsPage = () => <Reservations />;
 
-export default Reservations;
+export default ReservationsPage;

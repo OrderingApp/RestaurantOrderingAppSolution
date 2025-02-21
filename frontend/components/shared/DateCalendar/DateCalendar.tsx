@@ -69,12 +69,19 @@ const DateCalendar = ({
         if (index !== -1) sliderRef.current.slickGoTo(index);
     }, [dates, selectedDate]);
 
+    const mergedSliderSettings = {
+        ...sliderDefaultSettings,
+        ...sliderSettings,
+    };
+
     const handleDateSelect = (
         fullDate: string,
         fullDateFormatted: Date,
         index: number
     ) => {
-        sliderRef.current?.slickGoTo(index - 3);
+        sliderRef.current?.slickGoTo(
+            index - Math.floor(mergedSliderSettings.slidesToShow! / 2)
+        );
         onDateSelect?.(fullDateFormatted);
 
         setSelectedDate(fullDate);
@@ -82,10 +89,7 @@ const DateCalendar = ({
 
     return (
         <div data-testid="date-calendar">
-            <Slider
-                ref={sliderRef}
-                {...{ ...sliderDefaultSettings, ...sliderSettings }}
-            >
+            <Slider ref={sliderRef} {...mergedSliderSettings}>
                 {dates.map((date, index) => (
                     <DateItem
                         key={date.fullDate}
@@ -121,5 +125,3 @@ const sliderDefaultSettings: SliderSettings = {
 };
 
 export default DateCalendar;
-
-//TODO Make variants more flexible
