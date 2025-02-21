@@ -2,7 +2,7 @@
   "scripts": {
     "prepare": "husky",
     "lint:frontend": "npm run lint --prefix frontend",
-    "prettier:frontend": "npm run prettier:check --prefix frontend",
+    "prettier:frontend": "npm run prettier:write --prefix frontend",
     "vitest:frontend": "npm run vitest:run --prefix frontend",
     "cypress:frontend": "npm run cypress --prefix frontend",
     "test:frontend": "npm run test --prefix frontend",
