@@ -1,3 +1,5 @@
+'use client';
+
 import DetailsAside from '@/components/shared/asides/Details';
 import { CURRENCIES } from '@/helpers/constants/constants';
 
