@@ -7,7 +7,7 @@ const btnStyles: {
     sizes: BasicStyles['sizes'] & { xl: string };
 } = {
     variants: {
-        primary: 'bg-[#2B5162] text-white',
+        primary: 'bg-primary text-white',
         success: 'bg-[#2B622F] text-white',
         danger: 'bg-[#F20707] text-white ',
         outline: 'bg-white shadow-lg text-black border border-gray-200',
@@ -19,5 +19,5 @@ const btnStyles: {
         xl: 'px-[2.125rem] py-1 text-xl rounded-full',
     },
 };
-
+//TODO: updates sizes and variants
 export default btnStyles;

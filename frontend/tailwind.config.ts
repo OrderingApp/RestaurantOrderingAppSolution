@@ -19,6 +19,7 @@ export default {
                 secondary: 'var(--secondary)',
                 tertiary: 'var(--tertiary)',
                 danger: 'var(--danger)',
+                'danger-dark': 'var(--danger-dark)',
                 brown: 'var(--brown)',
                 white: 'var(--white)',
                 black: 'var(--black)',
