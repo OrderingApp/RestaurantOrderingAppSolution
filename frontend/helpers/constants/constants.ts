@@ -23,3 +23,8 @@ export const MENU_BAR_ICONS: {
     endOfDay: endOfDaySvg,
     settings: settingsSvg,
 };
+
+export const CURRENCIES = {
+    pln: 'zł',
+    eur: '€',
+};
