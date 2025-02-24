@@ -4,43 +4,46 @@
 
 // To get a specific order by its ID.
 
-GET {{API_HostAddress}}/Order/82BDD1B3-F8FA-4032-8612-ADBE7D0733C3
+GET {{API_HostAddress}}/orders/C93FA2FE-918A-4B90-9841-342C6A84E716
 Accept: application/json
-
-###
 
 ###
 
 // To get all orders (without filtering by status).
 
-GET {{API_HostAddress}}/Order
+GET {{API_HostAddress}}/orders
 Accept: application/json
-
-###
 
 ###
 
 // To get all orders filtered by status (e.g., only "Ongoing" orders).
-
-GET {{API_HostAddress}}/Order?orderStatus=Ongoing
+GET {{API_HostAddress}}/orders?orderStatus=Ongoing
 Accept: application/json
 
 ###
+
+GET {{API_HostAddress}}/orders/non-dinein-orders?orderType=Takeaway
+Accept: application/json
+
+
+###
+
+GET {{API_HostAddress}}/orders/non-dinein-orders?orderType=Delivery
+Accept: application/json
+
 
 ###
 
 // To get all Finished orders.
 
-GET {{API_HostAddress}}/Order?orderStatus=Finished
+GET {{API_HostAddress}}/orders?orderStatus=Finished
 Accept: application/json
-
-###
 
 ###
 
 // To get all cancelled orders.
 
-GET {{API_HostAddress}}/Order?orderStatus=Cancelled
+GET {{API_HostAddress}}/orders?orderStatus=Cancelled
 Accept: application/json
 
 ###

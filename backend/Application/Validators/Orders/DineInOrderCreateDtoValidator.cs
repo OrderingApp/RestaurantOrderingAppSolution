@@ -6,12 +6,16 @@ public class DineInOrderCreateDtoValidator : AbstractValidator<DineInOrderCreate
 {
     public DineInOrderCreateDtoValidator()
     {
-        RuleFor(x => x.OrderDateTime)
-            .NotEmpty().WithMessage("OrderDateTime is required.")
-            .Must(BeAValidDate).WithMessage("OrderDateTime must be in the future.");
+        RuleFor(x => x.DateTime)
+            .NotEmpty().WithMessage("Order date and time is required.")
+            .Must(BeAValidDate).WithMessage("Order date and time must be in the future.");
 
         RuleFor(x => x.TableId)
-            .NotEmpty().WithMessage("TableId is required.");
+            .NotEmpty().WithMessage("Table ID is required.")
+            .NotEqual(Guid.Empty).WithMessage("Table ID must be a valid GUID.");
+
+        RuleFor(x => x.OrderItems)
+            .NotEmpty().WithMessage("At least one order item is required.");
 
         RuleForEach(x => x.OrderItems)
             .SetValidator(new OrderItemCreateDtoValidator());
