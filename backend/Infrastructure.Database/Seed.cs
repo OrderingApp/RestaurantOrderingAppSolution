@@ -30,9 +30,9 @@ public class Seed
             // ✅ Ingredients
             var ingredients = new List<Ingredient>
             {
-                new() { Id = Guid.NewGuid(), Name = "Mozzarella", Price = 1.5M, IsUsed = true, IsDeleted = false },
-                new() { Id = Guid.NewGuid(), Name = "Tomato", Price = 0.5M, IsUsed = true, IsDeleted = false },
-                new() { Id = Guid.NewGuid(), Name = "Pepperoni", Price = 2.0M, IsUsed = true, IsDeleted = false }
+                new() { Id = Guid.NewGuid(), Name = "Mozzarella", Price = 1.5M, CanBeUsedAsExtra = true, IsDeleted = false },
+                new() { Id = Guid.NewGuid(), Name = "Tomato", Price = 0.5M, CanBeUsedAsExtra = true, IsDeleted = false },
+                new() { Id = Guid.NewGuid(), Name = "Pepperoni", Price = 2.0M, CanBeUsedAsExtra = true, IsDeleted = false }
             };
             await context.Ingredients.AddRangeAsync(ingredients);
 

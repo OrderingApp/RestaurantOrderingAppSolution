@@ -1,6 +1,5 @@
 ﻿using Application.Contracts;
 using Application.Dtos.Common;
-using Application.Dtos.OrderItemIngredients;
 using Application.Dtos.OrderItems;
 using Application.Dtos.Orders;
 using AutoMapper;
@@ -67,9 +66,9 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
                     }
                 }
 
-                if (dto.RemovedIngredients.Any())
+                if (dto.RemovedIngredientIds.Any())
                 {
-                    await HandleRemovedIngredients(orderItem, dto.RemovedIngredients);
+                    await HandleRemovedIngredients(orderItem, dto.RemovedIngredientIds);
                 }
 
                 orderItems.Add(orderItem);
@@ -80,7 +79,7 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
             order.TotalAmount = RecalculateOrderTotal(order);
             await orderingContext.SaveChangesAsync();
 
-            var orderItemsAddedEvent = mapper.Map<OrderItemAddedEvent>((orderId, order.OrderItems));
+            var orderItemsAddedEvent = mapper.Map<OrderItemAddedEvent>((orderId, orderItems));
             await eventHandlerService.HandleEventAsync(orderItemsAddedEvent);
 
             var updatedOrderDto = mapper.Map<OrderReadDto>(order);
@@ -177,9 +176,9 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
                 }
             }
 
-            if (updateDto.RemovedIngredients.Any())
+            if (updateDto.RemovedIngredientIds.Any())
             {
-                await HandleRemovedIngredients(orderItem, updateDto.RemovedIngredients);
+                await HandleRemovedIngredients(orderItem, updateDto.RemovedIngredientIds);
             }
 
             await orderingContext.SaveChangesAsync();
@@ -249,39 +248,44 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
         return order.OrderItems.Sum(oi => oi.Price * (1 - (oi.Discount / 100))) - order.Discount;
     }
 
-    private async Task HandleRemovedIngredients(OrderItem orderItem, List<OrderItemIngredientRemoveDto> removedIngredientsDto)
+    private async Task HandleRemovedIngredients(OrderItem orderItem, List<Guid> removedIngredientIds)
     {
-        if (!removedIngredientsDto.Any()) return;
-
-        var removedIds = removedIngredientsDto.Select(ri => ri.IngredientId).ToList();
+        if (!removedIngredientIds.Any()) return;
 
         var menuItemIngredients = await orderingContext.MenuItemIngredientRels
             .Where(mi => mi.MenuItemId == orderItem.MenuItemId)
             .Select(mi => mi.Ingredient)
             .ToListAsync();
 
-        // Separate removed ingredients into extra and menu item ingredients
-        var removedExtraIngredients = orderItem.ExtraIngredients.Where(ing => removedIds.Contains(ing.Id)).ToList();
-        var removedFromMenuItem = menuItemIngredients.Where(mi => removedIds.Contains(mi.Id)).ToList();
-
         // Remove from extra ingredients (and adjust price)
-        foreach (var removed in removedExtraIngredients)
+        var removedExtraIngredients = orderItem.ExtraIngredients
+            .Where(extra => removedIngredientIds.Contains(extra.Id))
+            .ToList();
+
+        foreach (var extra in removedExtraIngredients)
         {
-            orderItem.Price -= removed.Price * removed.Quantity;
-            orderItem.ExtraIngredients.Remove(removed);
+            orderItem.Price = Math.Max(0, orderItem.Price - (extra.Price * extra.Quantity));
+            orderItem.ExtraIngredients.Remove(extra);
         }
+
+        var removedFromMenuItem = menuItemIngredients
+            .Where(mi => removedIngredientIds.Contains(mi.Id))
+            .ToList();
 
         // Add removed ingredients from MenuItem to RemovedIngredients
-        foreach (var removed in removedFromMenuItem)
+        foreach (var ingredient in removedFromMenuItem)
         {
-            orderItem.RemovedIngredients.Add(new OrderItemIngredient
+            // Check if the ingredient is already marked as removed
+            if (!orderItem.RemovedIngredients.Any(ri => ri.Name == ingredient.Name))
             {
-                Id = removed.Id,
-                Name = removed.Name,
-                Price = 0, // Base ingredient, doesn't affect price
-                Quantity = 1
-            });
+                orderItem.RemovedIngredients.Add(new OrderItemIngredient
+                {
+                    Id = Guid.NewGuid(),
+                    Name = ingredient.Name,
+                    Price = 0,
+                    Quantity = 1
+                });
+            }
         }
     }
-
 }

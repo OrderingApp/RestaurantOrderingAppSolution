@@ -23,11 +23,11 @@ public class OrderItemCreateDtoValidator : AbstractValidator<OrderItemCreateDto>
                     .GreaterThan(0).WithMessage("Ingredient quantity must be greater than zero.");
             });
 
-        RuleForEach(x => x.RemovedIngredients)
-            .ChildRules(removed =>
-            {
-                removed.RuleFor(i => i.IngredientId)
-                    .NotEmpty().WithMessage("IngredientId is required.");
-            });
+        RuleForEach(x => x.RemovedIngredientIds)
+            .NotEmpty().WithMessage("RemovedIngredientId must not be empty.");
+
+        RuleFor(x => x)
+            .Must(x => !x.ExtraIngredients.Select(e => e.IngredientId).Intersect(x.RemovedIngredientIds).Any())
+            .WithMessage("An ingredient cannot be both added as an extra and removed.");
     }
 }

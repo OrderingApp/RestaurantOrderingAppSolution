@@ -525,12 +525,10 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                     .Failure("order not found", HttpStatusCode.NotFound);
             }
 
-            var deletedOrderId = orderToDelete.Id;
-
             orderingContext.Orders.Remove(orderToDelete);
             await orderingContext.SaveChangesAsync();
 
-            var orderDeletedEvent = new OrderDeletedEvent { OrderId = deletedOrderId };
+            var orderDeletedEvent = new OrderDeletedEvent { OrderId = id };
             await eventHandlerService.HandleEventAsync(orderDeletedEvent);
 
             return ResultDto<bool>

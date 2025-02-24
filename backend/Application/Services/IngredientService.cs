@@ -44,7 +44,7 @@ public class IngredientService(RestaurantOrderingContext orderingContext, IEvent
             var query = orderingContext.Ingredients
                 .Include(i => i.IngredientTagRels)
                     .ThenInclude(rel => rel.Tag)
-                .Where(i => i.IsUsed && !i.IsDeleted)
+                .Where(i => i.CanBeUsedAsExtra && !i.IsDeleted)
                 .AsQueryable();
 
             if (tags != null && tags.Any())
@@ -162,7 +162,7 @@ public class IngredientService(RestaurantOrderingContext orderingContext, IEvent
                 return ResultDto<bool>.Failure("Ingredient not found.", HttpStatusCode.NotFound);
 
             ingredient.IsDeleted = true;
-            ingredient.IsUsed = false;
+            ingredient.CanBeUsedAsExtra = false;
 
             orderingContext.MenuItemIngredientRels.RemoveRange(ingredient.MenuItemIngredientRels);
             orderingContext.IngredientTagRels.RemoveRange(ingredient.IngredientTagRels);

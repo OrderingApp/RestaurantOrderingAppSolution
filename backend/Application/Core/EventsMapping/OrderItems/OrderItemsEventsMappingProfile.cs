@@ -8,9 +8,9 @@ public class OrderItemsEventsMappingProfile : Profile
 {
     public OrderItemsEventsMappingProfile()
     {
-        CreateMap<OrderItem, OrderItemAddedEvent>()
-            .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id))
-            .ForMember(dest => dest.OrderItemIds, opt => opt.MapFrom(src => new List<Guid> { src.Id }));
+        CreateMap<(Guid orderId, List<OrderItem> orderItems), OrderItemAddedEvent>()
+            .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.orderId))
+            .ForMember(dest => dest.OrderItemIds, opt => opt.MapFrom(src => src.orderItems.Select(oi => oi.Id).ToList()));
 
         CreateMap<List<OrderItem>, OrderItemAddedEvent>()
             .ForMember(dest => dest.OrderItemIds, opt => opt.MapFrom(src => src.Select(oi => oi.Id).ToList()));

@@ -6,7 +6,7 @@ public class Ingredient
     public required string Name { get; set; }
     public decimal Price { get; set; }
 
-    public bool IsUsed { get; set; } = true;
+    public bool CanBeUsedAsExtra { get; set; }
     public bool IsDeleted { get; set; } = false;
 
     public List<MenuItemIngredientRel> MenuItemIngredientRels { get; set; } = new();

@@ -8,5 +8,5 @@ public class OrderItemCreateDto
     public Guid MenuItemId { get; set; }
 
     public List<OrderItemIngredientAddDto> ExtraIngredients { get; set; } = new();
-    public List<OrderItemIngredientRemoveDto> RemovedIngredients { get; set; } = new();
+    public List<Guid> RemovedIngredientIds { get; set; } = new();
 }
