@@ -4,15 +4,15 @@
 
 // To create a new reservation.
 
-POST {{API_HostAddress}}/Reservation
+POST {{API_HostAddress}}/reservations
 Content-Type: application/json
 Accept: application/json
 
 {
   "phoneNumber": "123456789",
-  "surname": "Smith",
-  "reservationDateTime": "2025-02-10T19:00:00Z",
-  "numberOfPeople": 4
+  "name": "Smith",
+  "dateTime": "2025-02-10T19:00:00Z",
+  "capacityNeeded": 4
 }
 
 ###
