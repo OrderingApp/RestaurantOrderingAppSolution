@@ -17,9 +17,10 @@ public class TablesEventsMappingProfile : Profile
         CreateMap<Table, TableDeletedEvent>()
             .ForMember(dest => dest.TableId, opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<(Table table, bool newOccupancy), TableOccupancyUpdatedEvent>()
-            .ForMember(dest => dest.TableId, opt => opt.MapFrom(src => src.table.Id))
-            .ForMember(dest => dest.NewOccupancy, opt => opt.MapFrom(src => src.newOccupancy));
+        CreateMap<(Table table, TableStatus previousTableStatus), TableStatusUpdatedEvent>()
+           .ForMember(dest => dest.TableId, opt => opt.MapFrom(src => src.table.Id))
+           .ForMember(dest => dest.From, opt => opt.MapFrom(src => src.previousTableStatus))
+           .ForMember(dest => dest.To, opt => opt.MapFrom(src => src.table.Status));
 
     }
 }

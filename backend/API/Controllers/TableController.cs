@@ -1,5 +1,6 @@
 ﻿using Application.Contracts;
 using Application.Dtos.Tables;
+using Domain;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -42,8 +43,8 @@ public class TableController(ITableService tableService) : BaseApiController
     /// <returns>A list of tables.</returns>
     [HttpGet]
     [ProducesResponseType(200)]
-    public async Task<IActionResult> GetAllTables() =>
-        HandleResult(await tableService.GetAllTables());
+    public async Task<IActionResult> GetTables() =>
+        HandleResult(await tableService.GetTables());
 
     /// <summary>
     /// Updates an existing table.
@@ -58,24 +59,24 @@ public class TableController(ITableService tableService) : BaseApiController
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> UpdateTable([FromBody] TableUpdateDto tableUpdateDto, Guid id) =>
-        HandleResult(await tableService.UpdateTable(tableUpdateDto, id));
+    public async Task<IActionResult> UpdateTable(Guid id, [FromBody] TableUpdateDto tableUpdateDto) =>
+        HandleResult(await tableService.UpdateTable(id, tableUpdateDto));
 
     /// <summary>
-    /// Updates the occupancy status of a table.
+    /// Updates the status of a table.
     /// </summary>
     /// <param name="id">The ID of the table to update.</param>
-    /// <param name="tableOccupancyDto">The updated occupancy details.</param>
-    /// <returns>The updated table occupancy status.</returns>
+    /// <param name="status">The updated status details.</param>
+    /// <returns>The updated table status.</returns>
     /// <response code="200">If the update was successful.</response>
     /// <response code="400">If the request is invalid.</response>
     /// <response code="404">If the table is not found.</response>
-    [HttpPut("{id}/occupancy")]
+    [HttpPut("{id}/status")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> UpdateOccupancy([FromBody] TableOccupancyDto tableOccupancyDto, Guid id) =>
-        HandleResult(await tableService.UpdateOccupancy(tableOccupancyDto, id));
+    public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] TableStatus status) =>
+        HandleResult(await tableService.UpdateStatus(id, status));
 
     /// <summary>
     /// Deletes a table.
