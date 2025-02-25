@@ -3,19 +3,19 @@
 ###
 // To get a specific reservation by its ID.
 
-GET {{API_HostAddress}}/Reservation/e5923a9a-b482-4955-83de-13bc5180b9d8
+GET {{API_HostAddress}}/reservations/e5923a9a-b482-4955-83de-13bc5180b9d8
 Accept: application/json
 
 ###
 // To get all reservations.
 
-GET {{API_HostAddress}}/Reservation
+GET {{API_HostAddress}}/reservations
 Accept: application/json
 
 ###
 // To get reservations for a specific date.
 
-GET {{API_HostAddress}}/Reservation/by-date?date=2025-02-10
+GET {{API_HostAddress}}/reservations/by-date?date=2025-02-10
 Accept: application/json
 
 ###

@@ -1,6 +1,6 @@
-﻿namespace Application.Dtos.MenuCategories;
+﻿namespace Application.Dtos.MenuItems;
 
-public class MenuCategoryReadDto
+public class MenuItemIngredientReadDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;

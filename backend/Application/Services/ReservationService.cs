@@ -61,26 +61,6 @@ public class ReservationService(RestaurantOrderingContext orderingContext, IEven
         }
     }
 
-    public async Task<ResultDto<List<ReservationReadDto>>> GetAllReservations()
-    {
-        try
-        {
-            var reservations = await orderingContext.Reservations
-                .Include(r => r.Table)
-                .ToListAsync();
-
-            var reservationDtos = mapper.Map<List<ReservationReadDto>>(reservations);
-
-            return ResultDto<List<ReservationReadDto>>
-                .Success(reservationDtos, HttpStatusCode.OK);
-        }
-        catch (Exception ex)
-        {
-            return ResultDto<List<ReservationReadDto>>
-                .Failure($"An error occured: {ex.Message}", HttpStatusCode.InternalServerError);
-        }
-    }
-
     public async Task<ResultDto<List<ReservationReadDto>>> GetReservationsByDate(DateTime date)
     {
         try
@@ -102,12 +82,12 @@ public class ReservationService(RestaurantOrderingContext orderingContext, IEven
         }
     }
 
-    public async Task<ResultDto<ReservationReadDto>> AssignTableToReservation(Guid reservationId, Guid tableId)
+    public async Task<ResultDto<ReservationReadDto>> AssignTableToReservation(Guid id, Guid tableId)
     {
         try
         {
             var reservation = await orderingContext.Reservations
-                .FirstOrDefaultAsync(r => r.Id == reservationId);
+                .FirstOrDefaultAsync(r => r.Id == id);
 
             if (reservation == null)
                 return ResultDto<ReservationReadDto>
@@ -140,7 +120,7 @@ public class ReservationService(RestaurantOrderingContext orderingContext, IEven
         }
     }
 
-    public async Task<ResultDto<ReservationReadDto>> UpdateReservation(ReservationUpdateDto reservationUpdate, Guid id)
+    public async Task<ResultDto<ReservationReadDto>> UpdateReservation(Guid id, ReservationUpdateDto reservationUpdate)
     {
         try
         {

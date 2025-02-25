@@ -3,5 +3,5 @@
 public class TableCreateDto
 {
     public string Name { get; set; } = null!;
-    public int NumberOfPeople { get; set; }
+    public int Capacity { get; set; }
 }

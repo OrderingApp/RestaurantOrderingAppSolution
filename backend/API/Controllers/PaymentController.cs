@@ -1,6 +1,5 @@
 ﻿using Application.Contracts;
 using Application.Dtos.Payments;
-using Domain;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -8,7 +7,7 @@ namespace API.Controllers;
 /// <summary>
 /// Manages payments for orders.
 /// </summary>
-[Route("/orders/{orderId}/payments/")]
+[Route("orders/{orderId}/payments")]
 public class PaymentController(IPaymentService paymentService) : BaseApiController
 {
     /// <summary>
@@ -22,8 +21,8 @@ public class PaymentController(IPaymentService paymentService) : BaseApiControll
     [HttpPost]
     [ProducesResponseType(201)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> AddPayment([FromBody] PaymentCreateDto paymentDto, Guid orderId) =>
-        HandleResult(await paymentService.AddPayment(paymentDto, orderId));
+    public async Task<IActionResult> AddPayment([FromRoute] Guid orderId, [FromBody] PaymentCreateDto paymentDto) =>
+        HandleResult(await paymentService.AddPayment(orderId, paymentDto));
 
     /// <summary>
     /// Retrieves all payments for a specific order.
@@ -33,6 +32,18 @@ public class PaymentController(IPaymentService paymentService) : BaseApiControll
     /// <response code="200">Returns the list of payments.</response>
     [HttpGet]
     [ProducesResponseType(200)]
-    public async Task<IActionResult> GetAllOrderPayments(Guid orderId) =>
+    public async Task<IActionResult> GetAllOrderPayments([FromRoute] Guid orderId) =>
         HandleResult(await paymentService.GetAllOrderPayments(orderId));
+
+    /// <summary>
+    /// Change status to refunded of payment.
+    /// </summary>
+    /// <param name="id">The ID of the payment.</param>
+    /// <param name="orderId">The ID of the order.</param>
+    /// <returns>changed status.</returns>
+    /// <response code="200">Returns the list of payments.</response>
+    [HttpPatch("{id}")]
+    [ProducesResponseType(200)]
+    public async Task<IActionResult> MarkPaymentAsRefunded([FromRoute] Guid id, [FromRoute] Guid orderId) =>
+        HandleResult(await paymentService.MarkPaymentAsRefunded(id, orderId));
 }

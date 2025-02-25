@@ -7,6 +7,7 @@ namespace API.Controllers;
 /// <summary>
 /// Manages tags used for categorizing menu items.
 /// </summary>
+[Route("api/tags")]
 public class TagsController(ITagService tagService) : BaseApiController
 {
     /// <summary>

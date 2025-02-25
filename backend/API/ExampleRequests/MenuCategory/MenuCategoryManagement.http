@@ -2,7 +2,7 @@
 
 // To update an existing menu category.
 
-PUT {{API_HostAddress}}/MenuCategory/0135f22f-8d28-4286-98c1-1eda42816779
+PUT {{API_HostAddress}}/MenuCategory/57a02042-fc02-4d4e-a4d1-abae0896c95a
 Content-Type: application/json
 Accept: application/json
 

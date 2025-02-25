@@ -11,8 +11,8 @@ public class TableCreateDtoValidator : AbstractValidator<TableCreateDto>
             .NotEmpty().WithMessage("Table name is required.")
             .MaximumLength(50).WithMessage("Table name must not exceed 50 characters.");
 
-        RuleFor(x => x.NumberOfPeople)
-            .GreaterThan(0).WithMessage("Number of people must be greater than zero.")
-            .LessThanOrEqualTo(20).WithMessage("Number of people must not exceed 20.");
+        RuleFor(x => x.Capacity)
+            .GreaterThan(0).WithMessage("Capacity must be greater than zero.")
+            .LessThanOrEqualTo(20).WithMessage("Capacity must not exceed 20.");
     }
 }

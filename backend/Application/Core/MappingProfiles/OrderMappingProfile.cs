@@ -22,5 +22,10 @@ public class OrderMappingProfile : Profile
             .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems))
             .ForMember(dest => dest.Payments, opt => opt.MapFrom(src => src.Payments));
 
+        CreateMap<Order, NonDineInOrderSummaryDto>()
+            .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Status.ToString()))
+            .ForMember(dest => dest.OrderType, opt => opt.MapFrom(src => src.Type.ToString()))
+            .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.CustomerInformation != null ? src.CustomerInformation.PhoneNumber : null))
+            .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.CustomerInformation != null ? src.CustomerInformation.Address : null));
     }
 }

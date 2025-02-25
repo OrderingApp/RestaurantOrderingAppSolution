@@ -7,5 +7,5 @@ public class MenuItemCreateDto
     public decimal Price { get; set; }
 
     public Guid MenuCategoryId { get; set; }
-    public List<Guid> TagIds { get; set; } = new List<Guid>();
+    public List<Guid> IngredientIds { get; set; } = new List<Guid>();
 }

@@ -7,7 +7,7 @@ namespace API.Controllers;
 /// <summary>
 /// Manages table reservations.
 /// </summary>
-/// 
+[Route("api/reservations")]
 public class ReservationController(IReservationService reservationService) : BaseApiController
 {
     /// <summary>
@@ -37,15 +37,6 @@ public class ReservationController(IReservationService reservationService) : Bas
         HandleResult(await reservationService.GetReservation(id));
 
     /// <summary>
-    /// Retrieves all reservations.
-    /// </summary>
-    /// <returns>A list of reservations.</returns>
-    [HttpGet]
-    [ProducesResponseType(200)]
-    public async Task<IActionResult> GetAllReservations() =>
-        HandleResult(await reservationService.GetAllReservations());
-
-    /// <summary>
     /// Retrieves reservations for a specific date.
     /// </summary>
     /// <param name="date">The reservation date to filter by.</param>
@@ -58,18 +49,18 @@ public class ReservationController(IReservationService reservationService) : Bas
     /// <summary>
     /// Assigns a table to a reservation.
     /// </summary>
-    /// <param name="reservationId">The reservation ID.</param>
+    /// <param name="id">The reservation ID.</param>
     /// <param name="tableId">The table ID to assign.</param>
     /// <returns>The updated reservation with the assigned table.</returns>
     /// <response code="200">If the table was assigned successfully.</response>
     /// <response code="400">If the request is invalid.</response>
     /// <response code="404">If the reservation or table is not found.</response>
-    [HttpPut("{reservationId}/table/{tableId}")]
+    [HttpPut("{id}/table")]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> AssignTableToReservation(Guid reservationId, Guid tableId) =>
-        HandleResult(await reservationService.AssignTableToReservation(reservationId, tableId));
+    public async Task<IActionResult> AssignTableToReservation(Guid id, Guid tableId) =>
+        HandleResult(await reservationService.AssignTableToReservation(id, tableId));
 
     /// <summary>
     /// Updates a reservation.
@@ -84,8 +75,8 @@ public class ReservationController(IReservationService reservationService) : Bas
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> UpdateReservation([FromBody] ReservationUpdateDto reservationUpdateDto, Guid id) =>
-        HandleResult(await reservationService.UpdateReservation(reservationUpdateDto, id));
+    public async Task<IActionResult> UpdateReservation(Guid id, [FromBody] ReservationUpdateDto reservationUpdateDto) =>
+        HandleResult(await reservationService.UpdateReservation(id, reservationUpdateDto));
 
     /// <summary>
     /// Deletes a reservation.

@@ -3,5 +3,5 @@
 public class OrderItemIngredientAddDto
 {
     public Guid IngredientId { get; set; }
-    public int Quantity { get; set; }
+    public int Quantity { get; set; } = 1;
 }

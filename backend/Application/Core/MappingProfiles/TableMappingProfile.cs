@@ -10,7 +10,7 @@ public class TableMappingProfile : Profile
     {
         CreateMap<TableCreateDto, Table>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
-            //.ForMember(dest => dest.IsOccupied, opt => opt.MapFrom(_ => false))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => TableStatus.Available))
             .ForMember(dest => dest.IsUsed, opt => opt.MapFrom(_ => true))
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(_ => false));
 
@@ -21,9 +21,7 @@ public class TableMappingProfile : Profile
         CreateMap<Table, TableSummaryDto>()
             .ForMember(dest => dest.Orders, opt => opt.MapFrom(src => src.Orders));
 
-        CreateMap<TableUpdateDto, Table>();
-
-        CreateMap<TableOccupancyDto, Table>();
-            //.ForMember(dest => dest.IsOccupied, opt => opt.MapFrom(src => src.IsOccupied));
+        CreateMap<TableUpdateDto, Table>()
+            .ForMember(dest => dest.Status, opt => opt.Condition(src => src.Status.HasValue));
     }
 }
