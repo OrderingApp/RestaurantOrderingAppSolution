@@ -9,15 +9,15 @@ public class ReservationCreateDtoValidator : AbstractValidator<ReservationCreate
             .NotEmpty().WithMessage("Phone number is required.")
             .Matches(@"^\d{9,15}$").WithMessage("Phone number must contain between 9 and 15 digits.");
 
-        RuleFor(x => x.Surname)
-            .NotEmpty().WithMessage("Surname is required.")
-            .MaximumLength(100).WithMessage("Surname must not exceed 100 characters.");
+        RuleFor(x => x.Name)
+            .NotEmpty().WithMessage("Name is required.")
+            .MaximumLength(100).WithMessage("Name must not exceed 100 characters.");
 
-        RuleFor(x => x.ReservationDateTime)
+        RuleFor(x => x.DateTime)
             .GreaterThan(DateTime.UtcNow).WithMessage("Reservation date and time must be in the future.");
 
-        RuleFor(x => x.NumberOfPeople)
+        RuleFor(x => x.CapacityNeeded)
             .GreaterThan(0).WithMessage("Number of people must be greater than 0.")
-            .LessThanOrEqualTo(20).WithMessage("Number of people must not exceed 20.");
+            .LessThanOrEqualTo(40).WithMessage("Number of people must not exceed 40.");
     }
 }
