@@ -17,13 +17,13 @@ public class OrderClosedEventHandler(RestaurantOrderingContext restaurantOrderin
 
         if (existingDailyRevenue != null)
         {
-            existingDailyRevenue.Ammount += totalAmount;
+            existingDailyRevenue.Amount += totalAmount;
         }
         else
         {
             await restaurantOrderingContext.SalesRevenues.AddAsync(new SalesRevenue
             {
-                Ammount = totalAmount,
+                Amount = totalAmount,
                 Date = today
             });
         }
@@ -39,13 +39,13 @@ public class OrderClosedEventHandler(RestaurantOrderingContext restaurantOrderin
         {
             if (existingMenuItemSales.TryGetValue(orderItem.MenuItemId, out var existingSale))
             {
-                existingSale.Ammount++;
+                existingSale.Amount++;
             }
             else
             {
                 newMenuItemSales.Add(new MenuItemSale
                 {
-                    Ammount = 1,
+                    Amount = 1,
                     Date = today,
                     MenuItemId = orderItem.MenuItemId
                 });
