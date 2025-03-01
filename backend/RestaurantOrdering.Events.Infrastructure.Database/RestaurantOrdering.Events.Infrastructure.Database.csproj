@@ -13,5 +13,9 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\RestaurantOrdering.Events.Domain\RestaurantOrdering.Events.Domain.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Migrations\" />
+	</ItemGroup>
 	
 </Project>

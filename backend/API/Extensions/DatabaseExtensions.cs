@@ -16,7 +16,7 @@ public static class DatabaseExtensions
 
         services.AddDbContext<EventsDatabaseContext>(opt =>
         {
-            opt.UseSqlite(configuration.GetConnectionString("EventsDatabaseContext"));
+            opt.UseSqlite("Data Source=events.db");
         });
 
         return services;
