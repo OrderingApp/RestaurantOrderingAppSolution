@@ -7,6 +7,7 @@ namespace API.Controllers;
 /// <summary>
 /// Manages menu categories.
 /// </summary>
+[Route("api/menu-categories")]
 public class MenuCategoryController(IMenuCategoryService menuCategoryService) : BaseApiController
 {
     /// <summary>
@@ -17,9 +18,10 @@ public class MenuCategoryController(IMenuCategoryService menuCategoryService) : 
     /// <response code="201">Returns the newly created menu category.</response>
     /// <response code="400">If the input is invalid.</response>
     [HttpPost]
-    [ProducesResponseType(201)]
+    [ProducesResponseType(typeof(MenuCategoryReadDto), 201)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> CreateMenuCategory([FromBody] MenuCategoryCreateDto menuCategoryCreateDto) =>
+    public async Task<ActionResult<MenuCategoryReadDto>> CreateMenuCategory(
+        [FromBody] MenuCategoryCreateDto menuCategoryCreateDto) =>
         HandleResult(await menuCategoryService.CreateMenuCategory(menuCategoryCreateDto));
 
     /// <summary>
@@ -30,19 +32,19 @@ public class MenuCategoryController(IMenuCategoryService menuCategoryService) : 
     /// <response code="200">Returns the menu category.</response>
     /// <response code="404">If the menu category is not found.</response>
     [HttpGet("{id}")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(MenuCategoryReadDto), 200)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> GetMenuCategory(Guid id) =>
+    public async Task<ActionResult<MenuCategoryReadDto>> GetMenuCategory([FromRoute] Guid id) =>
         HandleResult(await menuCategoryService.GetMenuCategory(id));
 
     /// <summary>
     /// Retrieves all menu categories.
     /// </summary>
     /// <returns>A list of menu categories.</returns>
-    [HttpGet("menu-categories")]
-    [ProducesResponseType(200)]
-    public async Task<IActionResult> GetAllMenuCategories() =>
-        HandleResult(await menuCategoryService.GetAllMenuCategories());
+    [HttpGet]
+    [ProducesResponseType(typeof(List<MenuCategoryReadDto>), 200)]
+    public async Task<ActionResult<List<MenuCategoryReadDto>>> GetMenuCategories() =>
+        HandleResult(await menuCategoryService.GetMenuCategories());
 
     /// <summary>
     /// Updates an existing menu category.
@@ -54,11 +56,13 @@ public class MenuCategoryController(IMenuCategoryService menuCategoryService) : 
     /// <response code="400">If the request is invalid.</response>
     /// <response code="404">If the menu category is not found.</response>
     [HttpPut("{id}")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(MenuCategoryReadDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> UpdateMenuCategory([FromBody] MenuCategoryUpdateDto menuCategoryUpdateDto, Guid id) =>
-        HandleResult(await menuCategoryService.UpdateMenuCategory(menuCategoryUpdateDto, id));
+    public async Task<ActionResult<MenuCategoryReadDto>> UpdateMenuCategory(
+        [FromRoute] Guid id, 
+        [FromBody] MenuCategoryUpdateDto menuCategoryUpdateDto) =>
+        HandleResult(await menuCategoryService.UpdateMenuCategory(id, menuCategoryUpdateDto));
 
     /// <summary>
     /// Deletes a menu category.
@@ -70,6 +74,6 @@ public class MenuCategoryController(IMenuCategoryService menuCategoryService) : 
     [HttpDelete("{id}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> DeleteMenuCategory(Guid id) =>
+    public async Task<IActionResult> DeleteMenuCategory([FromRoute] Guid id) =>
         HandleResult(await menuCategoryService.DeleteMenuCategory(id));
 }

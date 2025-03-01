@@ -13,9 +13,14 @@ public class IngredientUpdateDtoValidator : AbstractValidator<IngredientUpdateDt
             .MaximumLength(100).WithMessage("Ingredient name must not exceed 100 characters.");
 
         RuleFor(x => x.Price)
-            .GreaterThanOrEqualTo(0).WithMessage("Price must be a non-negative value.");
+            .GreaterThanOrEqualTo(0)
+            .When(x => x.Price.HasValue)
+            .WithMessage("Price must be a non-negative value.");
+
 
         RuleFor(x => x.IsUsed)
-            .NotNull().WithMessage("IsUsed flag is required.");
+            .NotNull().When(x => x.IsUsed.HasValue)
+            .WithMessage("IsUsed must be true or false if provided.");
+
     }
 }

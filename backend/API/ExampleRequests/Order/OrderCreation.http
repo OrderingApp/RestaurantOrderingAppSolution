@@ -3,102 +3,121 @@
 // To create one dineIn order with 2 order items. 
 // One order item with 2 extra ingredients and one without extra ingredients.
 
-POST {{API_HostAddress}}/Order/dinein
+POST {{API_HostAddress}}/orders/dinein
 Content-Type: application/json
 Accept: application/json
 
 {
-  "orderDateTime": "2026-02-07T12:00:00Z",
-  "tableId": "367d061a-aad9-4f38-8257-36cc71916924",
+  "dateTime": "2026-02-07T12:00:00Z",
+  "tableId": "9165C97C-5477-4EED-A566-F6FEC0E84694",
   "orderItems": [
     {
-      "menuItemId": "6EDD0176-C9EF-4F10-9693-F502CD2257B6",
+      "menuItemId": "3805A7EB-F095-4180-80E6-96289B539D6B",
       "specialInstructions": "No onions, extra cheese",
-      "ingredients": [
+      "extraIngredients": [
         {
-          "ingredientId": "B8461E8E-BBB1-4FFF-8ACE-9C2460390538",
+          "ingredientId": "A4458F4C-55D7-4BB9-9FE6-6E7B88BC96EA",
           "quantity": 2
         },
         {
-          "ingredientId": "C8F9CB59-D588-49C0-9C43-DA589ED4543C",
+          "ingredientId": "8C7FC3D2-8BD6-4634-AE36-4207D439C2A4",
           "quantity": 1
         }
-      ]
+      ],
+      "removedIngredientIds": []
     },
     {
-      "menuItemId": "AF7FD522-493E-4987-ABB0-4CDE845745AD",
-      "specialInstructions": null
+      "menuItemId": "1A069762-854A-4EE4-B455-722C843FDE5B",
+      "specialInstructions": null,
+      "extraIngredients": [],
+      "removedIngredientIds": []
     }
   ]
 }
 
 ###
+# To create one takeaway order with 2 order items.
+# One order item with 2 extra ingredients and one without extra ingredients.
 
-// To create one takeaway order with 2 order items. 
-// One order item with 2 extra ingredients and one without extra ingredients.
-
-POST {{API_HostAddress}}/Order/takeaway
+POST {{API_HostAddress}}/orders/takeaway
 Content-Type: application/json
 Accept: application/json
 
 {
   "orderDateTime": "2026-02-07T12:30:00Z",
-  "phoneNumber": "123456789",
-  "additionalInstructions": "Please call on arrival.",
+  "customerInformation": {
+    "phoneNumber": "123456789",
+    "additionalInstructions": "Please call on arrival.",
+    "orderCompletionType": "Immediate",
+    "preferredPaymentMethod": "Cash",
+    "expectedOrderCompletion": null
+  },
   "orderItems": [
     {
-      "menuItemId": "6EDD0176-C9EF-4F10-9693-F502CD2257B6",
+      "menuItemId": "0BD3199D-F0A5-4044-8364-208BECDE5963",
       "specialInstructions": "No onions, extra cheese",
-      "ingredients": [
+      "extraIngredients": [
         {
-          "ingredientId": "B8461E8E-BBB1-4FFF-8ACE-9C2460390538",
+          "ingredientId": "5A3CAF55-301A-41E5-911C-8985DB41660B",
           "quantity": 2
         },
         {
-          "ingredientId": "C8F9CB59-D588-49C0-9C43-DA589ED4543C",
+          "ingredientId": "878DD702-A80C-4A29-B831-9EE98C3B6906",
           "quantity": 1
         }
-      ]
+      ],
+      "removedIngredientIds": []
     },
     {
-      "menuItemId": "AF7FD522-493E-4987-ABB0-4CDE845745AD",
-      "specialInstructions": null
+      "menuItemId": "69FE84B9-DCBC-49BD-BDE4-0993A9E39345",
+      "specialInstructions": null,
+      "extraIngredients": [],
+      "removedIngredientIds": []
     }
   ]
 }
 
+
+
 ###
+# To create one delivery order with 2 order items.
+# One order item with 2 extra ingredients and one without extra ingredients.
 
-// To create one delivery order with 2 order items. 
-// One order item with 2 extra ingredients and one without extra ingredients.
-
-POST {{API_HostAddress}}/Order/delivery
+POST {{API_HostAddress}}/orders/delivery
 Content-Type: application/json
 Accept: application/json
 
 {
   "orderDateTime": "2026-02-07T13:00:00Z",
-  "phoneNumber": "123456789",
-  "address": "123 Main Street, City, Country",
-  "additionalInstructions": "Leave at the doorstep.",
+  "customerInformation": {
+    "phoneNumber": "123456789",
+    "address": "123 Main Street, City, Country",
+    "additionalInstructions": "Leave at the doorstep.",
+    "orderCompletionType": "Immediate",
+    "preferredPaymentMethod": "Card",
+    "expectedOrderCompletion": null
+  },
   "orderItems": [
     {
-      "menuItemId": "6EDD0176-C9EF-4F10-9693-F502CD2257B6",
+      "menuItemId": "0BD3199D-F0A5-4044-8364-208BECDE5963",
       "specialInstructions": "Extra spicy",
-      "ingredients": [
+      "extraIngredients": [
         {
-          "ingredientId": "B8461E8E-BBB1-4FFF-8ACE-9C2460390538",
+          "ingredientId": "5A3CAF55-301A-41E5-911C-8985DB41660B",
           "quantity": 2
         },
         {
-          "ingredientId": "C8F9CB59-D588-49C0-9C43-DA589ED4543C",
+          "ingredientId": "878DD702-A80C-4A29-B831-9EE98C3B6906",
           "quantity": 1
         }
-      ]
+      ],
+      "removedIngredientIds": []
     },
     {
-      "menuItemId": "AF7FD522-493E-4987-ABB0-4CDE845745AD",
-      "specialInstructions": null
+      "menuItemId": "69FE84B9-DCBC-49BD-BDE4-0993A9E39345",
+      "specialInstructions": null,
+      "extraIngredients": [],
+      "removedIngredientIds": []
     }
   ]
 }

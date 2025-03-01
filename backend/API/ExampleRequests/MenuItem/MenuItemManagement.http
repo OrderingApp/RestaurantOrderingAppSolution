@@ -2,7 +2,7 @@
 
 // To update an existing menu item.
 
-PUT {{API_HostAddress}}/MenuItem/f17610d5-9e2c-48c3-acf2-b6f7e56b0d25
+PUT {{API_HostAddress}}/MenuItem/fc0e8638-f584-4fd8-82a9-fea84f3eed39
 Content-Type: application/json
 Accept: application/json
 
@@ -10,8 +10,8 @@ Accept: application/json
   "name": "BBQ Chicken Pizza",
   "description": "Grilled chicken, BBQ sauce, and red onions",
   "price": 12.50,
-  "tagIds": [
-    "5D5243FB-32C0-4414-8653-61087B18F80B"
+  "ingredientIds": [
+    "8C7FC3D2-8BD6-4634-AE36-4207D439C2A4"
   ]
 }
 
@@ -19,7 +19,7 @@ Accept: application/json
 
 // To delete an existing menu item.
 
-DELETE {{API_HostAddress}}/MenuItem/f17610d5-9e2c-48c3-acf2-b6f7e56b0d25
+DELETE {{API_HostAddress}}/MenuItem/fc0e8638-f584-4fd8-82a9-fea84f3eed39
 Accept: application/json
 
 ###

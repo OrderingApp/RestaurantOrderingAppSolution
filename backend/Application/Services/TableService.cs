@@ -64,7 +64,7 @@ public class TableService(RestaurantOrderingContext orderingContext, IEventHandl
         }
     }
 
-    public async Task<ResultDto<List<TableReadDto>>> GetAllTables()
+    public async Task<ResultDto<List<TableReadDto>>> GetTables()
     {
         try
         {
@@ -84,7 +84,7 @@ public class TableService(RestaurantOrderingContext orderingContext, IEventHandl
         }
     }
 
-    public async Task<ResultDto<TableReadDto>> UpdateTable(TableUpdateDto tableUpdateDto, Guid id)
+    public async Task<ResultDto<TableReadDto>> UpdateTable(Guid id, TableUpdateDto tableUpdateDto)
     {
         try
         {
@@ -113,32 +113,33 @@ public class TableService(RestaurantOrderingContext orderingContext, IEventHandl
         }
     }
 
-    public async Task<ResultDto<TableReadDto>> UpdateOccupancy(TableOccupancyDto tableOccupancyDto, Guid id)
+    public async Task<ResultDto<TableReadDto>> UpdateStatus(Guid id, TableStatus tableStatus)
     {
         try
         {
             var table = await orderingContext.Tables.FindAsync(id);
 
-            if (table == null)
+            if (table == null || table.IsDeleted)
                 return ResultDto<TableReadDto>
                     .Failure("Table not found or has been deleted.", HttpStatusCode.NotFound);
 
-            if (table.IsOccupied == tableOccupancyDto.IsOccupied)
+            if (table.Status == tableStatus)
                 return ResultDto<TableReadDto>
-                    .Failure("The table already has the requested occupancy status.", HttpStatusCode.BadRequest);
+                    .Failure("Table already has the requested status.", HttpStatusCode.BadRequest);
 
+            var previousStatus = table.Status;
 
-            table.IsOccupied = tableOccupancyDto.IsOccupied;
+            table.Status = tableStatus;
 
             await orderingContext.SaveChangesAsync();
 
-            var updatedTableOccupancy = mapper.Map<TableReadDto>(table);
+            var updatedTableDto = mapper.Map<TableReadDto>(table);
 
-            var tableOccupancyUpdatedEvent = mapper.Map<TableOccupancyUpdatedEvent>((table, tableOccupancyDto.IsOccupied));
-            await eventHandlerService.HandleEventAsync(tableOccupancyUpdatedEvent);
+            var tableStatusUpdatedEvent = mapper.Map<TableStatusUpdatedEvent>((table, tableStatus));
+            await eventHandlerService.HandleEventAsync(tableStatusUpdatedEvent);
 
             return ResultDto<TableReadDto>
-                .Success(updatedTableOccupancy, HttpStatusCode.OK);
+                .Success(updatedTableDto, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
@@ -157,7 +158,7 @@ public class TableService(RestaurantOrderingContext orderingContext, IEventHandl
                     .Failure("Table not found.", HttpStatusCode.NotFound);
 
             table.IsDeleted = true;
-            table.IsOccupied = false;
+            //table.IsOccupied = false;
 
             orderingContext.Tables.Update(table);
             await orderingContext.SaveChangesAsync();

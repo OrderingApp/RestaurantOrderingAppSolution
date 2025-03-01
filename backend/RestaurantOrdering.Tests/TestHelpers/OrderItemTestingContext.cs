@@ -10,6 +10,6 @@ public static class OrderItemTestingContext
         MenuItemId = Guid.NewGuid(),
         Price = 10,
         SpecialInstructions = "Test item 1",
-        OrderItemIngredients = new List<OrderItemIngredient>()
+        //OrderItemIngredients = new List<MenuItemIngredientRel>()
     };
 }

@@ -1,8 +1,6 @@
 @API_HostAddress = http://localhost:5000/api
 
-###
-
-// To create a new ingredient.
+### Create a new ingredient
 
 POST {{API_HostAddress}}/Ingredients
 Content-Type: application/json
@@ -10,8 +8,7 @@ Accept: application/json
 
 {
   "name": "Mozzarella",
-  "price": 2.50,
-  "ingredientType": "Cheese"
+  "price": 2.5
 }
 
 ###

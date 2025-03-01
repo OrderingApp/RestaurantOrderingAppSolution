@@ -1,15 +1,13 @@
-﻿using Application.Dtos.OrderItemIngredients;
+﻿using Domain;
 
-namespace Application.Dtos.OrderItems
+namespace Application.Dtos.OrderItems;
+
+public class OrderItemsListDto
 {
-    public class OrderItemsListDto
-    {
-        public Guid Id { get; set; }
-        public string? MenuItemName { get; set; }
-        public decimal Price { get; set; }
-        public decimal Discount { get; set; }
+    public Guid Id { get; set; }
+    public string MenuItemName { get; set; } = null!;
+    public decimal Price { get; set; }
+    public decimal Discount { get; set; }
 
-        public List<OrderItemIngredientReadDto> Ingredients { get; set; } = new List<OrderItemIngredientReadDto>();
-
-    }
+    public OrderItemStatus Status { get; set; }
 }

@@ -2,31 +2,31 @@
 
 // To update an existing table.
 
-PUT {{API_HostAddress}}/Table/21b2af68-4041-48ef-bb9b-3a21627d6777
+PUT {{API_HostAddress}}/tables/21b2af68-4041-48ef-bb9b-3a21627d6777
 Content-Type: application/json
 Accept: application/json
 
 {
-  "name": "Family Table",
-  "numberOfPeople": 6,
-  "isUsed": true
+  "name": "Updated Table Name",
+  "capacity": 6,
+  "isUsed": true,
+  "status": "Reserved"
 }
 
 ###
-// To update the occupancy status of a table.
 
-PUT {{API_HostAddress}}/Table/21b2af68-4041-48ef-bb9b-3a21627d6777/updateOccupancy
+// To update the status of a table.
+
+PUT {{API_HostAddress}}/tables/{id}/status
 Content-Type: application/json
 Accept: application/json
 
-{
-  "isOccupied": true
-}
+"PendingPayment"
 
 ###
 // To delete an existing table.
 
-DELETE {{API_HostAddress}}/Table/21b2af68-4041-48ef-bb9b-3a21627d6777
+DELETE {{API_HostAddress}}/tables/21b2af68-4041-48ef-bb9b-3a21627d6777
 Accept: application/json
 
 ###

@@ -25,8 +25,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
     {
         try
         {
-            var dineInOrder = mapper.Map<Order>(dineInOrderDto);
-
             var table = await orderingContext.Tables
                 .FirstOrDefaultAsync(t => t.Id == dineInOrderDto.TableId);
 
@@ -34,7 +32,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 return ResultDto<OrderReadDto>
                     .Failure("Specified table does not exist.", HttpStatusCode.BadRequest);
 
-            table.IsOccupied = true;
+            var dineInOrder = mapper.Map<Order>(dineInOrderDto);
 
             dineInOrder.OrderItems = await PopulateOrderItemsAsync(dineInOrderDto.OrderItems, dineInOrder.Id);
             dineInOrder.TotalAmount = dineInOrder.OrderItems.Sum(oi => oi.Price);
@@ -63,13 +61,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         {
             var takeawayOrder = mapper.Map<Order>(takeawayOrderDto);
 
-            if(string.IsNullOrWhiteSpace(takeawayOrderDto.PhoneNumber))
-                return ResultDto<OrderReadDto>
-                    .Failure("Phone number is required for takeaway orders.", HttpStatusCode.BadRequest);
-
-            takeawayOrder.CustomerInformation = mapper.Map<CustomerInformation>(takeawayOrderDto);
-            takeawayOrder.CustomerInformation.OrderId = takeawayOrder.Id;
-
             takeawayOrder.OrderItems = await PopulateOrderItemsAsync(takeawayOrderDto.OrderItems, takeawayOrder.Id);
             takeawayOrder.TotalAmount = takeawayOrder.OrderItems.Sum(oi => oi.Price);
 
@@ -97,9 +88,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         {
             var deliveryOrder = mapper.Map<Order>(deliveryOrderDto);
 
-            deliveryOrder.CustomerInformation = mapper.Map<CustomerInformation>(deliveryOrderDto);
-            deliveryOrder.CustomerInformation.OrderId = deliveryOrder.Id;
-
             deliveryOrder.OrderItems = await PopulateOrderItemsAsync(deliveryOrderDto.OrderItems, deliveryOrder.Id);
             deliveryOrder.TotalAmount = deliveryOrder.OrderItems.Sum(oi => oi.Price);
 
@@ -121,58 +109,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         }
     }
 
-    public async Task<ResultDto<OrderReadDto>> SplitOrder(SplitOrderDto splitOrderDto, Guid orderId)
-    {
-        try
-        {
-            var originalOrder = await orderingContext.Orders
-                .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.MenuItem)
-                .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.OrderItemIngredients)
-                        .ThenInclude(oii => oii.Ingredient)
-                .Include(o => o.Payments)
-                .FirstOrDefaultAsync(o => o.Id == orderId);
-
-            if (originalOrder == null)
-                return ResultDto<OrderReadDto>.Failure("Order not found.", HttpStatusCode.NotFound);
-
-            var itemsToSplit = originalOrder.OrderItems
-                .Where(oi => splitOrderDto.OrderItemIds.Contains(oi.Id))
-                .ToList();
-
-            if (!itemsToSplit.Any())
-                return ResultDto<OrderReadDto>.Failure("No valid items selected for splitting.", HttpStatusCode.BadRequest);
-
-            var newOrder = new Order
-            {
-                Id = Guid.NewGuid(),
-                OrderDateTime = DateTime.UtcNow,
-                OrderStatus = originalOrder.OrderStatus,
-                TableId = originalOrder.TableId,
-                OrderType = originalOrder.OrderType,
-                OrderItems = mapper.Map<List<OrderItem>>(itemsToSplit)
-            };
-
-            originalOrder.OrderItems.RemoveAll(oi => itemsToSplit.Contains(oi));
-
-            originalOrder.TotalAmount = Math.Max(0, originalOrder.OrderItems.Sum(item => item.Price));
-            newOrder.TotalAmount = Math.Max(0, newOrder.OrderItems.Sum(item => item.Price));
-
-            orderingContext.Orders.Add(newOrder);
-            await orderingContext.SaveChangesAsync();
-
-            var orderSplitEvent = mapper.Map<OrderSplitBillEvent>(newOrder);
-            await eventHandlerService.HandleEventAsync(orderSplitEvent);
-
-            return ResultDto<OrderReadDto>.Success(null, HttpStatusCode.Created);
-        }
-        catch (Exception ex)
-        {
-            return ResultDto<OrderReadDto>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
-        }
-    }
-
     public async Task<ResultDto<OrderReadDto>> GetOrder(Guid id)
     {
         try
@@ -181,8 +117,6 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.MenuItem)
                 .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.OrderItemIngredients)
-                    .ThenInclude(oii => oii.Ingredient)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (order == null)
@@ -190,6 +124,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                     .Failure("Order not found", HttpStatusCode.NotFound);
 
             var orderDto = mapper.Map<OrderReadDto>(order);
+
 
             return ResultDto<OrderReadDto>
                 .Success(orderDto, HttpStatusCode.OK);
@@ -202,7 +137,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         }
     }
 
-    public async Task<ResultDto<List<OrderReadDto>>> GetAllOrders(OrderStatus? orderStatus)
+    public async Task<ResultDto<List<OrderReadDto>>> GetOrders(OrderStatus? orderStatus)
     {
         try
         {
@@ -214,7 +149,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
 
             if (orderStatus.HasValue)
             {
-                query = query.Where(o => o.OrderStatus == orderStatus.Value);
+                query = query.Where(o => o.Status == orderStatus.Value);
             }
 
             var orders = await query.ToListAsync();
@@ -231,65 +166,67 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         }
     }
 
-    public async Task<ResultDto<List<OrderReadDto>>> GetOngoingOrdersByType(OrderType orderType)
+    public async Task<ResultDto<List<NonDineInOrderSummaryDto>>> GetOngoingNonDineInOrders(OrderType orderType)
     {
         try
         {
+            if (orderType != OrderType.Delivery && orderType != OrderType.Takeaway)
+            {
+                return ResultDto<List<NonDineInOrderSummaryDto>>
+                    .Failure("Invalid order type. Only 'Delivery' and 'Takeaway' types are allowed.", HttpStatusCode.BadRequest);
+            }
+
             var orders = await orderingContext.Orders
-                .Where(o => o.OrderType == orderType && o.OrderStatus == OrderStatus.Ongoing)
+                .Where(o => o.Type == orderType && o.Status == OrderStatus.Ongoing)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.MenuItem)
-                .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.OrderItemIngredients)
-                        .ThenInclude(oii => oii.Ingredient)
                 .Include(o => o.CustomerInformation)
                 .ToListAsync();
 
-            var orderDtos = mapper.Map<List<OrderReadDto>>(orders);
+            var orderDtos = mapper.Map<List<NonDineInOrderSummaryDto>>(orders);
 
-            return ResultDto<List<OrderReadDto>>
+            return ResultDto<List<NonDineInOrderSummaryDto>>
                 .Success(orderDtos, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
-            return ResultDto<List<OrderReadDto>>
+            return ResultDto<List<NonDineInOrderSummaryDto>>
                 .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
         }
     }
 
-    public async Task<ResultDto<List<OrderReadDto>>> GetOngoingOrdersForTable(Guid tableId)
+    public async Task<ResultDto<List<OrderSummaryDto>>> GetOngoingOrdersForTable(Guid tableId)
     {
         try
         {
             var ongoingOrders = await orderingContext.Orders
-                .Where(o => o.TableId == tableId && o.OrderStatus == OrderStatus.Ongoing)
+                .Where(o => o.TableId == tableId && o.Status == OrderStatus.Ongoing)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.MenuItem)
-                .Include(o => o.CustomerInformation)
                 .ToListAsync();
 
             if (!ongoingOrders.Any())
-                return ResultDto<List<OrderReadDto>>
+                return ResultDto<List<OrderSummaryDto>>
                     .Failure("No ongoing orders found for this table.", HttpStatusCode.NotFound);
 
-            var orderDtos = mapper.Map<List<OrderReadDto>>(ongoingOrders);
-            return ResultDto<List<OrderReadDto>>
+            var orderDtos = mapper.Map<List<OrderSummaryDto>>(ongoingOrders);
+            return ResultDto<List<OrderSummaryDto>>
                 .Success(orderDtos, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
-            return ResultDto<List<OrderReadDto>>
+            return ResultDto<List<OrderSummaryDto>>
                 .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
         }
     }
 
-    public async Task<ResultDto<OrderReadDto>> ApplyOrderDiscount(decimal discountPercentage, Guid orderId)
+    public async Task<ResultDto<OrderReadDto>> ApplyOrderDiscount(Guid id, decimal discountPercentage)
     {
         try
         {
             var order = await orderingContext.Orders
                 .Include(o => o.OrderItems)
-                .FirstOrDefaultAsync(o => o.Id == orderId);
+                .FirstOrDefaultAsync(o => o.Id == id);
 
             if (order == null)
                 return ResultDto<OrderReadDto>.Failure("Order not found.", HttpStatusCode.NotFound);
@@ -315,13 +252,13 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         }
     }
 
-    public async Task<ResultDto<OrderReadDto>> ChangeOrderTable(Guid orderId, Guid newTableId)
+    public async Task<ResultDto<OrderReadDto>> ChangeOrderTable(Guid id, Guid newTableId)
     {
         try
         {
             var order = await orderingContext.Orders
                 .Include(o => o.Table)
-                .FirstOrDefaultAsync(o => o.Id == orderId);
+                .FirstOrDefaultAsync(o => o.Id == id);
 
             if (order == null)
                 return ResultDto<OrderReadDto>
@@ -337,17 +274,17 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 return ResultDto<OrderReadDto>
                     .Failure("Specified table does not exist.", HttpStatusCode.BadRequest);
 
-            if (order.TableId.HasValue)
+            if (newTable.Status == TableStatus.Ongoing)
+                return ResultDto<OrderReadDto>
+                    .Failure("The specified table is currently occupied.", HttpStatusCode.Conflict);
+
+            if (order.Table != null)
             {
-                var currentTable = await orderingContext.Tables.FirstOrDefaultAsync(t => t.Id == order.TableId);
-                if (currentTable != null)
-                {
-                    currentTable.IsOccupied = false;
-                    orderingContext.Tables.Update(currentTable);
-                }
+                order.Table.Status = TableStatus.Available;
+                orderingContext.Tables.Update(order.Table);
             }
 
-            newTable.IsOccupied = true;
+            newTable.Status = TableStatus.Ongoing;
             order.TableId = newTableId;
 
             orderingContext.Orders.Update(order);
@@ -370,21 +307,75 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         }
     }
 
-    public async Task<ResultDto<OrderReadDto>> UpdateOrderStatus(OrderStatus newStatus, Guid id)
+    public async Task<ResultDto<OrderReadDto>> CloseOrder(Guid id)
+    {
+        try
+        {
+            var order = await orderingContext.Orders
+                .Include(o => o.OrderItems)
+                .Include(o => o.Payments)
+                .Include(o => o.Table)
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (order == null)
+                return ResultDto<OrderReadDto>.Failure("Order not found.", HttpStatusCode.NotFound);
+
+            if (order.Status == OrderStatus.Closed)
+                return ResultDto<OrderReadDto>.Failure("Order is already closed.", HttpStatusCode.BadRequest);
+
+            var totalDue = Math.Max(0, order.TotalAmount * (1 - (order.Discount / 100m)));
+            var totalPaid = order.Payments.Sum(p => p.Amount);
+
+            if (totalPaid < totalDue)
+                return ResultDto<OrderReadDto>.Failure("Payments do not fully cover the order total.", HttpStatusCode.BadRequest);
+
+            order.Status = OrderStatus.Closed;
+
+            if (order.Table != null)
+            {
+                order.Table.Status = TableStatus.Available;
+                orderingContext.Tables.Update(order.Table);
+            }
+
+            await orderingContext.SaveChangesAsync();
+
+            var orderClosedEvent = mapper.Map<OrderClosedEvent>(order);
+            await eventHandlerService.HandleEventAsync(orderClosedEvent);
+
+            var orderReadDto = mapper.Map<OrderReadDto>(order);
+
+            return ResultDto<OrderReadDto>.Success(orderReadDto, HttpStatusCode.OK);
+        }
+        catch (Exception ex)
+        {
+            return ResultDto<OrderReadDto>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+        }
+    }
+
+
+    public async Task<ResultDto<OrderReadDto>> UpdateOrderStatus(Guid id, OrderStatus newStatus)
     {
         try
         {
             var order = await orderingContext.Orders
                     .Include(o => o.OrderItems)
+                    .Include(o => o.Table)
                     .FirstOrDefaultAsync(o => o.Id == id);
 
             if (order == null)
                 return ResultDto<OrderReadDto>
                     .Failure("Order not found", HttpStatusCode.NotFound);
 
-            var previousOrderStatus = order.OrderStatus;
+            var previousOrderStatus = order.Status;
 
-            order.OrderStatus = newStatus;
+            order.Status = newStatus;
+
+            if (newStatus == OrderStatus.Closed && order.Table != null)
+            {
+                order.Table.Status = TableStatus.Available;
+                orderingContext.Tables.Update(order.Table);
+            }
+
             await orderingContext.SaveChangesAsync();
 
             var orderStatusChangedEvent = mapper.Map<OrderStatusChangedEvent>((order, previousOrderStatus));
@@ -401,24 +392,24 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         }
     }
 
-    public async Task<ResultDto<OrderReadDto>> UpdateOrderType(OrderType newOrderType, OrderUpdateTypeDto updateTypeDto, Guid orderId)
+    public async Task<ResultDto<OrderReadDto>> UpdateOrderType(Guid id, OrderUpdateTypeDto updateTypeDto)
     {
         try
         {
             var order = await orderingContext.Orders
                 .Include(o => o.OrderItems)
                 .Include(o => o.CustomerInformation)
-                .FirstOrDefaultAsync(o => o.Id == orderId);
+                .FirstOrDefaultAsync(o => o.Id == id);
 
             if (order == null)
                 return ResultDto<OrderReadDto>.Failure("Order not found.", HttpStatusCode.NotFound);
 
-            if (order.OrderType == newOrderType)
+            if (order.Type == updateTypeDto.NewOrderType)
                 return ResultDto<OrderReadDto>.Failure("Order type is already set to the requested type.", HttpStatusCode.BadRequest);
 
-            var previousOrderType = order.OrderType;
+            var previousOrderType = order.Type;
 
-            switch (newOrderType)
+            switch (updateTypeDto.NewOrderType)
             {
                 case OrderType.DineIn:
                     await HandleDineInTransition(order, updateTypeDto.TableId);
@@ -436,14 +427,69 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                     return ResultDto<OrderReadDto>.Failure("Invalid order type.", HttpStatusCode.BadRequest);
             }
 
-            order.OrderType = newOrderType;
+            order.Type = updateTypeDto.NewOrderType;
             await orderingContext.SaveChangesAsync();
 
-            var orderTypeChangeEvent = mapper.Map<OrderTypeChangeEvent>((order, previousOrderType));
-            await eventHandlerService.HandleEventAsync(orderTypeChangeEvent);
+            if (previousOrderType != order.Type)
+            {
+                var orderTypeChangeEvent = mapper.Map<OrderTypeChangeEvent>((order, previousOrderType));
+                await eventHandlerService.HandleEventAsync(orderTypeChangeEvent);
+            }
 
             var updatedOrderDto = mapper.Map<OrderReadDto>(order);
             return ResultDto<OrderReadDto>.Success(updatedOrderDto, HttpStatusCode.OK);
+        }
+        catch (Exception ex)
+        {
+            return ResultDto<OrderReadDto>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+        }
+    }
+
+    public async Task<ResultDto<OrderReadDto>> SplitOrder(Guid id, SplitOrderDto splitOrderDto)
+    {
+        try
+        {
+            var originalOrder = await orderingContext.Orders
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.MenuItem)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.ExtraIngredients)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.RemovedIngredients)
+                .Include(o => o.Payments)
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (originalOrder == null)
+                return ResultDto<OrderReadDto>.Failure("Order not found.", HttpStatusCode.NotFound);
+
+            if (originalOrder.Payments.Any())
+                return ResultDto<OrderReadDto>.Failure("Order cannot be split after payments have been made.", HttpStatusCode.BadRequest);
+
+            var itemsToSplit = originalOrder.OrderItems
+                .Where(oi => splitOrderDto.OrderItemIds.Contains(oi.Id))
+                .ToList();
+
+            if (!itemsToSplit.Any())
+                return ResultDto<OrderReadDto>.Failure("No valid items selected for splitting.", HttpStatusCode.BadRequest);
+
+            var newOrder = mapper.Map<Order, Order>(originalOrder);
+
+            newOrder.OrderItems = mapper.Map<List<OrderItem>>(itemsToSplit);
+            newOrder.Id = Guid.NewGuid();
+            newOrder.DateTime = DateTime.UtcNow;
+
+            originalOrder.OrderItems.RemoveAll(oi => itemsToSplit.Contains(oi));
+
+            originalOrder.TotalAmount = Math.Max(0, originalOrder.OrderItems.Sum(item => item.Price));
+            newOrder.TotalAmount = Math.Max(0, newOrder.OrderItems.Sum(item => item.Price));
+
+            await orderingContext.Orders.AddAsync(newOrder);
+            await orderingContext.SaveChangesAsync();
+
+            var orderSplitEvent = mapper.Map<OrderSplitBillEvent>(newOrder);
+            await eventHandlerService.HandleEventAsync(orderSplitEvent);
+
+            return ResultDto<OrderReadDto>.Success(null, HttpStatusCode.Created);
         }
         catch (Exception ex)
         {
@@ -465,12 +511,10 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                     .Failure("order not found", HttpStatusCode.NotFound);
             }
 
-            var deletedOrderId = orderToDelete.Id;
-
             orderingContext.Orders.Remove(orderToDelete);
             await orderingContext.SaveChangesAsync();
 
-            var orderDeletedEvent = new OrderDeletedEvent { OrderId = deletedOrderId };
+            var orderDeletedEvent = new OrderDeletedEvent { OrderId = id };
             await eventHandlerService.HandleEventAsync(orderDeletedEvent);
 
             return ResultDto<bool>
@@ -485,48 +529,69 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
 
     private async Task<List<OrderItem>> PopulateOrderItemsAsync(IEnumerable<OrderItemCreateDto> orderItemDtos, Guid orderId)
     {
-        var menuItemIds = orderItemDtos
-            .Select(oi => oi.MenuItemId)
-            .Distinct();
+        var menuItemIds = orderItemDtos.Select(oi => oi.MenuItemId).Distinct().ToList();
+
         var menuItems = await orderingContext.MenuItems
             .Where(mi => menuItemIds.Contains(mi.Id))
+            .Include(mi => mi.MenuItemIngredientRels)
+                .ThenInclude(rel => rel.Ingredient)
             .ToDictionaryAsync(mi => mi.Id);
 
-        var ingredientIds = orderItemDtos
-            .SelectMany(oi => oi.Ingredients.Select(i => i.IngredientId))
-            .Distinct();
-        var ingredients = await orderingContext.Ingredients
-            .Where(ing => ingredientIds.Contains(ing.Id))
+        var allIngredientIds = orderItemDtos
+            .SelectMany(dto => dto.ExtraIngredients.Select(ei => ei.IngredientId)
+            .Concat(dto.RemovedIngredientIds))
+            .Distinct()
+            .ToList();
+
+        var allIngredients = await orderingContext.Ingredients
+            .Where(ing => allIngredientIds.Contains(ing.Id))
             .ToDictionaryAsync(ing => ing.Id);
 
         var orderItems = new List<OrderItem>();
-        foreach (var itemDto in orderItemDtos)
+
+        foreach (var dto in orderItemDtos)
         {
-            if (!menuItems.TryGetValue(itemDto.MenuItemId, out var menuItem))
+            if (!menuItems.TryGetValue(dto.MenuItemId, out var menuItem))
+                throw new KeyNotFoundException($"MenuItem with ID {dto.MenuItemId} not found.");
+
+            var orderItem = new OrderItem
             {
-                throw new KeyNotFoundException($"MenuItem with ID {itemDto.MenuItemId} not found.");
+                Id = Guid.NewGuid(),
+                OrderId = orderId,
+                MenuItemId = dto.MenuItemId,
+                SpecialInstructions = dto.SpecialInstructions,
+                Price = menuItem.Price
+            };
+
+            // Handling Extra Ingredients
+            foreach (var extra in dto.ExtraIngredients)
+            {
+                if (allIngredients.TryGetValue(extra.IngredientId, out var ingredient))
+                {
+                    orderItem.Price += ingredient.Price * extra.Quantity;
+                    orderItem.ExtraIngredients.Add(new OrderItemIngredient
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = ingredient.Name,
+                        Price = ingredient.Price,
+                        Quantity = extra.Quantity
+                    });
+                }
             }
 
-            var orderItem = mapper.Map<OrderItem>(itemDto);
-            orderItem.Price = menuItem.Price;
-            orderItem.OrderId = orderId;
-
-            foreach (var ingredientDto in itemDto.Ingredients)
+            // Handling Removed Ingredients
+            foreach (var removedId in dto.RemovedIngredientIds)
             {
-                if (!ingredients.TryGetValue(ingredientDto.IngredientId, out var ingredient))
+                if (allIngredients.TryGetValue(removedId, out var ingredient))
                 {
-                    throw new KeyNotFoundException($"Ingredient with ID {ingredientDto.IngredientId} not found.");
+                    orderItem.RemovedIngredients.Add(new OrderItemIngredient
+                    {
+                        Id = removedId,
+                        Name = ingredient.Name,
+                        Price = 0,
+                        Quantity = 1
+                    });
                 }
-
-                var orderItemIngredient = new OrderItemIngredient
-                {
-                    IngredientId = ingredient.Id,
-                    Quantity = ingredientDto.Quantity,
-                    OrderItemId = orderItem.Id
-                };
-
-                orderItem.OrderItemIngredients.Add(orderItemIngredient);
-                orderItem.Price += ingredient.Price * ingredientDto.Quantity;
             }
 
             orderItems.Add(orderItem);
@@ -544,18 +609,15 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         if (table == null)
             throw new ArgumentException("Specified table does not exist.");
 
-        table.IsOccupied = true;
-
         if (order.CustomerInformation != null)
         {
             orderingContext.CustomerInformations.Remove(order.CustomerInformation);
             order.CustomerInformation = null;
         }
 
-        if (order.TableId.HasValue)
-            await ClearTableOccupancy(order.TableId.Value);
-
         order.TableId = tableId;
+        table.Status = TableStatus.Ongoing;
+
         orderingContext.Tables.Update(table);
     }
 
@@ -567,22 +629,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         if (order.TableId.HasValue)
             order.TableId = null;
 
-        if (order.CustomerInformation == null)
-        {
-            order.CustomerInformation = new CustomerInformation
-            {
-                PhoneNumber = phoneNumber,
-                AdditionalInstructions = additionalInstructions
-            };
-            orderingContext.CustomerInformations.Add(order.CustomerInformation);
-        }
-        else
-        {
-            order.CustomerInformation.PhoneNumber = phoneNumber;
-            order.CustomerInformation.AdditionalInstructions = additionalInstructions;
-            order.CustomerInformation.Address = null;
-            orderingContext.CustomerInformations.Update(order.CustomerInformation);
-        }
+        UpdateCustomerInformation(order, phoneNumber, additionalInstructions, null);
     }
 
     private void HandleDeliveryTransition(Order order, string phoneNumber, string? additionalInstructions, string address)
@@ -593,13 +640,22 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         if (order.TableId.HasValue)
             order.TableId = null;
 
+        UpdateCustomerInformation(order, phoneNumber, additionalInstructions, address);
+    }
+
+    private void UpdateCustomerInformation(Order order, string phoneNumber, string? additionalInstructions, string? address)
+    {
         if (order.CustomerInformation == null)
         {
             order.CustomerInformation = new CustomerInformation
             {
+                OrderId = order.Id,
                 PhoneNumber = phoneNumber,
                 AdditionalInstructions = additionalInstructions,
-                Address = address
+                Address = address,
+                OrderCompletionType = OrderCompletionType.Immediate,
+                PreferredPaymentMethod = PreferredPaymentMethod.Cash,
+                ExpectedOrderCompletion = null
             };
             orderingContext.CustomerInformations.Add(order.CustomerInformation);
         }
@@ -608,18 +664,9 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             order.CustomerInformation.PhoneNumber = phoneNumber;
             order.CustomerInformation.AdditionalInstructions = additionalInstructions;
             order.CustomerInformation.Address = address;
-            orderingContext.CustomerInformations.Update(order.CustomerInformation);
         }
     }
 
-    private async Task ClearTableOccupancy(Guid tableId)
-    {
-        var table = await orderingContext.Tables.FirstOrDefaultAsync(t => t.Id == tableId);
-        if (table != null)
-        {
-            table.IsOccupied = false;
-        }
-    }
 
     private decimal RecalculateOrderTotal(Order order)
     {

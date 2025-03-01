@@ -13,16 +13,12 @@ public class IngredientMappingProfile : Profile
             .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()));
 
         // Map from Ingredient to IngredientReadDto
-        CreateMap<Ingredient, IngredientReadDto>();
+        CreateMap<Ingredient, IngredientReadDto>()
+            .ForMember(dest => dest.Tags, opt => opt.MapFrom(
+                src => src.IngredientTagRels.Select(rel => rel.Tag.Name).ToList()));
 
-        // Map from IngredientUpdateDto to Ingredient
+        // Map from IngredientUpdateDto to Ingredient (Only update non-null properties)
         CreateMap<IngredientUpdateDto, Ingredient>()
-            .ForMember(dest => dest.IngredientType, opt => opt.MapFrom(
-                (src, dest) => string.IsNullOrEmpty(src.IngredientType)
-                    ? dest.IngredientType // Keep existing value if null
-                    : Enum.TryParse<IngredientType>(src.IngredientType, true, out var parsedType)
-                        ? parsedType
-                        : throw new ArgumentException("Invalid ingredient type.") // Fail fast
-            ));
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
     }
 }

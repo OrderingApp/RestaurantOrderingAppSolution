@@ -2,7 +2,7 @@
 
 public class ReservationUpdateDto
 {
-    public DateTime? ReservationDateTime { get; set; }
-    public int? NumberOfPeople { get; set; }
+    public DateTime? DateTime { get; set; }
+    public int? CapacityNeeded { get; set; }
     public Guid? TableId { get; set; }
 }

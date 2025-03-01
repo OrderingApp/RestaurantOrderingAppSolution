@@ -1,7 +1,8 @@
 ﻿using Application.Dtos.CustomerInformations;
+using Domain;
 using FluentValidation;
 
-namespace Application.Validators;
+namespace Application.Validators.CustomerInformation;
 
 public class CustomerInformationCreateDtoValidator : AbstractValidator<CustomerInformationCreateDto>
 {
@@ -9,14 +10,17 @@ public class CustomerInformationCreateDtoValidator : AbstractValidator<CustomerI
     {
         RuleFor(x => x.PhoneNumber)
             .NotEmpty().WithMessage("Phone number is required.")
-            .Matches(@"^\d+$").WithMessage("Phone number must contain only digits.")
+            .Matches(@"^\+?[1-9]\d{8,14}$").WithMessage("Invalid phone number format.")
             .Length(9, 15).WithMessage("Phone number must be between 9 and 15 digits.");
 
-        RuleFor(x => x.Address)
-            .NotEmpty().When(x => !string.IsNullOrWhiteSpace(x.Address))
-            .WithMessage("Address cannot be empty if provided.");
+        RuleFor(x => x.OrderCompletionType)
+            .IsInEnum().WithMessage("Invalid order completion type.");
 
-        RuleFor(x => x.AdditionalInstructions)
-            .MaximumLength(250).WithMessage("Additional instructions must not exceed 250 characters.");
+        RuleFor(x => x.PreferredPaymentMethod)
+            .IsInEnum().WithMessage("Invalid preferred payment method.");
+
+        RuleFor(x => x.ExpectedOrderCompletion)
+            .GreaterThan(DateTime.UtcNow).WithMessage("Expected completion must be in the future.")
+            .When(x => x.ExpectedOrderCompletion.HasValue);
     }
 }

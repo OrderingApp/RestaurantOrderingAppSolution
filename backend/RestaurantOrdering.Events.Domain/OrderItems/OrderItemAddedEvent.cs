@@ -2,7 +2,8 @@
 
 public class OrderItemAddedEvent : BaseEvent
 {
-    public Guid OrderItemId { get; set; }
+    public Guid OrderId { get; set; }
+    public List<Guid> OrderItemIds { get; set; } = new();
 
     public override string GetEventType() => nameof(OrderItemAddedEvent);
 }

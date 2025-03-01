@@ -8,17 +8,21 @@ public class MenuItemUpdateDtoValidator : AbstractValidator<MenuItemUpdateDto>
     public MenuItemUpdateDtoValidator()
     {
         RuleFor(x => x.Name)
-            .NotEmpty().When(x => x.Name != null).WithMessage("Name cannot be empty if provided.")
+            .NotEmpty().When(x => x.Name != null)
+            .WithMessage("Name cannot be empty if provided.")
             .MaximumLength(100).WithMessage("Name must not exceed 100 characters.");
 
         RuleFor(x => x.Description)
-            .NotEmpty().When(x => x.Description != null).WithMessage("Description cannot be empty if provided.")
+            .NotEmpty().When(x => x.Description != null)
+            .WithMessage("Description cannot be empty if provided.")
             .MaximumLength(500).WithMessage("Description must not exceed 500 characters.");
 
         RuleFor(x => x.Price)
-            .GreaterThan(0).WithMessage("Price must be greater than zero.");
+            .GreaterThanOrEqualTo(0).When(x => x.Price.HasValue)
+            .WithMessage("Price must be a non-negative value.");
 
-        RuleForEach(x => x.TagIds)
-            .NotEmpty().WithMessage("Tag ID cannot be empty.");
+        RuleFor(x => x.IngredientIds)
+            .Must(ids => ids == null || ids.Distinct().Count() == ids.Count)
+            .WithMessage("Ingredient IDs must be unique.");
     }
 }

@@ -4,13 +4,13 @@
 
 // To create a new table.
 
-POST {{API_HostAddress}}/Table
+POST {{API_HostAddress}}/tables
 Content-Type: application/json
 Accept: application/json
 
 {
   "name": "VIP Table",
-  "numberOfPeople": 4
+  "capacity": 4
 }
 
 ###

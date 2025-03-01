@@ -8,6 +8,7 @@ public class PaymentReadDto
     public decimal Amount { get; set; }
     public DateTime? PaidAt { get; set; }
     public PaymentMethod PaymentMethod { get; set; }
+    public bool IsRefunded { get; set; }
 
     public Guid OrderId { get; set; }
 }

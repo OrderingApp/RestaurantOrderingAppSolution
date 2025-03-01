@@ -2,16 +2,14 @@
 
 // To get a specific order item by its ID.
 
-GET {{API_HostAddress}}/OrderItem/2ce10c11-4936-42c3-a8f6-7f02e575d31f
+GET {{API_HostAddress}}/orders/e67b14cd-40bc-4088-ba5f-51406b40f87b/order-items/534a44a2-5eac-49ea-8e2f-556645534ee6
 Accept: application/json
-
-###
 
 ###
 
 // To get all order items for a specific order.
 
-GET {{API_HostAddress}}/OrderItem/21b2af68-4041-48ef-bb9b-3a21627d6777/order-items
+GET {{API_HostAddress}}/orders/e67b14cd-40bc-4088-ba5f-51406b40f87b/order-items
 Accept: application/json
 
 ###

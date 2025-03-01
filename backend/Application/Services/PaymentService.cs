@@ -13,7 +13,7 @@ namespace Application.Services;
 
 public class PaymentService(RestaurantOrderingContext orderingContext, IEventHandlerService eventHandlerService, IMapper mapper) : IPaymentService
 {
-    public async Task<ResultDto<PaymentReadDto>> CreatePayment(PaymentCreateDto paymentDto, Guid orderId)
+    public async Task<ResultDto<PaymentReadDto>> AddPayment(Guid orderId, PaymentCreateDto paymentDto)
     {
         try
         {
@@ -23,6 +23,9 @@ public class PaymentService(RestaurantOrderingContext orderingContext, IEventHan
 
             if (order == null)
                 return ResultDto<PaymentReadDto>.Failure("Order not found", HttpStatusCode.NotFound);
+
+            if (order.Status != OrderStatus.PendingPayment)
+                return ResultDto<PaymentReadDto>.Failure("Order must be in Pending Payment status to add payment.", HttpStatusCode.BadRequest);
 
             var totalPaid = order.Payments.Sum(p => p.Amount);
 
@@ -34,12 +37,6 @@ public class PaymentService(RestaurantOrderingContext orderingContext, IEventHan
 
             orderingContext.Payments.Add(payment);
             await orderingContext.SaveChangesAsync();
-
-            if (totalPaid + payment.Amount >= order.TotalAmount)
-            {
-                order.OrderStatus = OrderStatus.Finished;
-                await orderingContext.SaveChangesAsync();
-            }
 
             var paymentReadDto = mapper.Map<PaymentReadDto>(payment);
 
@@ -74,6 +71,34 @@ public class PaymentService(RestaurantOrderingContext orderingContext, IEventHan
         catch (Exception ex)
         {
             return ResultDto<List<PaymentReadDto>>
+                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+        }
+    }
+
+    public async Task<ResultDto<PaymentReadDto>> MarkPaymentAsRefunded(Guid id, Guid orderId)
+    {
+        try
+        {
+            var orderExists = await orderingContext.Orders.AnyAsync(o => o.Id == orderId);
+            if (!orderExists)
+                return ResultDto<PaymentReadDto>.Failure("Order not found", HttpStatusCode.NotFound);
+
+            var payment = await orderingContext.Payments
+                .FirstOrDefaultAsync(p => p.Id == id && p.OrderId == orderId);
+
+            if(payment == null)
+                return ResultDto<PaymentReadDto>.Failure("Payment not found", HttpStatusCode.NotFound);
+
+            payment.IsRefunded = true;
+            await orderingContext.SaveChangesAsync();
+
+            var paymentReadDto = mapper.Map<PaymentReadDto>(payment);
+
+            return ResultDto<PaymentReadDto>.Success(paymentReadDto, HttpStatusCode.OK);
+        }
+        catch (Exception ex)
+        {
+            return ResultDto<PaymentReadDto>
                 .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
         }
     }

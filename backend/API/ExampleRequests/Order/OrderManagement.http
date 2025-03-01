@@ -1,12 +1,12 @@
 @API_HostAddress = http://localhost:5000/api
 
 // Use this for order example you need to copy Id
-POST {{API_HostAddress}}/Order/dinein
+POST {{API_HostAddress}}/orders/dinein
 Content-Type: application/json
 Accept: application/json
 
 {
-  "orderDateTime": "2026-02-07T12:00:00Z",
+  "dateTime": "2026-02-07T12:00:00Z",
   "tableId": "C9B75583-CAB5-457B-B87B-C89B9E2E6A36",
   "orderItems": [
     {
@@ -34,7 +34,7 @@ Accept: application/json
 
 // Split an order by moving specific items from one order to another.
 
-POST {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/split
+POST {{API_HostAddress}}/orders/21b2af68-4041-48ef-bb9b-3a21627d6777/split
 Content-Type: application/json
 Accept: application/json
 
@@ -48,13 +48,13 @@ Accept: application/json
 
 // To apply a discount to an existing order.
 
-PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/apply-discount?discount=10
+PATCH {{API_HostAddress}}/orders/C93FA2FE-918A-4B90-9841-342C6A84E716/apply-discount?discount=50
 Accept: application/json
 
 ###
 
 // Create a Table and Extract tableId
-POST {{API_HostAddress}}/Table
+POST {{API_HostAddress}}/tables
 Content-Type: application/json
 Accept: application/json
 
@@ -62,6 +62,7 @@ Accept: application/json
   "name": "Test Table",
   "numberOfPeople": 4
 }
+
 
 ###
 
@@ -72,31 +73,32 @@ Accept: application/json
 // 2. Create order with created table,
 // 3. Create table and proceed with change table
 
-PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/change-table
+PATCH {{API_HostAddress}}/orders/c93fa2fe-918a-4b90-9841-342c6a84e716/change-table
 Content-Type: application/json
 Accept: application/json
 
-"e54c100c-1bdf-4944-826d-af3316bca0c5"
+"7676ce30-f27e-4adb-acf0-8ad42c1b4cb4"
 
 ###
 
 // To update the status of an order.
 
-PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/status
+PATCH {{API_HostAddress}}/orders/C93FA2FE-918A-4B90-9841-342C6A84E716/status
 Content-Type: application/json
 Accept: application/json
 
-"Finished"
+"Closed"
 
 ###
 
 // To update the type of an order, changing it from **Dine-In to Takeaway**.
 
-PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/type?newOrderType=Takeaway
+PATCH {{API_HostAddress}}/orders/c93fa2fe-918a-4b90-9841-342c6a84e716/type
 Content-Type: application/json
 Accept: application/json
 
 {
+  "newOrderType": "Takeaway",
   "phoneNumber": "123456789"
 }
 
@@ -104,65 +106,31 @@ Accept: application/json
 
 // To update the type of an order, changing it from **Dine-In to Delivery**.
 
-PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/type?newOrderType=Delivery
+PATCH {{API_HostAddress}}/orders/C93FA2FE-918A-4B90-9841-342C6A84E716/type
 Content-Type: application/json
 Accept: application/json
 
 {
+  "newOrderType": "Delivery",
   "phoneNumber": "987654321",
   "address": "456 New Street, City",
-  "additionalInstructions": "Ring the doorbell twice."
+  "additionalInstructions": "Ring the doorbell twice.",
+  "orderCompletionType": "Immediate",
+  "preferredPaymentMethod": "Card",
+  "expectedOrderCompletion": null
 }
 
 ###
 
 // To update the type of an order, changing it from **Delivery to Dine-In**.
 
-PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/type?newOrderType=DineIn
+PATCH {{API_HostAddress}}/orders/C93FA2FE-918A-4B90-9841-342C6A84E716/type
 Content-Type: application/json
 Accept: application/json
 
 {
-  "tableId": "e54c100c-1bdf-4944-826d-af3316bca0c5"
-}
-
-
-###
-
-// To update the type of an order, changing it from **Delivery to Takeaway**.
-
-PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/type?newOrderType=Takeaway
-Content-Type: application/json
-Accept: application/json
-
-{
-  "phoneNumber": "555666777"
-}
-
-###
-
-// To update the type of an order, changing it from **Takeaway to Dine-In**.
-
-PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/type?newOrderType=DineIn
-Content-Type: application/json
-Accept: application/json
-
-{
-  "tableId": "e54c100c-1bdf-4944-826d-af3316bca0c5"
-}
-
-###
-
-// To update the type of an order, changing it from **Takeaway to Delivery**.
-
-PUT {{API_HostAddress}}/Order/21b2af68-4041-48ef-bb9b-3a21627d6777/type?newOrderType=Delivery
-Content-Type: application/json
-Accept: application/json
-
-{
-  "phoneNumber": "888999000",
-  "address": "789 Delivery Street, City",
-  "additionalInstructions": "Leave near the mailbox."
+  "newOrderType": "DineIn",
+  "tableId": "9165C97C-5477-4EED-A566-F6FEC0E84694"
 }
 
 ###

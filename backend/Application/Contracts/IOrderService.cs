@@ -1,5 +1,4 @@
 ﻿using Application.Dtos.Common;
-using Application.Dtos.OrderItems;
 using Application.Dtos.Orders;
 using Application.Dtos.Orders.OrderDelivery;
 using Application.Dtos.Orders.OrderDineIn;
@@ -10,17 +9,27 @@ namespace Application.Contracts;
 
 public interface IOrderService
 {
+    // Create orders
     Task<ResultDto<OrderReadDto>> CreateDineInOrder(DineInOrderCreateDto dineInOrderDto);
     Task<ResultDto<OrderReadDto>> CreateTakeawayOrder(TakeawayOrderCreateDto takeawayOrderDto);
     Task<ResultDto<OrderReadDto>> CreateDeliveryOrder(DeliveryOrderCreateDto deliveryOrderDto);
-    Task<ResultDto<OrderReadDto>> SplitOrder(SplitOrderDto splitOrderDto, Guid orderId);
+
+    // Get Orders
     Task<ResultDto<OrderReadDto>> GetOrder(Guid id);
-    Task<ResultDto<List<OrderReadDto>>> GetAllOrders(OrderStatus? orderStatus);
-    Task<ResultDto<List<OrderReadDto>>> GetOngoingOrdersByType(OrderType orderType);
-    Task<ResultDto<List<OrderReadDto>>> GetOngoingOrdersForTable(Guid tableId);
-    Task<ResultDto<OrderReadDto>> ApplyOrderDiscount(decimal discountPercentage, Guid orderId);
-    Task<ResultDto<OrderReadDto>> ChangeOrderTable(Guid orderId, Guid newTableId);
-    Task<ResultDto<OrderReadDto>> UpdateOrderStatus(OrderStatus newStatus, Guid id);
-    Task<ResultDto<OrderReadDto>> UpdateOrderType(OrderType newOrderType, OrderUpdateTypeDto updateTypeDto, Guid orderId);
+    Task<ResultDto<List<OrderReadDto>>> GetOrders(OrderStatus? orderStatus);
+    Task<ResultDto<List<NonDineInOrderSummaryDto>>> GetOngoingNonDineInOrders(OrderType orderType);
+    Task<ResultDto<List<OrderSummaryDto>>> GetOngoingOrdersForTable(Guid tableId);
+
+    // Update Orders
+    Task<ResultDto<OrderReadDto>> ApplyOrderDiscount(Guid id, decimal discountPercentage);
+    Task<ResultDto<OrderReadDto>> ChangeOrderTable(Guid id, Guid newTableId);
+    Task<ResultDto<OrderReadDto>> CloseOrder(Guid id);
+    Task<ResultDto<OrderReadDto>> UpdateOrderStatus(Guid id, OrderStatus newStatus);
+    Task<ResultDto<OrderReadDto>> UpdateOrderType(Guid id, OrderUpdateTypeDto updateTypeDto);
+
+    // Splitting Order
+    Task<ResultDto<OrderReadDto>> SplitOrder(Guid id, SplitOrderDto splitOrderDto);
+
+    // Delete Orders
     Task<ResultDto<bool>> DeleteOrder(Guid id);
 }

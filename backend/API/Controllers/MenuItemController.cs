@@ -7,6 +7,7 @@ namespace API.Controllers;
 /// <summary>
 /// Manages menu items.
 /// </summary>
+[Route("api/menu-items")]
 public class MenuItemController(IMenuItemService menuItemService) : BaseApiController
 {
     /// <summary>
@@ -17,9 +18,9 @@ public class MenuItemController(IMenuItemService menuItemService) : BaseApiContr
     /// <response code="201">Returns the newly created menu item.</response>
     /// <response code="400">If the input is invalid.</response>
     [HttpPost]
-    [ProducesResponseType(201)]
+    [ProducesResponseType(typeof(MenuItemReadDto), 201)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> CreateMenuItem([FromBody] MenuItemCreateDto menuItemCreateDto) =>
+    public async Task<ActionResult<MenuItemReadDto>> CreateMenuItem([FromBody] MenuItemCreateDto menuItemCreateDto) =>
         HandleResult(await menuItemService.CreateMenuItem(menuItemCreateDto));
 
     /// <summary>
@@ -30,31 +31,25 @@ public class MenuItemController(IMenuItemService menuItemService) : BaseApiContr
     /// <response code="200">Returns the menu item.</response>
     /// <response code="404">If the menu item is not found.</response>
     [HttpGet("{id}")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(MenuItemReadDto), 200)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> GetMenuItem(Guid id) =>
+    public async Task<ActionResult<MenuItemReadDto>> GetMenuItem([FromRoute] Guid id) =>
         HandleResult(await menuItemService.GetMenuItem(id));
 
     /// <summary>
-    /// Retrieves all menu items.
+    /// Retrieves all menu items with optional filtering.
     /// </summary>
-    /// <returns>A list of menu items.</returns>
+    /// <param name="categoryId">Optional: The category ID for filtering.</param>
+    /// <param name="ingredientIds">Optional: Filter by specific ingredient IDs.</param>
+    /// <param name="tags">Optional: Filter by ingredient tags.</param>
+    /// <returns>A list of menu items matching the filters.</returns>
     [HttpGet]
-    [ProducesResponseType(200)]
-    public async Task<IActionResult> GetAllMenuItems() =>
-        HandleResult(await menuItemService.GetAllMenuItems());
-
-    /// <summary>
-    /// Retrieves menu items by category.
-    /// </summary>
-    /// <param name="categoryId">The category ID.</param>
-    /// <param name="tagId">Optional tag filter.</param>
-    /// <returns>A list of menu items in the specified category.</returns>
-    /// <response code="200">Returns menu items in the category.</response>
-    [HttpGet("category/{categoryId}")]
-    [ProducesResponseType(200)]
-    public async Task<IActionResult> GetMenuItemsByCategory(Guid categoryId, [FromQuery] Guid? tagId) =>
-        HandleResult(await menuItemService.GetMenuItemsByCategory(categoryId, tagId));
+    [ProducesResponseType(typeof(List<MenuItemReadDto>), 200)]
+    public async Task<ActionResult<List<MenuItemReadDto>>> GetMenuItems(
+        [FromQuery] Guid? categoryId = null,
+        [FromQuery] List<Guid>? ingredientIds = null,
+        [FromQuery] List<string>? tags = null) =>
+        HandleResult(await menuItemService.GetMenuItems(categoryId, ingredientIds, tags));
 
     /// <summary>
     /// Updates an existing menu item.
@@ -66,11 +61,12 @@ public class MenuItemController(IMenuItemService menuItemService) : BaseApiContr
     /// <response code="400">If the request is invalid.</response>
     /// <response code="404">If the menu item is not found.</response>
     [HttpPut("{id}")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(MenuItemReadDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> UpdateMenuItem([FromBody] MenuItemUpdateDto menuItemUpdateDto, Guid id) =>
-        HandleResult(await menuItemService.UpdateMenuItem(menuItemUpdateDto, id));
+    public async Task<ActionResult<MenuItemReadDto>> UpdateMenuItem(
+        [FromRoute] Guid id, [FromBody] MenuItemUpdateDto menuItemUpdateDto) =>
+        HandleResult(await menuItemService.UpdateMenuItem(id, menuItemUpdateDto));
 
     /// <summary>
     /// Deletes a menu item.
@@ -82,6 +78,6 @@ public class MenuItemController(IMenuItemService menuItemService) : BaseApiContr
     [HttpDelete("{id}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> DeleteMenuItem(Guid id) =>
+    public async Task<IActionResult> DeleteMenuItem([FromRoute] Guid id) =>
         HandleResult(await menuItemService.DeleteMenuItem(id));
 }

@@ -1,17 +1,19 @@
 ﻿using Application.Dtos.Orders.OrderTakeAway;
+using Application.Validators;
+using Application.Validators.CustomerInformation;
 using FluentValidation;
 
 public class TakeawayOrderCreateDtoValidator : AbstractValidator<TakeawayOrderCreateDto>
 {
     public TakeawayOrderCreateDtoValidator()
     {
-        RuleFor(x => x.OrderDateTime)
+        RuleFor(x => x.DateTime)
             .NotEmpty().WithMessage("OrderDateTime is required.")
             .Must(BeAValidDate).WithMessage("OrderDateTime must be in the future.");
 
-        RuleFor(x => x.PhoneNumber)
-            .NotEmpty().WithMessage("PhoneNumber is required.")
-            .Matches(@"^\d{9,15}$").WithMessage("PhoneNumber must be between 9 and 15 digits.");
+        RuleFor(x => x.CustomerInformation)
+            .NotNull().WithMessage("CustomerInformation is required.")
+            .SetValidator(new CustomerInformationCreateDtoValidator());
 
         RuleForEach(x => x.OrderItems)
             .SetValidator(new OrderItemCreateDtoValidator());

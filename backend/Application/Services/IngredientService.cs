@@ -5,7 +5,6 @@ using AutoMapper;
 using Domain;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
-using RestaurantOrdering.Events.Application;
 using RestaurantOrdering.Events.Application.Contracts;
 using RestaurantOrdering.Events.Domain.Ingredients;
 using System.Net;
@@ -38,24 +37,35 @@ public class IngredientService(RestaurantOrderingContext orderingContext, IEvent
         }
     }
 
-    public async Task<ResultDto<List<IngredientReadDto>>> GetAllIngredients()
+    public async Task<ResultDto<List<IngredientReadDto>>> GetIngredients(List<string>? tags = null)
     {
         try
         {
-            var ingredients = await orderingContext.Ingredients
-                .ToListAsync();
+            var query = orderingContext.Ingredients
+                .Include(i => i.IngredientTagRels)
+                    .ThenInclude(rel => rel.Tag)
+                .Where(i => i.CanBeUsedAsExtra && !i.IsDeleted)
+                .AsQueryable();
 
+            if (tags != null && tags.Any())
+            {
+                var lowerTags = tags.Select(tag => tag.ToLower()).ToList();
+
+                query = query.Where(i => i.IngredientTagRels
+                    .Any(rel => lowerTags.Contains(rel.Tag.Name.ToLower())));
+            }
+
+            var ingredients = await query.ToListAsync();
             var ingredientDtos = mapper.Map<List<IngredientReadDto>>(ingredients);
 
-            return ResultDto<List<IngredientReadDto>>
-                .Success(ingredientDtos, HttpStatusCode.OK);
+            return ResultDto<List<IngredientReadDto>>.Success(ingredientDtos, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
-            return ResultDto<List<IngredientReadDto>>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<List<IngredientReadDto>>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
         }
     }
+
 
     public async Task<ResultDto<IngredientReadDto>> GetIngredient(Guid id)
     {
@@ -80,7 +90,38 @@ public class IngredientService(RestaurantOrderingContext orderingContext, IEvent
         }
     }
 
-    public async Task<ResultDto<IngredientReadDto>> UpdateIngredient(IngredientUpdateDto ingredientUpdateDto, Guid id)
+    public async Task<ResultDto<IngredientReadDto>> AddTagsToIngredient(Guid id, List<Guid> tagIds)
+    {
+        try
+        {
+            var ingredient = await orderingContext.Ingredients
+                .Include(i => i.IngredientTagRels)
+                .FirstOrDefaultAsync(i => i.Id == id);
+
+            if (ingredient == null)
+                return ResultDto<IngredientReadDto>.Failure("Ingredient not found.", HttpStatusCode.NotFound);
+
+            var existingTags = ingredient.IngredientTagRels.Select(rel => rel.TagId).ToList();
+            var newTags = tagIds.Except(existingTags).ToList();
+
+            foreach (var tagId in newTags)
+            {
+                orderingContext.IngredientTagRels.Add(new IngredientTagRel { IngredientId = id, TagId = tagId });
+            }
+
+            await orderingContext.SaveChangesAsync();
+
+            var updatedIngredientDto = mapper.Map<IngredientReadDto>(ingredient);
+            return ResultDto<IngredientReadDto>.Success(updatedIngredientDto, HttpStatusCode.OK);
+        }
+        catch (Exception ex)
+        {
+            return ResultDto<IngredientReadDto>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+        }
+    }
+
+
+    public async Task<ResultDto<IngredientReadDto>> UpdateIngredient(Guid id, IngredientUpdateDto ingredientUpdateDto)
     {
         try
         {
@@ -112,26 +153,27 @@ public class IngredientService(RestaurantOrderingContext orderingContext, IEvent
     {
         try
         {
-            var ingredient = await orderingContext.Ingredients.FindAsync(id);
+            var ingredient = await orderingContext.Ingredients
+                .Include(i => i.MenuItemIngredientRels)
+                .Include(i => i.IngredientTagRels)
+                .FirstOrDefaultAsync(i => i.Id == id);
 
             if (ingredient == null)
-                return ResultDto<bool>
-                    .Failure("Ingredient not found.", HttpStatusCode.NotFound);
+                return ResultDto<bool>.Failure("Ingredient not found.", HttpStatusCode.NotFound);
 
             ingredient.IsDeleted = true;
-            ingredient.IsUsed = false;
+            ingredient.CanBeUsedAsExtra = false;
+
+            orderingContext.MenuItemIngredientRels.RemoveRange(ingredient.MenuItemIngredientRels);
+            orderingContext.IngredientTagRels.RemoveRange(ingredient.IngredientTagRels);
+
             await orderingContext.SaveChangesAsync();
 
-            var ingredientDeletedEvent = mapper.Map<IngredientDeletedEvent>(ingredient);
-            await eventHandlerService.HandleEventAsync(ingredientDeletedEvent);
-
-            return ResultDto<bool>
-                .Success(true, HttpStatusCode.OK);
+            return ResultDto<bool>.Success(true, HttpStatusCode.NoContent);
         }
         catch (Exception ex)
         {
-            return ResultDto<bool>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<bool>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
         }
     }
 }

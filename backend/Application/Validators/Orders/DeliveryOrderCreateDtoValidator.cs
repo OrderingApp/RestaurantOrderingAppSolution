@@ -1,20 +1,19 @@
 ﻿using Application.Dtos.Orders.OrderDelivery;
+using Application.Validators;
+using Application.Validators.CustomerInformation;
 using FluentValidation;
 
 public class DeliveryOrderCreateDtoValidator : AbstractValidator<DeliveryOrderCreateDto>
 {
     public DeliveryOrderCreateDtoValidator()
     {
-        RuleFor(x => x.OrderDateTime)
-            .NotEmpty().WithMessage("OrderDateTime is required.")
-            .Must(BeAValidDate).WithMessage("OrderDateTime must be in the future.");
+        RuleFor(x => x.DateTime)
+            .NotEmpty().WithMessage("Order date and time is required.")
+            .Must(BeAValidDate).WithMessage("Order date and time must be in the future.");
 
-        RuleFor(x => x.PhoneNumber)
-            .NotEmpty().WithMessage("PhoneNumber is required.")
-            .Matches(@"^\d{9,15}$").WithMessage("PhoneNumber must be between 9 and 15 digits.");
-
-        RuleFor(x => x.Address)
-            .NotEmpty().WithMessage("Address is required.");
+        RuleFor(x => x.CustomerInformation)
+            .NotNull().WithMessage("Customer information is required.")
+            .SetValidator(new CustomerInformationCreateDtoValidator());
 
         RuleForEach(x => x.OrderItems)
             .SetValidator(new OrderItemCreateDtoValidator());

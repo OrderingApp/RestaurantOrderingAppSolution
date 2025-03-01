@@ -2,6 +2,7 @@
 using Application.Dtos.Common;
 using Application.Dtos.MenuItems;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Domain;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
@@ -19,20 +20,17 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
         {
             var menuItem = mapper.Map<MenuItem>(menuItemCreateDto);
 
-            if (menuItemCreateDto.TagIds.Any())
+            if (menuItemCreateDto.IngredientIds.Any())
             {
-                var validTags = await orderingContext.Tags
-                    .Where(t => menuItemCreateDto.TagIds.Contains(t.Id))
+                var ingredients = await orderingContext.Ingredients
+                    .Where(i => menuItemCreateDto.IngredientIds.Contains(i.Id))
                     .ToListAsync();
 
-                foreach (var tag in validTags)
+                menuItem.MenuItemIngredientRels = ingredients.Select(ingredient => new MenuItemIngredientRel
                 {
-                    menuItem.MenuItemTags.Add(new MenuItemTag
-                    {
-                        MenuItemId = menuItem.Id,
-                        TagId = tag.Id
-                    });
-                }
+                    MenuItemId = menuItem.Id,
+                    IngredientId = ingredient.Id
+                }).ToList();
             }
 
             await orderingContext.MenuItems.AddAsync(menuItem);
@@ -53,33 +51,16 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
         }
     }
 
-    public async Task<ResultDto<List<MenuItemReadDto>>> GetAllMenuItems()
-    {
-        try
-        {
-            var menuItems = await orderingContext.MenuItems
-                .Include(mi => mi.MenuItemTags)
-                .ThenInclude(mt => mt.Tag)
-                .ToListAsync();
-
-            var menuItemDtos = mapper.Map<List<MenuItemReadDto>>(menuItems);
-
-            return ResultDto<List<MenuItemReadDto>>
-                .Success(menuItemDtos, HttpStatusCode.OK);
-        }
-        catch (Exception ex)
-        {
-            return ResultDto<List<MenuItemReadDto>>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
-        }
-    }
-
     public async Task<ResultDto<MenuItemReadDto>> GetMenuItem(Guid id)
     {
         try
         {
             var menuItem = await orderingContext.MenuItems
                 .Include(mi => mi.MenuCategory)
+                .Include(mi => mi.MenuItemIngredientRels)
+                    .ThenInclude(rel => rel.Ingredient)
+                        .ThenInclude(ing => ing.IngredientTagRels)
+                            .ThenInclude(tagRel => tagRel.Tag)
                 .FirstOrDefaultAsync(mi => mi.Id == id);
 
             if (menuItem == null)
@@ -98,41 +79,52 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
         }
     }
 
-    public async Task<ResultDto<List<MenuItemReadDto>>> GetMenuItemsByCategory(Guid categoryId, Guid? tagId)
+    public async Task<ResultDto<List<MenuItemReadDto>>> GetMenuItems(Guid? categoryId = null, List<Guid>? ingredientIds = null, List<string>? tags = null)
     {
         try
         {
             var query = orderingContext.MenuItems
-                .Where(mi => mi.MenuCategoryId == categoryId && !mi.IsDeleted)
-                .Include(mi => mi.MenuItemTags)
-                    .ThenInclude(mt => mt.Tag)
+                .Where(mi => mi.IsUsed && !mi.IsDeleted)
                 .AsQueryable();
 
-            if (tagId.HasValue)
+            if (categoryId.HasValue)
             {
-                query = query.Where(mi => mi.MenuItemTags.Any(mt => mt.TagId == tagId.Value));
+                query = query.Where(mi => mi.MenuCategoryId == categoryId.Value);
             }
 
-            var menuItems = await query.ToListAsync();
+            if (ingredientIds != null && ingredientIds.Any())
+            {
+                query = query.Where(mi => mi.MenuItemIngredientRels
+                    .Any(rel => ingredientIds.Contains(rel.IngredientId)));
+            }
 
-            var menuItemDtos = mapper.Map<List<MenuItemReadDto>>(menuItems);
+            if (tags != null && tags.Any())
+            {
+                var lowerTags = tags.Select(tag => tag.ToLower()).ToList();
+                query = query.Where(mi => mi.MenuItemIngredientRels
+                    .Any(rel => rel.Ingredient.IngredientTagRels
+                        .Any(tagRel => lowerTags.Contains(tagRel.Tag.Name.ToLower()))));
+            }
 
-            return ResultDto<List<MenuItemReadDto>>
-                .Success(menuItemDtos, HttpStatusCode.OK);
+            var menuItems = await query
+                .ProjectTo<MenuItemReadDto>(mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return ResultDto<List<MenuItemReadDto>>.Success(menuItems, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
-            return ResultDto<List<MenuItemReadDto>>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<List<MenuItemReadDto>>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
         }
     }
 
-    public async Task<ResultDto<MenuItemReadDto>> UpdateMenuItem(MenuItemUpdateDto menuItemUpdateDto, Guid id)
+
+    public async Task<ResultDto<MenuItemReadDto>> UpdateMenuItem(Guid id, MenuItemUpdateDto menuItemUpdateDto)
     {
         try
         {
             var menuItem = await orderingContext.MenuItems
-                .Include(mi => mi.MenuItemTags)
+                .Include(mi => mi.MenuItemIngredientRels)
                 .FirstOrDefaultAsync(mi => mi.Id == id);
 
             if (menuItem == null)
@@ -141,33 +133,30 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
 
             mapper.Map(menuItemUpdateDto, menuItem);
 
-            menuItem.MenuItemTags.Clear();
-
-            if (menuItemUpdateDto.TagIds.Any())
+            if (menuItemUpdateDto.IngredientIds?.Any() == true)
             {
-                var validTags = await orderingContext.Tags
-                    .Where(t => menuItemUpdateDto.TagIds.Contains(t.Id))
+                orderingContext.MenuItemIngredientRels.RemoveRange(menuItem.MenuItemIngredientRels);
+
+                var ingredients = await orderingContext.Ingredients
+                    .Where(i => menuItemUpdateDto.IngredientIds.Contains(i.Id))
                     .ToListAsync();
 
-                foreach (var tag in validTags)
+                menuItem.MenuItemIngredientRels = ingredients.Select(ingredient => new MenuItemIngredientRel
                 {
-                    menuItem.MenuItemTags.Add(new MenuItemTag
-                    {
-                        MenuItemId = menuItem.Id,
-                        TagId = tag.Id
-                    });
-                }
+                    MenuItemId = menuItem.Id,
+                    IngredientId = ingredient.Id
+                }).ToList();
             }
 
             await orderingContext.SaveChangesAsync();
 
-            var updatedMenuItem = mapper.Map<MenuItemReadDto>(menuItem);
+            var updatedMenuItemDto = mapper.Map<MenuItemReadDto>(menuItem);
 
             var menuItemUpdatedEvent = mapper.Map<MenuItemUpdatedEvent>(menuItem);
             await eventHandlerService.HandleEventAsync(menuItemUpdatedEvent);
 
             return ResultDto<MenuItemReadDto>
-                .Success(updatedMenuItem, HttpStatusCode.OK);
+                .Success(updatedMenuItemDto, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
@@ -175,7 +164,6 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
                 .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
         }
     }
-
 
     public async Task<ResultDto<bool>> DeleteMenuItem(Guid id)
     {
@@ -186,6 +174,10 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
             if (menuItemToDelete == null)
                 return ResultDto<bool>
                     .Failure("Menu item not found.", HttpStatusCode.NotFound);
+
+            if (menuItemToDelete.IsDeleted)
+                return ResultDto<bool>
+                    .Failure("MenuItem has already been deleted.", HttpStatusCode.BadRequest);
 
             menuItemToDelete.IsDeleted = true;
             menuItemToDelete.IsUsed = false;
