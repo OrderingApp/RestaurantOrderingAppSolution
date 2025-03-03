@@ -32,6 +32,7 @@ public class RestaurantOrderingContext : DbContext
     public DbSet<CustomerInformation> CustomerInformations { get; set; }
     public DbSet<Reservation> Reservations { get; set; }
     public DbSet<Payment> Payments { get; set; }
+    public DbSet<SubCategory> SubCategories { get; set; }
     public DbSet<MenuItemSale> MenuItemSales { get; set; }
     public DbSet<SalesRevenue> SalesRevenues { get; set; }
 
@@ -108,13 +109,33 @@ public class RestaurantOrderingContext : DbContext
             .HasOne(oi => oi.MenuItem)
             .WithMany()
             .HasForeignKey(oi => oi.MenuItemId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
-        // ✅ MenuCategory and MenuItem relationship
+        // ✅ MenuCategory and SubCategory relationship (One-to-Many)
         modelBuilder.Entity<MenuCategory>()
-            .HasMany(mc => mc.MenuItems)
+            .HasMany(mc => mc.SubCategories)
             .WithOne(mi => mi.MenuCategory)
             .HasForeignKey(mi => mi.MenuCategoryId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // ✅ SubCategory and MenuItem relationship (One-to-Many)
+        modelBuilder.Entity<SubCategory>()
+            .HasMany(sc => sc.MenuItems)
+            .WithOne(mi => mi.SubCategory)
+            .HasForeignKey(mi => mi.SubCategoryId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // ✅ MenuItem can belong to either a MenuCategory or a SubCategory
+        modelBuilder.Entity<MenuItem>()
+            .HasOne(mi => mi.MenuCategory)
+            .WithMany(mc => mc.MenuItems)
+            .HasForeignKey(mi => mi.MenuCategoryId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<MenuItem>()
+            .HasOne(mi => mi.SubCategory)
+            .WithMany(sc => sc.MenuItems)
+            .HasForeignKey(mi => mi.SubCategoryId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // ✅ Table and Order relationship

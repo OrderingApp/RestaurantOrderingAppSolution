@@ -7,5 +7,6 @@ public class MenuCategory
     public bool IsUsed { get; set; } = true;
     public bool IsDeleted { get; set; } = false;
 
+    public List<SubCategory> SubCategories { get; set; } = new();
     public List<MenuItem> MenuItems { get; set; } = new();
 }

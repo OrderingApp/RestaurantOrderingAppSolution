@@ -96,6 +96,7 @@ public class IngredientService(RestaurantOrderingContext orderingContext, IEvent
         {
             var ingredient = await orderingContext.Ingredients
                 .Include(i => i.IngredientTagRels)
+                    .ThenInclude(rel => rel.Tag)
                 .FirstOrDefaultAsync(i => i.Id == id);
 
             if (ingredient == null)

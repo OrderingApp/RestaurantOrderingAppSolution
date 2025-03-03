@@ -12,9 +12,15 @@ public class Seed
             // ✅ MenuCategories
             var menuCategories = new List<MenuCategory>
             {
-                new() { Id = Guid.NewGuid(), Name = "Appetizers", IsUsed = true, IsDeleted = false },
-                new() { Id = Guid.NewGuid(), Name = "Veg Pizza", IsUsed = true, IsDeleted = false },
-                new() { Id = Guid.NewGuid(), Name = "Meat Pizza", IsUsed = true, IsDeleted = false }
+                new() { Id = Guid.NewGuid(), Name = "Przystawki" },
+                new() { Id = Guid.NewGuid(), Name = "Panuozzo" },
+                new() { Id = Guid.NewGuid(), Name = "Piadina" },
+                new() { Id = Guid.NewGuid(), Name = "Pizza" },
+                new() { Id = Guid.NewGuid(), Name = "Calzone" },
+                new() { Id = Guid.NewGuid(), Name = "Napoje" },
+                new() { Id = Guid.NewGuid(), Name = "Sezon Letni" },
+                new() { Id = Guid.NewGuid(), Name = "Sezon Zimowy" },
+                new() { Id = Guid.NewGuid(), Name = "Alkohol" }
             };
             await context.MenuCategories.AddRangeAsync(menuCategories);
 
@@ -27,20 +33,48 @@ public class Seed
             };
             await context.MenuItems.AddRangeAsync(menuItems);
 
+            // ✅ SubCategories
+            var subCategories = new List<SubCategory>
+            {
+                new() { Id = Guid.NewGuid(), Name = "Rossa", MenuCategoryId = menuCategories[3].Id },
+                new() { Id = Guid.NewGuid(), Name = "Bianca", MenuCategoryId = menuCategories[3].Id },
+                new() { Id = Guid.NewGuid(), Name = "Special", MenuCategoryId = menuCategories[3].Id },
+                new() { Id = Guid.NewGuid(), Name = "Ciepłe", MenuCategoryId = menuCategories[5].Id },
+                new() { Id = Guid.NewGuid(), Name = "Zimne", MenuCategoryId = menuCategories[5].Id },
+                new() { Id = Guid.NewGuid(), Name = "Piwo", MenuCategoryId = menuCategories[8].Id },
+                new() { Id = Guid.NewGuid(), Name = "Bezalkoholowe", MenuCategoryId = menuCategories[8].Id },
+                new() { Id = Guid.NewGuid(), Name = "Drinki", MenuCategoryId = menuCategories[8].Id }
+            };
+            await context.SubCategories.AddRangeAsync(subCategories);
+
             // ✅ Ingredients
             var ingredients = new List<Ingredient>
             {
-                new() { Id = Guid.NewGuid(), Name = "Mozzarella", Price = 1.5M, CanBeUsedAsExtra = true, IsDeleted = false },
-                new() { Id = Guid.NewGuid(), Name = "Tomato", Price = 0.5M, CanBeUsedAsExtra = true, IsDeleted = false },
-                new() { Id = Guid.NewGuid(), Name = "Pepperoni", Price = 2.0M, CanBeUsedAsExtra = true, IsDeleted = false }
+                new() { Id = Guid.NewGuid(), Name = "Biały sos", Price = 1.5M },
+                new() { Id = Guid.NewGuid(), Name = "Mozzarella", Price = 2M },
+                new() { Id = Guid.NewGuid(), Name = "Pomidorki", Price = 1M },
+                new() { Id = Guid.NewGuid(), Name = "Pesto", Price = 1.5M },
+                new() { Id = Guid.NewGuid(), Name = "Nitki Chilli", Price = 1M },
+                new() { Id = Guid.NewGuid(), Name = "Włoska szynka", Price = 3M },
+                new() { Id = Guid.NewGuid(), Name = "Salami napoli", Price = 2.5M },
+                new() { Id = Guid.NewGuid(), Name = "Kurczak", Price = 3M },
+                new() { Id = Guid.NewGuid(), Name = "Łosoś", Price = 3.5M },
+                new() { Id = Guid.NewGuid(), Name = "Czerwona cebula", Price = 1M },
+                new() { Id = Guid.NewGuid(), Name = "Bazylia", Price = 0.5M },
+                new() { Id = Guid.NewGuid(), Name = "Pieczarki", Price = 1M }
             };
             await context.Ingredients.AddRangeAsync(ingredients);
 
             // ✅ Tags
             var tags = new List<Tag>
             {
-                new() { Id = Guid.NewGuid(), Name = "Vegetarian", IsUsed = true, IsDeleted = false },
-                new() { Id = Guid.NewGuid(), Name = "Spicy", IsUsed = true, IsDeleted = false }
+                new() { Id = Guid.NewGuid(), Name = "Szynka" },
+                new() { Id = Guid.NewGuid(), Name = "Salami" },
+                new() { Id = Guid.NewGuid(), Name = "Spianata" },
+                new() { Id = Guid.NewGuid(), Name = "Kurczak" },
+                new() { Id = Guid.NewGuid(), Name = "Wege" },
+                new() { Id = Guid.NewGuid(), Name = "N'duja" },
+                new() { Id = Guid.NewGuid(), Name = "Łosoś" }
             };
             await context.Tags.AddRangeAsync(tags);
 
