@@ -8,7 +8,5 @@ public class SubCategory
     public bool IsDeleted { get; set; } = false;
 
     public Guid MenuCategoryId { get; set; }
-    public MenuCategory MenuCategory { get; set; } = null!;
-
     public List<MenuItem> MenuItems { get; set; } = new();
 }

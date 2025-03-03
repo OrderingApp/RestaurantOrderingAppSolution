@@ -79,31 +79,32 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
         }
     }
 
-    public async Task<ResultDto<List<MenuItemReadDto>>> GetMenuItems(Guid? categoryId = null, List<Guid>? ingredientIds = null, List<string>? tags = null)
+    public async Task<ResultDto<List<MenuItemReadDto>>> GetMenuItems(GetMenuItemsRequest request)
     {
         try
         {
             var query = orderingContext.MenuItems
+                .Include(m => m.MenuItemIngredientRels)
+                    .ThenInclude(mi => mi.Ingredient)
+                        .ThenInclude(i => i.IngredientTagRels)
                 .Where(mi => mi.IsUsed && !mi.IsDeleted)
                 .AsQueryable();
 
-            if (categoryId.HasValue)
+            if (request.MenuCategoryId.HasValue)
             {
-                query = query.Where(mi => mi.MenuCategoryId == categoryId.Value);
+                query = query.Where(mi => mi.MenuCategoryId == request.MenuCategoryId.Value);
             }
 
-            if (ingredientIds != null && ingredientIds.Any())
+            if (request.SubCategoryId.HasValue)
             {
-                query = query.Where(mi => mi.MenuItemIngredientRels
-                    .Any(rel => ingredientIds.Contains(rel.IngredientId)));
+                query = query.Where(mi => mi.SubCategoryId == request.SubCategoryId.Value);
             }
 
-            if (tags != null && tags.Any())
+            if (request.TagIds != null && request.TagIds.Any())
             {
-                var lowerTags = tags.Select(tag => tag.ToLower()).ToList();
-                query = query.Where(mi => mi.MenuItemIngredientRels
-                    .Any(rel => rel.Ingredient.IngredientTagRels
-                        .Any(tagRel => lowerTags.Contains(tagRel.Tag.Name.ToLower()))));
+                query = query.Where(m => m.MenuItemIngredientRels
+                    .Any(mi => mi.Ingredient.IngredientTagRels
+                        .Any(it => request.TagIds.Contains(it.TagId))));
             }
 
             var menuItems = await query

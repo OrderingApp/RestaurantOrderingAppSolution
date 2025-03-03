@@ -114,9 +114,8 @@ public class RestaurantOrderingContext : DbContext
         // ✅ MenuCategory and SubCategory relationship (One-to-Many)
         modelBuilder.Entity<MenuCategory>()
             .HasMany(mc => mc.SubCategories)
-            .WithOne(mi => mi.MenuCategory)
-            .HasForeignKey(mi => mi.MenuCategoryId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade);
 
         // ✅ SubCategory and MenuItem relationship (One-to-Many)
         modelBuilder.Entity<SubCategory>()

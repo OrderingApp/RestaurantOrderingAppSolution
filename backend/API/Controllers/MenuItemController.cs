@@ -39,17 +39,14 @@ public class MenuItemController(IMenuItemService menuItemService) : BaseApiContr
     /// <summary>
     /// Retrieves all menu items with optional filtering.
     /// </summary>
-    /// <param name="categoryId">Optional: The category ID for filtering.</param>
-    /// <param name="ingredientIds">Optional: Filter by specific ingredient IDs.</param>
-    /// <param name="tags">Optional: Filter by ingredient tags.</param>
+    /// <param name="menuCategoryId">Optional: The category ID for filtering.</param>
+    /// <param name="subCategoryId">Optional: Filter by specific ingredient IDs.</param>
+    /// <param name="tagIds">Optional: Filter by ingredient tags.</param>
     /// <returns>A list of menu items matching the filters.</returns>
     [HttpGet]
     [ProducesResponseType(typeof(List<MenuItemReadDto>), 200)]
-    public async Task<ActionResult<List<MenuItemReadDto>>> GetMenuItems(
-        [FromQuery] Guid? categoryId = null,
-        [FromQuery] List<Guid>? ingredientIds = null,
-        [FromQuery] List<string>? tags = null) =>
-        HandleResult(await menuItemService.GetMenuItems(categoryId, ingredientIds, tags));
+    public async Task<ActionResult<List<MenuItemReadDto>>> GetMenuItems([FromQuery]GetMenuItemsRequest request) =>
+        HandleResult(await menuItemService.GetMenuItems(request));
 
     /// <summary>
     /// Updates an existing menu item.
