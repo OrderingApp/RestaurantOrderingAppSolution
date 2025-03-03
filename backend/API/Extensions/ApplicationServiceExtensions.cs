@@ -16,6 +16,7 @@ public static class ApplicationServiceExtensions
         // Register application services
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IMenuCategoryService, MenuCategoryService>();
+        services.AddScoped<ISubCategoryService, SubCategoryService>();
         services.AddScoped<IMenuItemService, MenuItemService>();
         services.AddScoped<IOrderItemService, OrderItemService>();
         services.AddScoped<ITableService, TableService>();

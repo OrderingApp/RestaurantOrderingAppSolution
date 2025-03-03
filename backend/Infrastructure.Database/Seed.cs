@@ -12,35 +12,114 @@ public class Seed
             // ✅ MenuCategories
             var menuCategories = new List<MenuCategory>
             {
-                new() { Id = Guid.NewGuid(), Name = "Appetizers", IsUsed = true, IsDeleted = false },
-                new() { Id = Guid.NewGuid(), Name = "Veg Pizza", IsUsed = true, IsDeleted = false },
-                new() { Id = Guid.NewGuid(), Name = "Meat Pizza", IsUsed = true, IsDeleted = false }
+                new() { Id = Guid.NewGuid(), Name = "Przystawki" },
+                new() { Id = Guid.NewGuid(), Name = "Panuozzo" },
+                new() { Id = Guid.NewGuid(), Name = "Piadina" },
+                new() { Id = Guid.NewGuid(), Name = "Pizza" },
+                new() { Id = Guid.NewGuid(), Name = "Calzone" },
+                new() { Id = Guid.NewGuid(), Name = "Napoje" },
+                new() { Id = Guid.NewGuid(), Name = "Sezon Letni" },
+                new() { Id = Guid.NewGuid(), Name = "Sezon Zimowy" },
+                new() { Id = Guid.NewGuid(), Name = "Alkohol" }
             };
             await context.MenuCategories.AddRangeAsync(menuCategories);
+
+            // ✅ SubCategories
+            var subCategories = new List<SubCategory>
+            {
+                new() { Id = Guid.NewGuid(), Name = "Rossa", MenuCategoryId = menuCategories[3].Id },
+                new() { Id = Guid.NewGuid(), Name = "Bianca", MenuCategoryId = menuCategories[3].Id },
+                new() { Id = Guid.NewGuid(), Name = "Special", MenuCategoryId = menuCategories[3].Id },
+                new() { Id = Guid.NewGuid(), Name = "Ciepłe", MenuCategoryId = menuCategories[5].Id },
+                new() { Id = Guid.NewGuid(), Name = "Zimne", MenuCategoryId = menuCategories[5].Id },
+                new() { Id = Guid.NewGuid(), Name = "Piwo", MenuCategoryId = menuCategories[8].Id },
+                new() { Id = Guid.NewGuid(), Name = "Bezalkoholowe", MenuCategoryId = menuCategories[8].Id },
+                new() { Id = Guid.NewGuid(), Name = "Drinki", MenuCategoryId = menuCategories[8].Id }
+            };
+            await context.SubCategories.AddRangeAsync(subCategories);
 
             // ✅ MenuItems
             var menuItems = new List<MenuItem>
             {
-                new() { Id = Guid.NewGuid(), Name = "Garlic Bread", Price = 5.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[0].Id },
-                new() { Id = Guid.NewGuid(), Name = "Veggie Delight Pizza", Price = 12.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[1].Id },
-                new() { Id = Guid.NewGuid(), Name = "Pepperoni Pizza", Price = 15.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[2].Id }
+                new() { Id = Guid.NewGuid(), Name = "Numer 1", Price = 5.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[0].Id },
+                new() { Id = Guid.NewGuid(), Name = "Numer 2", Price = 12.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[2].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 3", Price = 15.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[0].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 4", Price = 5.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[1].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 5", Price = 12.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[1].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 6", Price = 15.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[0].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 7", Price = 5.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[2].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 8", Price = 12.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[0].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 9", Price = 15.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[2].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 10", Price = 5.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[1].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 11", Price = 12.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[1].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 12", Price = 15.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[0].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 13", Price = 5.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[0].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 14", Price = 12.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[0].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 15", Price = 15.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[0].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 16", Price = 5.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[0].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 17", Price = 12.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[2].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 18", Price = 15.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[2].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 19", Price = 5.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[2].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 20", Price = 12.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[0].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 21", Price = 15.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[0].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 22", Price = 5.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[2].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 23", Price = 12.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[0].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 24", Price = 15.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[2].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 25", Price = 5.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[0].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 27", Price = 15.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[2].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 28", Price = 5.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[0].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 29", Price = 12.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[1].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 30", Price = 15.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[0].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 31", Price = 5.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[1].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 32", Price = 12.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[1].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Numer 33", Price = 15.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id, SubCategoryId = subCategories[2].Id  },
+                new() { Id = Guid.NewGuid(), Name = "Podpłomyki", Price = 12.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[0].Id },
+                new() { Id = Guid.NewGuid(), Name = "Miska Buratty", Price = 15.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[0].Id },
+                new() { Id = Guid.NewGuid(), Name = "Deska Piccolo", Price = 5.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[0].Id },
+                new() { Id = Guid.NewGuid(), Name = "Numer 1", Price = 12.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[1].Id },
+                new() { Id = Guid.NewGuid(), Name = "Numer 2", Price = 15.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[1].Id },
+                new() { Id = Guid.NewGuid(), Name = "Numer 1", Price = 5.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[2].Id },
+                new() { Id = Guid.NewGuid(), Name = "Numer 2", Price = 12.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[2].Id },
+                new() { Id = Guid.NewGuid(), Name = "Numer 3", Price = 15.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[2].Id },
+                new() { Id = Guid.NewGuid(), Name = "Numer 31", Price = 5.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id },
+                new() { Id = Guid.NewGuid(), Name = "Numer 32", Price = 12.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id },
+                new() { Id = Guid.NewGuid(), Name = "Numer 33", Price = 15.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[3].Id },
+                new() { Id = Guid.NewGuid(), Name = "Podpłomyki", Price = 12.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[0].Id },
+                new() { Id = Guid.NewGuid(), Name = "Miska Buratty", Price = 15.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[0].Id },
+                new() { Id = Guid.NewGuid(), Name = "Deska Piccolo", Price = 5.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[0].Id },
+                new() { Id = Guid.NewGuid(), Name = "Numer 1", Price = 12.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[1].Id },
+                new() { Id = Guid.NewGuid(), Name = "Numer 2", Price = 15.00M, IsUsed = true, IsDeleted = false, MenuCategoryId = menuCategories[1].Id },
             };
             await context.MenuItems.AddRangeAsync(menuItems);
 
             // ✅ Ingredients
             var ingredients = new List<Ingredient>
             {
-                new() { Id = Guid.NewGuid(), Name = "Mozzarella", Price = 1.5M, CanBeUsedAsExtra = true, IsDeleted = false },
-                new() { Id = Guid.NewGuid(), Name = "Tomato", Price = 0.5M, CanBeUsedAsExtra = true, IsDeleted = false },
-                new() { Id = Guid.NewGuid(), Name = "Pepperoni", Price = 2.0M, CanBeUsedAsExtra = true, IsDeleted = false }
+                new() { Id = Guid.NewGuid(), Name = "Biały sos", Price = 1.5M },
+                new() { Id = Guid.NewGuid(), Name = "Mozzarella", Price = 2M },
+                new() { Id = Guid.NewGuid(), Name = "Pomidorki", Price = 1M },
+                new() { Id = Guid.NewGuid(), Name = "Pesto", Price = 1.5M },
+                new() { Id = Guid.NewGuid(), Name = "Nitki Chilli", Price = 1M },
+                new() { Id = Guid.NewGuid(), Name = "Włoska szynka", Price = 3M },
+                new() { Id = Guid.NewGuid(), Name = "Salami napoli", Price = 2.5M },
+                new() { Id = Guid.NewGuid(), Name = "Kurczak", Price = 3M },
+                new() { Id = Guid.NewGuid(), Name = "Łosoś", Price = 3.5M },
+                new() { Id = Guid.NewGuid(), Name = "Czerwona cebula", Price = 1M },
+                new() { Id = Guid.NewGuid(), Name = "Bazylia", Price = 0.5M },
+                new() { Id = Guid.NewGuid(), Name = "Pieczarki", Price = 1M }
             };
             await context.Ingredients.AddRangeAsync(ingredients);
 
             // ✅ Tags
             var tags = new List<Tag>
             {
-                new() { Id = Guid.NewGuid(), Name = "Vegetarian", IsUsed = true, IsDeleted = false },
-                new() { Id = Guid.NewGuid(), Name = "Spicy", IsUsed = true, IsDeleted = false }
+                new() { Id = Guid.NewGuid(), Name = "Szynka" },
+                new() { Id = Guid.NewGuid(), Name = "Salami" },
+                new() { Id = Guid.NewGuid(), Name = "Spianata" },
+                new() { Id = Guid.NewGuid(), Name = "Kurczak" },
+                new() { Id = Guid.NewGuid(), Name = "Wege" },
+                new() { Id = Guid.NewGuid(), Name = "N'duja" },
+                new() { Id = Guid.NewGuid(), Name = "Łosoś" }
             };
             await context.Tags.AddRangeAsync(tags);
 

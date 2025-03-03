@@ -96,6 +96,7 @@ public class IngredientService(RestaurantOrderingContext orderingContext, IEvent
         {
             var ingredient = await orderingContext.Ingredients
                 .Include(i => i.IngredientTagRels)
+                    .ThenInclude(rel => rel.Tag)
                 .FirstOrDefaultAsync(i => i.Id == id);
 
             if (ingredient == null)
@@ -111,7 +112,12 @@ public class IngredientService(RestaurantOrderingContext orderingContext, IEvent
 
             await orderingContext.SaveChangesAsync();
 
-            var updatedIngredientDto = mapper.Map<IngredientReadDto>(ingredient);
+            var updatedIngredient = await orderingContext.Ingredients
+            .Include(i => i.IngredientTagRels)
+                .ThenInclude(rel => rel.Tag)
+            .FirstOrDefaultAsync(i => i.Id == id);
+
+            var updatedIngredientDto = mapper.Map<IngredientReadDto>(updatedIngredient);
             return ResultDto<IngredientReadDto>.Success(updatedIngredientDto, HttpStatusCode.OK);
         }
         catch (Exception ex)
