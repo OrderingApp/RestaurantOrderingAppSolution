@@ -31,7 +31,9 @@ public static class DatabaseExtensions
         {
             var restaurantOrderingContext = services.GetRequiredService<RestaurantOrderingContext>();
             await restaurantOrderingContext.Database.MigrateAsync();
-            await Seed.SeedData(restaurantOrderingContext);
+
+            var excelSeeder = new ExcelSeeder(restaurantOrderingContext);
+            await excelSeeder.SeedFromExcel("C:\\Users\\jakub\\Desktop\\Cs\\pc\\RestaurantOrderingAppSolution\\backend\\Infrastructure.Database\\SeedData.xlsx");
 
             var eventsDatabaseContext = services.GetRequiredService<EventsDatabaseContext>();
             await eventsDatabaseContext.Database.MigrateAsync();
