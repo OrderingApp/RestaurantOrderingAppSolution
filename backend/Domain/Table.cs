@@ -9,6 +9,9 @@ public class Table
     public bool IsUsed { get; set; } = true;
     public bool IsDeleted { get; set; } = false;
 
+    public Guid AreaId { get; set; }
+    public Area Area { get; set; } = null!;
+
     public List<Order> Orders { get; set; } = new();
 
     public List<Reservation> Reservations { get; set; } = new();

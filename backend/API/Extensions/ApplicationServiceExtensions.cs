@@ -19,6 +19,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<ISubCategoryService, SubCategoryService>();
         services.AddScoped<IMenuItemService, MenuItemService>();
         services.AddScoped<IOrderItemService, OrderItemService>();
+        services.AddScoped<IAreaService, AreaService>();
         services.AddScoped<ITableService, TableService>();
         services.AddScoped<IIngredientService, IngredientService>();
         services.AddScoped<ITagService, TagService>();
