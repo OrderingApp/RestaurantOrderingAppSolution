@@ -107,14 +107,14 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
                         .Any(it => request.TagIds.Contains(it.TagId))));
             }
 
-            request.PageNumber = Math.Max(request.PageNumber, 1);
+            request.Page = Math.Max(request.Page, 1);
             request.PageSize = Math.Clamp(request.PageSize, 1, 100);
 
             var totalItems = await query.CountAsync();
 
             var menuItems = await query
                 .ProjectTo<MenuItemReadDto>(mapper.ConfigurationProvider)
-                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Skip((request.Page - 1) * request.PageSize)
                 .Take(request.PageSize)
                 .ToListAsync();
 
@@ -122,7 +122,7 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
             {
                 Items = menuItems,
                 TotalCount = totalItems,
-                PageNumber = request.PageNumber,
+                Page = request.Page,
                 PageSize = request.PageSize
             };
 

@@ -1,4 +1,6 @@
-﻿namespace Application.Dtos.MenuItems;
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace Application.Dtos.MenuItems;
 
 public class GetMenuItemsRequest
 {
@@ -6,6 +8,9 @@ public class GetMenuItemsRequest
     public Guid? SubCategoryId { get; set; }
     public List<Guid>? TagIds { get; set; }
 
-    public int PageNumber { get; set; } = 1;
+    [FromQuery(Name = "page")]
+    public int Page { get; set; } = 1;
+
+    [FromQuery(Name = "page-size")]
     public int PageSize { get; set; } = 10;
 }
