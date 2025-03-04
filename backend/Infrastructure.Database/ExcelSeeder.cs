@@ -22,6 +22,7 @@ public class ExcelSeeder
         await SeedMenuItems(package);
         await SeedIngredients(package);
         await SeedTags(package);
+        await SeedAreas(package);
         await SeedTables(package);
         await SeedOrders(package);
         await SeedOrderItems(package);
@@ -388,6 +389,51 @@ public class ExcelSeeder
         }
     }
 
+    private async Task SeedAreas(ExcelPackage package)
+    {
+        try
+        {
+            if (!_context.Areas.Any())
+            {
+                var sheet = package.Workbook.Worksheets["Area"];
+
+                if (sheet == null)
+                {
+                    Console.WriteLine("Sheet 'Area' not found. Skipping area seeding.");
+                    return;
+                }
+
+                if (sheet.Dimension == null || sheet.Dimension.End.Row < 2)
+                {
+                    Console.WriteLine("Sheet 'Area' is empty. Skipping area seeding.");
+                    return;
+                }
+
+                var areas = new List<Area>();
+
+                for (int row = 2; row <= sheet.Dimension.End.Row; row++)
+                {
+                    areas.Add(new Area
+                    {
+                        Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
+                        Name = sheet.Cells[row, 2].Text,
+                        IsUsed = TryParseBool(sheet.Cells[row, 3].Text),
+                        IsDeleted = TryParseBool(sheet.Cells[row, 4].Text)
+                    });
+                }
+
+                await _context.Areas.AddRangeAsync(areas);
+                await _context.SaveChangesAsync();
+                Console.WriteLine("Areas seeded successfully!");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Error seeding Areas: {ex.Message}");
+        }
+    }
+
+
     private async Task SeedTables(ExcelPackage package)
     {
         try
@@ -395,22 +441,32 @@ public class ExcelSeeder
             if (!_context.Tables.Any())
             {
                 var sheet = package.Workbook.Worksheets["Table"];
-                var entities = new List<Table>();
+                var tables = new List<Table>();
 
                 for (int row = 2; row <= sheet.Dimension.End.Row; row++)
                 {
-                    entities.Add(new Table
+                    var areaId = TryParseGuid(sheet.Cells[row, 7].Text);
+
+
+                    if (areaId == null || !_context.Areas.Any(a => a.Id == areaId))
+                    {
+                        Console.WriteLine($"Skipping row {row}: AreaId {areaId} does not exist.");
+                        continue;
+                    }
+
+                    tables.Add(new Table
                     {
                         Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
                         Name = sheet.Cells[row, 2].Text,
                         Capacity = int.Parse(sheet.Cells[row, 3].Text),
                         IsUsed = TryParseBool(sheet.Cells[row, 4].Text),
                         IsDeleted = TryParseBool(sheet.Cells[row, 5].Text),
-                        Status = TryParseEnum<TableStatus>(sheet.Cells[row, 6].Text) ?? TableStatus.Available
+                        Status = TryParseEnum<TableStatus>(sheet.Cells[row, 6].Text) ?? TableStatus.Available,
+                        AreaId = areaId.Value
                     });
                 }
 
-                await _context.Tables.AddRangeAsync(entities);
+                await _context.Tables.AddRangeAsync(tables);
                 await _context.SaveChangesAsync();
                 Console.WriteLine("Tables seeded successfully!");
             }
@@ -420,6 +476,7 @@ public class ExcelSeeder
             Console.WriteLine($"Error seeding Tables: {ex.Message}");
         }
     }
+
 
     private async Task SeedCustomerInformation(ExcelPackage package)
     {

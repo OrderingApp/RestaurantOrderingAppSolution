@@ -24,6 +24,7 @@ public class RestaurantOrderingContext : DbContext
     public DbSet<MenuCategory> MenuCategories { get; set; }
     public DbSet<MenuItem> MenuItems { get; set; }
     public DbSet<Table> Tables { get; set; }
+    public DbSet<Area> Areas { get; set; }
     public DbSet<Tag> Tags { get; set; }
     public DbSet<Ingredient> Ingredients { get; set; }
     public DbSet<MenuItemIngredientRel> MenuItemIngredientRels { get; set; }
@@ -142,6 +143,14 @@ public class RestaurantOrderingContext : DbContext
             .HasMany(t => t.Orders)
             .WithOne(o => o.Table)
             .HasForeignKey(o => o.TableId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // ✅ Area and Table relationship
+
+        modelBuilder.Entity<Area>()
+            .HasMany(a => a.Tables)
+            .WithOne(t => t.Area)
+            .HasForeignKey(t => t.AreaId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // ✅ Table and Reservation relationship
