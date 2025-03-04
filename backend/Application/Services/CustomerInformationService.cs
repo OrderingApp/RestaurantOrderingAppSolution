@@ -16,7 +16,7 @@ public class CustomerInformationService(RestaurantOrderingContext orderingContex
     {
         try
         {
-            var customerInformation = await orderingContext.CustomerInformations.FindAsync(id);
+            var customerInformation = await orderingContext.CustomerInformation.FindAsync(id);
 
             if (customerInformation == null)
             {
@@ -40,7 +40,7 @@ public class CustomerInformationService(RestaurantOrderingContext orderingContex
     {
         try
         {
-            var customerInformation = await orderingContext.CustomerInformations.FindAsync(id);
+            var customerInformation = await orderingContext.CustomerInformation.FindAsync(id);
 
             if (customerInformation == null)
             {

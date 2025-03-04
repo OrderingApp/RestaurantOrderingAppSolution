@@ -611,7 +611,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
 
         if (order.CustomerInformation != null)
         {
-            orderingContext.CustomerInformations.Remove(order.CustomerInformation);
+            orderingContext.CustomerInformation.Remove(order.CustomerInformation);
             order.CustomerInformation = null;
         }
 
@@ -657,7 +657,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                 PreferredPaymentMethod = PreferredPaymentMethod.Cash,
                 ExpectedOrderCompletion = null
             };
-            orderingContext.CustomerInformations.Add(order.CustomerInformation);
+            orderingContext.CustomerInformation.Add(order.CustomerInformation);
         }
         else
         {

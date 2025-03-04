@@ -29,7 +29,7 @@ public class RestaurantOrderingContext : DbContext
     public DbSet<MenuItemIngredientRel> MenuItemIngredientRels { get; set; }
     public DbSet<IngredientTagRel> IngredientTagRels { get; set; }
     public DbSet<OrderItemIngredient> OrderItemIngredients { get; set; }
-    public DbSet<CustomerInformation> CustomerInformations { get; set; }
+    public DbSet<CustomerInformation> CustomerInformation { get; set; }
     public DbSet<Reservation> Reservations { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<SubCategory> SubCategories { get; set; }
