@@ -1,6 +1,5 @@
 ﻿using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
-using RestaurantOrdering.Events.Domain;
 using RestaurantOrdering.Events.Infrastructure.Database;
 
 namespace API.Extensions;

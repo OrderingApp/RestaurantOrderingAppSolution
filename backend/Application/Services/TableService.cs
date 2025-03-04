@@ -17,6 +17,13 @@ public class TableService(RestaurantOrderingContext orderingContext, IEventHandl
     {
         try
         {
+            var areaExists = await orderingContext.Areas.AnyAsync(a => a.Id == tableCreateDto.AreaId);
+            if (!areaExists)
+            {
+                return ResultDto<TableReadDto>
+                    .Failure("The specified AreaId does not exist.", HttpStatusCode.BadRequest);
+            }
+
             var table = mapper.Map<Table>(tableCreateDto);
 
             await orderingContext.Tables.AddAsync(table);

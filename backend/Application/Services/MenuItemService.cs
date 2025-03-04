@@ -79,7 +79,7 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
         }
     }
 
-    public async Task<ResultDto<List<MenuItemReadDto>>> GetMenuItems(GetMenuItemsRequest request)
+    public async Task<ResultDto<PagedResultDto<MenuItemReadDto>>> GetMenuItems(GetMenuItemsRequest request)
     {
         try
         {
@@ -107,17 +107,33 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
                         .Any(it => request.TagIds.Contains(it.TagId))));
             }
 
+            request.PageNumber = Math.Max(request.PageNumber, 1);
+            request.PageSize = Math.Clamp(request.PageSize, 1, 100);
+
+            var totalItems = await query.CountAsync();
+
             var menuItems = await query
                 .ProjectTo<MenuItemReadDto>(mapper.ConfigurationProvider)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
                 .ToListAsync();
 
-            return ResultDto<List<MenuItemReadDto>>.Success(menuItems, HttpStatusCode.OK);
+            var pagedResult = new PagedResultDto<MenuItemReadDto>
+            {
+                Items = menuItems,
+                TotalCount = totalItems,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
+
+            return ResultDto<PagedResultDto<MenuItemReadDto>>.Success(pagedResult, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
-            return ResultDto<List<MenuItemReadDto>>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<PagedResultDto<MenuItemReadDto>>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
         }
     }
+
 
 
     public async Task<ResultDto<MenuItemReadDto>> UpdateMenuItem(Guid id, MenuItemUpdateDto menuItemUpdateDto)

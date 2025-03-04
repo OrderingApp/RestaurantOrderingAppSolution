@@ -1,4 +1,5 @@
 ﻿using Application.Contracts;
+using Application.Dtos.Common;
 using Application.Dtos.MenuItems;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,16 +38,15 @@ public class MenuItemController(IMenuItemService menuItemService) : BaseApiContr
         HandleResult(await menuItemService.GetMenuItem(id));
 
     /// <summary>
-    /// Retrieves all menu items with optional filtering.
+    /// Retrieves paginated menu items with optional filtering.
     /// </summary>
-    /// <param name="menuCategoryId">Optional: The category ID for filtering.</param>
-    /// <param name="subCategoryId">Optional: Filter by specific ingredient IDs.</param>
-    /// <param name="tagIds">Optional: Filter by ingredient tags.</param>
-    /// <returns>A list of menu items matching the filters.</returns>
+    /// <param name="request">Filtering and pagination parameters.</param>
+    /// <returns>A paginated list of menu items.</returns>
     [HttpGet]
-    [ProducesResponseType(typeof(List<MenuItemReadDto>), 200)]
-    public async Task<ActionResult<List<MenuItemReadDto>>> GetMenuItems([FromQuery]GetMenuItemsRequest request) =>
+    [ProducesResponseType(typeof(PagedResultDto<MenuItemReadDto>), 200)]
+    public async Task<ActionResult<PagedResultDto<MenuItemReadDto>>> GetMenuItems([FromQuery] GetMenuItemsRequest request) =>
         HandleResult(await menuItemService.GetMenuItems(request));
+
 
     /// <summary>
     /// Updates an existing menu item.
