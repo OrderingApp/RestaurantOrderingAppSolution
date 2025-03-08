@@ -66,6 +66,7 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
         {
             var menuCategories = await orderingContext.MenuCategories
                 .Where(mc => mc.IsUsed && !mc.IsDeleted)
+                .Include(mc => mc.SubCategories)
                 .ToListAsync();
 
             var menuCategoryDtos = mapper.Map<List<MenuCategoryReadDto>>(menuCategories);
