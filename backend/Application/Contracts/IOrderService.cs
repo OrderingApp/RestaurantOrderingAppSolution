@@ -30,6 +30,7 @@ public interface IOrderService
     // Split/Join Order
     Task<ResultDto<OrderReadDto>> SplitOrder(Guid id, MoveOrderItemsDto splitOrderDto);
     Task<ResultDto<OrderReadDto>> JoinOrder(Guid sourceOrderId, Guid targetOrderId);
+    Task<ResultDto<OrderReadDto>> MoveOrderItems(Guid sourceOrderId, Guid targetOrderId, MoveOrderItemsDto moveOrderItemsDto);
 
     // Delete Orders
     Task<ResultDto<bool>> DeleteOrder(Guid id);

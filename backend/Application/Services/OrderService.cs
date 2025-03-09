@@ -545,6 +545,62 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         }
     }
 
+    public async Task<ResultDto<OrderReadDto>> MoveOrderItems(Guid sourceOrderId, Guid targetOrderId, MoveOrderItemsDto moveOrderItemsDto)
+    {
+        try
+        {
+            var sourceOrder = await orderingContext.Orders
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.MenuItem)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.ExtraIngredients)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.RemovedIngredients)
+                .Include(o => o.Payments)
+                .FirstOrDefaultAsync(o => o.Id == sourceOrderId);
+
+            var targetOrder = await orderingContext.Orders
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.MenuItem)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.ExtraIngredients)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.RemovedIngredients)
+                .Include(o => o.Payments)
+                .FirstOrDefaultAsync(o => o.Id == targetOrderId);
+
+            if (sourceOrder == null || targetOrder == null)
+                return ResultDto<OrderReadDto>.Failure("One or both orders not found.", HttpStatusCode.NotFound);
+
+            if (sourceOrder.Payments.Any() || targetOrder.Payments.Any())
+                return ResultDto<OrderReadDto>.Failure("Cannot move items after payments have been made.", HttpStatusCode.BadRequest);
+
+            var itemsToMove = sourceOrder.OrderItems
+                .Where(oi => moveOrderItemsDto.OrderItemIds.Contains(oi.Id))
+                .ToList();
+
+            if (!itemsToMove.Any())
+                return ResultDto<OrderReadDto>.Failure("No valid items selected for moving.", HttpStatusCode.BadRequest);
+
+            targetOrder.OrderItems.AddRange(itemsToMove);
+            sourceOrder.OrderItems.RemoveAll(oi => itemsToMove.Contains(oi));
+
+            sourceOrder.TotalAmount = Math.Max(0, sourceOrder.OrderItems.Sum(item => item.Price));
+            targetOrder.TotalAmount = Math.Max(0, targetOrder.OrderItems.Sum(item => item.Price));
+
+            await orderingContext.SaveChangesAsync();
+
+            var orderMoveEvent = mapper.Map<OrderItemsMovedEvent>((sourceOrder, targetOrder.Id, moveOrderItemsDto.OrderItemIds));
+            await eventHandlerService.HandleEventAsync(orderMoveEvent);
+
+            return ResultDto<OrderReadDto>.Success(null, HttpStatusCode.OK);
+        }
+        catch (Exception ex)
+        {
+            return ResultDto<OrderReadDto>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+        }
+    }
+
 
     public async Task<ResultDto<bool>> DeleteOrder(Guid id)
     {

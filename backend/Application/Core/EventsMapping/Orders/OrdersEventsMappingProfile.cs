@@ -24,6 +24,11 @@ public class OrdersEventsMappingProfile : Profile
         CreateMap<Order, OrderJoinEvent>()
             .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
 
+        CreateMap<(Order sourceOrder, Guid targetOrderId, List<Guid> movedItemIds), OrderItemsMovedEvent>()
+            .ForMember(dest => dest.SourceOrderId, opt => opt.MapFrom(src => src.sourceOrder.Id))
+            .ForMember(dest => dest.TargetOrderId, opt => opt.MapFrom(src => src.targetOrderId))
+            .ForMember(dest => dest.MovedItemIds, opt => opt.MapFrom(src => src.movedItemIds));
+
         CreateMap<Order, OrderTableChangedEvent>()
             .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
 
