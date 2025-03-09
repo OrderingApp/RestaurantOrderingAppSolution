@@ -18,7 +18,10 @@ public class OrdersEventsMappingProfile : Profile
         CreateMap<Order, DineInOrderCreatedEvent>()
             .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<Order, OrderSplitBillEvent>()
+        CreateMap<Order, OrderSplitEvent>()
+            .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
+
+        CreateMap<Order, OrderJoinEvent>()
             .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
 
         CreateMap<Order, OrderTableChangedEvent>()

@@ -445,7 +445,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         }
     }
 
-    public async Task<ResultDto<OrderReadDto>> SplitOrder(Guid id, SplitOrderDto splitOrderDto)
+    public async Task<ResultDto<OrderReadDto>> SplitOrder(Guid id, MoveOrderItemsDto splitOrderDto)
     {
         try
         {
@@ -486,7 +486,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             await orderingContext.Orders.AddAsync(newOrder);
             await orderingContext.SaveChangesAsync();
 
-            var orderSplitEvent = mapper.Map<OrderSplitBillEvent>(newOrder);
+            var orderSplitEvent = mapper.Map<OrderSplitEvent>(newOrder);
             await eventHandlerService.HandleEventAsync(orderSplitEvent);
 
             return ResultDto<OrderReadDto>.Success(null, HttpStatusCode.Created);
@@ -496,6 +496,55 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             return ResultDto<OrderReadDto>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
         }
     }
+
+    public async Task<ResultDto<OrderReadDto>> JoinOrder(Guid sourceOrderId, Guid targetOrderId)
+    {
+        try
+        {
+            var sourceOrder = await orderingContext.Orders
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.MenuItem)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.ExtraIngredients)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.RemovedIngredients)
+                .Include(o => o.Payments)
+                .FirstOrDefaultAsync(o => o.Id == sourceOrderId);
+
+            var targetOrder = await orderingContext.Orders
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.MenuItem)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.ExtraIngredients)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.RemovedIngredients)
+                .Include(o => o.Payments)
+                .FirstOrDefaultAsync(o => o.Id == targetOrderId);
+
+            if (sourceOrder == null || targetOrder == null)
+                return ResultDto<OrderReadDto>.Failure("One or both orders not found.", HttpStatusCode.NotFound);
+
+            if (sourceOrder.Payments.Any() || targetOrder.Payments.Any())
+                return ResultDto<OrderReadDto>.Failure("Orders cannot be joined after payments have been made.", HttpStatusCode.BadRequest);
+
+            targetOrder.OrderItems.AddRange(sourceOrder.OrderItems);
+
+            targetOrder.TotalAmount = Math.Max(0, targetOrder.OrderItems.Sum(item => item.Price));
+
+            orderingContext.Orders.Remove(sourceOrder);
+            await orderingContext.SaveChangesAsync();
+
+            var orderJoinEvent = mapper.Map<OrderJoinEvent>(targetOrder);
+            await eventHandlerService.HandleEventAsync(orderJoinEvent);
+
+            return ResultDto<OrderReadDto>.Success(null, HttpStatusCode.OK);
+        }
+        catch (Exception ex)
+        {
+            return ResultDto<OrderReadDto>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+        }
+    }
+
 
     public async Task<ResultDto<bool>> DeleteOrder(Guid id)
     {
