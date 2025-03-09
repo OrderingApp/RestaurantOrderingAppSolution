@@ -7,6 +7,5 @@ public class MenuItemReadDto
     public string Description { get; set; } = null!;
     public decimal Price { get; set; }
 
-    public Guid MenuCategoryId { get; set; }
     public List<MenuItemIngredientReadDto> Ingredients { get; set; } = new();
 }

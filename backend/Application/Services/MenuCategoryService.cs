@@ -1,13 +1,16 @@
 ﻿using Application.Contracts;
 using Application.Dtos.Common;
 using Application.Dtos.MenuCategories;
+using Application.Dtos.MenuItems;
 using AutoMapper;
 using Domain;
 using Infrastructure.Database;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RestaurantOrdering.Events.Application.Contracts;
 using RestaurantOrdering.Events.Domain.MenuCategories;
 using System.Net;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Application.Services;
 
@@ -78,6 +81,81 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
         {
             return ResultDto<List<MenuCategoryReadDto>>
                 .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+        }
+    }
+
+    public async Task<PagedResultDto<MenuCategoryHierarchyReadDto>> GetMenuCategoriesWithHierarchy(GetMenuCategoryHierarchyRequest request)
+    {
+        try
+        {
+            var query = orderingContext.MenuCategories
+                .Where(mc => mc.IsUsed && !mc.IsDeleted)
+                .Include(mc => mc.SubCategories)
+                .Include(mc => mc.MenuItems)
+                    .ThenInclude(mi => mi.MenuItemIngredientRels)
+                        .ThenInclude(mii => mii.Ingredient)
+                            .ThenInclude(i => i.IngredientTagRels)
+                .AsQueryable();
+
+            if (request.MenuCategoryId.HasValue)
+            {
+                query = query.Where(mc => mc.Id == request.MenuCategoryId.Value);
+            }
+            if (request.SubCategoryId.HasValue)
+            {
+                query = query.Where(mc => mc.SubCategories.Any(sc => sc.Id == request.SubCategoryId.Value));
+            }
+
+            if (request.TagIds != null && request.TagIds.Any())
+            {
+                query = query.Where(mc => mc.MenuItems
+                    .Any(mi => mi.MenuItemIngredientRels
+                        .Any(mii => mii.Ingredient.IngredientTagRels
+                            .Any(it => request.TagIds.Contains(it.TagId)))));
+            }
+
+            var totalItems = await query.CountAsync();
+
+            bool pageLimit = false;
+
+            if (pageLimit)
+            {
+                if (request.Page.HasValue && request.PageSize.HasValue)
+                {
+                    request.Page = Math.Max(request.Page.Value, 0);
+                    request.PageSize = Math.Clamp(request.PageSize.Value, 1, 100);
+
+                    query = query
+                        .Skip(request.Page.Value * request.PageSize.Value)
+                        .Take(request.PageSize.Value);
+                }
+            }
+
+            var menuCategories = await query.ToListAsync();
+
+            var menuCategoryDtos = mapper.Map<List<MenuCategoryHierarchyReadDto>>(menuCategories);
+
+            return new PagedResultDto<MenuCategoryHierarchyReadDto>(
+                menuCategoryDtos,
+                totalItems,
+                request.Page ?? 0,
+                request.PageSize ?? totalItems
+            );
+
+        }
+        catch (Exception ex)
+        {
+            return new PagedResultDto<MenuCategoryHierarchyReadDto>(
+                new List<MenuCategoryHierarchyReadDto>(),
+                0,
+                0,
+                0
+            )
+            {
+                IsSuccess = false,
+                ErrorMessage = $"An error occurred: {ex.Message}",
+                HttpStatusCode = HttpStatusCode.InternalServerError
+            };
         }
     }
 

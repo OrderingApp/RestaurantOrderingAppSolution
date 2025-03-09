@@ -79,63 +79,6 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
         }
     }
 
-    public async Task<ResultDto<PagedResultDto<MenuItemReadDto>>> GetMenuItems(GetMenuItemsRequest request)
-    {
-        try
-        {
-            var query = orderingContext.MenuItems
-                .Include(m => m.MenuItemIngredientRels)
-                    .ThenInclude(mi => mi.Ingredient)
-                        .ThenInclude(i => i.IngredientTagRels)
-                .Where(mi => mi.IsUsed && !mi.IsDeleted)
-                .AsQueryable();
-
-            if (request.MenuCategoryId.HasValue)
-            {
-                query = query.Where(mi => mi.MenuCategoryId == request.MenuCategoryId.Value);
-            }
-
-            if (request.SubCategoryId.HasValue)
-            {
-                query = query.Where(mi => mi.SubCategoryId == request.SubCategoryId.Value);
-            }
-
-            if (request.TagIds != null && request.TagIds.Any())
-            {
-                query = query.Where(m => m.MenuItemIngredientRels
-                    .Any(mi => mi.Ingredient.IngredientTagRels
-                        .Any(it => request.TagIds.Contains(it.TagId))));
-            }
-
-            request.Page = Math.Max(request.Page, 1);
-            request.PageSize = Math.Clamp(request.PageSize, 1, 100);
-
-            var totalItems = await query.CountAsync();
-
-            var menuItems = await query
-                .ProjectTo<MenuItemReadDto>(mapper.ConfigurationProvider)
-                .Skip((request.Page - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToListAsync();
-
-            var pagedResult = new PagedResultDto<MenuItemReadDto>
-            {
-                Items = menuItems,
-                TotalCount = totalItems,
-                Page = request.Page,
-                PageSize = request.PageSize
-            };
-
-            return ResultDto<PagedResultDto<MenuItemReadDto>>.Success(pagedResult, HttpStatusCode.OK);
-        }
-        catch (Exception ex)
-        {
-            return ResultDto<PagedResultDto<MenuItemReadDto>>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
-        }
-    }
-
-
-
     public async Task<ResultDto<MenuItemReadDto>> UpdateMenuItem(Guid id, MenuItemUpdateDto menuItemUpdateDto)
     {
         try

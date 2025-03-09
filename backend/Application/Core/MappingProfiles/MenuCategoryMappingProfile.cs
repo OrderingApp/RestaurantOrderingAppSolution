@@ -10,6 +10,8 @@ public class MenuCategoryMappingProfile : Profile
     {
         CreateMap<MenuCategory, MenuCategoryReadDto>();
 
+        CreateMap<MenuCategory, MenuCategoryHierarchyReadDto>();
+
         CreateMap<MenuCategoryCreateDto, MenuCategory>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
             .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(_ => false));

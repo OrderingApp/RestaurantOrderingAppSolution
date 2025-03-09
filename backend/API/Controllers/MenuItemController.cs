@@ -38,17 +38,6 @@ public class MenuItemController(IMenuItemService menuItemService) : BaseApiContr
         HandleResult(await menuItemService.GetMenuItem(id));
 
     /// <summary>
-    /// Retrieves paginated menu items with optional filtering.
-    /// </summary>
-    /// <param name="request">Filtering and pagination parameters.</param>
-    /// <returns>A paginated list of menu items.</returns>
-    [HttpGet]
-    [ProducesResponseType(typeof(PagedResultDto<MenuItemReadDto>), 200)]
-    public async Task<ActionResult<PagedResultDto<MenuItemReadDto>>> GetMenuItems([FromQuery] GetMenuItemsRequest request) =>
-        HandleResult(await menuItemService.GetMenuItems(request));
-
-
-    /// <summary>
     /// Updates an existing menu item.
     /// </summary>
     /// <param name="id">The ID of the menu item to update.</param>
