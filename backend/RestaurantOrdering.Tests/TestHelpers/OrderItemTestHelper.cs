@@ -8,7 +8,7 @@ public static class OrderItemTestHelper
     {
         return new OrderItem
         {
-            Id = Guid.NewGuid(), // Ensures each test gets a fresh object
+            Id = Guid.NewGuid(),
             MenuItemId = menuItemId ?? Guid.NewGuid(),
             Price = price,
             SpecialInstructions = specialInstructions ?? "Default Special Instructions",

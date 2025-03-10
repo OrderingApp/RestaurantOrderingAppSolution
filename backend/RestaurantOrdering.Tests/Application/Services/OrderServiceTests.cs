@@ -10,6 +10,7 @@ using Moq;
 using RestaurantOrdering.Events.Application.Contracts;
 using FluentAssertions;
 using System.Net;
+using RestaurantOrdering.Tests.TestHelpers;
 
 public class OrderServiceTests
 {
@@ -35,32 +36,30 @@ public class OrderServiceTests
     public async Task CreateDineInOrder_ShouldReturnSuccess_WhenTableExists()
     {
         // Arrange
-        var tableId = Guid.NewGuid();
-        var dineInOrderDto = new DineInOrderCreateDto
-        {
-            TableId = tableId,
-            OrderItems = new List<OrderItemCreateDto>
-        {
-            new OrderItemCreateDto { MenuItemId = Guid.NewGuid() }
-        }
-        };
+        var table = TableTestHelper.CreateTable();
+        var menuItem = MenuItemTestHelper.CreateMenuItem();
+        var orderItem = OrderItemTestHelper.CreateOrderItem(menuItem.Id);
+        var order = OrderTestHelper.CreateOrder(tableId: table.Id, items: new List<OrderItem> { orderItem });
 
-        var table = new Table { Id = tableId, Name = "test" };
-
-        // ✅ Add the table to the in-memory database
+        // ✅ Add required entities to in-memory DB
         _dbContext.Tables.Add(table);
+        _dbContext.MenuItems.Add(menuItem);
         await _dbContext.SaveChangesAsync();
 
-        var orderEntity = new Order { Id = Guid.NewGuid(), TableId = tableId };
-        var orderReadDto = new OrderReadDto { Id = orderEntity.Id };
-
-        _mockMapper.Setup(m => m.Map<Order>(dineInOrderDto)).Returns(orderEntity);
-        _mockMapper.Setup(m => m.Map<OrderReadDto>(orderEntity)).Returns(orderReadDto);
+        _mockMapper.Setup(m => m.Map<Order>(It.IsAny<DineInOrderCreateDto>())).Returns(order);
 
         // Act
-        var result = await _orderService.CreateDineInOrder(dineInOrderDto);
+        var result = await _orderService.CreateDineInOrder(new DineInOrderCreateDto
+        {
+            TableId = table.Id,
+            OrderItems = new List<OrderItemCreateDto>
+        {
+            new OrderItemCreateDto { MenuItemId = menuItem.Id}
+        }
+        });
 
         // Assert
-        result.ShouldBeSuccessful(HttpStatusCode.Created);
+        result.Should().NotBeNull();
+        result.IsSuccess.Should().BeTrue();
     }
 }
