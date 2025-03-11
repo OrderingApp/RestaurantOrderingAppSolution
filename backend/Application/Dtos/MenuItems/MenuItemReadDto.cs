@@ -8,4 +8,5 @@ public class MenuItemReadDto
     public decimal Price { get; set; }
 
     public List<MenuItemIngredientReadDto> Ingredients { get; set; } = new();
+    public Guid? SubCategoryId { get; set; }
 }

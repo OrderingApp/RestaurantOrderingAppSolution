@@ -95,6 +95,7 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
                     .ThenInclude(mi => mi.MenuItemIngredientRels)
                         .ThenInclude(mii => mii.Ingredient)
                             .ThenInclude(i => i.IngredientTagRels)
+                                .ThenInclude(it => it.Tag)
                 .AsQueryable();
 
             if (request.MenuCategoryId.HasValue)
