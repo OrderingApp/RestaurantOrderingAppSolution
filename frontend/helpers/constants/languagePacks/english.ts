@@ -30,27 +30,42 @@ const enPack: languagePack = {
         reservationTitle: 'Check Reservations',
         upsertReservation: 'Create/Edit Reservation',
         listOfReservations: 'List of reservations',
+        reservationCard: {
+            title: 'Reservation',
+            people: ['people'],
+        },
     },
     createReservationPage: {
         createReservation: 'Create reservation',
+        editReservation: 'Edit reservation',
         chooseReservation: 'Choose reservation',
         form: {
-            personalData: 'Personal data',
-            noOfPeople: 'Number of people',
+            name: 'Personal data',
+            capacityNeeded: 'Number of people',
             date: 'Date',
             time: 'Time',
-            phone: 'Phone number',
+            phoneNumber: 'Phone number',
             submit: 'Book a table',
+            edit: 'Confirm changes',
             errors: {
-                personalData: {
+                name: {
                     min: 'Please enter at least 3 characters',
                     max: 'Please enter max 30 characters',
                 },
-                noOfPeople: 'Plese enter a correct number of people',
+                capacityNeeded: 'Plese enter a correct number of people',
                 date: 'Please enter a correct date',
                 time: 'Plese enter a correct time',
-                phone: 'Please enter a valid 9-digit phone number',
+                phoneNumber: 'Please enter a valid 9-digit phone number',
             },
+        },
+    },
+    tablePage: {
+        tableCard: {
+            title: {
+                payment: 'Table in payment process',
+                normal: 'Active table',
+            },
+            balanceName: 'Balance',
         },
     },
 };

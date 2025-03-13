@@ -1,17 +1,43 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
 import useLanguage from '@/helpers/hooks/useLanguage';
+import useQueryReservations from '@/helpers/queries/reservations/useQueryReservations';
 
 import ReservationForm from '@/components/reservations/ReservationForm';
 import DateCalendar from '@/components/shared/DateCalendar/DateCalendar';
+import { ReservationCard } from '@/components/shared/cards/ReservationCard';
+
 import languagePacks from '@/helpers/constants/languagePacks';
-import ReservationItem from '@/components/shared/ReservationItem/ReservationItem';
 
 const CreateReservation = () => {
+    const router = useRouter();
     const { language } = useLanguage();
+    const [selectedId, setSelectedId] = useState<string | null>(null);
+    const [selectedDate, setSelectedDate] = useState<string>(
+        new Date().toISOString().split('T')[0]
+    );
+    const { data } = useQueryReservations(selectedDate);
     const {
         createReservationPage: { chooseReservation },
     } = languagePacks[language];
+
+    const onDateSelectHandler = (date: Date) => {
+        const formattedDate = date.toISOString().split('T')[0];
+        setSelectedDate(formattedDate);
+    };
+
+    const toggleSelected = (id: string) => {
+        if (selectedId === id) {
+            setSelectedId(null);
+            router.push('/reservations/create');
+        } else {
+            setSelectedId(id);
+            router.push(`/reservations/create?edit=${id}`);
+        }
+    };
 
     return (
         <section className="min-h-full flex">
@@ -23,12 +49,20 @@ const CreateReservation = () => {
                 <div className="py-2">
                     <DateCalendar
                         sliderSettings={{ slidesToShow: 5, slidesToScroll: 5 }}
+                        onDateSelect={onDateSelectHandler}
                     />
                 </div>
-                <div className="flex gap-1 p-2">
-                    <ReservationItem />
-                    <ReservationItem />
-                    <ReservationItem />
+                <div className="flex gap-3 p-4 flex-wrap">
+                    {data?.map((reservation) => (
+                        <ReservationCard
+                            onClick={() => toggleSelected(reservation.id)}
+                            key={reservation.id}
+                            {...reservation}
+                            className={
+                                selectedId == reservation.id ? 'scale-110' : ''
+                            }
+                        />
+                    ))}
                 </div>
             </div>
         </section>
@@ -36,3 +70,5 @@ const CreateReservation = () => {
 };
 
 export default CreateReservation;
+
+//TODO maybe ul idk

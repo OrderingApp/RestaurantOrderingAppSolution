@@ -1,17 +1,23 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 import useLanguage from '@/helpers/hooks/useLanguage';
+import useQueryReservations from '@/helpers/queries/reservations/useQueryReservations';
 
 import Button from '@/components/shared/Button/Button';
 import DateCalendar from '@/components/shared/DateCalendar/DateCalendar';
+import { ReservationCard } from '@/components/shared/cards/ReservationCard';
 import languagePacks from '@/helpers/constants/languagePacks';
-import ReservationItem from '@/components/shared/ReservationItem/ReservationItem';
 
 const Reservations = () => {
-    const { language } = useLanguage();
     const router = useRouter();
+    const { language } = useLanguage();
+    const [selectedDate, setSelectedDate] = useState(
+        new Date().toISOString().split('T')[0]
+    );
+    const { data } = useQueryReservations(selectedDate);
 
     const {
         reservationsPage: {
@@ -21,8 +27,9 @@ const Reservations = () => {
         },
     } = languagePacks[language];
 
-    const handleDateSelect = (date: Date) => {
-        console.log(date);
+    const onDateSelectHandler = (date: Date) => {
+        const formattedDate = date.toISOString().split('T')[0];
+        setSelectedDate(formattedDate);
     };
 
     return (
@@ -41,7 +48,7 @@ const Reservations = () => {
             </header>
 
             <div className="pb-4">
-                <DateCalendar onDateSelect={handleDateSelect} />
+                <DateCalendar onDateSelect={onDateSelectHandler} />
             </div>
 
             <main className="flex flex-col">
@@ -49,9 +56,12 @@ const Reservations = () => {
                     {listOfReservations}
                 </h2>
                 <div className="flex gap-4 p-3">
-                    <ReservationItem />
-                    <ReservationItem />
-                    <ReservationItem />
+                    {data?.map((reservation) => (
+                        <ReservationCard
+                            key={reservation.id}
+                            {...reservation}
+                        />
+                    ))}
                 </div>
             </main>
         </section>
@@ -59,3 +69,5 @@ const Reservations = () => {
 };
 
 export default Reservations;
+
+//TODO maybe ul list idk

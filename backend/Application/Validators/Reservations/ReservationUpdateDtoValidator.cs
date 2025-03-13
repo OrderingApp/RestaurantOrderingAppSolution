@@ -14,8 +14,5 @@ public class ReservationUpdateDtoValidator : AbstractValidator<ReservationUpdate
             .LessThanOrEqualTo(20).WithMessage("Number of people must not exceed 20.")
             .When(x => x.CapacityNeeded.HasValue);
 
-        RuleFor(x => x.TableId)
-            .NotEmpty().WithMessage("Table ID must not be empty.")
-            .When(x => x.TableId.HasValue);
     }
 }

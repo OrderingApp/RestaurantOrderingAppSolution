@@ -30,27 +30,42 @@ const plPack: languagePack = {
         reservationTitle: 'Sprawdź Rezerwacje',
         upsertReservation: 'Utwórz/Edytuj Rezerwacje',
         listOfReservations: 'Lista rezerwacji',
+        reservationCard: {
+            title: 'Rezerwacja',
+            people: ['osoba', 'osoby', 'osób'],
+        },
     },
     createReservationPage: {
         createReservation: 'Stwórz rezerwację',
+        editReservation: 'Edytuj rezerwację',
         chooseReservation: 'Wybierz rezerwację',
         form: {
-            personalData: 'Dane osobowe',
-            noOfPeople: 'Liczba osób',
+            name: 'Dane osobowe',
+            capacityNeeded: 'Liczba osób',
             date: 'Data',
             time: 'Godzina',
-            phone: 'Numer telefonu',
+            phoneNumber: 'Numer telefonu',
             submit: 'Zarezerwuj stolik',
+            edit: 'Zatwierdź zmiany',
             errors: {
-                personalData: {
+                name: {
                     min: 'Proszę podać co najmniej 3 znaki',
                     max: 'Proszę podać maksymalnie 30 znaków',
                 },
-                noOfPeople: 'Proszę podać poprawną liczbę osób',
+                capacityNeeded: 'Proszę podać poprawną liczbę osób',
                 date: 'Proszę podać poprawną datę',
                 time: 'Proszę podać poprawną godzinę',
-                phone: 'Proszę podać poprawny 9-cyfrowy numer telefonu',
+                phoneNumber: 'Proszę podać poprawny 9-cyfrowy numer telefonu',
             },
+        },
+    },
+    tablePage: {
+        tableCard: {
+            title: {
+                payment: 'Stolik w trakcie płatności',
+                normal: 'Stolik aktywny',
+            },
+            balanceName: 'Saldo',
         },
     },
 };

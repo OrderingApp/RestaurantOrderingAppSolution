@@ -28,3 +28,11 @@ export const CURRENCIES = {
     pln: 'zł',
     eur: '€',
 };
+
+export const BACKEND_URL = 'http://localhost:5000/api';
+
+export enum BACKEND_PATHS {
+    Areas = 'areas',
+    Reservations = 'reservations',
+    MenuItems = 'menu-categories',
+}
