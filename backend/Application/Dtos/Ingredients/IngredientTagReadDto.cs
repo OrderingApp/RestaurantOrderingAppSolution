@@ -1,8 +1,7 @@
 ﻿namespace Application.Dtos.MenuItems;
 
-public class MenuItemIngredientReadDto
+public class IngredientTagReadDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
-    public List<IngredientTagReadDto> Tags { get; set; } = new();
 }

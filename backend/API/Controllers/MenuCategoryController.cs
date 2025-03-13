@@ -1,4 +1,5 @@
 ﻿using Application.Contracts;
+using Application.Dtos.Common;
 using Application.Dtos.MenuCategories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -45,6 +46,21 @@ public class MenuCategoryController(IMenuCategoryService menuCategoryService) : 
     [ProducesResponseType(typeof(List<MenuCategoryReadDto>), 200)]
     public async Task<ActionResult<List<MenuCategoryReadDto>>> GetMenuCategories() =>
         HandleResult(await menuCategoryService.GetMenuCategories());
+
+    /// <summary>
+    /// Retrieves all menu categories, including their subcategories and associated menu items.
+    /// Supports optional filtering by category, subcategory, and tags.
+    /// </summary>
+    /// <param name="request">The request containing optional filters and pagination parameters.</param>
+    /// <returns>A paginated list of menu categories with their hierarchical structure.</returns>
+    /// <response code="200">Returns the list of menu categories with hierarchy.</response>
+    /// <response code="400">If the request parameters are invalid.</response>
+    /// <response code="500">If an internal server error occurs.</response>
+    [HttpGet("hierarchy")]
+    [ProducesResponseType(typeof(List<MenuCategoryHierarchyReadDto>), 200)]
+    public async Task<ActionResult<List<MenuCategoryHierarchyReadDto>>> GetMenuCategoriesWithHierarchy(
+        [FromQuery] GetMenuCategoryHierarchyRequest request) =>
+            HandleResult(await menuCategoryService.GetMenuCategoriesWithHierarchy(request));
 
     /// <summary>
     /// Updates an existing menu category.

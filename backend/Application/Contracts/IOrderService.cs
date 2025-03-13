@@ -27,8 +27,10 @@ public interface IOrderService
     Task<ResultDto<OrderReadDto>> UpdateOrderStatus(Guid id, OrderStatus newStatus);
     Task<ResultDto<OrderReadDto>> UpdateOrderType(Guid id, OrderUpdateTypeDto updateTypeDto);
 
-    // Splitting Order
-    Task<ResultDto<OrderReadDto>> SplitOrder(Guid id, SplitOrderDto splitOrderDto);
+    // Split/Join Order
+    Task<ResultDto<OrderReadDto>> SplitOrder(Guid id, MoveOrderItemsDto splitOrderDto);
+    Task<ResultDto<OrderReadDto>> JoinOrder(Guid sourceOrderId, Guid targetOrderId);
+    Task<ResultDto<OrderReadDto>> MoveOrderItems(Guid sourceOrderId, Guid targetOrderId, MoveOrderItemsDto moveOrderItemsDto);
 
     // Delete Orders
     Task<ResultDto<bool>> DeleteOrder(Guid id);

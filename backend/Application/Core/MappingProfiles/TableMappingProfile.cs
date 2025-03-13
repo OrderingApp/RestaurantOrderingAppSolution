@@ -12,7 +12,8 @@ public class TableMappingProfile : Profile
             .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => TableStatus.Available))
             .ForMember(dest => dest.IsUsed, opt => opt.MapFrom(_ => true))
-            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(_ => false));
+            .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(_ => false))
+            .ForMember(dest => dest.AreaId, opt => opt.MapFrom(src => src.AreaId));
 
         CreateMap<Table, TableReadDto>()
             .ForMember(dest => dest.Reservation, opt => opt.MapFrom(src =>

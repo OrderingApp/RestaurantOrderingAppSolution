@@ -1,85 +1,65 @@
-﻿//using Application.Core.MappingProfiles;
-//using Application.Dtos.Orders;
-//using Application.Services;
-//using AutoMapper;
-//using Domain;
-//using Infrastructure.Database;
-//using Microsoft.EntityFrameworkCore;
-//using RestaurantOrdering.Tests.TestHelpers;
-//using System.Net;
+﻿using Application.Dtos.OrderItems;
+using Application.Dtos.Orders.OrderDineIn;
+using Application.Dtos.Orders;
+using Application.Services;
+using AutoMapper;
+using Domain;
+using Infrastructure.Database;
+using Microsoft.EntityFrameworkCore;
+using Moq;
+using RestaurantOrdering.Events.Application.Contracts;
+using FluentAssertions;
+using System.Net;
+using RestaurantOrdering.Tests.TestHelpers;
 
-//public class OrderServiceTests
-//{
-//    private readonly RestaurantOrderingContext _context;
-//    private readonly OrderService _orderService;
-//    private readonly IMapper _mapper;
+public class OrderServiceTests
+{
+    private readonly RestaurantOrderingContext _dbContext;
+    private readonly Mock<IEventHandlerService> _mockEventHandler;
+    private readonly Mock<IMapper> _mockMapper;
+    private readonly OrderService _orderService;
 
-//    public OrderServiceTests()
-//    {
-//        var mappingConfig = new MapperConfiguration(cfg =>
-//        {
-//            cfg.AddProfile<OrderMappingProfile>();
-//        });
-//        _mapper = mappingConfig.CreateMapper();
+    public OrderServiceTests()
+    {
+        var options = new DbContextOptionsBuilder<RestaurantOrderingContext>()
+                    .UseInMemoryDatabase(databaseName: "TestDatabase")
+                    .Options;
 
-//        var options = new DbContextOptionsBuilder<RestaurantOrderingContext>()
-//            .UseInMemoryDatabase(databaseName: "TestDatabase")
-//            .Options;
+        _dbContext = new RestaurantOrderingContext(options);
+        _mockEventHandler = new Mock<IEventHandlerService>();
+        _mockMapper = new Mock<IMapper>();
 
-//        _context = new RestaurantOrderingContext(options);
+        _orderService = new OrderService(_dbContext, _mockEventHandler.Object, _mockMapper.Object);
+    }
 
-//        _orderService = new OrderService(_context, _mapper);
-//    }
+    [Fact]
+    public async Task CreateDineInOrder_ShouldReturnSuccess_WhenTableExists()
+    {
+        // Arrange
+        var table = TableTestHelper.CreateTable();
+        var menuItem = MenuItemTestHelper.CreateMenuItem();
+        var orderItem = OrderItemTestHelper.CreateOrderItem(menuItem.Id);
+        var order = OrderTestHelper.CreateOrder(tableId: table.Id, items: new List<OrderItem> { orderItem });
 
-//    [Fact]
-//    public async Task SplitBill_ShouldCreateNewOrder_WithSelectedItems()
-//    {
-//        var orderId = Guid.NewGuid();
-//        var orderItem1 = OrderItemTestingContext.OrderItem1;
-//        var orderItem2 = new OrderItem
-//        {
-//            Id = Guid.NewGuid(),
-//            MenuItemId = Guid.NewGuid(),
-//            Price = 15,
-//            Quantity = 1,
-//            SpecialInstructions = "Test item 2",
-//            OrderItemIngredients = new List<OrderItemIngredient>()
-//        };
+        // ✅ Add required entities to in-memory DB
+        _dbContext.Tables.Add(table);
+        _dbContext.MenuItems.Add(menuItem);
+        await _dbContext.SaveChangesAsync();
 
-//        var originalOrder = new Order
-//        {
-//            Id = orderId,
-//            TotalAmount = 35,
-//            OrderType = OrderType.DineIn,
-//            TableId = Guid.NewGuid(),
-//            OrderItems = new List<OrderItem> { orderItem1, orderItem2 },
-//            PaymentStatus = PaymentStatus.Pending
-//        };
+        _mockMapper.Setup(m => m.Map<Order>(It.IsAny<DineInOrderCreateDto>())).Returns(order);
 
-//        _context.Orders.Add(originalOrder);
-//        await _context.SaveChangesAsync();
-//        var orders = _context.Orders.ToList();
+        // Act
+        var result = await _orderService.CreateDineInOrder(new DineInOrderCreateDto
+        {
+            TableId = table.Id,
+            OrderItems = new List<OrderItemCreateDto>
+        {
+            new OrderItemCreateDto { MenuItemId = menuItem.Id}
+        }
+        });
 
-//        var splitBillDto = new SplitBillDto
-//        {
-//            OrderItemIds = new List<Guid> { orderItem1.Id }
-//        };
-
-//        var result = await _orderService.SplitBill(splitBillDto, orderId);
-
-//        Assert.NotNull(result);
-//        if (!result.IsSuccess)
-//        {
-//            Console.WriteLine($"Error: {result.ErrorMessage}");
-//        }
-//        //Assert.True(result.IsSuccess);
-//        //Assert.Equal(HttpStatusCode.Created, result.HttpStatusCode);
-//        //Assert.NotNull(result.Data);
-//        //Assert.Single(result.Data.OrderItems);
-//        //Assert.Equal(orderItem1.Id, result.Data.OrderItems.First().Id);
-
-//        //Assert.Single(originalOrder.OrderItems);
-//        //Assert.Equal(orderItem2.Id, originalOrder.OrderItems.First().Id);
-//        //Assert.Equal(15, originalOrder.TotalAmount);
-//    }
-//}
+        // Assert
+        result.Should().NotBeNull();
+        result.IsSuccess.Should().BeTrue();
+    }
+}

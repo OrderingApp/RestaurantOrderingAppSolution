@@ -79,47 +79,6 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
         }
     }
 
-    public async Task<ResultDto<List<MenuItemReadDto>>> GetMenuItems(GetMenuItemsRequest request)
-    {
-        try
-        {
-            var query = orderingContext.MenuItems
-                .Include(m => m.MenuItemIngredientRels)
-                    .ThenInclude(mi => mi.Ingredient)
-                        .ThenInclude(i => i.IngredientTagRels)
-                .Where(mi => mi.IsUsed && !mi.IsDeleted)
-                .AsQueryable();
-
-            if (request.MenuCategoryId.HasValue)
-            {
-                query = query.Where(mi => mi.MenuCategoryId == request.MenuCategoryId.Value);
-            }
-
-            if (request.SubCategoryId.HasValue)
-            {
-                query = query.Where(mi => mi.SubCategoryId == request.SubCategoryId.Value);
-            }
-
-            if (request.TagIds != null && request.TagIds.Any())
-            {
-                query = query.Where(m => m.MenuItemIngredientRels
-                    .Any(mi => mi.Ingredient.IngredientTagRels
-                        .Any(it => request.TagIds.Contains(it.TagId))));
-            }
-
-            var menuItems = await query
-                .ProjectTo<MenuItemReadDto>(mapper.ConfigurationProvider)
-                .ToListAsync();
-
-            return ResultDto<List<MenuItemReadDto>>.Success(menuItems, HttpStatusCode.OK);
-        }
-        catch (Exception ex)
-        {
-            return ResultDto<List<MenuItemReadDto>>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
-        }
-    }
-
-
     public async Task<ResultDto<MenuItemReadDto>> UpdateMenuItem(Guid id, MenuItemUpdateDto menuItemUpdateDto)
     {
         try

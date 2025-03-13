@@ -9,25 +9,25 @@ Accept: application/json
 
 {
   "dateTime": "2026-02-07T12:00:00Z",
-  "tableId": "9165C97C-5477-4EED-A566-F6FEC0E84694",
+  "tableId": "09E15DAA-7A1E-4BB1-AD51-94F1F6CAD2E4",
   "orderItems": [
     {
-      "menuItemId": "3805A7EB-F095-4180-80E6-96289B539D6B",
+      "menuItemId": "0026375D-9736-4B94-ABA5-3E7644643DFF",
       "specialInstructions": "No onions, extra cheese",
       "extraIngredients": [
         {
-          "ingredientId": "A4458F4C-55D7-4BB9-9FE6-6E7B88BC96EA",
+          "ingredientId": "012BD3A0-F0A6-4A8D-9AE7-703EEE731302",
           "quantity": 2
         },
         {
-          "ingredientId": "8C7FC3D2-8BD6-4634-AE36-4207D439C2A4",
+          "ingredientId": "2201F320-8642-4275-BB32-324D592EB355",
           "quantity": 1
         }
       ],
       "removedIngredientIds": []
     },
     {
-      "menuItemId": "1A069762-854A-4EE4-B455-722C843FDE5B",
+      "menuItemId": "0A762473-96D2-4409-A8CA-631C8AAA1236",
       "specialInstructions": null,
       "extraIngredients": [],
       "removedIngredientIds": []

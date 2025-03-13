@@ -9,9 +9,18 @@ public class ResultDto<T>
     public string? ErrorMessage { get; set; }
     public HttpStatusCode HttpStatusCode { get; set; }
 
-    public static ResultDto<T> Success(T data, HttpStatusCode httpStatusCode) => 
+    public ResultDto() { }
+
+    public ResultDto(T data, HttpStatusCode httpStatusCode = HttpStatusCode.OK)
+    {
+        IsSuccess = true;
+        Data = data;
+        HttpStatusCode = httpStatusCode;
+    }
+
+    public static ResultDto<T> Success(T data, HttpStatusCode httpStatusCode = HttpStatusCode.OK) =>
         new ResultDto<T> { IsSuccess = true, Data = data, HttpStatusCode = httpStatusCode };
 
-    public static ResultDto<T> Failure(string errorMessage, HttpStatusCode httpStatusCode) => 
+    public static ResultDto<T> Failure(string errorMessage, HttpStatusCode httpStatusCode) =>
         new ResultDto<T> { IsSuccess = false, ErrorMessage = errorMessage, HttpStatusCode = httpStatusCode };
 }

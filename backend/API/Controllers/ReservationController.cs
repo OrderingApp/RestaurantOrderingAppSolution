@@ -41,9 +41,9 @@ public class ReservationController(IReservationService reservationService) : Bas
     /// </summary>
     /// <param name="date">The reservation date to filter by.</param>
     /// <returns>A list of reservations on the specified date.</returns>
-    [HttpGet("by-date")]
+    [HttpGet("by-date/{date}")]
     [ProducesResponseType(200)]
-    public async Task<IActionResult> GetReservationsByDate([FromQuery] DateTime date) =>
+    public async Task<ActionResult<List<ReservationReadDto>>> GetReservationsByDate(DateTime date) =>
         HandleResult(await reservationService.GetReservationsByDate(date));
 
     /// <summary>

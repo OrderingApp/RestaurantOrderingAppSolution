@@ -151,8 +151,35 @@ public class OrderController(IOrderService orderService) : BaseApiController
     [ProducesResponseType(typeof(OrderReadDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<OrderReadDto>> SplitOrder([FromRoute] Guid id, [FromBody] SplitOrderDto splitOrderDto) =>
+    public async Task<ActionResult<OrderReadDto>> SplitOrder([FromRoute] Guid id, [FromBody] MoveOrderItemsDto splitOrderDto) =>
         HandleResult(await orderService.SplitOrder(id, splitOrderDto));
+
+    /// <summary>
+    /// Joins an existing order into another order, merging all items and removing the source order.
+    /// </summary>
+    /// <param name="sourceOrderId">The ID of the order to be merged.</param>
+    /// <param name="targetOrderId">The ID of the order that will receive the merged items.</param>
+    /// <returns>The updated target order details.</returns>
+    [HttpPost("{sourceOrderId}/join/{targetOrderId}")]
+    [ProducesResponseType(typeof(OrderReadDto), 200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public async Task<ActionResult<OrderReadDto>> JoinOrder(Guid sourceOrderId, Guid targetOrderId) =>
+        HandleResult(await orderService.JoinOrder(sourceOrderId, targetOrderId));
+
+    /// <summary>
+    /// Moves specific order items from one order to another.
+    /// </summary>
+    /// <param name="sourceOrderId">The ID of the order from which items will be moved.</param>
+    /// <param name="targetOrderId">The ID of the order that will receive the items.</param>
+    /// <param name="moveOrderItemsDto">List of order item IDs to move.</param>
+    /// <returns>The updated target order details.</returns>
+    [HttpPost("{sourceOrderId}/move-items/{targetOrderId}")]
+    [ProducesResponseType(typeof(OrderReadDto), 200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public async Task<ActionResult<OrderReadDto>> MoveOrderItems(Guid sourceOrderId, Guid targetOrderId, [FromBody] MoveOrderItemsDto moveOrderItemsDto) =>
+        HandleResult(await orderService.MoveOrderItems(sourceOrderId, targetOrderId, moveOrderItemsDto));
 
     /// <summary>
     /// Deletes an order by ID.
