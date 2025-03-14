@@ -8,18 +8,101 @@ const TablesPage = () => {
         <DetailsAside
             title="stolik b2"
             items={items}
-            buttons={buttons}
             price={3}
-            name="stolik"
             currency="pln"
             button={{
                 onClick: () => console.log('clicked'),
             }}
-        ></DetailsAside>
+            buttons={buttons}
+        />
     );
 };
 
 const items = [
+    {
+        name: 'rosa 1',
+        price: 33,
+        currency: 'pln' as keyof typeof CURRENCIES,
+        quantity: 1,
+    },
+
+    {
+        name: 'Pizza Margheritta',
+        price: 33,
+        currency: 'pln' as keyof typeof CURRENCIES,
+        quantity: 2,
+        annotation: 'dodatkowe składniki',
+    },
+    {
+        name: 'pizza Margheritta',
+        price: 33,
+        currency: 'pln' as keyof typeof CURRENCIES,
+        quantity: 1,
+    },
+
+    {
+        name: 'Pizza Margheritta',
+        price: 33,
+        currency: 'pln' as keyof typeof CURRENCIES,
+        quantity: 2,
+        annotation: 'dodatkowe składniki',
+    },
+    {
+        name: 'pizza Margheritta',
+        price: 33,
+        currency: 'pln' as keyof typeof CURRENCIES,
+        quantity: 1,
+    },
+
+    {
+        name: 'Pizza Margheritta',
+        price: 33,
+        currency: 'pln' as keyof typeof CURRENCIES,
+        quantity: 2,
+        annotation: 'dodatkowe składniki',
+    },
+    {
+        name: 'pizza Margheritta',
+        price: 33,
+        currency: 'pln' as keyof typeof CURRENCIES,
+        quantity: 1,
+    },
+
+    {
+        name: 'Pizza Margheritta',
+        price: 33,
+        currency: 'pln' as keyof typeof CURRENCIES,
+        quantity: 2,
+        annotation: 'dodatkowe składniki',
+    },
+    {
+        name: 'pizza Margheritta',
+        price: 33,
+        currency: 'pln' as keyof typeof CURRENCIES,
+        quantity: 1,
+    },
+
+    {
+        name: 'Pizza Margheritta',
+        price: 33,
+        currency: 'pln' as keyof typeof CURRENCIES,
+        quantity: 2,
+        annotation: 'dodatkowe składniki',
+    },
+    {
+        name: 'pizza Margheritta',
+        price: 33,
+        currency: 'pln' as keyof typeof CURRENCIES,
+        quantity: 1,
+    },
+
+    {
+        name: 'Pizza Margheritta',
+        price: 33,
+        currency: 'pln' as keyof typeof CURRENCIES,
+        quantity: 2,
+        annotation: 'dodatkowe składniki',
+    },
     {
         name: 'pizza Margheritta',
         price: 33,
