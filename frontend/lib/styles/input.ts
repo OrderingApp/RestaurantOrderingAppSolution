@@ -18,7 +18,7 @@ export const inputStyles: {
     sizes: {
         sm: {
             label: 'text-sm',
-            input: 'px-4 py-3 text-md',
+            input: 'px-4 py-2 text-md',
             error: 'text-sm',
         },
         md: {

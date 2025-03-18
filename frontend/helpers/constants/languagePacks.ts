@@ -37,19 +37,40 @@ export interface languagePack {
     reservationsPage: {
         reservationTitle: string;
         upsertReservation: string;
-        listOfReservations: string;
+        reservationsList: string;
+        reservationCard: {
+            title: string;
+            people: string[];
+        };
     };
     createReservationPage: {
         createReservation: string;
+        editReservation: string;
         chooseReservation: string;
         form: createReservationPageFormFields & {
             submit: string;
-            errors: Omit<createReservationPageFormFields, 'personalData'> & {
-                personalData: {
+            edit: string;
+            errors: Omit<createReservationPageFormFields, 'name'> & {
+                name: {
                     min: string;
                     max: string;
                 };
             };
+        };
+    };
+    menuPage: {
+        searchInputPlaceholder: string;
+        menuCategoryCard: {
+            itemsTitle: string[];
+        };
+    };
+    tablePage: {
+        tableCard: {
+            title: {
+                payment: string;
+                normal: string;
+            };
+            balanceName: string;
         };
     };
 }
@@ -59,11 +80,11 @@ interface loginPageFormFields {
     password: string;
 }
 interface createReservationPageFormFields {
-    personalData: string;
-    noOfPeople: string;
+    name: string;
+    capacityNeeded: string;
     date: string;
     time: string;
-    phone: string;
+    phoneNumber: string;
 }
 
 export default languagePacks;

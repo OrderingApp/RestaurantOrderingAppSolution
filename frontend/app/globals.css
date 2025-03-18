@@ -22,6 +22,7 @@
 body {
     font-family: Arial, Helvetica, sans-serif;
     color: var(--black);
+    list-style: none;
 }
 
 .hide-scrollbar {

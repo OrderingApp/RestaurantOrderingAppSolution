@@ -7,6 +7,7 @@ type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
     labelClassName?: string;
     inputClassName?: string;
     errorClassName?: string;
+    iconClassName?: string;
     icon?: React.ReactElement;
     errors?: { type: string; message?: string };
 };
@@ -24,6 +25,7 @@ const Input = ({
     inputClassName,
     labelClassName,
     errorClassName,
+    iconClassName,
     icon,
     errors,
     ...props
@@ -42,7 +44,11 @@ const Input = ({
             </label>
         )}
 
-        {icon && <span className="absolute top-8 right-4">{icon}</span>}
+        {icon && (
+            <span className={clsx('absolute top-8 right-4', iconClassName)}>
+                {icon}
+            </span>
+        )}
 
         <input
             {...{
