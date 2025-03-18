@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Reservation } from './useQueryReservations';
 import { BACKEND_URL } from '@/helpers/constants/constants';
 import { Reservations } from '@/helpers/utils/queryKeys';
+import { useRouter } from 'next/navigation';
 
 export interface ReservationDto {
     phoneNumber: string;
@@ -10,79 +11,36 @@ export interface ReservationDto {
     capacityNeeded: string;
 }
 
-const useReservationMutationCreate = () => {
+const useReservationMutation = (type: 'create' | 'update' | 'delete') => {
     const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: async ({ data }: { data: ReservationDto }) => {
-            const response = await fetch(`${BACKEND_URL}/reservations`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to create reservation');
-            }
-
-            return response.json();
-        },
-
-        onMutate: async (newReservation: { data: ReservationDto }) => {
-            await queryClient.cancelQueries({
-                queryKey: [Reservations.BY_DATE],
-            });
-
-            const previousReservations = queryClient.getQueryData<
-                Reservation[]
-            >([Reservations.BY_DATE]);
-
-            queryClient.setQueryData(
-                [Reservations.BY_DATE],
-                (old: Reservation[] = []) => [
-                    ...old,
-                    { id: Date.now(), ...newReservation.data },
-                ]
-            );
-
-            return { previousReservations };
-        },
-
-        onError: (err, newReservation, context) => {
-            if (context?.previousReservations) {
-                queryClient.setQueryData(
-                    [Reservations.BY_DATE],
-                    context.previousReservations
-                );
-            }
-        },
-
-        onSettled: () => {
-            queryClient.invalidateQueries({ queryKey: [Reservations.BY_DATE] });
-        },
-    });
-};
-
-export const useReservationMutationUpdate = () => {
-    const queryClient = useQueryClient();
+    const router = useRouter();
 
     return useMutation({
         mutationFn: async ({
             id,
             data,
         }: {
-            id: string;
-            data: ReservationDto;
+            id?: string;
+            data?: ReservationDto;
         }) => {
-            const response = await fetch(`${BACKEND_URL}/reservations/${id}`, {
-                method: 'PUT',
+            let url = `${BACKEND_URL}/reservations`;
+            let method = 'POST';
+
+            if (type === 'update' && id) {
+                url += `/${id}`;
+                method = 'PUT';
+            } else if (type === 'delete' && id) {
+                url += `/${id}`;
+                method = 'DELETE';
+            }
+
+            const response = await fetch(url, {
+                method,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
+                body: type !== 'delete' ? JSON.stringify(data) : undefined,
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to update reservation');
-            }
+            if (!response.ok) throw new Error(`Failed to ${type} reservation`);
 
             return response.json();
         },
@@ -91,8 +49,8 @@ export const useReservationMutationUpdate = () => {
             id,
             data,
         }: {
-            id: string;
-            data: ReservationDto;
+            id?: string;
+            data?: ReservationDto;
         }) => {
             await queryClient.cancelQueries({
                 queryKey: [Reservations.BY_DATE],
@@ -104,18 +62,28 @@ export const useReservationMutationUpdate = () => {
 
             queryClient.setQueryData(
                 [Reservations.BY_DATE],
-                (old: Reservation[] = []) =>
-                    old.map((reservation) =>
-                        reservation.id === id
-                            ? { ...reservation, ...data }
-                            : reservation
-                    )
+                (old: Reservation[] = []) => {
+                    if (type === 'create' && data) {
+                        return [...old, { id: Date.now(), ...data }];
+                    } else if (type === 'update' && id && data) {
+                        return old.map((reservation) =>
+                            reservation.id === id
+                                ? { ...reservation, ...data }
+                                : reservation
+                        );
+                    } else if (type === 'delete' && id) {
+                        return old.filter(
+                            (reservation) => reservation.id !== id
+                        );
+                    }
+                    return old;
+                }
             );
 
             return { previousReservations };
         },
 
-        onError: (err, newReservation, context) => {
+        onError: (err, _, context) => {
             if (context?.previousReservations) {
                 queryClient.setQueryData(
                     [Reservations.BY_DATE],
@@ -126,57 +94,9 @@ export const useReservationMutationUpdate = () => {
 
         onSettled: () => {
             queryClient.invalidateQueries({ queryKey: [Reservations.BY_DATE] });
-        },
-    });
-};
-export const useReservationMutationDelete = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: async ({ id }: { id: string }) => {
-            const response = await fetch(`${BACKEND_URL}/reservations/${id}`, {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update reservation');
-            }
-
-            return response.json();
-        },
-
-        onMutate: async ({ id }: { id: string }) => {
-            await queryClient.cancelQueries({
-                queryKey: [Reservations.BY_DATE],
-            });
-
-            const previousReservations = queryClient.getQueryData<
-                Reservation[]
-            >([Reservations.BY_DATE]);
-
-            queryClient.setQueryData(
-                [Reservations.BY_DATE],
-                (old: Reservation[] = []) =>
-                    old.filter((reservation) => reservation.id !== id)
-            );
-
-            return { previousReservations };
-        },
-
-        onError: (err, newReservation, context) => {
-            if (context?.previousReservations) {
-                queryClient.setQueryData(
-                    [Reservations.BY_DATE],
-                    context.previousReservations
-                );
-            }
-        },
-
-        onSettled: () => {
-            queryClient.invalidateQueries({ queryKey: [Reservations.BY_DATE] });
+            router.push('/reservations');
         },
     });
 };
 
-export default useReservationMutationCreate;
+export default useReservationMutation;

@@ -27,7 +27,8 @@ const MenuSubcategory = ({ name, id }: MenuSubcategoryProps) => {
             updatedIngredients.forEach((ingredient) =>
                 params.append('ingredientsIds', ingredient)
             );
-        } else {
+        }
+        if (!isSelected) {
             params.append('ingredientsIds', id);
         }
         router.push(`${pathname}?${params.toString()}`, { scroll: false });

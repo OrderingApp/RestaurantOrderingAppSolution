@@ -18,28 +18,30 @@ const ItemCard = ({
     children,
     className,
 }: ItemCardProps) => (
-    <button onClick={onClick}>
-        <div
-            className={clsx(
-                'w-32 h-28 border border-black rounded-lg overflow-hidden relative',
-                className
-            )}
-        >
+    <li>
+        <button onClick={onClick}>
             <div
                 className={clsx(
-                    'absolute left-[-2px] top-0 w-[130px] flex justify-between items-center px-2 h-8 border-b border-l border-r border-black text-white rounded-b-[10px]',
-                    itemCardStyles.variants[variant]
+                    'w-32 h-28 border border-black rounded-lg overflow-hidden relative',
+                    className
                 )}
             >
-                <p className="text-[10px]">{title}</p>
-                {subtitle && <p className="text-[10px]">{subtitle}</p>}
-            </div>
+                <div
+                    className={clsx(
+                        'absolute left-[-2px] top-0 w-[130px] flex justify-between items-center px-2 h-8 border-b border-l border-r border-black text-white rounded-b-[10px]',
+                        itemCardStyles.variants[variant]
+                    )}
+                >
+                    <p className="text-[10px]">{title}</p>
+                    {subtitle && <p className="text-[10px]">{subtitle}</p>}
+                </div>
 
-            <div className="h-full bg-[#F5F5F5E5] bg-opacity-90 p-2 mt-8">
-                {children}
+                <div className="h-full bg-[#F5F5F5E5] bg-opacity-90 p-2 mt-8">
+                    {children}
+                </div>
             </div>
-        </div>
-    </button>
+        </button>
+    </li>
 );
 
 export default ItemCard;

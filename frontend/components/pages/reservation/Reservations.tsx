@@ -8,29 +8,23 @@ import useQueryReservations from '@/helpers/queries/reservations/useQueryReserva
 
 import Button from '@/components/shared/Button/Button';
 import DateCalendar from '@/components/shared/DateCalendar/DateCalendar';
-import { ReservationCard } from '@/components/shared/cards/ReservationCard';
+import ReservationCard from '@/components/shared/cards/ReservationCard';
 import languagePacks from '@/helpers/constants/languagePacks';
+import TableCard from '@/components/shared/cards/TableCard';
 
 const Reservations = () => {
     const router = useRouter();
     const { language } = useLanguage();
-    const [selectedDate, setSelectedDate] = useState(
-        new Date().toISOString().split('T')[0]
-    );
+    const [selectedDate, setSelectedDate] = useState(new Date().toISOString());
     const { data } = useQueryReservations(selectedDate);
 
     const {
         reservationsPage: {
             reservationTitle,
             upsertReservation,
-            listOfReservations,
+            reservationsList,
         },
     } = languagePacks[language];
-
-    const onDateSelectHandler = (date: Date) => {
-        const formattedDate = date.toISOString().split('T')[0];
-        setSelectedDate(formattedDate);
-    };
 
     return (
         <section className="py-3">
@@ -48,26 +42,27 @@ const Reservations = () => {
             </header>
 
             <div className="pb-4">
-                <DateCalendar onDateSelect={onDateSelectHandler} />
+                <DateCalendar
+                    onDateSelect={(date) => setSelectedDate(date.toISOString())}
+                />
             </div>
 
             <main className="flex flex-col">
                 <h2 className="text-black text-3xl font-bold py-5 pl-10">
-                    {listOfReservations}
+                    {reservationsList}
                 </h2>
-                <div className="flex gap-4 p-3">
+                <ul className="flex gap-4 p-3">
                     {data?.map((reservation) => (
                         <ReservationCard
                             key={reservation.id}
                             {...reservation}
                         />
                     ))}
-                </div>
+                    <TableCard status="ACTIVE" balance={100} />
+                </ul>
             </main>
         </section>
     );
 };
 
 export default Reservations;
-
-//TODO maybe ul list idk

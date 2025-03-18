@@ -7,7 +7,10 @@ import {
     MenuItemType,
 } from '@/helpers/queries/menu-items/useQueryMenuItems';
 import clsx from 'clsx';
-
+import { SEARCH_PARAMS_NAMES } from '@/helpers/constants/constants';
+import languagePacks from '@/helpers/constants/languagePacks';
+import useLanguage from '@/helpers/hooks/useLanguage';
+import { getPluralForm } from '@/helpers/utils/utils';
 interface MenuCategoryProps {
     id: string;
     icon: string;
@@ -29,14 +32,20 @@ const MenuCategory = ({
 }: MenuCategoryProps) => {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const categoryId = searchParams.get('categoryId');
-    const subcategoryId = searchParams.get('subcategoryId');
+    const { language } = useLanguage();
+    const categoryId = searchParams.get(SEARCH_PARAMS_NAMES.CATEGORY);
+    const subcategoryId = searchParams.get(SEARCH_PARAMS_NAMES.SUBCATEGORY);
+
+    const {
+        menuPage: {
+            menuCategoryCard: { itemsTitle },
+        },
+    } = languagePacks[language];
 
     const isMenuItem = (
         item: MenuItemType | MenuCategoryType
-    ): item is MenuItemType => {
-        return (item as MenuItemType).subCategoryId !== undefined;
-    };
+    ): item is MenuItemType =>
+        (item as MenuItemType).subCategoryId !== undefined;
 
     const getAmount = () => {
         if (type === 'subcategory') {
@@ -72,16 +81,20 @@ const MenuCategory = ({
             } else {
                 newParams.set('categoryId', id);
             }
-            newParams.delete('subcategoryId');
-        } else if (type === 'subcategory') {
+        }
+
+        if (type === 'subcategory') {
             if (subcategoryId === id) {
                 newParams.delete('subcategoryId');
             } else {
                 newParams.set('subcategoryId', id);
             }
         }
+
         router.push(id === 'all' ? '/order' : `/order?${newParams.toString()}`);
     };
+
+    const amountItemsName = getPluralForm(amount, itemsTitle, language);
 
     return (
         <button
@@ -112,7 +125,7 @@ const MenuCategory = ({
                         isActive ? 'text-white' : 'text-black'
                     )}
                 >
-                    {amount} pozycji
+                    {amount} {amountItemsName}
                 </p>
             </div>
         </button>
@@ -120,3 +133,5 @@ const MenuCategory = ({
 };
 
 export default MenuCategory;
+
+//TODO BUTTONS CHANGE

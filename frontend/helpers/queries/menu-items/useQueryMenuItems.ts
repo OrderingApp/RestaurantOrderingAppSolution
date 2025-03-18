@@ -3,15 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchWithToken } from '@/helpers/utils/utils';
 import { MenuItems } from '@/helpers/utils/queryKeys';
 
-interface Ingredient {
-    id: string;
-    name: string;
-}
+type NamedEntity = { id: string; name: string };
 
-interface SubCategory {
-    id: string;
-    name: string;
-}
+type Ingredient = NamedEntity;
+type SubCategory = NamedEntity;
 
 export interface MenuItemType {
     menuItems: any;

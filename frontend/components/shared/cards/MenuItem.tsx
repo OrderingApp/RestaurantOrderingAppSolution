@@ -5,6 +5,11 @@ import Image from 'next/image';
 
 import Button from '../Button/Button';
 import informationIcon from '@/public/images/svg/Info.svg';
+import {
+    CURRENCIES,
+    MAX_ITEM_SELECT,
+    MIN_ITEM_SELECT,
+} from '@/helpers/constants/constants';
 
 interface MenuItemProps {
     name: string;
@@ -14,30 +19,20 @@ interface MenuItemProps {
 const MenuItem = ({ name, price }: MenuItemProps) => {
     const [inputValue, setInputValue] = useState<number | string>(1);
 
-    const handleDecrease = () => {
+    const handleDecrease = () =>
         setInputValue((prev) => Math.max(1, +prev - 1));
-    };
 
-    const handleIncrease = () => {
-        setInputValue((prev) => +prev + 1);
-    };
+    const handleIncrease = () => setInputValue((prev) => +prev + 1);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
 
-        if (value === '') {
-            setInputValue(value);
-            return;
-        }
-
-        const numericValue = parseInt(value, 10);
-        setInputValue(
-            isNaN(numericValue) || numericValue < 1 ? 1 : numericValue
-        );
+        if (!value) return setInputValue(value);
+        setInputValue(isNaN(+value) || +value < 1 ? 1 : value);
     };
 
     return (
-        <div className="w-52 min-h-56 rounded-lg shadow-[0px_4px_4px_0px_#00000040] bg-white p-4 py-8 pb-4 relative flex flex-col justify-between">
+        <li className="w-52 min-h-56 rounded-lg shadow-[0px_4px_4px_0px_#00000040] bg-white p-4 py-8 pb-4 relative flex flex-col justify-between">
             <Image
                 width={22}
                 height={22}
@@ -48,7 +43,7 @@ const MenuItem = ({ name, price }: MenuItemProps) => {
             <div>
                 <h2 className="text-center text-[1.3rem] font-bold">{name}</h2>
                 <p className="text-center text-sm text-[#2B5162] font-bold">
-                    {price}zł
+                    {price} {CURRENCIES.pln}
                 </p>
             </div>
             <label className="relative my-3">
@@ -56,17 +51,15 @@ const MenuItem = ({ name, price }: MenuItemProps) => {
                     onClick={handleDecrease}
                     className="absolute top-1 left-1 w-4 h-4 bg-[#2B5162] rounded-full text-white flex justify-center items-center"
                 >
-                    <span>-</span>
+                    -
                 </button>
                 <input
                     className="bg-[#ECECEC] shadow-[0px_0px_5px_0px_#6A6A6A] rounded-md w-full text-center [&&::-webkit-inner-spin-button]:appearance-none"
                     type="number"
-                    name=""
-                    id=""
-                    min={1}
+                    min={MIN_ITEM_SELECT}
                     onChange={handleChange}
                     value={inputValue}
-                    max={99}
+                    max={MAX_ITEM_SELECT}
                 />
                 <button
                     onClick={handleIncrease}
@@ -80,7 +73,7 @@ const MenuItem = ({ name, price }: MenuItemProps) => {
                     Dodaj
                 </Button>
             </div>
-        </div>
+        </li>
     );
 };
 

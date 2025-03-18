@@ -5,12 +5,17 @@ import ItemCard, { ItemCardProps } from './ItemCard';
 
 import { Reservation } from '@/helpers/queries/reservations/useQueryReservations';
 import languagePacks from '@/helpers/constants/languagePacks';
+import { getPluralForm } from '@/helpers/utils/utils';
+import { formatDate } from '@/helpers/utils/dates';
 
 interface ReservationCardProps
     extends Omit<ItemCardProps, 'variant' | 'children' | 'title'>,
-        Partial<Reservation> {}
+        Partial<Reservation> {
+    capacityNeeded: number;
+    dateTime: string;
+}
 
-export const ReservationCard = ({
+const ReservationCard = ({
     dateTime,
     name,
     capacityNeeded,
@@ -25,27 +30,22 @@ export const ReservationCard = ({
         },
     } = languagePacks[language];
 
-    const checkNumberOfPeople = (amount: number) => {
-        return amount === 1 ? people[0] : amount <= 4 ? people[1] : people[2];
-    };
-
-    const peopleName =
-        language === 'en' ? people : checkNumberOfPeople(capacityNeeded!);
+    const peopleName = getPluralForm(capacityNeeded, people, language);
 
     return (
         <ItemCard
             title={title}
-            subtitle={dateTime!.split('T')[1].split('.')[0].slice(0, -3)}
+            subtitle={formatDate(new Date(dateTime), language).time}
             variant="reservation"
             onClick={onClick}
             className={className}
         >
-            <div>
-                <p className="text-[11px] text-left font-bold">{name}</p>
-                <p className="text-[11px] text-left font-bold">
-                    {capacityNeeded} {peopleName}
-                </p>
-            </div>
+            <p className="text-[11px] text-left font-bold">{name}</p>
+            <p className="text-[11px] text-left font-bold">
+                {capacityNeeded} {peopleName}
+            </p>
         </ItemCard>
     );
 };
+
+export default ReservationCard;

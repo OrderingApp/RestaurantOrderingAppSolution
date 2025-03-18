@@ -1,3 +1,4 @@
+import { CURRENCIES } from '@/helpers/constants/constants';
 import ItemCard, { ItemCardProps } from './ItemCard';
 
 interface OrderCardProps
@@ -26,7 +27,10 @@ const OrderCard = ({
         onClick={onClick}
     >
         <div>
-            <p className="text-left text-[11px] font-bold">{price}zł</p>
+            <p className="text-left text-[11px] font-bold">
+                {price}
+                {CURRENCIES.pln}
+            </p>
             <p className="text-left text-[11px] font-bold">{phoneNumber}</p>
             {address && (
                 <p className="text-left text-[11px] font-bold">{address}</p>
@@ -37,4 +41,4 @@ const OrderCard = ({
 
 export default OrderCard;
 
-//TODO change currencies
+//TODO CHANGE NAMES FROM LANGUAGE PACKS AND CURRENCIES

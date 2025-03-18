@@ -8,7 +8,7 @@ import useQueryReservations from '@/helpers/queries/reservations/useQueryReserva
 
 import ReservationForm from '@/components/reservations/ReservationForm';
 import DateCalendar from '@/components/shared/DateCalendar/DateCalendar';
-import { ReservationCard } from '@/components/shared/cards/ReservationCard';
+import ReservationCard from '@/components/shared/cards/ReservationCard';
 
 import languagePacks from '@/helpers/constants/languagePacks';
 
@@ -17,15 +17,17 @@ const CreateReservation = () => {
     const { language } = useLanguage();
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [selectedDate, setSelectedDate] = useState<string>(
-        new Date().toISOString().split('T')[0]
+        new Date().toISOString()
     );
+    console.log(selectedDate);
+
     const { data } = useQueryReservations(selectedDate);
     const {
         createReservationPage: { chooseReservation },
     } = languagePacks[language];
 
     const onDateSelectHandler = (date: Date) => {
-        const formattedDate = date.toISOString().split('T')[0];
+        const formattedDate = date.toISOString();
         setSelectedDate(formattedDate);
     };
 

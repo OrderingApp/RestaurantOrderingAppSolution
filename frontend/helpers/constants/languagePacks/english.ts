@@ -29,10 +29,10 @@ const enPack: languagePack = {
     reservationsPage: {
         reservationTitle: 'Check Reservations',
         upsertReservation: 'Create/Edit Reservation',
-        listOfReservations: 'List of reservations',
+        reservationsList: 'List of reservations',
         reservationCard: {
             title: 'Reservation',
-            people: ['people'],
+            people: ['person', 'persons'],
         },
     },
     createReservationPage: {
@@ -57,6 +57,12 @@ const enPack: languagePack = {
                 time: 'Plese enter a correct time',
                 phoneNumber: 'Please enter a valid 9-digit phone number',
             },
+        },
+    },
+    menuPage: {
+        searchInputPlaceholder: 'Search',
+        menuCategoryCard: {
+            itemsTitle: ['item', 'items'],
         },
     },
     tablePage: {

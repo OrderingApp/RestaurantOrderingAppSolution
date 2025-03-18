@@ -7,7 +7,7 @@ export const getReservationSchema = (lang: LanguageTypes) => {
         createReservationPage: {
             form: {
                 errors: {
-                    name: { min: minname, max: maxname },
+                    name: { min: minName, max: maxMame },
                     capacityNeeded,
                     date,
                     time,
@@ -18,7 +18,7 @@ export const getReservationSchema = (lang: LanguageTypes) => {
     } = languagePacks[lang];
 
     return z.object({
-        name: z.string().min(3, minname).max(30, maxname),
+        name: z.string().min(3, minName).max(30, maxMame),
         capacityNeeded: z
             .string()
             .refine(

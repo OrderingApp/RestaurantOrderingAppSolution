@@ -4,12 +4,6 @@ import { useEffect } from 'react';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 
-import userSvg from '@/public/images/svg/user.svg';
-import usersSvg from '@/public/images/svg/users.svg';
-import calendarSvg from '@/public/images/svg/calendar.svg';
-import timeSvg from '@/public/images/svg/time.svg';
-import phoneSvg from '@/public/images/svg/phone.svg';
-
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -18,13 +12,10 @@ import Button from '../shared/Button/Button';
 
 import { useLanguage } from '@/providers/LanguageProvider';
 import { useQueryReservationsById } from '@/helpers/queries/reservations/useQueryReservations';
-import useReservationMutationCreate, {
-    useReservationMutationDelete,
-    useReservationMutationUpdate,
-} from '@/helpers/queries/reservations/useMutationReservation';
+import useReservationMutation from '@/helpers/queries/reservations/useMutationReservation';
 
 import {
-    RESTAURANT_ClOSING_HOUR,
+    RESTAURANT_CLOSING_HOUR,
     RESTAURANT_OPENING_HOUR,
 } from '@/helpers/constants/constants';
 import { checkMaxAndMinDate } from '@/helpers/utils/dates';
@@ -33,6 +24,7 @@ import {
     getReservationSchema,
     type ReservationSchema,
 } from '@/helpers/models/reservationForm';
+import { ICONS } from '@/helpers/constants/icons/icons';
 
 const formDefaultValues = {
     name: '',
@@ -77,49 +69,50 @@ const ReservationForm = () => {
     });
 
     const { data: reservation } = useQueryReservationsById(editParam ?? '');
-    const { mutate: createMutate } = useReservationMutationCreate();
-    const { mutate: updateMutate } = useReservationMutationUpdate();
-    const { mutate: deleteMutate } = useReservationMutationDelete();
+    const createReservationMutation = useReservationMutation('create');
+    const updateReservationMutation = useReservationMutation('update');
+    const deleteReservationMutation = useReservationMutation('delete');
 
-    const submitFormHandler = async (data: ReservationSchema) => {
-        const dateTimeStr = `${data.date}T${data.time}:00`;
+    const submitFormHandler = async ({
+        date,
+        time,
+        ...data
+    }: ReservationSchema) => {
+        const dateTimeStr = `${date}T${time}:00`;
         const newReservation = {
-            name: data.name,
-            capacityNeeded: data.capacityNeeded,
-            phoneNumber: data.phoneNumber,
+            ...data,
             dateTime: dateTimeStr,
         };
         if (editParam) {
-            updateMutate({ data: newReservation, id: editParam });
-            reset();
+            updateReservationMutation.mutate({
+                data: newReservation,
+                id: editParam,
+            });
         } else {
-            createMutate({ data: newReservation });
-            reset();
+            createReservationMutation.mutate({ data: newReservation });
         }
+        reset();
     };
 
     useEffect(() => {
-        if (editParam) {
-            if (!reservation) return;
-            reset({
-                name: reservation.name,
-                date: reservation.dateTime.split('T')[0],
-                phoneNumber: reservation.phoneNumber,
-                time: reservation.dateTime
-                    .split('T')[1]
-                    .split('.')[0]
-                    .slice(0, -3),
-                capacityNeeded: reservation.capacityNeeded.toString(),
-            });
-        } else {
-            reset({
+        if (!editParam)
+            return reset({
                 name: '',
                 date: minDateString,
                 phoneNumber: '',
                 time: '',
                 capacityNeeded: '',
             });
-        }
+
+        if (!reservation) return;
+
+        reset({
+            name: reservation.name,
+            date: reservation.dateTime.split('T')[0],
+            phoneNumber: reservation.phoneNumber,
+            time: reservation.dateTime.split('T')[1].split('.')[0].slice(0, -3),
+            capacityNeeded: reservation.capacityNeeded.toString(),
+        });
     }, [editParam, reservation, minDateString, reset]);
 
     return (
@@ -137,7 +130,7 @@ const ReservationForm = () => {
                             type="text"
                             id="name"
                             label={name}
-                            icon={<Image src={userSvg} alt="userIcon" />}
+                            icon={<Image src={ICONS.USER} alt="userIcon" />}
                             {...register('name')}
                             errors={errors.name}
                             inputClassName="w-full"
@@ -148,7 +141,7 @@ const ReservationForm = () => {
                             type="number"
                             id="capacityNeeded"
                             label={capacityNeeded}
-                            icon={<Image src={usersSvg} alt="usersIcon" />}
+                            icon={<Image src={ICONS.USERS} alt="usersIcon" />}
                             {...register('capacityNeeded')}
                             min={1}
                             errors={errors.capacityNeeded}
@@ -158,7 +151,7 @@ const ReservationForm = () => {
                         <Input
                             type="date"
                             id="date"
-                            icon={<Image src={calendarSvg} alt="dateIcon" />}
+                            icon={<Image src={ICONS.CALENDAR} alt="dateIcon" />}
                             label={date}
                             min={minDateString}
                             max={maxDateString}
@@ -170,10 +163,10 @@ const ReservationForm = () => {
                         <Input
                             type="time"
                             id="time"
-                            icon={<Image src={timeSvg} alt="timeIcon" />}
+                            icon={<Image src={ICONS.TIME} alt="timeIcon" />}
                             label={time}
                             min={RESTAURANT_OPENING_HOUR}
-                            max={RESTAURANT_ClOSING_HOUR}
+                            max={RESTAURANT_CLOSING_HOUR}
                             {...register('time')}
                             errors={errors.time}
                             inputClassName="w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0"
@@ -183,7 +176,7 @@ const ReservationForm = () => {
                             type="phoneNumber"
                             id="phoneNumber"
                             label={phoneNumber}
-                            icon={<Image src={phoneSvg} alt="phoneIcon" />}
+                            icon={<Image src={ICONS.PHONE} alt="phoneIcon" />}
                             {...register('phoneNumber')}
                             errors={errors.phoneNumber}
                             inputClassName="w-full"
@@ -196,7 +189,11 @@ const ReservationForm = () => {
                         </Button>
                         {editParam && (
                             <Button
-                                onClick={() => deleteMutate({ id: editParam })}
+                                onClick={() =>
+                                    deleteReservationMutation.mutate({
+                                        id: editParam,
+                                    })
+                                }
                                 className="w-full mt-4"
                                 variant="danger"
                                 size="lg"

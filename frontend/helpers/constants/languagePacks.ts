@@ -37,7 +37,7 @@ export interface languagePack {
     reservationsPage: {
         reservationTitle: string;
         upsertReservation: string;
-        listOfReservations: string;
+        reservationsList: string;
         reservationCard: {
             title: string;
             people: string[];
@@ -56,6 +56,12 @@ export interface languagePack {
                     max: string;
                 };
             };
+        };
+    };
+    menuPage: {
+        searchInputPlaceholder: string;
+        menuCategoryCard: {
+            itemsTitle: string[];
         };
     };
     tablePage: {

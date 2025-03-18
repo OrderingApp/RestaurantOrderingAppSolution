@@ -29,10 +29,10 @@ const plPack: languagePack = {
     reservationsPage: {
         reservationTitle: 'Sprawdź Rezerwacje',
         upsertReservation: 'Utwórz/Edytuj Rezerwacje',
-        listOfReservations: 'Lista rezerwacji',
+        reservationsList: 'Lista rezerwacji',
         reservationCard: {
             title: 'Rezerwacja',
-            people: ['osoba', 'osoby', 'osób'],
+            people: ['osób', 'osoba', 'osoby', 'osób'],
         },
     },
     createReservationPage: {
@@ -57,6 +57,12 @@ const plPack: languagePack = {
                 time: 'Proszę podać poprawną godzinę',
                 phoneNumber: 'Proszę podać poprawny 9-cyfrowy numer telefonu',
             },
+        },
+    },
+    menuPage: {
+        searchInputPlaceholder: 'Wyszukaj',
+        menuCategoryCard: {
+            itemsTitle: ['pozycji', 'pozycja', 'pozycje', 'pozycji'],
         },
     },
     tablePage: {
