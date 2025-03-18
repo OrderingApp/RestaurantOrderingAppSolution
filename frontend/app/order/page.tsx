@@ -110,7 +110,7 @@ const MenuPage = () => {
     };
 
     return (
-        <div className="max-h-[48rem] flex flex-col py-2 pl-4 pr-2 rounded-3xl overflow-hidden">
+        <div className="max-h-[48rem] flex flex-col py-2 pl-4 pr-10 rounded-3xl overflow-hidden">
             <div className="min-h-[728px] bg-[#F6F6F6] w-full rounded-3xl p-10 flex flex-col">
                 <Input
                     type="search"
