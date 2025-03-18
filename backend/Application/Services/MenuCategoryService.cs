@@ -90,12 +90,13 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
         {
             var query = orderingContext.MenuCategories
                 .Where(mc => mc.IsUsed && !mc.IsDeleted)
-                .Include(mc => mc.SubCategories)
-                .Include(mc => mc.MenuItems)
+                .Include(mc => mc.SubCategories.OrderBy(sc => sc.SequenceNumber))
+                .Include(mc => mc.MenuItems.OrderBy(mi => mi.SequenceNumber))
                     .ThenInclude(mi => mi.MenuItemIngredientRels)
                         .ThenInclude(mii => mii.Ingredient)
                             .ThenInclude(i => i.IngredientTagRels)
                                 .ThenInclude(it => it.Tag)
+                .OrderBy(mc => mc.SequenceNumber)
                 .AsQueryable();
 
             if (request.MenuCategoryId.HasValue)

@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(RestaurantOrderingContext))]
-    partial class RestaurantOrderingContextModelSnapshot : ModelSnapshot
+    [Migration("20250315101220_menuCategoryOrder")]
+    partial class menuCategoryOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
@@ -116,7 +119,7 @@ namespace Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("SequenceNumber")
+                    b.Property<int>("Order")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -148,9 +151,6 @@ namespace Infrastructure.Database.Migrations
 
                     b.Property<decimal>("Price")
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("SequenceNumber")
-                        .HasColumnType("INTEGER");
 
                     b.Property<Guid?>("SubCategoryId")
                         .HasColumnType("TEXT");
@@ -370,9 +370,6 @@ namespace Infrastructure.Database.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("SequenceNumber")
-                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

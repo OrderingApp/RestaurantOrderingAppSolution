@@ -50,7 +50,9 @@ public class ExcelSeeder
                         Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
                         Name = sheet.Cells[row, 2].Text,
                         IsUsed = TryParseBool(sheet.Cells[row, 3].Text),
-                        IsDeleted = TryParseBool(sheet.Cells[row, 4].Text)
+                        IsDeleted = TryParseBool(sheet.Cells[row, 4].Text),
+                        SequenceNumber = TryParseInt(sheet.Cells[row, 5].Text)
+                            ?? throw new Exception($"Invalid SequenceNumber at row {row}")
                     });
                 }
 
@@ -82,7 +84,10 @@ public class ExcelSeeder
                         Name = sheet.Cells[row, 2].Text,
                         IsUsed = TryParseBool(sheet.Cells[row, 3].Text),
                         IsDeleted = TryParseBool(sheet.Cells[row, 4].Text),
-                        MenuCategoryId = TryParseGuid(sheet.Cells[row, 5].Text) ?? throw new Exception($"Invalid GUID in MenuCategoryId at row {row}")
+                        MenuCategoryId = TryParseGuid(sheet.Cells[row, 5].Text) 
+                            ?? throw new Exception($"Invalid GUID in MenuCategoryId at row {row}"),
+                        SequenceNumber = TryParseInt(sheet.Cells[row, 6].Text)
+                            ?? throw new Exception($"Invalid SequenceNumber at row {row}")
                     });
                 }
 
@@ -117,7 +122,9 @@ public class ExcelSeeder
                         IsUsed = TryParseBool(sheet.Cells[row, 5].Text),
                         IsDeleted = TryParseBool(sheet.Cells[row, 6].Text),
                         MenuCategoryId = TryParseGuid(sheet.Cells[row, 7].Text),
-                        SubCategoryId = TryParseGuid(sheet.Cells[row, 8].Text)
+                        SubCategoryId = TryParseGuid(sheet.Cells[row, 8].Text),
+                        SequenceNumber = TryParseInt(sheet.Cells[row, 9].Text)
+                            ?? throw new Exception($"Invalid SequenceNumber at row {row}")
                     });
                 }
 
@@ -531,6 +538,11 @@ public class ExcelSeeder
     private static TEnum? TryParseEnum<TEnum>(string value) where TEnum : struct
     {
         return Enum.TryParse(value, true, out TEnum result) ? result : (TEnum?)null;
+    }
+
+    private int? TryParseInt(string input)
+    {
+        return int.TryParse(input, out int result) ? result : (int?)null;
     }
 
 }
