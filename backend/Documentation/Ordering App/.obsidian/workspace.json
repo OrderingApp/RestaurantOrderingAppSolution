@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Meetings/13.03.2025.md",
+                "file": "Backend/To consider/Administration Panel to consider.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "13.03.2025"
+              "title": "Administration Panel to consider"
             }
           }
         ]
@@ -169,36 +169,37 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "472473e6846fba09",
+  "active": "c02f239f0a89105b",
   "lastOpenFiles": [
-    "Meetings/Meetings.md",
-    "Meetings/13.03.2025.md",
-    "Administration Panel/Sections/Settings.md",
-    "Administration Panel/Sections/Sections.md",
-    "Administration Panel/Sections/Menu.md",
-    "Administration Panel/Sections/Invoices.md",
-    "Administration Panel/Sections/Employees.md",
-    "Administration Panel/Administration Panel.md",
-    "Administration Panel/Sections/Reservations.md",
-    "Administration Panel/Sections/Raports.md",
-    "Tasks/ToFix.md",
-    "To consider/To ask.md",
-    "To consider/Administration Panel to consider.md",
-    "To consider/To consider.md",
+    "Backend",
+    "Backend/Tasks/ToFix.md",
+    "Backend/To consider/To consider.md",
+    "Backend/To consider/Administration Panel to consider.md",
+    "Backend/To consider/To ask.md",
     "Ordering App.md",
-    "Administration Panel/Sections",
+    "Meetings/13.03.2025.md",
+    "Meetings/Meetings.md",
+    "Backend/Administration Panel/Sections/Settings.md",
+    "Backend/Administration Panel/Sections/Sections.md",
+    "Backend/Administration Panel/Sections/Menu.md",
+    "Backend/Administration Panel/Sections/Invoices.md",
+    "Backend/Administration Panel/Sections/Employees.md",
+    "Backend/Administration Panel/Administration Panel.md",
+    "Backend/Administration Panel/Sections/Reservations.md",
+    "Backend/Administration Panel/Sections/Raports.md",
+    "Backend/Administration Panel/Sections",
     "Administration Panel/Untitled.md",
-    "Administration Panel",
-    "To consider",
-    "Tasks",
+    "Backend/Administration Panel",
+    "Backend/To consider",
+    "Backend/Tasks",
     "fsa.md",
     "sdfa.md",
     "Welcome.md",
     "Meetings",
-    "Events",
-    "Database",
-    "Application",
-    "Services",
-    "Domain"
+    "Backend/Events",
+    "Backend/Database",
+    "Backend/Application",
+    "Backend/Services",
+    "Backend/Domain"
   ]
 }
