@@ -10,7 +10,15 @@ public class SubCategoryMappingProfile : Profile
     {
         CreateMap<SubCategory, SubCategoryReadDto>()
             .ForMember(dest => dest.TotalItemsInSubCategory,
-                opt => opt.MapFrom(src => src.MenuItems.Count(mi => mi.IsUsed && !mi.IsDeleted)));
+                opt => opt.MapFrom(src => src.MenuItems.Count(mi => mi.IsUsed && !mi.IsDeleted)))
+            .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.MenuItems
+                .SelectMany(mi => mi.MenuItemIngredientRels)
+                .Select(mii => mii.Ingredient)
+                .SelectMany(i => i.IngredientTagRels)
+                .Select(it => it.Tag)
+                .Distinct()
+                .ToList()
+            ));
 
         CreateMap<SubCategoryCreateDto, SubCategory>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
