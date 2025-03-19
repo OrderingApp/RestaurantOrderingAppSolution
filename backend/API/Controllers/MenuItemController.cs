@@ -1,6 +1,8 @@
 ﻿using Application.Contracts;
 using Application.Dtos.Common;
+using Application.Dtos.MenuCategories;
 using Application.Dtos.MenuItems;
+using Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -36,6 +38,16 @@ public class MenuItemController(IMenuItemService menuItemService) : BaseApiContr
     [ProducesResponseType(404)]
     public async Task<ActionResult<MenuItemReadDto>> GetMenuItem([FromRoute] Guid id) =>
         HandleResult(await menuItemService.GetMenuItem(id));
+
+
+    /// <summary>
+    /// Retrieves all menu items.
+    /// </summary>
+    /// <returns>A list of menu items.</returns>
+    [HttpGet]
+    [ProducesResponseType(typeof(List<MenuItemReadDto>), 200)]
+    public async Task<ActionResult<List<MenuItemReadDto>>> GetMenuItems() =>
+        HandleResult(await menuItemService.GetMenuItems());
 
     /// <summary>
     /// Updates an existing menu item.

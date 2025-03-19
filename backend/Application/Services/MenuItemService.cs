@@ -79,6 +79,32 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
         }
     }
 
+    public async Task<ResultDto<List<MenuItemReadDto>>> GetMenuItems()
+    {
+        try
+        {
+            var menuItems = await orderingContext.MenuItems
+                .Where(mi => mi.IsUsed && !mi.IsDeleted)
+                .Include(mi => mi.MenuItemIngredientRels)
+                    .ThenInclude(rel => rel.Ingredient)
+                        .ThenInclude(i => i.IngredientTagRels)
+                            .ThenInclude(tagRel => tagRel.Tag)
+                .OrderBy(mi => mi.SequenceNumber)
+                .ToListAsync();
+
+            var menuItemDtos = mapper.Map<List<MenuItemReadDto>>(menuItems);
+
+            return ResultDto<List<MenuItemReadDto>>
+                .Success(menuItemDtos, HttpStatusCode.OK);
+        }
+        catch (Exception ex)
+        {
+            return ResultDto<List<MenuItemReadDto>>
+                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+        }
+    }
+
+
     public async Task<ResultDto<MenuItemReadDto>> UpdateMenuItem(Guid id, MenuItemUpdateDto menuItemUpdateDto)
     {
         try

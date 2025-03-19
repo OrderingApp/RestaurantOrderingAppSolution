@@ -1,4 +1,5 @@
-﻿using Application.Dtos.Tags;
+﻿using Application.Dtos.MenuItems;
+using Application.Dtos.Tags;
 using AutoMapper;
 using Domain;
 
@@ -16,6 +17,8 @@ public class TagMappingProfile : Profile
 
         // Map from Tag to TagReadDto
         CreateMap<Tag, TagReadDto>();
+
+        CreateMap<Tag, IngredientTagReadDto>();
 
         // Map from TagUpdateDto to Tag
         CreateMap<TagUpdateDto, Tag>();

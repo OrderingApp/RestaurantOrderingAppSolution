@@ -2,6 +2,7 @@
 using Application.Dtos.Common;
 using Application.Dtos.Tags;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Domain;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
@@ -42,12 +43,17 @@ public class TagService(RestaurantOrderingContext orderingContext, IEventHandler
         try
         {
             var tags = await orderingContext.Tags
-                .ToListAsync();
+                        .Where(t => t.IsUsed && !t.IsDeleted)
+                        .ProjectTo<TagReadDto>(mapper.ConfigurationProvider)
+                        .ToListAsync();
 
-            var tagDtos = mapper.Map<List<TagReadDto>>(tags);
+            if (!tags.Any())
+            {
+                return ResultDto<List<TagReadDto>>
+                    .Failure("No tags found", HttpStatusCode.NotFound);
+            }
 
-            return ResultDto<List<TagReadDto>>
-                .Success(tagDtos, HttpStatusCode.OK);
+            return ResultDto<List<TagReadDto>>.Success(tags, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {

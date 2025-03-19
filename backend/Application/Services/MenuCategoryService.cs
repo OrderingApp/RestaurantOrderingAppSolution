@@ -67,9 +67,31 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
             var menuCategories = await orderingContext.MenuCategories
                 .Where(mc => mc.IsUsed && !mc.IsDeleted)
                 .Include(mc => mc.SubCategories)
+                .OrderBy(mc => mc.SequenceNumber)
                 .ToListAsync();
 
+            var menuItems = await orderingContext.MenuItems
+                .Where(mi => mi.IsUsed && !mi.IsDeleted)
+                .ToListAsync();
+
+            foreach (var category in menuCategories)
+            {
+                category.SubCategories = category.SubCategories
+                    .OrderBy(sc => sc.SequenceNumber)
+                    .ToList();
+            }
+
             var menuCategoryDtos = mapper.Map<List<MenuCategoryReadDto>>(menuCategories);
+
+            foreach (var categoryDto in menuCategoryDtos)
+            {
+                categoryDto.TotalItems = menuItems.Count(mi => mi.MenuCategoryId == categoryDto.Id);
+
+                foreach (var subCategoryDto in categoryDto.SubCategories)
+                {
+                    subCategoryDto.TotalItemsInSubCategory = menuItems.Count(mi => mi.SubCategoryId == subCategoryDto.Id);
+                }
+            }
 
             return ResultDto<List<MenuCategoryReadDto>>
                 .Success(menuCategoryDtos, HttpStatusCode.OK);
