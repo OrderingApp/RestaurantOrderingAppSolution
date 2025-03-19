@@ -1,16 +1,13 @@
 ﻿using Application.Contracts;
 using Application.Dtos.Common;
 using Application.Dtos.MenuCategories;
-using Application.Dtos.MenuItems;
 using AutoMapper;
 using Domain;
 using Infrastructure.Database;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RestaurantOrdering.Events.Application.Contracts;
 using RestaurantOrdering.Events.Domain.MenuCategories;
 using System.Net;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Application.Services;
 

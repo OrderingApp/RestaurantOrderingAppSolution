@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Tasks/ToFix.md",
+                "file": "Meetings/13.03.2025.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "ToFix"
+              "title": "13.03.2025"
             }
           }
         ]
@@ -171,23 +171,23 @@
   },
   "active": "472473e6846fba09",
   "lastOpenFiles": [
-    "To consider/To ask.md",
-    "To consider/Administration Panel to consider.md",
-    "To consider/To consider.md",
-    "Tasks/ToFix.md",
-    "Administration Panel/Sections/Raports.md",
-    "Administration Panel/Sections/Reservations.md",
+    "Meetings/Meetings.md",
+    "Meetings/13.03.2025.md",
+    "Administration Panel/Sections/Settings.md",
+    "Administration Panel/Sections/Sections.md",
     "Administration Panel/Sections/Menu.md",
     "Administration Panel/Sections/Invoices.md",
     "Administration Panel/Sections/Employees.md",
-    "Administration Panel/Sections/Sections.md",
-    "Meetings/Meetings.md",
     "Administration Panel/Administration Panel.md",
+    "Administration Panel/Sections/Reservations.md",
+    "Administration Panel/Sections/Raports.md",
+    "Tasks/ToFix.md",
+    "To consider/To ask.md",
+    "To consider/Administration Panel to consider.md",
+    "To consider/To consider.md",
     "Ordering App.md",
-    "Administration Panel/Sections/Settings.md",
     "Administration Panel/Sections",
     "Administration Panel/Untitled.md",
-    "Meetings/13.03.2025.md",
     "Administration Panel",
     "To consider",
     "Tasks",
