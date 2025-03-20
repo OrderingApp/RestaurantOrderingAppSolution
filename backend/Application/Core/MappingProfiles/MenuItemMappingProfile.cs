@@ -13,6 +13,7 @@ public class MenuItemMappingProfile : Profile
                 src.MenuItemIngredientRels.Select(mii => mii.Ingredient).ToList()
             ));
 
+        CreateMap<MenuItem, MenuItemDetailedDto>();
 
         CreateMap<Ingredient, MenuItemIngredientReadDto>()
             .ForMember(dest => dest.TagIds, opt => opt.MapFrom(src =>

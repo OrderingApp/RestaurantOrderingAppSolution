@@ -10,5 +10,5 @@ public class TableReadDto
     public int Capacity { get; set; }
 
     public ReservationSummaryDto? Reservation { get; set; }
-    public TableStatus TableStatus { get; set; }
+    public TableStatus Status { get; set; }
 }
