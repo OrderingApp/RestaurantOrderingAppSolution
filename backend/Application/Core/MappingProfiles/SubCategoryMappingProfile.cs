@@ -9,7 +9,7 @@ public class SubCategoryMappingProfile : Profile
     public SubCategoryMappingProfile()
     {
         CreateMap<SubCategory, SubCategoryReadDto>()
-            .ForMember(dest => dest.TotalItemsInSubCategory,
+            .ForMember(dest => dest.TotalItems,
                 opt => opt.MapFrom(src => src.MenuItems.Count(mi => mi.IsUsed && !mi.IsDeleted)));
 
         CreateMap<SubCategoryCreateDto, SubCategory>()

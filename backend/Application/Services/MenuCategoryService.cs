@@ -89,7 +89,7 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
 
                 foreach (var subCategoryDto in categoryDto.SubCategories)
                 {
-                    subCategoryDto.TotalItemsInSubCategory = menuItems.Count(mi => mi.SubCategoryId == subCategoryDto.Id);
+                    subCategoryDto.TotalItems = menuItems.Count(mi => mi.SubCategoryId == subCategoryDto.Id);
                 }
             }
 

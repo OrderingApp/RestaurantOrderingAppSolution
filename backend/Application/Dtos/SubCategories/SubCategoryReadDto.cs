@@ -1,6 +1,4 @@
-﻿using Application.Dtos.Tags;
-
-namespace Application.Dtos.SubCategories;
+﻿namespace Application.Dtos.SubCategories;
 
 public class SubCategoryReadDto
 {
