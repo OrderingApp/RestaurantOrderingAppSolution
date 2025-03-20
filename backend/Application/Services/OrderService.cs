@@ -37,6 +37,10 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
             dineInOrder.OrderItems = await PopulateOrderItemsAsync(dineInOrderDto.OrderItems, dineInOrder.Id);
             dineInOrder.TotalAmount = dineInOrder.OrderItems.Sum(oi => oi.Price);
 
+            table.Status = dineInOrder.OrderItems.Any()
+                ? TableStatus.PendingServingOrderItems
+                : TableStatus.Ongoing;
+
             var result = await orderingContext.Orders.AddAsync(dineInOrder);
             await orderingContext.SaveChangesAsync();
 

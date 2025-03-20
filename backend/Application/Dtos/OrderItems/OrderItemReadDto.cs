@@ -13,5 +13,5 @@ public class OrderItemReadDto
     public List<OrderItemIngredientReadDto> ExtraIngredients { get; set; } = new();
     public List<OrderItemIngredientReadDto> RemovedIngredients { get; set; } = new();
 
-    public MenuItemReadDto MenuItem { get; set; } = null!;
+    public MenuItemDetailedDto MenuItem { get; set; } = null!;
 }

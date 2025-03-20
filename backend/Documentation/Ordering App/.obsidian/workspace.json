@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Backend/To consider/To ask.md",
+                "file": "Backend/To consider/To consider.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "To ask"
+              "title": "To consider"
             }
           }
         ]
@@ -171,13 +171,13 @@
   },
   "active": "472473e6846fba09",
   "lastOpenFiles": [
+    "Backend/To consider/To ask.md",
     "Backend/To consider/Administration Panel to consider.md",
     "Backend/Tasks/ToFix.md",
-    "Backend/To consider/To ask.md",
+    "Meetings/13.03.2025.md",
     "Backend/To consider/To consider.md",
     "Backend",
     "Ordering App.md",
-    "Meetings/13.03.2025.md",
     "Meetings/Meetings.md",
     "Backend/Administration Panel/Sections/Settings.md",
     "Backend/Administration Panel/Sections/Sections.md",
