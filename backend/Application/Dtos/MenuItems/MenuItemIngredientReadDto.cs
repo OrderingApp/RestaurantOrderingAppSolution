@@ -4,5 +4,5 @@ public class MenuItemIngredientReadDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
-    public Guid TagId { get; set; }
+    public List<Guid> TagIds { get; set; } = new();
 }
