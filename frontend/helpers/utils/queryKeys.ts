@@ -8,6 +8,8 @@ enum RESERVATIONS_KEYS {
 }
 enum MENU_ITEMS {
     All = 'menu-categories',
+    ITEMS = 'menu-items',
+    TAGS = 'tags',
 }
 
 const QUERY_KEYS = {

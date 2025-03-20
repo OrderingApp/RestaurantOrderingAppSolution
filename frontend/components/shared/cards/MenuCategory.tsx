@@ -1,23 +1,23 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+
 import Image from 'next/image';
-import {
-    MenuCategoryType,
-    MenuItemType,
-} from '@/helpers/queries/menu-items/useQueryMenuItems';
 import clsx from 'clsx';
+
 import { SEARCH_PARAMS_NAMES } from '@/helpers/constants/constants';
 import languagePacks from '@/helpers/constants/languagePacks';
-import useLanguage from '@/helpers/hooks/useLanguage';
 import { getPluralForm } from '@/helpers/utils/utils';
+
+import useLanguage from '@/helpers/hooks/useLanguage';
+
 interface MenuCategoryProps {
     id: string;
     icon: string;
     iconActive: string;
     size?: 'lg' | 'sm';
     name: string;
-    items: MenuItemType[] | MenuCategoryType[];
+    totalItems: number;
     type?: 'category' | 'subcategory';
 }
 
@@ -27,11 +27,12 @@ const MenuCategory = ({
     iconActive,
     name,
     size = 'lg',
-    items,
+    totalItems,
     type = 'category',
 }: MenuCategoryProps) => {
     const searchParams = useSearchParams();
     const router = useRouter();
+    const pathname = usePathname();
     const { language } = useLanguage();
     const categoryId = searchParams.get(SEARCH_PARAMS_NAMES.CATEGORY);
     const subcategoryId = searchParams.get(SEARCH_PARAMS_NAMES.SUBCATEGORY);
@@ -41,31 +42,6 @@ const MenuCategory = ({
             menuCategoryCard: { itemsTitle },
         },
     } = languagePacks[language];
-
-    const isMenuItem = (
-        item: MenuItemType | MenuCategoryType
-    ): item is MenuItemType =>
-        (item as MenuItemType).subCategoryId !== undefined;
-
-    const getAmount = () => {
-        if (type === 'subcategory') {
-            return (
-                (items as Array<MenuItemType | MenuCategoryType>)
-                    .filter(isMenuItem)
-                    .filter((item) => item.subCategoryId === id).length || 0
-            );
-        }
-        if (id === 'all') {
-            return (
-                (items as MenuCategoryType[])?.flatMap(
-                    (category) => category.menuItems
-                )?.length || 0
-            );
-        }
-        return items?.length || 0;
-    };
-
-    const amount = getAmount();
 
     const isActive =
         (id === 'all' && !categoryId) ||
@@ -91,10 +67,12 @@ const MenuCategory = ({
             }
         }
 
-        router.push(id === 'all' ? '/order' : `/order?${newParams.toString()}`);
+        router.push(
+            id === 'all' ? `${pathname}` : `${pathname}?${newParams.toString()}`
+        );
     };
 
-    const amountItemsName = getPluralForm(amount, itemsTitle, language);
+    const amountItemsName = getPluralForm(totalItems, itemsTitle, language);
 
     return (
         <button
@@ -125,7 +103,7 @@ const MenuCategory = ({
                         isActive ? 'text-white' : 'text-black'
                     )}
                 >
-                    {amount} {amountItemsName}
+                    {totalItems} {amountItemsName}
                 </p>
             </div>
         </button>
@@ -134,4 +112,4 @@ const MenuCategory = ({
 
 export default MenuCategory;
 
-//TODO BUTTONS CHANGE
+//TODO BUTTONS CHANGE TRY USE TRIARY OPERATOR

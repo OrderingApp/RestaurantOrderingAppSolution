@@ -10,13 +10,18 @@ import {
     MAX_ITEM_SELECT,
     MIN_ITEM_SELECT,
 } from '@/helpers/constants/constants';
+import clsx from 'clsx';
+import { menuItemStyles } from '@/lib/styles/menuItem';
 
 interface MenuItemProps {
+    id: string;
     name: string;
     price: number;
+    variant: 'card' | 'order';
+    handleClick: (id: string) => void;
 }
 
-const MenuItem = ({ name, price }: MenuItemProps) => {
+const MenuItem = ({ id, name, price, variant, handleClick }: MenuItemProps) => {
     const [inputValue, setInputValue] = useState<number | string>(1);
 
     const handleDecrease = () =>
@@ -32,8 +37,14 @@ const MenuItem = ({ name, price }: MenuItemProps) => {
     };
 
     return (
-        <li className="w-52 min-h-56 rounded-lg shadow-[0px_4px_4px_0px_#00000040] bg-white p-4 py-8 pb-4 relative flex flex-col justify-between">
+        <li
+            className={clsx(
+                'rounded-lg shadow-[0px_4px_4px_0px_#00000040] bg-white p-4 py-8 pb-4 relative flex flex-col',
+                menuItemStyles.variants[variant]
+            )}
+        >
             <Image
+                onClick={() => handleClick(id)}
                 width={22}
                 height={22}
                 src={informationIcon}
@@ -46,33 +57,37 @@ const MenuItem = ({ name, price }: MenuItemProps) => {
                     {price} {CURRENCIES.pln}
                 </p>
             </div>
-            <label className="relative my-3">
-                <button
-                    onClick={handleDecrease}
-                    className="absolute top-1 left-1 w-4 h-4 bg-[#2B5162] rounded-full text-white flex justify-center items-center"
-                >
-                    -
-                </button>
-                <input
-                    className="bg-[#ECECEC] shadow-[0px_0px_5px_0px_#6A6A6A] rounded-md w-full text-center [&&::-webkit-inner-spin-button]:appearance-none"
-                    type="number"
-                    min={MIN_ITEM_SELECT}
-                    onChange={handleChange}
-                    value={inputValue}
-                    max={MAX_ITEM_SELECT}
-                />
-                <button
-                    onClick={handleIncrease}
-                    className="absolute top-1 right-1 w-4 h-4 bg-[#2B5162] rounded-full text-white flex justify-center items-center"
-                >
-                    +
-                </button>
-            </label>
-            <div className="flex flex-col gap-2">
-                <Button className="w-full rounded-lg py-4" size="md">
-                    Dodaj
-                </Button>
-            </div>
+            {variant === 'order' && (
+                <>
+                    <label className="relative my-3">
+                        <button
+                            onClick={handleDecrease}
+                            className="absolute top-1 left-1 w-4 h-4 bg-[#2B5162] rounded-full text-white flex justify-center items-center"
+                        >
+                            -
+                        </button>
+                        <input
+                            className="bg-[#ECECEC] shadow-[0px_0px_5px_0px_#6A6A6A] rounded-md w-full text-center [&&::-webkit-inner-spin-button]:appearance-none"
+                            type="number"
+                            min={MIN_ITEM_SELECT}
+                            onChange={handleChange}
+                            value={inputValue}
+                            max={MAX_ITEM_SELECT}
+                        />
+                        <button
+                            onClick={handleIncrease}
+                            className="absolute top-1 right-1 w-4 h-4 bg-[#2B5162] rounded-full text-white flex justify-center items-center"
+                        >
+                            +
+                        </button>
+                    </label>
+                    <div className="flex flex-col gap-2">
+                        <Button className="w-full rounded-lg py-4" size="md">
+                            Dodaj
+                        </Button>
+                    </div>
+                </>
+            )}
         </li>
     );
 };
