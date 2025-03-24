@@ -1,9 +1,9 @@
 import Button, { type ButtonProps } from '@/components/shared/Button/Button';
-import ItemsList, {
-    Item,
+import ItemsList from '@/components/shared/lists/Items/Items';
+import Item, {
     type BaseItemProps,
     type ButtonItemProps,
-} from '@/components/shared/lists/Items/Items';
+} from '@/components/shared/lists/Items/Item';
 
 type DetailsAsideProps = {
     title: string;

@@ -25,18 +25,16 @@ export const getPluralForm = (
     titles: string[],
     lang: string
 ) => {
-    if (lang === 'pl') {
-        if (amount === 1) return titles[1];
-        if (
-            [2, 3, 4].includes(amount % 10) &&
-            ![12, 13, 14].includes(amount % 100)
-        ) {
-            return titles[2];
-        }
-        return titles[0];
-    } else if (lang === 'en') {
-        return amount === 1 ? titles[1] : titles[0];
-    } else {
-        return titles[0];
-    }
+    if (amount === 1) return titles[1];
+
+    if (
+        lang === 'pl' &&
+        [2, 3, 4].includes(amount % 10) &&
+        ![12, 13, 14].includes(amount % 100)
+    )
+        return titles[2];
+
+    return titles[0];
 };
+
+//TODO: make getPluralForm more readable (titles, pl if check) AND probably set 'lang' arg to typeof languages AND maybe use switch case here, but probably not needed now
