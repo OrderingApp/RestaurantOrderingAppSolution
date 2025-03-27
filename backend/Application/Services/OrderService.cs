@@ -170,7 +170,7 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
         }
     }
 
-    public async Task<ResultDto<List<NonDineInOrderSummaryDto>>> GetOngoingNonDineInOrders(OrderType orderType)
+    public async Task<ResultDto<List<NonDineInOrderSummaryDto>>> GetOngoingNonDineInOrders(OrderType orderType, DateTime date)
     {
         try
         {
@@ -180,12 +180,31 @@ public class OrderService(RestaurantOrderingContext orderingContext, IEventHandl
                     .Failure("Invalid order type. Only 'Delivery' and 'Takeaway' types are allowed.", HttpStatusCode.BadRequest);
             }
 
-            var orders = await orderingContext.Orders
-                .Where(o => o.Type == orderType && o.Status == OrderStatus.Ongoing)
+            var nextDay = date.AddDays(1);
+
+            var ongoingOrdersQuery = orderingContext.Orders
+                .Where(o =>
+                    o.Type == orderType &&
+                    o.Status == OrderStatus.Ongoing &&
+                    o.DateTime >= date && o.DateTime < nextDay);
+
+            // Get only 10 latest closed orders for the day
+            var closedOrdersQuery = orderingContext.Orders
+                .Where(o =>
+                    o.Type == orderType &&
+                    o.Status == OrderStatus.Closed &&
+                    o.DateTime >= date && o.DateTime < nextDay)
+                .OrderByDescending(o => o.DateTime)
+                .Take(10);
+
+            // Combine both queries
+            var ordersQuery = ongoingOrdersQuery
+                .Union(closedOrdersQuery)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.MenuItem)
-                .Include(o => o.CustomerInformation)
-                .ToListAsync();
+                .Include(o => o.CustomerInformation);
+
+            var orders = await ordersQuery.ToListAsync();
 
             var orderDtos = mapper.Map<List<NonDineInOrderSummaryDto>>(orders);
 

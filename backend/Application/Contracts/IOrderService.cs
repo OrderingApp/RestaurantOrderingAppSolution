@@ -17,7 +17,7 @@ public interface IOrderService
     // Get Orders
     Task<ResultDto<OrderReadDto>> GetOrder(Guid id);
     Task<ResultDto<List<OrderReadDto>>> GetOrders(OrderStatus? orderStatus);
-    Task<ResultDto<List<NonDineInOrderSummaryDto>>> GetOngoingNonDineInOrders(OrderType orderType);
+    Task<ResultDto<List<NonDineInOrderSummaryDto>>> GetOngoingNonDineInOrders(OrderType orderType, DateTime date);
     Task<ResultDto<List<OrderSummaryDto>>> GetOngoingOrdersForTable(Guid tableId);
 
     // Update Orders
