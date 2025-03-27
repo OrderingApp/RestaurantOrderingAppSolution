@@ -74,6 +74,20 @@ const plPack: languagePack = {
             balanceName: 'Saldo',
         },
     },
+    ordersPage: {
+        ordersActiveTitle: 'Otwarte',
+        ordersClosedTitle: 'Zamknięte',
+        orderPickup: 'Odbiór',
+        orderDelivery: 'Dowóz',
+        createOrder: 'Utwórz',
+        editOrder: 'Edytuj',
+        deleteOrder: 'Usuń',
+        payment: 'Płatność',
+        orderCard: {
+            pickup: 'Odbiór',
+            delivery: 'Dostawa',
+        },
+    },
 };
 
 export default plPack;

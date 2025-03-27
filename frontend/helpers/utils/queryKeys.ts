@@ -12,10 +12,15 @@ enum MENU_ITEMS {
     TAGS = 'tags',
 }
 
+enum ORDERS_KEYS {
+    BY_TYPE = 'orderType',
+}
+
 const QUERY_KEYS = {
     Areas: { ...AREA_KEYS },
     Reservations: { ...RESERVATIONS_KEYS },
     MenuItems: { ...MENU_ITEMS },
+    OrdersItems: { ...ORDERS_KEYS },
 } as const;
 
-export const { Areas, Reservations, MenuItems } = QUERY_KEYS;
+export const { Areas, Reservations, MenuItems, OrdersItems } = QUERY_KEYS;

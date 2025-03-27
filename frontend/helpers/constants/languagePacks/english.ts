@@ -74,6 +74,20 @@ const enPack: languagePack = {
             balanceName: 'Balance',
         },
     },
+    ordersPage: {
+        ordersActiveTitle: 'Open',
+        ordersClosedTitle: 'Closed',
+        orderPickup: 'Pickup',
+        orderDelivery: 'Delivery',
+        createOrder: 'Create',
+        editOrder: 'Edit',
+        deleteOrder: 'Delete',
+        payment: 'Payment',
+        orderCard: {
+            pickup: 'Pickup',
+            delivery: 'Delivery',
+        },
+    },
 };
 
 export default enPack;

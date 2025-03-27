@@ -73,6 +73,20 @@ export interface languagePack {
             balanceName: string;
         };
     };
+    ordersPage: {
+        ordersActiveTitle: string;
+        ordersClosedTitle: string;
+        orderPickup: string;
+        orderDelivery: string;
+        createOrder: string;
+        editOrder: string;
+        deleteOrder: string;
+        payment: string;
+        orderCard: {
+            pickup: string;
+            delivery: string;
+        };
+    };
 }
 
 interface loginPageFormFields {

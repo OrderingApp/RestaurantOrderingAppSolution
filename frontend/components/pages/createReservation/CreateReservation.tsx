@@ -19,7 +19,6 @@ const CreateReservation = () => {
     const [selectedDate, setSelectedDate] = useState<string>(
         new Date().toISOString()
     );
-    console.log(selectedDate);
 
     const { data } = useQueryReservations(selectedDate);
     const {

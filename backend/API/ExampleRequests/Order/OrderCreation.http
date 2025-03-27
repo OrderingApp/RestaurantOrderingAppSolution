@@ -44,7 +44,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "orderDateTime": "2026-02-07T12:30:00Z",
+  "dateTime": "2025-03-27T20:00:00Z",
   "customerInformation": {
     "phoneNumber": "123456789",
     "additionalInstructions": "Please call on arrival.",
@@ -54,22 +54,22 @@ Accept: application/json
   },
   "orderItems": [
     {
-      "menuItemId": "0BD3199D-F0A5-4044-8364-208BECDE5963",
+      "menuItemId": "0026375D-9736-4B94-ABA5-3E7644643DFF",
       "specialInstructions": "No onions, extra cheese",
       "extraIngredients": [
         {
-          "ingredientId": "5A3CAF55-301A-41E5-911C-8985DB41660B",
+          "ingredientId": "012BD3A0-F0A6-4A8D-9AE7-703EEE731302",
           "quantity": 2
         },
         {
-          "ingredientId": "878DD702-A80C-4A29-B831-9EE98C3B6906",
+          "ingredientId": "2201F320-8642-4275-BB32-324D592EB355",
           "quantity": 1
         }
       ],
       "removedIngredientIds": []
     },
     {
-      "menuItemId": "69FE84B9-DCBC-49BD-BDE4-0993A9E39345",
+      "menuItemId": "0A762473-96D2-4409-A8CA-631C8AAA1236",
       "specialInstructions": null,
       "extraIngredients": [],
       "removedIngredientIds": []
@@ -88,8 +88,8 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "orderDateTime": "2026-02-07T13:00:00Z",
-  "customerInformation": {
+  "dateTime": "2025-03-27T20:00:00Z",
+ "customerInformation": {
     "phoneNumber": "123456789",
     "address": "123 Main Street, City, Country",
     "additionalInstructions": "Leave at the doorstep.",
@@ -99,22 +99,22 @@ Accept: application/json
   },
   "orderItems": [
     {
-      "menuItemId": "0BD3199D-F0A5-4044-8364-208BECDE5963",
-      "specialInstructions": "Extra spicy",
+      "menuItemId": "0026375D-9736-4B94-ABA5-3E7644643DFF",
+      "specialInstructions": "No onions, extra cheese",
       "extraIngredients": [
         {
-          "ingredientId": "5A3CAF55-301A-41E5-911C-8985DB41660B",
+          "ingredientId": "012BD3A0-F0A6-4A8D-9AE7-703EEE731302",
           "quantity": 2
         },
         {
-          "ingredientId": "878DD702-A80C-4A29-B831-9EE98C3B6906",
+          "ingredientId": "2201F320-8642-4275-BB32-324D592EB355",
           "quantity": 1
         }
       ],
       "removedIngredientIds": []
     },
     {
-      "menuItemId": "69FE84B9-DCBC-49BD-BDE4-0993A9E39345",
+      "menuItemId": "0A762473-96D2-4409-A8CA-631C8AAA1236",
       "specialInstructions": null,
       "extraIngredients": [],
       "removedIngredientIds": []

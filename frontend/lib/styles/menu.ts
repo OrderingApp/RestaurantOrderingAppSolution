@@ -24,7 +24,7 @@ export const menuStyles: MenuStyles = {
             menuItemVariant: 'card',
         },
         order: {
-            container: 'w-[80%]',
+            container: 'w-[776px]',
             list: 'gap-y-4 pl-5',
             listCols: 3,
             menuItemVariant: 'order',
