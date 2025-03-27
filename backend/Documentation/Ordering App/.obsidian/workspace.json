@@ -13,12 +13,20 @@
             "state": {
               "type": "markdown",
               "state": {
+<<<<<<< Updated upstream
                 "file": "Meetings/13.03.2025.md",
+=======
+                "file": "Backend/Administration Panel/Sections/Raports.md",
+>>>>>>> Stashed changes
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
+<<<<<<< Updated upstream
               "title": "13.03.2025"
+=======
+              "title": "Raports"
+>>>>>>> Stashed changes
             }
           }
         ]
@@ -171,10 +179,17 @@
   },
   "active": "472473e6846fba09",
   "lastOpenFiles": [
+<<<<<<< Updated upstream
     "Backend/To consider/To consider.md",
     "Backend/To consider/To ask.md",
     "Backend/To consider/Administration Panel to consider.md",
     "Backend/Tasks/ToFix.md",
+=======
+    "Backend/To consider/To ask.md",
+    "Backend/To consider/Administration Panel to consider.md",
+    "Backend/Tasks/ToFix.md",
+    "Backend/To consider/To consider.md",
+>>>>>>> Stashed changes
     "Backend",
     "Ordering App.md",
     "Meetings/13.03.2025.md",

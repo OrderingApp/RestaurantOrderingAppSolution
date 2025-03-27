@@ -1,5 +1,6 @@
 ﻿using Application.Contracts;
 using Application.Dtos.Areas;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -7,6 +8,7 @@ namespace API.Controllers;
 /// <summary>
 /// Manages restaurant areas, including retrieval, creation, updates, and deletion.
 /// </summary>
+[Authorize(Roles = "Waiter")]
 [Route("api/areas")]
 public class AreaController(IAreaService areaService) : BaseApiController
 {
