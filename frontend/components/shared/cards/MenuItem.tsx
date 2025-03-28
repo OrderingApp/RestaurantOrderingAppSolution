@@ -12,6 +12,7 @@ import {
 } from '@/helpers/constants/constants';
 import clsx from 'clsx';
 import { menuItemStyles } from '@/lib/styles/menuItem';
+import { useOrdersContext } from '@/providers/OrdersContext';
 
 interface MenuItemProps {
     id: string;
@@ -23,6 +24,7 @@ interface MenuItemProps {
 
 const MenuItem = ({ id, name, price, variant, handleClick }: MenuItemProps) => {
     const [inputValue, setInputValue] = useState<number | string>(1);
+    const { addOrder } = useOrdersContext();
 
     const handleDecrease = () =>
         setInputValue((prev) => Math.max(1, +prev - 1));
@@ -34,6 +36,15 @@ const MenuItem = ({ id, name, price, variant, handleClick }: MenuItemProps) => {
 
         if (!value) return setInputValue(value);
         setInputValue(isNaN(+value) || +value < 1 ? 1 : value);
+    };
+
+    const newItem = {
+        id,
+        name: name,
+        price,
+        discount: 0,
+        quantity: inputValue,
+        currency: 'pln',
     };
 
     return (
@@ -82,7 +93,11 @@ const MenuItem = ({ id, name, price, variant, handleClick }: MenuItemProps) => {
                         </button>
                     </label>
                     <div className="flex flex-col gap-2">
-                        <Button className="w-full rounded-lg py-4" size="md">
+                        <Button
+                            className="w-full rounded-lg py-4"
+                            onClick={() => addOrder(newItem)}
+                            size="md"
+                        >
                             Dodaj
                         </Button>
                     </div>

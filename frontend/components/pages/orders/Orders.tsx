@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import {
-    CURRENCIES,
     FILTER_STATUS,
     ordersTypes,
     SEARCH_PARAMS_NAMES,
@@ -19,9 +18,11 @@ import OverviewModal from '@/components/shared/modals/OverviewModal';
 import ToggleSwitch from '@/components/shared/toggleSwitch/ToggleSwitch';
 import Menu from '../menu/Menu';
 import DetailsAside from '@/components/shared/asides/Details';
+import { useOrdersContext } from '@/providers/OrdersContext';
 
 const Orders = () => {
     const { language } = useLanguage();
+    const { orders } = useOrdersContext();
     const seachParams = useSearchParams();
     const router = useRouter();
     const orderType =
@@ -67,111 +68,18 @@ const Orders = () => {
         router.push(`/orders?${params.toString()}`);
     };
 
-    const items = [
-        {
-            name: 'rosa 1',
-            price: 33,
-            currency: 'pln' as keyof typeof CURRENCIES,
-            quantity: 1,
-        },
-
-        {
-            name: 'Pizza Margheritta',
-            price: 33,
-            currency: 'pln' as keyof typeof CURRENCIES,
-            quantity: 2,
-            annotation: 'dodatkowe składniki',
-        },
-        {
-            name: 'pizza Margheritta',
-            price: 33,
-            currency: 'pln' as keyof typeof CURRENCIES,
-            quantity: 1,
-        },
-
-        {
-            name: 'Pizza Margheritta',
-            price: 33,
-            currency: 'pln' as keyof typeof CURRENCIES,
-            quantity: 2,
-            annotation: 'dodatkowe składniki',
-        },
-        {
-            name: 'pizza Margheritta',
-            price: 33,
-            currency: 'pln' as keyof typeof CURRENCIES,
-            quantity: 1,
-        },
-
-        {
-            name: 'Pizza Margheritta',
-            price: 33,
-            currency: 'pln' as keyof typeof CURRENCIES,
-            quantity: 2,
-            annotation: 'dodatkowe składniki',
-        },
-        {
-            name: 'pizza Margheritta',
-            price: 33,
-            currency: 'pln' as keyof typeof CURRENCIES,
-            quantity: 1,
-        },
-
-        {
-            name: 'Pizza Margheritta',
-            price: 33,
-            currency: 'pln' as keyof typeof CURRENCIES,
-            quantity: 2,
-            annotation: 'dodatkowe składniki',
-        },
-        {
-            name: 'pizza Margheritta',
-            price: 33,
-            currency: 'pln' as keyof typeof CURRENCIES,
-            quantity: 1,
-        },
-
-        {
-            name: 'Pizza Margheritta',
-            price: 33,
-            currency: 'pln' as keyof typeof CURRENCIES,
-            quantity: 2,
-            annotation: 'dodatkowe składniki',
-        },
-        {
-            name: 'pizza Margheritta',
-            price: 33,
-            currency: 'pln' as keyof typeof CURRENCIES,
-            quantity: 1,
-        },
-
-        {
-            name: 'Pizza Margheritta',
-            price: 33,
-            currency: 'pln' as keyof typeof CURRENCIES,
-            quantity: 2,
-            annotation: 'dodatkowe składniki',
-        },
-        {
-            name: 'pizza Margheritta',
-            price: 33,
-            currency: 'pln' as keyof typeof CURRENCIES,
-            quantity: 1,
-        },
-
-        {
-            name: 'Pizza Margheritta',
-            price: 33,
-            currency: 'pln' as keyof typeof CURRENCIES,
-            quantity: 2,
-            annotation: 'dodatkowe składniki',
-        },
-    ];
     const buttons = [
+        {
+            children: 'Dodaj zniżkę',
+        },
         {
             children: 'Zatwierdź',
         },
-        { children: 'Zamknij bez zmian', onClick: () => toggleModal() },
+        {
+            children: 'Zamknij bez zmian',
+            onClick: () => toggleModal(),
+            variant: 'tertiary',
+        },
     ];
 
     return modal ? (
@@ -179,7 +87,7 @@ const Orders = () => {
             <Menu variant="order">
                 <DetailsAside
                     title="Odbiór"
-                    items={items}
+                    items={orders}
                     price={3}
                     currency="pln"
                     buttons={buttons}
