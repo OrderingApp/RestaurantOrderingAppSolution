@@ -10,5 +10,6 @@ public class OrderItemSummaryDto
     public decimal Discount { get; set; }
     public string MenuItemName { get; set; } = null!;
 
-    public List<OrderItemIngredientReadDto> Ingredients { get; set; } = new List<OrderItemIngredientReadDto>();
+    public List<OrderItemIngredientReadDto> Ingredients { get; set; } =
+        new List<OrderItemIngredientReadDto>();
 }

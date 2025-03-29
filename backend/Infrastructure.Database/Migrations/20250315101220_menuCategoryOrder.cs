@@ -15,15 +15,14 @@ namespace Infrastructure.Database.Migrations
                 table: "MenuCategories",
                 type: "INTEGER",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 0
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Order",
-                table: "MenuCategories");
+            migrationBuilder.DropColumn(name: "Order", table: "MenuCategories");
         }
     }
 }

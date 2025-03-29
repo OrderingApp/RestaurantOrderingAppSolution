@@ -8,6 +8,7 @@ public class OrderItemStatusUpdateValidator : AbstractValidator<OrderItemStatus>
     public OrderItemStatusUpdateValidator()
     {
         RuleFor(x => x)
-            .IsInEnum().WithMessage("Invalid status value. Allowed values: Pending, Served, Cancelled.");
+            .IsInEnum()
+            .WithMessage("Invalid status value. Allowed values: Pending, Served, Cancelled.");
     }
 }

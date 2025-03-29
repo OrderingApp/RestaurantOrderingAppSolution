@@ -10,7 +10,7 @@ public class SubCategoriesEventsMappingProfile : Profile
     public SubCategoriesEventsMappingProfile()
     {
         CreateMap<SubCategory, SubCategoryCreatedEvent>()
-    .ForMember(dest => dest.SubCategoryId, opt => opt.MapFrom(src => src.Id));
+            .ForMember(dest => dest.SubCategoryId, opt => opt.MapFrom(src => src.Id));
 
         CreateMap<SubCategory, SubCategoryUpdatedEvent>()
             .ForMember(dest => dest.SubCategoryId, opt => opt.MapFrom(src => src.Id));

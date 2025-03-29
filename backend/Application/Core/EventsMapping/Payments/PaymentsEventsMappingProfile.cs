@@ -10,6 +10,5 @@ public class PaymentsEventsMappingProfile : Profile
     {
         CreateMap<Payment, PaymentCreatedEvent>()
             .ForMember(dest => dest.PaymentId, opt => opt.MapFrom(src => src.Id));
-
     }
 }

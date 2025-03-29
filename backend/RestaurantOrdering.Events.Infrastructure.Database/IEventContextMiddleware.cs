@@ -6,4 +6,3 @@ public interface IEventContextMiddleware
 {
     void HandleEventContextAdded(EventContext eventContext);
 }
-

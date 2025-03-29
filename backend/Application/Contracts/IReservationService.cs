@@ -8,7 +8,10 @@ public interface IReservationService
     Task<ResultDto<ReservationReadDto>> CreateReservation(ReservationCreateDto reservationCreate);
     Task<ResultDto<ReservationReadDto>> GetReservation(Guid id);
     Task<ResultDto<List<ReservationReadDto>>> GetReservationsByDate(DateTime date);
-    Task<ResultDto<ReservationReadDto>> UpdateReservation(Guid id, ReservationUpdateDto reservationUpdate);
+    Task<ResultDto<ReservationReadDto>> UpdateReservation(
+        Guid id,
+        ReservationUpdateDto reservationUpdate
+    );
     Task<ResultDto<ReservationReadDto>> AssignTableToReservation(Guid id, Guid tableId);
     Task<ResultDto<bool>> DeleteReservation(Guid id);
 }

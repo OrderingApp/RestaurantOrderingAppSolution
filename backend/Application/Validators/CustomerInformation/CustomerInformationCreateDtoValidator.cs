@@ -9,18 +9,24 @@ public class CustomerInformationCreateDtoValidator : AbstractValidator<CustomerI
     public CustomerInformationCreateDtoValidator()
     {
         RuleFor(x => x.PhoneNumber)
-            .NotEmpty().WithMessage("Phone number is required.")
-            .Matches(@"^\+?[1-9]\d{8,14}$").WithMessage("Invalid phone number format.")
-            .Length(9, 15).WithMessage("Phone number must be between 9 and 15 digits.");
+            .NotEmpty()
+            .WithMessage("Phone number is required.")
+            .Matches(@"^\+?[1-9]\d{8,14}$")
+            .WithMessage("Invalid phone number format.")
+            .Length(9, 15)
+            .WithMessage("Phone number must be between 9 and 15 digits.");
 
         RuleFor(x => x.OrderCompletionType)
-            .IsInEnum().WithMessage("Invalid order completion type.");
+            .IsInEnum()
+            .WithMessage("Invalid order completion type.");
 
         RuleFor(x => x.PreferredPaymentMethod)
-            .IsInEnum().WithMessage("Invalid preferred payment method.");
+            .IsInEnum()
+            .WithMessage("Invalid preferred payment method.");
 
         RuleFor(x => x.ExpectedOrderCompletion)
-            .GreaterThan(DateTime.UtcNow).WithMessage("Expected completion must be in the future.")
+            .GreaterThan(DateTime.UtcNow)
+            .WithMessage("Expected completion must be in the future.")
             .When(x => x.ExpectedOrderCompletion.HasValue);
     }
 }

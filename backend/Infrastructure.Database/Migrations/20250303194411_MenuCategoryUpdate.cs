@@ -12,7 +12,8 @@ namespace Infrastructure.Database.Migrations
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_SubCategories_MenuCategories_MenuCategoryId",
-                table: "SubCategories");
+                table: "SubCategories"
+            );
 
             migrationBuilder.AddForeignKey(
                 name: "FK_SubCategories_MenuCategories_MenuCategoryId",
@@ -20,7 +21,8 @@ namespace Infrastructure.Database.Migrations
                 column: "MenuCategoryId",
                 principalTable: "MenuCategories",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Cascade
+            );
         }
 
         /// <inheritdoc />
@@ -28,7 +30,8 @@ namespace Infrastructure.Database.Migrations
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_SubCategories_MenuCategories_MenuCategoryId",
-                table: "SubCategories");
+                table: "SubCategories"
+            );
 
             migrationBuilder.AddForeignKey(
                 name: "FK_SubCategories_MenuCategories_MenuCategoryId",
@@ -36,7 +39,8 @@ namespace Infrastructure.Database.Migrations
                 column: "MenuCategoryId",
                 principalTable: "MenuCategories",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+                onDelete: ReferentialAction.Restrict
+            );
         }
     }
 }

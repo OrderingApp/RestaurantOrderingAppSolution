@@ -13,7 +13,8 @@ namespace Infrastructure.Database.Migrations
             migrationBuilder.RenameColumn(
                 name: "IsUsed",
                 table: "Ingredients",
-                newName: "CanBeUsedAsExtra");
+                newName: "CanBeUsedAsExtra"
+            );
         }
 
         /// <inheritdoc />
@@ -22,7 +23,8 @@ namespace Infrastructure.Database.Migrations
             migrationBuilder.RenameColumn(
                 name: "CanBeUsedAsExtra",
                 table: "Ingredients",
-                newName: "IsUsed");
+                newName: "IsUsed"
+            );
         }
     }
 }

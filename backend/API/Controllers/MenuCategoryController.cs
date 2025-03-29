@@ -22,8 +22,8 @@ public class MenuCategoryController(IMenuCategoryService menuCategoryService) : 
     [ProducesResponseType(typeof(MenuCategoryReadDto), 201)]
     [ProducesResponseType(400)]
     public async Task<ActionResult<MenuCategoryReadDto>> CreateMenuCategory(
-        [FromBody] MenuCategoryCreateDto menuCategoryCreateDto) =>
-        HandleResult(await menuCategoryService.CreateMenuCategory(menuCategoryCreateDto));
+        [FromBody] MenuCategoryCreateDto menuCategoryCreateDto
+    ) => HandleResult(await menuCategoryService.CreateMenuCategory(menuCategoryCreateDto));
 
     /// <summary>
     /// Retrieves a specific menu category by ID.
@@ -58,9 +58,10 @@ public class MenuCategoryController(IMenuCategoryService menuCategoryService) : 
     /// <response code="500">If an internal server error occurs.</response>
     [HttpGet("hierarchy")]
     [ProducesResponseType(typeof(List<MenuCategoryHierarchyReadDto>), 200)]
-    public async Task<ActionResult<List<MenuCategoryHierarchyReadDto>>> GetMenuCategoriesWithHierarchy(
-        [FromQuery] GetMenuCategoryHierarchyRequest request) =>
-            HandleResult(await menuCategoryService.GetMenuCategoriesWithHierarchy(request));
+    public async Task<
+        ActionResult<List<MenuCategoryHierarchyReadDto>>
+    > GetMenuCategoriesWithHierarchy([FromQuery] GetMenuCategoryHierarchyRequest request) =>
+        HandleResult(await menuCategoryService.GetMenuCategoriesWithHierarchy(request));
 
     /// <summary>
     /// Updates an existing menu category.
@@ -76,9 +77,9 @@ public class MenuCategoryController(IMenuCategoryService menuCategoryService) : 
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
     public async Task<ActionResult<MenuCategoryReadDto>> UpdateMenuCategory(
-        [FromRoute] Guid id, 
-        [FromBody] MenuCategoryUpdateDto menuCategoryUpdateDto) =>
-        HandleResult(await menuCategoryService.UpdateMenuCategory(id, menuCategoryUpdateDto));
+        [FromRoute] Guid id,
+        [FromBody] MenuCategoryUpdateDto menuCategoryUpdateDto
+    ) => HandleResult(await menuCategoryService.UpdateMenuCategory(id, menuCategoryUpdateDto));
 
     /// <summary>
     /// Deletes a menu category.

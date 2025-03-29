@@ -23,8 +23,9 @@ public class AreaController(IAreaService areaService) : BaseApiController
     [HttpPost]
     [ProducesResponseType(typeof(AreaReadDto), 201)]
     [ProducesResponseType(400)]
-    public async Task<ActionResult<AreaReadDto>> CreateArea([FromBody] AreaCreateDto areaCreateDto) =>
-        HandleResult(await areaService.CreateArea(areaCreateDto, GetUserId()));
+    public async Task<ActionResult<AreaReadDto>> CreateArea(
+        [FromBody] AreaCreateDto areaCreateDto
+    ) => HandleResult(await areaService.CreateArea(areaCreateDto, GetUserId()));
 
     /// <summary>
     /// Retrieves an area by its ID.
@@ -62,8 +63,10 @@ public class AreaController(IAreaService areaService) : BaseApiController
     [ProducesResponseType(typeof(AreaReadDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<AreaReadDto>> UpdateArea([FromRoute] Guid id, [FromBody] AreaUpdateDto areaUpdateDto) =>
-        HandleResult(await areaService.UpdateArea(id, areaUpdateDto));
+    public async Task<ActionResult<AreaReadDto>> UpdateArea(
+        [FromRoute] Guid id,
+        [FromBody] AreaUpdateDto areaUpdateDto
+    ) => HandleResult(await areaService.UpdateArea(id, areaUpdateDto));
 
     /// <summary>
     /// Deletes an area by ID.

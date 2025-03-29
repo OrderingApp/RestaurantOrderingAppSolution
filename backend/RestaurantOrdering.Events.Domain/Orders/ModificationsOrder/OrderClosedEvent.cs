@@ -9,9 +9,9 @@ public class OrderClosedEvent : BaseEvent
     public decimal Discount { get; set; } = 0;
     public List<OrderClosedEventOrderItem> OrderItems { get; set; } = new();
     public List<OrderClosedEventPayment> Payments { get; set; } = new();
+
     public override string GetEventType() => nameof(OrderClosedEvent);
 }
-
 
 public class OrderClosedEventOrderItem
 {

@@ -31,5 +31,5 @@ public enum OrderItemStatus
 {
     Pending,
     Served,
-    Cancelled
+    Cancelled,
 }

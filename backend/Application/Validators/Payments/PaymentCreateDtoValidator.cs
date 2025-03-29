@@ -9,8 +9,6 @@ public class PaymentCreateDtoValidator : AbstractValidator<PaymentCreateDto>
             .GreaterThan(0)
             .WithMessage("Payment amount must be greater than zero.");
 
-        RuleFor(p => p.PaymentMethod)
-            .IsInEnum()
-            .WithMessage("Invalid payment method specified.");
+        RuleFor(p => p.PaymentMethod).IsInEnum().WithMessage("Invalid payment method specified.");
     }
 }

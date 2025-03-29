@@ -28,12 +28,12 @@ public enum OrderStatus
     Ongoing,
     PendingPayment,
     Closed,
-    Cancelled
+    Cancelled,
 }
 
 public enum OrderType
 {
     DineIn,
     Takeaway,
-    Delivery
+    Delivery,
 }

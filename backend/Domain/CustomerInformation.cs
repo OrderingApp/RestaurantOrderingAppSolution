@@ -18,11 +18,11 @@ public class CustomerInformation
 public enum OrderCompletionType
 {
     Immediate,
-    Scheduled
+    Scheduled,
 }
 
 public enum PreferredPaymentMethod
 {
     Card,
-    Cash
+    Cash,
 }

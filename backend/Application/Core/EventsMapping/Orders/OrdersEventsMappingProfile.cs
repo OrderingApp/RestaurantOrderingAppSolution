@@ -24,7 +24,10 @@ public class OrdersEventsMappingProfile : Profile
         CreateMap<Order, OrderJoinEvent>()
             .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id));
 
-        CreateMap<(Order sourceOrder, Guid targetOrderId, List<Guid> movedItemIds), OrderItemsMovedEvent>()
+        CreateMap<
+            (Order sourceOrder, Guid targetOrderId, List<Guid> movedItemIds),
+            OrderItemsMovedEvent
+        >()
             .ForMember(dest => dest.SourceOrderId, opt => opt.MapFrom(src => src.sourceOrder.Id))
             .ForMember(dest => dest.TargetOrderId, opt => opt.MapFrom(src => src.targetOrderId))
             .ForMember(dest => dest.MovedItemIds, opt => opt.MapFrom(src => src.movedItemIds));
@@ -46,9 +49,9 @@ public class OrdersEventsMappingProfile : Profile
         CreateMap<Payment, OrderClosedEventPayment>();
 
         CreateMap<(Order order, OrderStatus previousOrderStatus), OrderStatusChangedEvent>()
-           .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.order.Id))
-           .ForMember(dest => dest.From, opt => opt.MapFrom(src => src.previousOrderStatus))
-           .ForMember(dest => dest.To, opt => opt.MapFrom(src => src.order.Status));
+            .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.order.Id))
+            .ForMember(dest => dest.From, opt => opt.MapFrom(src => src.previousOrderStatus))
+            .ForMember(dest => dest.To, opt => opt.MapFrom(src => src.order.Status));
 
         CreateMap<(Order order, OrderType previousOrderType), OrderTypeChangeEvent>()
             .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.order.Id))

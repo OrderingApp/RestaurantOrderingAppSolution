@@ -14,6 +14,9 @@ public class TakeawayOrderMappingProfile : Profile
             .ForMember(dest => dest.TotalAmount, opt => opt.Ignore())
             .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => OrderStatus.Ongoing))
             .ForMember(dest => dest.OrderItems, opt => opt.Ignore())
-            .ForMember(dest => dest.CustomerInformation, opt => opt.MapFrom(src => src.CustomerInformation));
+            .ForMember(
+                dest => dest.CustomerInformation,
+                opt => opt.MapFrom(src => src.CustomerInformation)
+            );
     }
 }

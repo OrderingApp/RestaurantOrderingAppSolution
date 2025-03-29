@@ -21,8 +21,10 @@ public class PaymentController(IPaymentService paymentService) : BaseApiControll
     [HttpPost]
     [ProducesResponseType(201)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> AddPayment([FromRoute] Guid orderId, [FromBody] PaymentCreateDto paymentDto) =>
-        HandleResult(await paymentService.AddPayment(orderId, paymentDto));
+    public async Task<IActionResult> AddPayment(
+        [FromRoute] Guid orderId,
+        [FromBody] PaymentCreateDto paymentDto
+    ) => HandleResult(await paymentService.AddPayment(orderId, paymentDto));
 
     /// <summary>
     /// Retrieves all payments for a specific order.
@@ -44,6 +46,8 @@ public class PaymentController(IPaymentService paymentService) : BaseApiControll
     /// <response code="200">Returns the list of payments.</response>
     [HttpPatch("{id}")]
     [ProducesResponseType(200)]
-    public async Task<IActionResult> MarkPaymentAsRefunded([FromRoute] Guid id, [FromRoute] Guid orderId) =>
-        HandleResult(await paymentService.MarkPaymentAsRefunded(id, orderId));
+    public async Task<IActionResult> MarkPaymentAsRefunded(
+        [FromRoute] Guid id,
+        [FromRoute] Guid orderId
+    ) => HandleResult(await paymentService.MarkPaymentAsRefunded(id, orderId));
 }

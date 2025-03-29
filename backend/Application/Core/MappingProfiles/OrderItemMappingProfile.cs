@@ -1,5 +1,5 @@
-﻿using Application.Dtos.OrderItems;
-using Application.Dtos.OrderItemIngredients;
+﻿using Application.Dtos.OrderItemIngredients;
+using Application.Dtos.OrderItems;
 using AutoMapper;
 using Domain;
 
@@ -11,8 +11,14 @@ public class OrderItemMappingProfile : Profile
     {
         CreateMap<OrderItem, OrderItemReadDto>()
             .ForMember(dest => dest.MenuItem, opt => opt.MapFrom(src => src.MenuItem))
-            .ForMember(dest => dest.ExtraIngredients, opt => opt.MapFrom(src => src.ExtraIngredients))
-            .ForMember(dest => dest.RemovedIngredients, opt => opt.MapFrom(src => src.RemovedIngredients));
+            .ForMember(
+                dest => dest.ExtraIngredients,
+                opt => opt.MapFrom(src => src.ExtraIngredients)
+            )
+            .ForMember(
+                dest => dest.RemovedIngredients,
+                opt => opt.MapFrom(src => src.RemovedIngredients)
+            );
 
         CreateMap<OrderItemCreateDto, OrderItem>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))

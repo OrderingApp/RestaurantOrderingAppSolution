@@ -19,19 +19,19 @@ namespace RestaurantOrdering.Events.Infrastructure.Database.Migrations
                     CorrelationId = table.Column<Guid>(type: "TEXT", nullable: false),
                     DateTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     EventType = table.Column<string>(type: "TEXT", nullable: false),
-                    PayloadJson = table.Column<string>(type: "TEXT", nullable: false)
+                    PayloadJson = table.Column<string>(type: "TEXT", nullable: false),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EventContexts", x => x.Id);
-                });
+                }
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "EventContexts");
+            migrationBuilder.DropTable(name: "EventContexts");
         }
     }
 }

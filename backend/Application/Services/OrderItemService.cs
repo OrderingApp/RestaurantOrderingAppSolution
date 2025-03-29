@@ -1,4 +1,5 @@
-﻿using Application.Contracts;
+﻿using System.Net;
+using Application.Contracts;
 using Application.Dtos.Common;
 using Application.Dtos.OrderItems;
 using Application.Dtos.Orders;
@@ -8,28 +9,34 @@ using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using RestaurantOrdering.Events.Application.Contracts;
 using RestaurantOrdering.Events.Domain.OrderItems;
-using System.Net;
 
 namespace Application.Services;
 
-public class OrderItemService(RestaurantOrderingContext orderingContext, IEventHandlerService eventHandlerService, IMapper mapper) : IOrderItemService
+public class OrderItemService(
+    RestaurantOrderingContext orderingContext,
+    IEventHandlerService eventHandlerService,
+    IMapper mapper
+) : IOrderItemService
 {
-    public async Task<ResultDto<OrderReadDto>> AddOrderItems(Guid orderId, List<OrderItemCreateDto> orderItemDtos)
+    public async Task<ResultDto<OrderReadDto>> AddOrderItems(
+        Guid orderId,
+        List<OrderItemCreateDto> orderItemDtos
+    )
     {
         try
         {
-            var order = await orderingContext.Orders
-                .Include(o => o.OrderItems)
+            var order = await orderingContext
+                .Orders.Include(o => o.OrderItems)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
 
             if (order == null)
                 return ResultDto<OrderReadDto>.Failure("Order not found.", HttpStatusCode.NotFound);
 
             var menuItemIds = orderItemDtos.Select(dto => dto.MenuItemId).Distinct();
-            var menuItems = await orderingContext.MenuItems
-                .Where(mi => menuItemIds.Contains(mi.Id))
+            var menuItems = await orderingContext
+                .MenuItems.Where(mi => menuItemIds.Contains(mi.Id))
                 .Include(mi => mi.MenuItemIngredientRels)
-                    .ThenInclude(rel => rel.Ingredient)
+                .ThenInclude(rel => rel.Ingredient)
                 .ToDictionaryAsync(mi => mi.Id);
 
             var orderItems = new List<OrderItem>();
@@ -37,7 +44,10 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
             foreach (var dto in orderItemDtos)
             {
                 if (!menuItems.TryGetValue(dto.MenuItemId, out var menuItem))
-                    return ResultDto<OrderReadDto>.Failure($"MenuItem with ID {dto.MenuItemId} not found.", HttpStatusCode.BadRequest);
+                    return ResultDto<OrderReadDto>.Failure(
+                        $"MenuItem with ID {dto.MenuItemId} not found.",
+                        HttpStatusCode.BadRequest
+                    );
 
                 var orderItem = mapper.Map<OrderItem>(dto);
                 orderItem.OrderId = orderId;
@@ -45,23 +55,29 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
 
                 if (dto.ExtraIngredients.Any())
                 {
-                    var extraIngredients = await orderingContext.Ingredients
-                        .Where(i => dto.ExtraIngredients.Select(ei => ei.IngredientId).Contains(i.Id))
+                    var extraIngredients = await orderingContext
+                        .Ingredients.Where(i =>
+                            dto.ExtraIngredients.Select(ei => ei.IngredientId).Contains(i.Id)
+                        )
                         .ToListAsync();
 
                     foreach (var extra in dto.ExtraIngredients)
                     {
-                        var ingredient = extraIngredients.FirstOrDefault(i => i.Id == extra.IngredientId);
+                        var ingredient = extraIngredients.FirstOrDefault(i =>
+                            i.Id == extra.IngredientId
+                        );
                         if (ingredient != null)
                         {
                             orderItem.Price += ingredient.Price * extra.Quantity;
-                            orderItem.ExtraIngredients.Add(new OrderItemIngredient
-                            {
-                                Id = Guid.NewGuid(),
-                                Name = ingredient.Name,
-                                Price = ingredient.Price,
-                                Quantity = extra.Quantity
-                            });
+                            orderItem.ExtraIngredients.Add(
+                                new OrderItemIngredient
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Name = ingredient.Name,
+                                    Price = ingredient.Price,
+                                    Quantity = extra.Quantity,
+                                }
+                            );
                         }
                     }
                 }
@@ -73,7 +89,6 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
 
                 orderItems.Add(orderItem);
             }
-
 
             await orderingContext.OrderItems.AddRangeAsync(orderItems);
             order.TotalAmount = RecalculateOrderTotal(order);
@@ -87,7 +102,10 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
         }
         catch (Exception ex)
         {
-            return ResultDto<OrderReadDto>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<OrderReadDto>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
@@ -95,21 +113,27 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
     {
         try
         {
-            var orderItem = await orderingContext.OrderItems
-                .Include(oi => oi.MenuItem)
-                    .ThenInclude(mi => mi.MenuItemIngredientRels)
-                        .ThenInclude(rel => rel.Ingredient)
+            var orderItem = await orderingContext
+                .OrderItems.Include(oi => oi.MenuItem)
+                .ThenInclude(mi => mi.MenuItemIngredientRels)
+                .ThenInclude(rel => rel.Ingredient)
                 .FirstOrDefaultAsync(oi => oi.Id == id && oi.OrderId == orderId);
 
             if (orderItem == null)
-                return ResultDto<OrderItemReadDto>.Failure("Order item not found.", HttpStatusCode.NotFound);
+                return ResultDto<OrderItemReadDto>.Failure(
+                    "Order item not found.",
+                    HttpStatusCode.NotFound
+                );
 
             var orderItemDto = mapper.Map<OrderItemReadDto>(orderItem);
             return ResultDto<OrderItemReadDto>.Success(orderItemDto, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
-            return ResultDto<OrderItemReadDto>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<OrderItemReadDto>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
@@ -117,8 +141,8 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
     {
         try
         {
-            var orderItems = await orderingContext.OrderItems
-                .Where(oi => oi.OrderId == orderId)
+            var orderItems = await orderingContext
+                .OrderItems.Where(oi => oi.OrderId == orderId)
                 .Include(oi => oi.MenuItem)
                 .OrderBy(oi => oi.Status == OrderItemStatus.Pending ? 0 : 1)
                 .ToListAsync();
@@ -128,24 +152,34 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
         }
         catch (Exception ex)
         {
-            return ResultDto<List<OrderItemsListDto>>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<List<OrderItemsListDto>>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
-    public async Task<ResultDto<OrderItemReadDto>> UpdateOrderItem(Guid orderId, Guid id, OrderItemUpdateDto updateDto)
+    public async Task<ResultDto<OrderItemReadDto>> UpdateOrderItem(
+        Guid orderId,
+        Guid id,
+        OrderItemUpdateDto updateDto
+    )
     {
         try
         {
-            var orderItem = await orderingContext.OrderItems
-                .Include(oi => oi.MenuItem)
-                    .ThenInclude(mi => mi.MenuItemIngredientRels)
-                        .ThenInclude(rel => rel.Ingredient)
+            var orderItem = await orderingContext
+                .OrderItems.Include(oi => oi.MenuItem)
+                .ThenInclude(mi => mi.MenuItemIngredientRels)
+                .ThenInclude(rel => rel.Ingredient)
                 .Include(oi => oi.ExtraIngredients)
                 .Include(oi => oi.RemovedIngredients)
                 .FirstOrDefaultAsync(oi => oi.Id == id && oi.OrderId == orderId);
 
             if (orderItem == null)
-                return ResultDto<OrderItemReadDto>.Failure("Order item not found.", HttpStatusCode.NotFound);
+                return ResultDto<OrderItemReadDto>.Failure(
+                    "Order item not found.",
+                    HttpStatusCode.NotFound
+                );
 
             if (!string.IsNullOrWhiteSpace(updateDto.SpecialInstructions))
                 orderItem.SpecialInstructions = updateDto.SpecialInstructions;
@@ -155,23 +189,29 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
 
             if (updateDto.ExtraIngredients.Any())
             {
-                var extraIngredients = await orderingContext.Ingredients
-                    .Where(i => updateDto.ExtraIngredients.Select(ei => ei.IngredientId).Contains(i.Id))
+                var extraIngredients = await orderingContext
+                    .Ingredients.Where(i =>
+                        updateDto.ExtraIngredients.Select(ei => ei.IngredientId).Contains(i.Id)
+                    )
                     .ToListAsync();
 
                 foreach (var extra in updateDto.ExtraIngredients)
                 {
-                    var ingredient = extraIngredients.FirstOrDefault(i => i.Id == extra.IngredientId);
+                    var ingredient = extraIngredients.FirstOrDefault(i =>
+                        i.Id == extra.IngredientId
+                    );
                     if (ingredient != null)
                     {
                         orderItem.Price += ingredient.Price * extra.Quantity;
-                        orderItem.ExtraIngredients.Add(new OrderItemIngredient
-                        {
-                            Id = Guid.NewGuid(),
-                            Name = ingredient.Name,
-                            Price = ingredient.Price,
-                            Quantity = extra.Quantity
-                        });
+                        orderItem.ExtraIngredients.Add(
+                            new OrderItemIngredient
+                            {
+                                Id = Guid.NewGuid(),
+                                Name = ingredient.Name,
+                                Price = ingredient.Price,
+                                Quantity = extra.Quantity,
+                            }
+                        );
                     }
                 }
             }
@@ -191,16 +231,24 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
         }
         catch (Exception ex)
         {
-            return ResultDto<OrderItemReadDto>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<OrderItemReadDto>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
-    public async Task<ResultDto<bool>> UpdateOrderItemStatus(Guid orderId, Guid id, OrderItemStatus status)
+    public async Task<ResultDto<bool>> UpdateOrderItemStatus(
+        Guid orderId,
+        Guid id,
+        OrderItemStatus status
+    )
     {
         try
         {
-            var orderItem = await orderingContext.OrderItems
-                .FirstOrDefaultAsync(oi => oi.Id == id && oi.OrderId == orderId);
+            var orderItem = await orderingContext.OrderItems.FirstOrDefaultAsync(oi =>
+                oi.Id == id && oi.OrderId == orderId
+            );
 
             if (orderItem == null)
                 return ResultDto<bool>.Failure("Order item not found.", HttpStatusCode.NotFound);
@@ -209,14 +257,19 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
             orderItem.Status = status;
             await orderingContext.SaveChangesAsync();
 
-            var orderItemStatusUpdatedEvent = mapper.Map<OrderItemStatusUpdatedEvent>((orderItem, previousStatus));
+            var orderItemStatusUpdatedEvent = mapper.Map<OrderItemStatusUpdatedEvent>(
+                (orderItem, previousStatus)
+            );
             await eventHandlerService.HandleEventAsync(orderItemStatusUpdatedEvent);
 
             return ResultDto<bool>.Success(true, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
-            return ResultDto<bool>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<bool>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
@@ -224,7 +277,9 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
     {
         try
         {
-            var orderItem = await orderingContext.OrderItems.FirstOrDefaultAsync(oi => oi.Id == id && oi.OrderId == orderId);
+            var orderItem = await orderingContext.OrderItems.FirstOrDefaultAsync(oi =>
+                oi.Id == id && oi.OrderId == orderId
+            );
 
             if (orderItem == null)
                 return ResultDto<bool>.Failure("Order item not found.", HttpStatusCode.NotFound);
@@ -239,7 +294,10 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
         }
         catch (Exception ex)
         {
-            return ResultDto<bool>.Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<bool>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
@@ -248,18 +306,22 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
         return order.OrderItems.Sum(oi => oi.Price * (1 - (oi.Discount / 100))) - order.Discount;
     }
 
-    private async Task HandleRemovedIngredients(OrderItem orderItem, List<Guid> removedIngredientIds)
+    private async Task HandleRemovedIngredients(
+        OrderItem orderItem,
+        List<Guid> removedIngredientIds
+    )
     {
-        if (!removedIngredientIds.Any()) return;
+        if (!removedIngredientIds.Any())
+            return;
 
-        var menuItemIngredients = await orderingContext.MenuItemIngredientRels
-            .Where(mi => mi.MenuItemId == orderItem.MenuItemId)
+        var menuItemIngredients = await orderingContext
+            .MenuItemIngredientRels.Where(mi => mi.MenuItemId == orderItem.MenuItemId)
             .Select(mi => mi.Ingredient)
             .ToListAsync();
 
         // Remove from extra ingredients (and adjust price)
-        var removedExtraIngredients = orderItem.ExtraIngredients
-            .Where(extra => removedIngredientIds.Contains(extra.Id))
+        var removedExtraIngredients = orderItem
+            .ExtraIngredients.Where(extra => removedIngredientIds.Contains(extra.Id))
             .ToList();
 
         foreach (var extra in removedExtraIngredients)
@@ -278,13 +340,15 @@ public class OrderItemService(RestaurantOrderingContext orderingContext, IEventH
             // Check if the ingredient is already marked as removed
             if (!orderItem.RemovedIngredients.Any(ri => ri.Name == ingredient.Name))
             {
-                orderItem.RemovedIngredients.Add(new OrderItemIngredient
-                {
-                    Id = Guid.NewGuid(),
-                    Name = ingredient.Name,
-                    Price = 0,
-                    Quantity = 1
-                });
+                orderItem.RemovedIngredients.Add(
+                    new OrderItemIngredient
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = ingredient.Name,
+                        Price = 0,
+                        Quantity = 1,
+                    }
+                );
             }
         }
     }

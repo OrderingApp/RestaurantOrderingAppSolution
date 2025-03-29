@@ -3,6 +3,7 @@
 public class DeliveryOrderCreatedEvent : BaseEvent
 {
     public Guid OrderId { get; set; }
+
     //public DateTime OrderDateTime { get; set; }
     //public string PhoneNumber { get; set; } = null!;
     //public string Address { get; set; } = null!;

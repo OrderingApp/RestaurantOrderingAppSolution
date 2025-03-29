@@ -21,8 +21,8 @@ public class SubCategoryController(ISubCategoryService subCategoryService) : Bas
     [ProducesResponseType(typeof(SubCategoryReadDto), 201)]
     [ProducesResponseType(400)]
     public async Task<ActionResult<SubCategoryReadDto>> CreateSubCategory(
-        [FromBody] SubCategoryCreateDto subCategoryCreateDto) =>
-        HandleResult(await subCategoryService.CreateSubCategory(subCategoryCreateDto));
+        [FromBody] SubCategoryCreateDto subCategoryCreateDto
+    ) => HandleResult(await subCategoryService.CreateSubCategory(subCategoryCreateDto));
 
     /// <summary>
     /// Retrieves a specific sub-category by ID.
@@ -61,8 +61,8 @@ public class SubCategoryController(ISubCategoryService subCategoryService) : Bas
     [ProducesResponseType(404)]
     public async Task<ActionResult<SubCategoryReadDto>> UpdateSubCategory(
         [FromRoute] Guid id,
-        [FromBody] SubCategoryUpdateDto subCategoryUpdateDto) =>
-        HandleResult(await subCategoryService.UpdateSubCategory(id, subCategoryUpdateDto));
+        [FromBody] SubCategoryUpdateDto subCategoryUpdateDto
+    ) => HandleResult(await subCategoryService.UpdateSubCategory(id, subCategoryUpdateDto));
 
     /// <summary>
     /// Deletes a sub-category.

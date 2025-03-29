@@ -1,4 +1,5 @@
-﻿using Application.Contracts;
+﻿using System.Net;
+using Application.Contracts;
 using Application.Dtos.Common;
 using Application.Dtos.Payments;
 using AutoMapper;
@@ -7,30 +8,45 @@ using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using RestaurantOrdering.Events.Application.Contracts;
 using RestaurantOrdering.Events.Domain.Payments;
-using System.Net;
 
 namespace Application.Services;
 
-public class PaymentService(RestaurantOrderingContext orderingContext, IEventHandlerService eventHandlerService, IMapper mapper) : IPaymentService
+public class PaymentService(
+    RestaurantOrderingContext orderingContext,
+    IEventHandlerService eventHandlerService,
+    IMapper mapper
+) : IPaymentService
 {
-    public async Task<ResultDto<PaymentReadDto>> AddPayment(Guid orderId, PaymentCreateDto paymentDto)
+    public async Task<ResultDto<PaymentReadDto>> AddPayment(
+        Guid orderId,
+        PaymentCreateDto paymentDto
+    )
     {
         try
         {
-            var order = await orderingContext.Orders
-                .Include(o => o.Payments)
+            var order = await orderingContext
+                .Orders.Include(o => o.Payments)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
 
             if (order == null)
-                return ResultDto<PaymentReadDto>.Failure("Order not found", HttpStatusCode.NotFound);
+                return ResultDto<PaymentReadDto>.Failure(
+                    "Order not found",
+                    HttpStatusCode.NotFound
+                );
 
             if (order.Status != OrderStatus.PendingPayment)
-                return ResultDto<PaymentReadDto>.Failure("Order must be in Pending Payment status to add payment.", HttpStatusCode.BadRequest);
+                return ResultDto<PaymentReadDto>.Failure(
+                    "Order must be in Pending Payment status to add payment.",
+                    HttpStatusCode.BadRequest
+                );
 
             var totalPaid = order.Payments.Sum(p => p.Amount);
 
             if (totalPaid + paymentDto.Amount > order.TotalAmount)
-                return ResultDto<PaymentReadDto>.Failure("Payment exceeds order total.", HttpStatusCode.BadRequest);
+                return ResultDto<PaymentReadDto>.Failure(
+                    "Payment exceeds order total.",
+                    HttpStatusCode.BadRequest
+                );
 
             var payment = mapper.Map<Payment>(paymentDto);
             payment.OrderId = orderId;
@@ -47,8 +63,10 @@ public class PaymentService(RestaurantOrderingContext orderingContext, IEventHan
         }
         catch (Exception ex)
         {
-            return ResultDto<PaymentReadDto>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<PaymentReadDto>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
@@ -58,10 +76,13 @@ public class PaymentService(RestaurantOrderingContext orderingContext, IEventHan
         {
             var orderExists = await orderingContext.Orders.AnyAsync(o => o.Id == orderId);
             if (!orderExists)
-                return ResultDto<List<PaymentReadDto>>.Failure("Order not found", HttpStatusCode.NotFound);
+                return ResultDto<List<PaymentReadDto>>.Failure(
+                    "Order not found",
+                    HttpStatusCode.NotFound
+                );
 
-            var payments = await orderingContext.Payments
-                .Where(p => p.OrderId == orderId)
+            var payments = await orderingContext
+                .Payments.Where(p => p.OrderId == orderId)
                 .ToListAsync();
 
             var paymentReadDtos = mapper.Map<List<PaymentReadDto>>(payments);
@@ -70,8 +91,10 @@ public class PaymentService(RestaurantOrderingContext orderingContext, IEventHan
         }
         catch (Exception ex)
         {
-            return ResultDto<List<PaymentReadDto>>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<List<PaymentReadDto>>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
@@ -81,13 +104,20 @@ public class PaymentService(RestaurantOrderingContext orderingContext, IEventHan
         {
             var orderExists = await orderingContext.Orders.AnyAsync(o => o.Id == orderId);
             if (!orderExists)
-                return ResultDto<PaymentReadDto>.Failure("Order not found", HttpStatusCode.NotFound);
+                return ResultDto<PaymentReadDto>.Failure(
+                    "Order not found",
+                    HttpStatusCode.NotFound
+                );
 
-            var payment = await orderingContext.Payments
-                .FirstOrDefaultAsync(p => p.Id == id && p.OrderId == orderId);
+            var payment = await orderingContext.Payments.FirstOrDefaultAsync(p =>
+                p.Id == id && p.OrderId == orderId
+            );
 
-            if(payment == null)
-                return ResultDto<PaymentReadDto>.Failure("Payment not found", HttpStatusCode.NotFound);
+            if (payment == null)
+                return ResultDto<PaymentReadDto>.Failure(
+                    "Payment not found",
+                    HttpStatusCode.NotFound
+                );
 
             payment.IsRefunded = true;
             await orderingContext.SaveChangesAsync();
@@ -98,8 +128,10 @@ public class PaymentService(RestaurantOrderingContext orderingContext, IEventHan
         }
         catch (Exception ex)
         {
-            return ResultDto<PaymentReadDto>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<PaymentReadDto>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 }

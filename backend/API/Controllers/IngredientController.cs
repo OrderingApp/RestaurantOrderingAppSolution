@@ -20,8 +20,9 @@ public class IngredientsController(IIngredientService ingredientService) : BaseA
     [HttpPost]
     [ProducesResponseType(typeof(IngredientReadDto), 201)]
     [ProducesResponseType(400)]
-    public async Task<ActionResult<IngredientReadDto>> CreateIngredient([FromBody] IngredientCreateDto ingredientCreateDto) =>
-        HandleResult(await ingredientService.CreateIngredient(ingredientCreateDto));
+    public async Task<ActionResult<IngredientReadDto>> CreateIngredient(
+        [FromBody] IngredientCreateDto ingredientCreateDto
+    ) => HandleResult(await ingredientService.CreateIngredient(ingredientCreateDto));
 
     /// <summary>
     /// Retrieves a specific ingredient by ID.
@@ -42,8 +43,9 @@ public class IngredientsController(IIngredientService ingredientService) : BaseA
     /// <returns>A list of all available ingredients.</returns>
     [HttpGet]
     [ProducesResponseType(typeof(List<IngredientReadDto>), 200)]
-    public async Task<ActionResult<List<IngredientReadDto>>> GetIngredients([FromQuery] List<string>? tags = null) =>
-        HandleResult(await ingredientService.GetIngredients(tags));
+    public async Task<ActionResult<List<IngredientReadDto>>> GetIngredients(
+        [FromQuery] List<string>? tags = null
+    ) => HandleResult(await ingredientService.GetIngredients(tags));
 
     /// <summary>
     /// Adds tags to an ingredient.
@@ -56,8 +58,10 @@ public class IngredientsController(IIngredientService ingredientService) : BaseA
     [HttpPut("{id}/tags")]
     [ProducesResponseType(typeof(IngredientReadDto), 200)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<IngredientReadDto>> AddTagsToIngredient([FromRoute] Guid id, [FromBody] List<Guid> tagIds) =>
-        HandleResult(await ingredientService.AddTagsToIngredient(id, tagIds));
+    public async Task<ActionResult<IngredientReadDto>> AddTagsToIngredient(
+        [FromRoute] Guid id,
+        [FromBody] List<Guid> tagIds
+    ) => HandleResult(await ingredientService.AddTagsToIngredient(id, tagIds));
 
     /// <summary>
     /// Updates an ingredient.
@@ -72,8 +76,10 @@ public class IngredientsController(IIngredientService ingredientService) : BaseA
     [ProducesResponseType(typeof(IngredientReadDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<IngredientReadDto>> UpdateIngredient([FromRoute] Guid id, [FromBody] IngredientUpdateDto ingredientUpdateDto) =>
-        HandleResult(await ingredientService.UpdateIngredient(id, ingredientUpdateDto));
+    public async Task<ActionResult<IngredientReadDto>> UpdateIngredient(
+        [FromRoute] Guid id,
+        [FromBody] IngredientUpdateDto ingredientUpdateDto
+    ) => HandleResult(await ingredientService.UpdateIngredient(id, ingredientUpdateDto));
 
     /// <summary>
     /// Deletes an ingredient.

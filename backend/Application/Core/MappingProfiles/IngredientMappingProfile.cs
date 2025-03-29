@@ -14,8 +14,11 @@ public class IngredientMappingProfile : Profile
 
         // Map from Ingredient to IngredientReadDto
         CreateMap<Ingredient, IngredientReadDto>()
-            .ForMember(dest => dest.Tags, opt => opt.MapFrom(
-                src => src.IngredientTagRels.Select(rel => rel.Tag.Name).ToList()));
+            .ForMember(
+                dest => dest.Tags,
+                opt =>
+                    opt.MapFrom(src => src.IngredientTagRels.Select(rel => rel.Tag.Name).ToList())
+            );
 
         // Map from IngredientUpdateDto to Ingredient (Only update non-null properties)
         CreateMap<IngredientUpdateDto, Ingredient>()
