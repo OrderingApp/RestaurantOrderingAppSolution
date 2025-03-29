@@ -1,5 +1,7 @@
-﻿using Application.Contracts;
+﻿using API.Authorization;
+using Application.Contracts;
 using Application.Dtos.Areas;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -7,10 +9,10 @@ namespace API.Controllers;
 /// <summary>
 /// Manages restaurant areas, including retrieval, creation, updates, and deletion.
 /// </summary>
+[Authorize(Roles = Roles.Waiter)]
 [Route("api/areas")]
 public class AreaController(IAreaService areaService) : BaseApiController
 {
-
     /// <summary>
     /// Creates a new area.
     /// </summary>
@@ -22,7 +24,7 @@ public class AreaController(IAreaService areaService) : BaseApiController
     [ProducesResponseType(typeof(AreaReadDto), 201)]
     [ProducesResponseType(400)]
     public async Task<ActionResult<AreaReadDto>> CreateArea([FromBody] AreaCreateDto areaCreateDto) =>
-        HandleResult(await areaService.CreateArea(areaCreateDto));
+        HandleResult(await areaService.CreateArea(areaCreateDto, GetUserId()));
 
     /// <summary>
     /// Retrieves an area by its ID.
