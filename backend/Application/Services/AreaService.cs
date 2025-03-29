@@ -12,7 +12,7 @@ namespace Application.Services;
 
 public class AreaService(RestaurantOrderingContext orderingContext, IEventHandlerService eventHandlerService, IMapper mapper) : IAreaService
 {
-    public async Task<ResultDto<AreaReadDto>> CreateArea(AreaCreateDto areaCreateDto)
+    public async Task<ResultDto<AreaReadDto>> CreateArea(AreaCreateDto areaCreateDto, Guid userId)
     {
         try
         {

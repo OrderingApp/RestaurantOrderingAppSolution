@@ -3,7 +3,6 @@ using Application.Contracts;
 using Application.Dtos.Areas;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace API.Controllers;
 
@@ -25,7 +24,7 @@ public class AreaController(IAreaService areaService) : BaseApiController
     [ProducesResponseType(typeof(AreaReadDto), 201)]
     [ProducesResponseType(400)]
     public async Task<ActionResult<AreaReadDto>> CreateArea([FromBody] AreaCreateDto areaCreateDto) =>
-        HandleResult(await areaService.CreateArea(areaCreateDto));
+        HandleResult(await areaService.CreateArea(areaCreateDto, GetUserId()));
 
     /// <summary>
     /// Retrieves an area by its ID.
