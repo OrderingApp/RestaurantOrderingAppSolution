@@ -19,4 +19,6 @@ public abstract class BaseApiController : ControllerBase
 
         return StatusCode((int)result.HttpStatusCode, new { result.ErrorMessage });
     }
+
+    //public Guid GetUserId() { return Guid.Empty; }
 }

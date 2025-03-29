@@ -1,4 +1,8 @@
 using API.Extensions;
+using Keycloak.AuthServices.Authentication;
+using Keycloak.AuthServices.Authorization;
+using Keycloak.AuthServices.Common;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -63,17 +67,17 @@ builder.Services.AddSwaggerGen(options =>
 
 });
 
-builder.Services.AddAuthentication("Bearer")
-    .AddJwtBearer("Bearer", options =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
+builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration);
+
+builder.Services.AddAuthorization()
+    .AddKeycloakAuthorization(options =>
     {
-        options.Authority = "http://localhost:8080/realms/OrderApp";
-        options.Audience = "order-api";
-        options.RequireHttpsMetadata = false;
-    });
-
-builder.Services.AddAuthorization();
-
-
+        options.EnableRolesMapping =
+            RolesClaimTransformationSource.Realm;
+        options.RoleClaimType = KeycloakConstants.RoleClaimType;
+    })
+    .AddAuthorizationBuilder();
 
 var app = builder.Build();
 
