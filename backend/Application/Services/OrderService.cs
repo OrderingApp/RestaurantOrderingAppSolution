@@ -218,7 +218,6 @@ public class OrderService(
                 && o.DateTime < nextDay
             );
 
-            // Get only 10 latest closed orders for the day
             var closedOrdersQuery = orderingContext
                 .Orders.Where(o =>
                     o.Type == orderType
@@ -354,8 +353,14 @@ public class OrderService(
 
             if (order.Table != null)
             {
-                order.Table.Status = TableStatus.Available;
-                orderingContext.Tables.Update(order.Table);
+                bool hasOtherOpenOrders = await orderingContext.Orders
+                    .AnyAsync(o => o.TableId == order.TableId && o.Id != order.Id && o.Status != OrderStatus.Closed);
+
+                if (!hasOtherOpenOrders)
+                {
+                    order.Table.Status = TableStatus.Available;
+                    orderingContext.Tables.Update(order.Table);
+                }
             }
 
             newTable.Status = TableStatus.Ongoing;
@@ -414,8 +419,14 @@ public class OrderService(
 
             if (order.Table != null)
             {
-                order.Table.Status = TableStatus.Available;
-                orderingContext.Tables.Update(order.Table);
+                bool hasOtherOpenOrders = await orderingContext.Orders
+                    .AnyAsync(o => o.TableId == order.TableId && o.Id != order.Id && o.Status != OrderStatus.Closed);
+
+                if (!hasOtherOpenOrders)
+                {
+                    order.Table.Status = TableStatus.Available;
+                    orderingContext.Tables.Update(order.Table);
+                }
             }
 
             await orderingContext.SaveChangesAsync();
