@@ -229,7 +229,6 @@ public class OrderService(
                 .OrderByDescending(o => o.DateTime)
                 .Take(10);
 
-            // Combine both queries
             var ordersQuery = ongoingOrdersQuery
                 .Union(closedOrdersQuery)
                 .Include(o => o.OrderItems)

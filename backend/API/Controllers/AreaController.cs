@@ -9,7 +9,7 @@ namespace API.Controllers;
 /// <summary>
 /// Manages restaurant areas, including retrieval, creation, updates, and deletion.
 /// </summary>
-[Authorize(Roles = Roles.Waiter)]
+//[Authorize(Roles = Roles.Waiter)]
 [Route("api/areas")]
 public class AreaController(IAreaService areaService) : BaseApiController
 {
