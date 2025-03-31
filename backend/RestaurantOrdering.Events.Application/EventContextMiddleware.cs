@@ -1,12 +1,14 @@
 ﻿using RestaurantOrdering.Events.Domain.Orders.ModificationsOrder;
 using RestaurantOrdering.Events.Domain;
 using RestaurantOrdering.Events.Infrastructure.Database;
+using RestaurantOrdering.Events.Application.Orders.OrderModifications;
+using System.Text.Json;
 
 namespace RestaurantOrdering.Events.Application;
 
-public class EventContextMiddleware : IEventContextMiddleware
+public class EventContextMiddleware(OrderClosedEventHandler orderClosedEventHandler) : IEventContextMiddleware
 {
-    public void HandleEventContextAdded(EventContext eventContext)
+    public async void HandleEventContextAdded(EventContext eventContext)
     {
         Console.WriteLine($"New EventContext added: {eventContext.Id}");
 
@@ -16,7 +18,8 @@ public class EventContextMiddleware : IEventContextMiddleware
             case nameof(OrderClosedEvent):
                 {
                     Console.WriteLine($"Handling: {nameof(OrderClosedEvent)}");
-                    // some method from Application
+                    var eventToHandle = JsonSerializer.Deserialize<OrderClosedEvent>(eventContext.Payload);
+                    await orderClosedEventHandler.HandleEventAsync(eventToHandle);
                     break;
                 }
         }

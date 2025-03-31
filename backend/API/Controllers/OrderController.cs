@@ -79,8 +79,8 @@ public class OrderController(IOrderService orderService) : BaseApiController
     /// <response code="200">Returns the list of non-dine-in orders.</response>
     [HttpGet("non-dinein-orders")]
     [ProducesResponseType(typeof(List<NonDineInOrderSummaryDto>), 200)]
-    public async Task<ActionResult<List<NonDineInOrderSummaryDto>>> GetOngoingNonDineInOrders([FromQuery] OrderType orderType) =>
-        HandleResult(await orderService.GetOngoingNonDineInOrders(orderType));
+    public async Task<ActionResult<List<NonDineInOrderSummaryDto>>> GetOngoingNonDineInOrders([FromQuery] OrderType orderType, [FromQuery] DateTime date) =>
+        HandleResult(await orderService.GetOngoingNonDineInOrders(orderType, date));
 
     /// <summary>
     /// Applies a discount to an existing order.
