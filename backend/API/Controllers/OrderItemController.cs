@@ -23,8 +23,10 @@ public class OrderItemController(IOrderItemService orderItemService) : BaseApiCo
     [HttpPost]
     [ProducesResponseType(typeof(OrderReadDto), 201)]
     [ProducesResponseType(400)]
-    public async Task<ActionResult<OrderReadDto>> AddOrderItems([FromRoute] Guid orderId, [FromBody] List<OrderItemCreateDto> orderItemDtos) =>
-        HandleResult(await orderItemService.AddOrderItems(orderId, orderItemDtos));
+    public async Task<ActionResult<OrderReadDto>> AddOrderItems(
+        [FromRoute] Guid orderId,
+        [FromBody] List<OrderItemCreateDto> orderItemDtos
+    ) => HandleResult(await orderItemService.AddOrderItems(orderId, orderItemDtos));
 
     /// <summary>
     /// Retrieves a specific order item by ID.
@@ -37,8 +39,10 @@ public class OrderItemController(IOrderItemService orderItemService) : BaseApiCo
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(OrderItemReadDto), 200)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<OrderItemReadDto>> GetOrderItem([FromRoute] Guid orderId, [FromRoute] Guid id) =>
-        HandleResult(await orderItemService.GetOrderItem(orderId, id));
+    public async Task<ActionResult<OrderItemReadDto>> GetOrderItem(
+        [FromRoute] Guid orderId,
+        [FromRoute] Guid id
+    ) => HandleResult(await orderItemService.GetOrderItem(orderId, id));
 
     /// <summary>
     /// Retrieves all items in a specific order.
@@ -48,8 +52,9 @@ public class OrderItemController(IOrderItemService orderItemService) : BaseApiCo
     /// <response code="200">Returns the list of order items.</response>
     [HttpGet]
     [ProducesResponseType(typeof(List<OrderItemsListDto>), 200)]
-    public async Task<ActionResult<List<OrderItemsListDto>>> GetOrderItems([FromRoute] Guid orderId) =>
-        HandleResult(await orderItemService.GetOrderItems(orderId));
+    public async Task<ActionResult<List<OrderItemsListDto>>> GetOrderItems(
+        [FromRoute] Guid orderId
+    ) => HandleResult(await orderItemService.GetOrderItems(orderId));
 
     /// <summary>
     /// Updates an order item.
@@ -65,8 +70,11 @@ public class OrderItemController(IOrderItemService orderItemService) : BaseApiCo
     [ProducesResponseType(typeof(OrderItemReadDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<OrderItemReadDto>> UpdateOrderItem([FromRoute] Guid orderId, [FromRoute] Guid id, [FromBody] OrderItemUpdateDto updateDto) =>
-        HandleResult(await orderItemService.UpdateOrderItem(orderId, id, updateDto));
+    public async Task<ActionResult<OrderItemReadDto>> UpdateOrderItem(
+        [FromRoute] Guid orderId,
+        [FromRoute] Guid id,
+        [FromBody] OrderItemUpdateDto updateDto
+    ) => HandleResult(await orderItemService.UpdateOrderItem(orderId, id, updateDto));
 
     /// <summary>
     /// Updates the status of an order item.
@@ -82,8 +90,11 @@ public class OrderItemController(IOrderItemService orderItemService) : BaseApiCo
     [ProducesResponseType(typeof(bool), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<bool>> UpdateOrderItemStatus([FromRoute] Guid orderId, [FromRoute] Guid id, [FromBody] OrderItemStatus status) =>
-        HandleResult(await orderItemService.UpdateOrderItemStatus(orderId, id, status));
+    public async Task<ActionResult<bool>> UpdateOrderItemStatus(
+        [FromRoute] Guid orderId,
+        [FromRoute] Guid id,
+        [FromBody] OrderItemStatus status
+    ) => HandleResult(await orderItemService.UpdateOrderItemStatus(orderId, id, status));
 
     /// <summary>
     /// Deletes an order item.
@@ -96,6 +107,8 @@ public class OrderItemController(IOrderItemService orderItemService) : BaseApiCo
     [HttpDelete("{id}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> DeleteOrderItem([FromRoute] Guid orderId, [FromRoute] Guid id) =>
-        HandleResult(await orderItemService.DeleteOrderItem(orderId, id));
+    public async Task<IActionResult> DeleteOrderItem(
+        [FromRoute] Guid orderId,
+        [FromRoute] Guid id
+    ) => HandleResult(await orderItemService.DeleteOrderItem(orderId, id));
 }

@@ -22,6 +22,5 @@ public class TagMappingProfile : Profile
 
         // Map from TagUpdateDto to Tag
         CreateMap<TagUpdateDto, Tag>();
-
     }
 }

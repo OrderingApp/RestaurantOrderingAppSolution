@@ -9,7 +9,7 @@ public class ReservationsEventsMappingProfile : Profile
     public ReservationsEventsMappingProfile()
     {
         CreateMap<Reservation, ReservationCreatedEvent>()
-    .ForMember(dest => dest.ReservationId, opt => opt.MapFrom(src => src.Id));
+            .ForMember(dest => dest.ReservationId, opt => opt.MapFrom(src => src.Id));
 
         CreateMap<Reservation, ReservationUpdatedEvent>()
             .ForMember(dest => dest.ReservationId, opt => opt.MapFrom(src => src.Id));
@@ -20,6 +20,5 @@ public class ReservationsEventsMappingProfile : Profile
         CreateMap<(Reservation reservation, Guid tableId), TableAssignedToReservationEvent>()
             .ForMember(dest => dest.ReservationId, opt => opt.MapFrom(src => src.reservation.Id))
             .ForMember(dest => dest.TableId, opt => opt.MapFrom(src => src.tableId));
-
     }
 }

@@ -23,8 +23,9 @@ public class MenuItemController(IMenuItemService menuItemService) : BaseApiContr
     [HttpPost]
     [ProducesResponseType(typeof(MenuItemReadDto), 201)]
     [ProducesResponseType(400)]
-    public async Task<ActionResult<MenuItemReadDto>> CreateMenuItem([FromBody] MenuItemCreateDto menuItemCreateDto) =>
-        HandleResult(await menuItemService.CreateMenuItem(menuItemCreateDto));
+    public async Task<ActionResult<MenuItemReadDto>> CreateMenuItem(
+        [FromBody] MenuItemCreateDto menuItemCreateDto
+    ) => HandleResult(await menuItemService.CreateMenuItem(menuItemCreateDto));
 
     /// <summary>
     /// Retrieves a specific menu item by ID.
@@ -38,7 +39,6 @@ public class MenuItemController(IMenuItemService menuItemService) : BaseApiContr
     [ProducesResponseType(404)]
     public async Task<ActionResult<MenuItemReadDto>> GetMenuItem([FromRoute] Guid id) =>
         HandleResult(await menuItemService.GetMenuItem(id));
-
 
     /// <summary>
     /// Retrieves all menu items.
@@ -63,8 +63,9 @@ public class MenuItemController(IMenuItemService menuItemService) : BaseApiContr
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
     public async Task<ActionResult<MenuItemReadDto>> UpdateMenuItem(
-        [FromRoute] Guid id, [FromBody] MenuItemUpdateDto menuItemUpdateDto) =>
-        HandleResult(await menuItemService.UpdateMenuItem(id, menuItemUpdateDto));
+        [FromRoute] Guid id,
+        [FromBody] MenuItemUpdateDto menuItemUpdateDto
+    ) => HandleResult(await menuItemService.UpdateMenuItem(id, menuItemUpdateDto));
 
     /// <summary>
     /// Deletes a menu item.

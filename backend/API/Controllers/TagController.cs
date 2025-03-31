@@ -29,8 +29,7 @@ public class TagsController(ITagService tagService) : BaseApiController
     /// <returns>A list of tags.</returns>
     [HttpGet]
     [ProducesResponseType(200)]
-    public async Task<IActionResult> GetAllTags() =>
-        HandleResult(await tagService.GetAllTags());
+    public async Task<IActionResult> GetAllTags() => HandleResult(await tagService.GetAllTags());
 
     /// <summary>
     /// Retrieves a specific tag by ID.
@@ -42,8 +41,7 @@ public class TagsController(ITagService tagService) : BaseApiController
     [HttpGet("{id}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> GetTag(Guid id) =>
-        HandleResult(await tagService.GetTag(id));
+    public async Task<IActionResult> GetTag(Guid id) => HandleResult(await tagService.GetTag(id));
 
     /// <summary>
     /// Updates an existing tag.

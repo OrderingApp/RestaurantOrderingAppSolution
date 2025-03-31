@@ -12,25 +12,30 @@ namespace Infrastructure.Database.Migrations
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_CustomerInformations_Orders_OrderId",
-                table: "CustomerInformations");
+                table: "CustomerInformations"
+            );
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_CustomerInformations",
-                table: "CustomerInformations");
+                table: "CustomerInformations"
+            );
 
             migrationBuilder.RenameTable(
                 name: "CustomerInformations",
-                newName: "CustomerInformation");
+                newName: "CustomerInformation"
+            );
 
             migrationBuilder.RenameIndex(
                 name: "IX_CustomerInformations_OrderId",
                 table: "CustomerInformation",
-                newName: "IX_CustomerInformation_OrderId");
+                newName: "IX_CustomerInformation_OrderId"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_CustomerInformation",
                 table: "CustomerInformation",
-                column: "Id");
+                column: "Id"
+            );
 
             migrationBuilder.AddForeignKey(
                 name: "FK_CustomerInformation_Orders_OrderId",
@@ -38,7 +43,8 @@ namespace Infrastructure.Database.Migrations
                 column: "OrderId",
                 principalTable: "Orders",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Cascade
+            );
         }
 
         /// <inheritdoc />
@@ -46,25 +52,30 @@ namespace Infrastructure.Database.Migrations
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_CustomerInformation_Orders_OrderId",
-                table: "CustomerInformation");
+                table: "CustomerInformation"
+            );
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_CustomerInformation",
-                table: "CustomerInformation");
+                table: "CustomerInformation"
+            );
 
             migrationBuilder.RenameTable(
                 name: "CustomerInformation",
-                newName: "CustomerInformations");
+                newName: "CustomerInformations"
+            );
 
             migrationBuilder.RenameIndex(
                 name: "IX_CustomerInformation_OrderId",
                 table: "CustomerInformations",
-                newName: "IX_CustomerInformations_OrderId");
+                newName: "IX_CustomerInformations_OrderId"
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_CustomerInformations",
                 table: "CustomerInformations",
-                column: "Id");
+                column: "Id"
+            );
 
             migrationBuilder.AddForeignKey(
                 name: "FK_CustomerInformations_Orders_OrderId",
@@ -72,7 +83,8 @@ namespace Infrastructure.Database.Migrations
                 column: "OrderId",
                 principalTable: "Orders",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Cascade
+            );
         }
     }
 }

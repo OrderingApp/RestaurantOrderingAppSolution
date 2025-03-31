@@ -27,5 +27,5 @@ public enum TableStatus
     PendingServingOrderItems,
     OrderItemsServed,
     PendingPayment,
-    Closed
+    Closed,
 }

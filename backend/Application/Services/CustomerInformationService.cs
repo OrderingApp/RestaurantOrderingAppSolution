@@ -1,4 +1,5 @@
-﻿using Application.Contracts;
+﻿using System.Net;
+using Application.Contracts;
 using Application.Dtos.Common;
 using Application.Dtos.CustomerInformations;
 using AutoMapper;
@@ -6,11 +7,14 @@ using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using RestaurantOrdering.Events.Application.Contracts;
 using RestaurantOrdering.Events.Domain.CustomerInformations;
-using System.Net;
 
 namespace Application.Services;
 
-public class CustomerInformationService(RestaurantOrderingContext orderingContext, IEventHandlerService eventHandlerService, IMapper mapper) : ICustomerInformationService
+public class CustomerInformationService(
+    RestaurantOrderingContext orderingContext,
+    IEventHandlerService eventHandlerService,
+    IMapper mapper
+) : ICustomerInformationService
 {
     public async Task<ResultDto<CustomerInformationReadDto>> GetCustomerInformation(Guid id)
     {
@@ -20,23 +24,34 @@ public class CustomerInformationService(RestaurantOrderingContext orderingContex
 
             if (customerInformation == null)
             {
-                return ResultDto<CustomerInformationReadDto>
-                    .Failure("Customer information not found.", HttpStatusCode.NotFound);
+                return ResultDto<CustomerInformationReadDto>.Failure(
+                    "Customer information not found.",
+                    HttpStatusCode.NotFound
+                );
             }
 
-            var customerInformationDto = mapper.Map<CustomerInformationReadDto>(customerInformation);
+            var customerInformationDto = mapper.Map<CustomerInformationReadDto>(
+                customerInformation
+            );
 
-            return ResultDto<CustomerInformationReadDto>
-                .Success(customerInformationDto, HttpStatusCode.OK);
+            return ResultDto<CustomerInformationReadDto>.Success(
+                customerInformationDto,
+                HttpStatusCode.OK
+            );
         }
         catch (Exception ex)
         {
-            return ResultDto<CustomerInformationReadDto>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<CustomerInformationReadDto>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
-    public async Task<ResultDto<CustomerInformationReadDto>> UpdateCustomerInformation(Guid id, CustomerInformationUpdateDto customerInformationUpdateDto)
+    public async Task<ResultDto<CustomerInformationReadDto>> UpdateCustomerInformation(
+        Guid id,
+        CustomerInformationUpdateDto customerInformationUpdateDto
+    )
     {
         try
         {
@@ -44,26 +59,36 @@ public class CustomerInformationService(RestaurantOrderingContext orderingContex
 
             if (customerInformation == null)
             {
-                return ResultDto<CustomerInformationReadDto>
-                    .Failure("Customer information not found.", HttpStatusCode.NotFound);
+                return ResultDto<CustomerInformationReadDto>.Failure(
+                    "Customer information not found.",
+                    HttpStatusCode.NotFound
+                );
             }
 
             mapper.Map(customerInformationUpdateDto, customerInformation);
             orderingContext.Entry(customerInformation).State = EntityState.Modified;
             await orderingContext.SaveChangesAsync();
 
-            var updatedCustomerInformationDto = mapper.Map<CustomerInformationReadDto>(customerInformation);
+            var updatedCustomerInformationDto = mapper.Map<CustomerInformationReadDto>(
+                customerInformation
+            );
 
-            var customerInformationUpdatedEvent = mapper.Map<CustomerInformationUpdatedEvent>(customerInformation);
+            var customerInformationUpdatedEvent = mapper.Map<CustomerInformationUpdatedEvent>(
+                customerInformation
+            );
             await eventHandlerService.HandleEventAsync(customerInformationUpdatedEvent);
 
-            return ResultDto<CustomerInformationReadDto>
-                .Success(updatedCustomerInformationDto, HttpStatusCode.OK);
+            return ResultDto<CustomerInformationReadDto>.Success(
+                updatedCustomerInformationDto,
+                HttpStatusCode.OK
+            );
         }
         catch (Exception ex)
         {
-            return ResultDto<CustomerInformationReadDto>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<CustomerInformationReadDto>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 }

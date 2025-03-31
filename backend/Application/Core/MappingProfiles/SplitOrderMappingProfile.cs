@@ -20,8 +20,14 @@ public class SplitOrderMappingProfile : Profile
             .ForMember(dest => dest.Order, opt => opt.Ignore())
             .ForMember(dest => dest.OrderId, opt => opt.Ignore())
             .ForMember(dest => dest.MenuItem, opt => opt.MapFrom(src => src.MenuItem))
-            .ForMember(dest => dest.ExtraIngredients, opt => opt.MapFrom(src => src.ExtraIngredients))
-            .ForMember(dest => dest.RemovedIngredients, opt => opt.MapFrom(src => src.RemovedIngredients));
+            .ForMember(
+                dest => dest.ExtraIngredients,
+                opt => opt.MapFrom(src => src.ExtraIngredients)
+            )
+            .ForMember(
+                dest => dest.RemovedIngredients,
+                opt => opt.MapFrom(src => src.RemovedIngredients)
+            );
 
         // Mapping for cloning OrderItemIngredient with a new ID
         CreateMap<OrderItemIngredient, OrderItemIngredient>()

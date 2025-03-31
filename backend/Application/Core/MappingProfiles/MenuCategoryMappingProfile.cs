@@ -13,17 +13,22 @@ public class MenuCategoryMappingProfile : Profile
         CreateMap<MenuCategory, MenuCategoryHierarchyReadDto>()
             .ForMember(dest => dest.SubCategories, opt => opt.MapFrom(src => src.SubCategories))
             .ForMember(dest => dest.MenuItems, opt => opt.MapFrom(src => src.MenuItems))
-            .ForMember(dest => dest.Tags, opt => opt.MapFrom(src =>
-                src.MenuItems
-                    .SelectMany(mi => mi.MenuItemIngredientRels)
-                    .Select(mii => mii.Ingredient)
-                    .SelectMany(i => i.IngredientTagRels)
-                    .Select(it => it.Tag)
-                    .Distinct()
-                    .ToList()
-            ))
-            .ForMember(dest => dest.TotalItems,
-                opt => opt.MapFrom(src => src.MenuItems.Count(mi => mi.IsUsed && !mi.IsDeleted)));
+            .ForMember(
+                dest => dest.Tags,
+                opt =>
+                    opt.MapFrom(src =>
+                        src.MenuItems.SelectMany(mi => mi.MenuItemIngredientRels)
+                            .Select(mii => mii.Ingredient)
+                            .SelectMany(i => i.IngredientTagRels)
+                            .Select(it => it.Tag)
+                            .Distinct()
+                            .ToList()
+                    )
+            )
+            .ForMember(
+                dest => dest.TotalItems,
+                opt => opt.MapFrom(src => src.MenuItems.Count(mi => mi.IsUsed && !mi.IsDeleted))
+            );
 
         CreateMap<MenuCategoryCreateDto, MenuCategory>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))

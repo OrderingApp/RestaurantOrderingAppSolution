@@ -20,8 +20,9 @@ public class ReservationController(IReservationService reservationService) : Bas
     [HttpPost]
     [ProducesResponseType(201)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> CreateReservation([FromBody] ReservationCreateDto reservationCreateDto) =>
-        HandleResult(await reservationService.CreateReservation(reservationCreateDto));
+    public async Task<IActionResult> CreateReservation(
+        [FromBody] ReservationCreateDto reservationCreateDto
+    ) => HandleResult(await reservationService.CreateReservation(reservationCreateDto));
 
     /// <summary>
     /// Retrieves a specific reservation by ID.
@@ -43,8 +44,9 @@ public class ReservationController(IReservationService reservationService) : Bas
     /// <returns>A list of reservations on the specified date.</returns>
     [HttpGet("by-date/{date}")]
     [ProducesResponseType(200)]
-    public async Task<ActionResult<List<ReservationReadDto>>> GetReservationsByDate(DateTime date) =>
-        HandleResult(await reservationService.GetReservationsByDate(date));
+    public async Task<ActionResult<List<ReservationReadDto>>> GetReservationsByDate(
+        DateTime date
+    ) => HandleResult(await reservationService.GetReservationsByDate(date));
 
     /// <summary>
     /// Assigns a table to a reservation.
@@ -75,8 +77,10 @@ public class ReservationController(IReservationService reservationService) : Bas
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> UpdateReservation(Guid id, [FromBody] ReservationUpdateDto reservationUpdateDto) =>
-        HandleResult(await reservationService.UpdateReservation(id, reservationUpdateDto));
+    public async Task<IActionResult> UpdateReservation(
+        Guid id,
+        [FromBody] ReservationUpdateDto reservationUpdateDto
+    ) => HandleResult(await reservationService.UpdateReservation(id, reservationUpdateDto));
 
     /// <summary>
     /// Deletes a reservation.

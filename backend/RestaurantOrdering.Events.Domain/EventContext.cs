@@ -7,6 +7,7 @@ public class EventContext
 {
     public Guid Id { get; set; }
     public Guid CorrelationId { get; set; }
+
     //public Guid UserId { get; set; }
     public DateTime DateTime { get; set; }
     public string EventType { get; set; } = null!;

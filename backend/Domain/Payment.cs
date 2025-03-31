@@ -16,5 +16,5 @@ public class Payment
 public enum PaymentMethod
 {
     Cash,
-    Card
+    Card,
 }

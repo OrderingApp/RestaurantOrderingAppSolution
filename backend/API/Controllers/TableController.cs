@@ -43,8 +43,7 @@ public class TableController(ITableService tableService) : BaseApiController
     /// <returns>A list of tables.</returns>
     [HttpGet]
     [ProducesResponseType(200)]
-    public async Task<IActionResult> GetTables() =>
-        HandleResult(await tableService.GetTables());
+    public async Task<IActionResult> GetTables() => HandleResult(await tableService.GetTables());
 
     /// <summary>
     /// Updates an existing table.
@@ -59,8 +58,10 @@ public class TableController(ITableService tableService) : BaseApiController
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> UpdateTable(Guid id, [FromBody] TableUpdateDto tableUpdateDto) =>
-        HandleResult(await tableService.UpdateTable(id, tableUpdateDto));
+    public async Task<IActionResult> UpdateTable(
+        Guid id,
+        [FromBody] TableUpdateDto tableUpdateDto
+    ) => HandleResult(await tableService.UpdateTable(id, tableUpdateDto));
 
     /// <summary>
     /// Updates the status of a table.

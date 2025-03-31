@@ -8,7 +8,7 @@ public static class MenuItemTestHelper
         {
             Id = id ?? Guid.NewGuid(),
             Price = price,
-            Name = "Test Menu Item"
+            Name = "Test Menu Item",
         };
     }
 }
