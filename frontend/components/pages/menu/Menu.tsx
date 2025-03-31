@@ -26,11 +26,11 @@ import useLanguage from '@/helpers/hooks/useLanguage';
 import MenuItemInformation from '@/components/shared/modals/MenuItemInformation';
 
 interface MenuProps {
-    variant: 'card' | 'order';
+    variant?: 'card' | 'order';
     children?: React.ReactNode;
 }
 
-const Menu = ({ variant, children }: MenuProps) => {
+const Menu = ({ variant = 'order', children }: MenuProps) => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { language } = useLanguage();
@@ -40,10 +40,10 @@ const Menu = ({ variant, children }: MenuProps) => {
         totalItems,
         displayedTags,
     } = useFilterMenu();
-    const [openModal, setOpenModal] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const {
-        menuPage: { searchInputPlaceholder },
+        menuPage: { searchInputPlaceholder, allCategories },
     } = languagePacks[language];
 
     const changeInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,9 +52,7 @@ const Menu = ({ variant, children }: MenuProps) => {
         router.push(`?${newParams.toString()}`);
     };
 
-    const openModalHandler = (id: string) => {
-        setOpenModal(id);
-    };
+    const openModalHandler = () => setIsModalOpen(true);
 
     return (
         <div className="bg-[#F6F6F6] w-full rounded-3xl h-full flex flex-row ">
@@ -77,7 +75,7 @@ const Menu = ({ variant, children }: MenuProps) => {
                         id={MENU_CATEGORY_NAMES.ALL}
                         icon={menuSvg}
                         iconActive={menuSvgWhite}
-                        name="Wszystko"
+                        name={allCategories}
                         totalItems={totalItems!}
                     />
                     {displayedCategories?.map((item) => (
@@ -94,8 +92,8 @@ const Menu = ({ variant, children }: MenuProps) => {
                         />
                     ))}
                 </div>
-                {(displayedTags?.length ?? 0) > 0 && (
-                    <ul className="flex flexr-row gap-3 px-5 py-2">
+                {displayedTags?.length! > 0 && (
+                    <ul className="flex gap-3 px-5 py-2">
                         {displayedTags?.map((tag) => (
                             <MenuTag {...tag} key={tag.id} />
                         ))}
@@ -123,9 +121,11 @@ const Menu = ({ variant, children }: MenuProps) => {
                     ))}
                 </ul>
             </div>
-            {openModal && (
-                <Modal onClose={() => setOpenModal('')}>
-                    <MenuItemInformation onClick={() => setOpenModal('')} />
+            {isModalOpen && (
+                <Modal onClose={() => setIsModalOpen(false)}>
+                    <MenuItemInformation
+                        onClick={() => setIsModalOpen(false)}
+                    />
                 </Modal>
             )}
 

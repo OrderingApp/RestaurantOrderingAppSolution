@@ -15,10 +15,10 @@ interface MenuCategoryProps {
     id: string;
     icon: string;
     iconActive: string;
-    size?: 'lg' | 'sm';
     name: string;
     totalItems: number;
     type?: 'category' | 'subcategory';
+    size?: 'lg' | 'sm';
 }
 
 const MenuCategory = ({

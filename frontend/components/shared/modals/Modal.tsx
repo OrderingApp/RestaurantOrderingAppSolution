@@ -7,8 +7,8 @@ const Modal = ({
 }: {
     children: ReactNode;
     onClose: () => void;
-}) => {
-    return createPortal(
+}) =>
+    createPortal(
         <div
             onClick={onClose}
             className="absolute top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.8)] flex items-center justify-center"
@@ -17,6 +17,5 @@ const Modal = ({
         </div>,
         document.body
     );
-};
 
 export default Modal;

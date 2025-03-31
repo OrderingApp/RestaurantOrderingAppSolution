@@ -63,6 +63,7 @@ export interface languagePack {
         menuCategoryCard: {
             itemsTitle: string[];
         };
+        allCategories: string;
     };
     tablePage: {
         tableCard: {

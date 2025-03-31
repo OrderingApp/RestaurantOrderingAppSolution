@@ -64,6 +64,7 @@ const plPack: languagePack = {
         menuCategoryCard: {
             itemsTitle: ['pozycji', 'pozycja', 'pozycje', 'pozycji'],
         },
+        allCategories: 'Wszystko',
     },
     tablePage: {
         tableCard: {

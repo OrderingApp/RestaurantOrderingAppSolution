@@ -64,6 +64,7 @@ const enPack: languagePack = {
         menuCategoryCard: {
             itemsTitle: ['item', 'items'],
         },
+        allCategories: 'All',
     },
     tablePage: {
         tableCard: {

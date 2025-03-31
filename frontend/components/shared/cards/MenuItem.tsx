@@ -108,3 +108,5 @@ const MenuItem = ({ id, name, price, variant, handleClick }: MenuItemProps) => {
 };
 
 export default MenuItem;
+
+// TODO use language pack
