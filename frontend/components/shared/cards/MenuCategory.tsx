@@ -1,24 +1,24 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+
 import Image from 'next/image';
-import {
-    MenuCategoryType,
-    MenuItemType,
-} from '@/helpers/queries/menu-items/useQueryMenuItems';
 import clsx from 'clsx';
+
 import { SEARCH_PARAMS_NAMES } from '@/helpers/constants/constants';
 import languagePacks from '@/helpers/constants/languagePacks';
-import useLanguage from '@/helpers/hooks/useLanguage';
 import { getPluralForm } from '@/helpers/utils/utils';
+
+import useLanguage from '@/helpers/hooks/useLanguage';
+
 interface MenuCategoryProps {
     id: string;
     icon: string;
     iconActive: string;
-    size?: 'lg' | 'sm';
     name: string;
-    items: MenuItemType[] | MenuCategoryType[];
+    totalItems: number;
     type?: 'category' | 'subcategory';
+    size?: 'lg' | 'sm';
 }
 
 const MenuCategory = ({
@@ -27,11 +27,12 @@ const MenuCategory = ({
     iconActive,
     name,
     size = 'lg',
-    items,
+    totalItems,
     type = 'category',
 }: MenuCategoryProps) => {
     const searchParams = useSearchParams();
     const router = useRouter();
+    const pathname = usePathname();
     const { language } = useLanguage();
     const categoryId = searchParams.get(SEARCH_PARAMS_NAMES.CATEGORY);
     const subcategoryId = searchParams.get(SEARCH_PARAMS_NAMES.SUBCATEGORY);
@@ -42,31 +43,6 @@ const MenuCategory = ({
         },
     } = languagePacks[language];
 
-    const isMenuItem = (
-        item: MenuItemType | MenuCategoryType
-    ): item is MenuItemType =>
-        (item as MenuItemType).subCategoryId !== undefined;
-
-    const getAmount = () => {
-        if (type === 'subcategory') {
-            return (
-                (items as Array<MenuItemType | MenuCategoryType>)
-                    .filter(isMenuItem)
-                    .filter((item) => item.subCategoryId === id).length || 0
-            );
-        }
-        if (id === 'all') {
-            return (
-                (items as MenuCategoryType[])?.flatMap(
-                    (category) => category.menuItems
-                )?.length || 0
-            );
-        }
-        return items?.length || 0;
-    };
-
-    const amount = getAmount();
-
     const isActive =
         (id === 'all' && !categoryId) ||
         (type === 'category' && categoryId === id) ||
@@ -75,26 +51,28 @@ const MenuCategory = ({
     const toggleSelectedCategory = () => {
         const newParams = new URLSearchParams(searchParams.toString());
 
-        if (type === 'category') {
-            if (categoryId === id) {
-                newParams.delete('categoryId');
-            } else {
-                newParams.set('categoryId', id);
-            }
-        }
+        type === 'category'
+            ? categoryId === id
+                ? newParams.delete('categoryId')
+                : newParams.set('categoryId', id)
+            : type === 'subcategory'
+              ? subcategoryId === id
+                  ? newParams.delete('subcategoryId')
+                  : newParams.set('subcategoryId', id)
+              : null;
 
-        if (type === 'subcategory') {
-            if (subcategoryId === id) {
-                newParams.delete('subcategoryId');
-            } else {
-                newParams.set('subcategoryId', id);
-            }
-        }
+        const modalParam = newParams.get('modal')
+            ? `modal=${newParams.get('modal')}`
+            : '';
 
-        router.push(id === 'all' ? '/order' : `/order?${newParams.toString()}`);
+        router.push(
+            id === 'all'
+                ? `${pathname}?${modalParam}`
+                : `${pathname}?${newParams.toString()}`
+        );
     };
 
-    const amountItemsName = getPluralForm(amount, itemsTitle, language);
+    const amountItemsName = getPluralForm(totalItems, itemsTitle, language);
 
     return (
         <button
@@ -125,7 +103,7 @@ const MenuCategory = ({
                         isActive ? 'text-white' : 'text-black'
                     )}
                 >
-                    {amount} {amountItemsName}
+                    {totalItems} {amountItemsName}
                 </p>
             </div>
         </button>
@@ -134,4 +112,4 @@ const MenuCategory = ({
 
 export default MenuCategory;
 
-//TODO BUTTONS CHANGE
+//TODO BUTTONS CHANGE TRY USE TRIARY OPERATOR

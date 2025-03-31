@@ -64,6 +64,7 @@ const enPack: languagePack = {
         menuCategoryCard: {
             itemsTitle: ['item', 'items'],
         },
+        allCategories: 'All',
     },
     tablePage: {
         tableCard: {
@@ -72,6 +73,20 @@ const enPack: languagePack = {
                 normal: 'Active table',
             },
             balanceName: 'Balance',
+        },
+    },
+    ordersPage: {
+        ordersActiveTitle: 'Open',
+        ordersClosedTitle: 'Closed',
+        orderPickup: 'Pickup',
+        orderDelivery: 'Delivery',
+        createOrder: 'Create',
+        editOrder: 'Edit',
+        deleteOrder: 'Delete',
+        payment: 'Payment',
+        orderCard: {
+            pickup: 'Pickup',
+            delivery: 'Delivery',
         },
     },
 };

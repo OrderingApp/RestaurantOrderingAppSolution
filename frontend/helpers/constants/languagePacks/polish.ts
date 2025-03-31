@@ -64,6 +64,7 @@ const plPack: languagePack = {
         menuCategoryCard: {
             itemsTitle: ['pozycji', 'pozycja', 'pozycje', 'pozycji'],
         },
+        allCategories: 'Wszystko',
     },
     tablePage: {
         tableCard: {
@@ -72,6 +73,20 @@ const plPack: languagePack = {
                 normal: 'Stolik aktywny',
             },
             balanceName: 'Saldo',
+        },
+    },
+    ordersPage: {
+        ordersActiveTitle: 'Otwarte',
+        ordersClosedTitle: 'Zamknięte',
+        orderPickup: 'Odbiór',
+        orderDelivery: 'Dowóz',
+        createOrder: 'Utwórz',
+        editOrder: 'Edytuj',
+        deleteOrder: 'Usuń',
+        payment: 'Płatność',
+        orderCard: {
+            pickup: 'Odbiór',
+            delivery: 'Dostawa',
         },
     },
 };
