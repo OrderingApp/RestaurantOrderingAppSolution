@@ -35,8 +35,6 @@ export const BACKEND_URL = 'http://localhost:5000/api';
 
 export enum BACKEND_PATHS {
     Areas = 'areas',
-<<<<<<< HEAD
-=======
     Reservations = 'reservations',
     MenuICategories = 'menu-categories',
     MenuItems = 'menu-items',
@@ -56,7 +54,6 @@ export enum SEARCH_PARAMS_NAMES {
 
 export enum MENU_CATEGORY_NAMES {
     ALL = 'all',
->>>>>>> 80c954fc6beaaad83f96a0ce999d81e4463517c0
 }
 
 export enum FILTER_STATUS {

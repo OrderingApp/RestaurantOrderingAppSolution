@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import clsx from 'clsx';
 
 import Button, { type ButtonProps } from '../../Button/Button';
@@ -12,6 +12,7 @@ export interface BaseItemProps {
     name: string;
     price: number;
     currency: keyof typeof CURRENCIES;
+    onClick?: () => void;
     quantity?: number;
     annotation?: string;
     button?: Omit<ButtonProps, 'className' | 'children'> & { name?: string };
@@ -19,7 +20,7 @@ export interface BaseItemProps {
 }
 
 export type ButtonItemProps = Required<
-    Omit<BaseItemProps, 'quantity' | 'annotation'>
+    Omit<BaseItemProps, 'quantity' | 'annotation' | 'nestedItems'>
 >;
 
 export type ItemProps = BaseItemProps | ButtonItemProps;
@@ -54,33 +55,25 @@ const ListItem = ({
     nestedItems,
     priceStr,
     quantity,
-}: Pick<BaseItemProps, 'name' | 'annotation' | 'nestedItems'> & {
+    onClick,
+}: Pick<
+    BaseItemProps,
+    'name' | 'onClick' | 'quantity' | 'annotation' | 'nestedItems'
+> & {
     priceStr: ReturnType<typeof formatPriceStr>;
 }) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     const toggleExpand = () => setIsExpanded((prev) => !prev);
 
-    const ListItemContainer = ({
-        children,
-        className,
-    }: {
-        children: ReactNode;
-        className: string;
-    }) =>
-        nestedItems ? (
-            <button onClick={toggleExpand} className={className}>
-                {children}
-            </button>
-        ) : (
-            <div className={className}>{children}</div>
-        );
-
     return (
-        <ListItemContainer className="grid grid-cols-[1fr_auto] items-center gap-x-4 py-2 px-2 min-h-12 rounded-md shadow-[0px_0px_5px_0px_rgba(0,_0,_0,_0.22)]">
+        <button
+            onClick={nestedItems ? toggleExpand : onClick}
+            className="grid grid-cols-[1fr_auto] items-center gap-x-4 py-2 px-2 min-h-12 rounded-md shadow-[0px_0px_5px_0px_rgba(0,_0,_0,_0.22)]"
+        >
             <dt className="font-bold leading-none capitalize">
-                {name}{' '}
-                <span className="text-[12px]  font-normal">x{quantity}</span>
+                {name}
+                <span className="text-[12px] font-normal">x{quantity}</span>
             </dt>
             <dd
                 className={clsx(
@@ -97,8 +90,8 @@ const ListItem = ({
                 </dd>
             )}
 
-            {isExpanded && <ItemsList {...nestedItems} />}
-        </ListItemContainer>
+            {nestedItems && isExpanded && <ItemsList items={nestedItems} />}
+        </button>
     );
 };
 
