@@ -8,6 +8,7 @@ public class MenuItem
     public decimal Price { get; set; }
     public bool IsUsed { get; set; } = true;
     public bool IsDeleted { get; set; } = false;
+    public int SequenceNumber { get; set; }
 
     public Guid? MenuCategoryId { get; set; }
     public MenuCategory? MenuCategory { get; set; } = null!;

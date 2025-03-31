@@ -8,7 +8,8 @@ namespace API.Controllers;
 /// Manages customer information, including retrieval and updates.
 /// </summary>
 [Route("api/customers/{id}/information")]
-public class CustomerInformationController(ICustomerInformationService customerInformationService) : BaseApiController
+public class CustomerInformationController(ICustomerInformationService customerInformationService)
+    : BaseApiController
 {
     /// <summary>
     /// Retrieves customer information by ID.
@@ -20,8 +21,9 @@ public class CustomerInformationController(ICustomerInformationService customerI
     [HttpGet]
     [ProducesResponseType(typeof(CustomerInformationReadDto), 200)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<CustomerInformationReadDto>> GetCustomerInformation([FromRoute] Guid id) =>
-        HandleResult(await customerInformationService.GetCustomerInformation(id));
+    public async Task<ActionResult<CustomerInformationReadDto>> GetCustomerInformation(
+        [FromRoute] Guid id
+    ) => HandleResult(await customerInformationService.GetCustomerInformation(id));
 
     /// <summary>
     /// Updates customer information.
@@ -36,6 +38,14 @@ public class CustomerInformationController(ICustomerInformationService customerI
     [ProducesResponseType(typeof(CustomerInformationReadDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<CustomerInformationReadDto>> UpdateCustomerInformation([FromRoute] Guid id, [FromBody] CustomerInformationUpdateDto customerInformationUpdateDto) =>
-        HandleResult(await customerInformationService.UpdateCustomerInformation(id, customerInformationUpdateDto));
+    public async Task<ActionResult<CustomerInformationReadDto>> UpdateCustomerInformation(
+        [FromRoute] Guid id,
+        [FromBody] CustomerInformationUpdateDto customerInformationUpdateDto
+    ) =>
+        HandleResult(
+            await customerInformationService.UpdateCustomerInformation(
+                id,
+                customerInformationUpdateDto
+            )
+        );
 }

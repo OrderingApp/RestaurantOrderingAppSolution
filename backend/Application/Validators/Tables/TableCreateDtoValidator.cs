@@ -8,11 +8,15 @@ public class TableCreateDtoValidator : AbstractValidator<TableCreateDto>
     public TableCreateDtoValidator()
     {
         RuleFor(x => x.Name)
-            .NotEmpty().WithMessage("Table name is required.")
-            .MaximumLength(50).WithMessage("Table name must not exceed 50 characters.");
+            .NotEmpty()
+            .WithMessage("Table name is required.")
+            .MaximumLength(50)
+            .WithMessage("Table name must not exceed 50 characters.");
 
         RuleFor(x => x.Capacity)
-            .GreaterThan(0).WithMessage("Capacity must be greater than zero.")
-            .LessThanOrEqualTo(20).WithMessage("Capacity must not exceed 20.");
+            .GreaterThan(0)
+            .WithMessage("Capacity must be greater than zero.")
+            .LessThanOrEqualTo(20)
+            .WithMessage("Capacity must not exceed 20.");
     }
 }

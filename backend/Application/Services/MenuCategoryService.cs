@@ -1,22 +1,25 @@
-﻿using Application.Contracts;
+﻿using System.Net;
+using Application.Contracts;
 using Application.Dtos.Common;
 using Application.Dtos.MenuCategories;
-using Application.Dtos.MenuItems;
 using AutoMapper;
 using Domain;
 using Infrastructure.Database;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RestaurantOrdering.Events.Application.Contracts;
 using RestaurantOrdering.Events.Domain.MenuCategories;
-using System.Net;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Application.Services;
 
-public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEventHandlerService eventHandlerService, IMapper mapper) : IMenuCategoryService
+public class MenuCategoryService(
+    RestaurantOrderingContext orderingContext,
+    IEventHandlerService eventHandlerService,
+    IMapper mapper
+) : IMenuCategoryService
 {
-    public async Task<ResultDto<MenuCategoryReadDto>> CreateMenuCategory(MenuCategoryCreateDto menuCategoryCreateDto)
+    public async Task<ResultDto<MenuCategoryReadDto>> CreateMenuCategory(
+        MenuCategoryCreateDto menuCategoryCreateDto
+    )
     {
         try
         {
@@ -30,13 +33,17 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
             var menuCategoryCreatedEvent = mapper.Map<MenuCategoryCreatedEvent>(menuCategory);
             await eventHandlerService.HandleEventAsync(menuCategoryCreatedEvent);
 
-            return ResultDto<MenuCategoryReadDto>
-                .Success(createdMenuCategory, HttpStatusCode.Created);
+            return ResultDto<MenuCategoryReadDto>.Success(
+                createdMenuCategory,
+                HttpStatusCode.Created
+            );
         }
         catch (Exception ex)
         {
-            return ResultDto<MenuCategoryReadDto>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<MenuCategoryReadDto>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
@@ -44,22 +51,26 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
     {
         try
         {
-            var menuCategory = await orderingContext.MenuCategories
-                .FirstOrDefaultAsync(mc => mc.Id == id);
+            var menuCategory = await orderingContext.MenuCategories.FirstOrDefaultAsync(mc =>
+                mc.Id == id
+            );
 
             if (menuCategory == null)
-                return ResultDto<MenuCategoryReadDto>
-                    .Failure("MenuCategory not found.", HttpStatusCode.NotFound);
+                return ResultDto<MenuCategoryReadDto>.Failure(
+                    "MenuCategory not found.",
+                    HttpStatusCode.NotFound
+                );
 
             var menuCategoryDto = mapper.Map<MenuCategoryReadDto>(menuCategory);
 
-            return ResultDto<MenuCategoryReadDto>
-                .Success(menuCategoryDto, HttpStatusCode.OK);
+            return ResultDto<MenuCategoryReadDto>.Success(menuCategoryDto, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
-            return ResultDto<MenuCategoryReadDto>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<MenuCategoryReadDto>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
@@ -67,35 +78,66 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
     {
         try
         {
-            var menuCategories = await orderingContext.MenuCategories
-                .Where(mc => mc.IsUsed && !mc.IsDeleted)
+            var menuCategories = await orderingContext
+                .MenuCategories.Where(mc => mc.IsUsed && !mc.IsDeleted)
                 .Include(mc => mc.SubCategories)
+                .OrderBy(mc => mc.SequenceNumber)
                 .ToListAsync();
+
+            var menuItems = await orderingContext
+                .MenuItems.Where(mi => mi.IsUsed && !mi.IsDeleted)
+                .ToListAsync();
+
+            foreach (var category in menuCategories)
+            {
+                category.SubCategories = category
+                    .SubCategories.OrderBy(sc => sc.SequenceNumber)
+                    .ToList();
+            }
 
             var menuCategoryDtos = mapper.Map<List<MenuCategoryReadDto>>(menuCategories);
 
-            return ResultDto<List<MenuCategoryReadDto>>
-                .Success(menuCategoryDtos, HttpStatusCode.OK);
+            foreach (var categoryDto in menuCategoryDtos)
+            {
+                categoryDto.TotalItems = menuItems.Count(mi => mi.MenuCategoryId == categoryDto.Id);
+
+                foreach (var subCategoryDto in categoryDto.SubCategories)
+                {
+                    subCategoryDto.TotalItems = menuItems.Count(mi =>
+                        mi.SubCategoryId == subCategoryDto.Id
+                    );
+                }
+            }
+
+            return ResultDto<List<MenuCategoryReadDto>>.Success(
+                menuCategoryDtos,
+                HttpStatusCode.OK
+            );
         }
         catch (Exception ex)
         {
-            return ResultDto<List<MenuCategoryReadDto>>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<List<MenuCategoryReadDto>>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
-    public async Task<PagedResultDto<MenuCategoryHierarchyReadDto>> GetMenuCategoriesWithHierarchy(GetMenuCategoryHierarchyRequest request)
+    public async Task<PagedResultDto<MenuCategoryHierarchyReadDto>> GetMenuCategoriesWithHierarchy(
+        GetMenuCategoryHierarchyRequest request
+    )
     {
         try
         {
-            var query = orderingContext.MenuCategories
-                .Where(mc => mc.IsUsed && !mc.IsDeleted)
-                .Include(mc => mc.SubCategories)
-                .Include(mc => mc.MenuItems)
-                    .ThenInclude(mi => mi.MenuItemIngredientRels)
-                        .ThenInclude(mii => mii.Ingredient)
-                            .ThenInclude(i => i.IngredientTagRels)
-                                .ThenInclude(it => it.Tag)
+            var query = orderingContext
+                .MenuCategories.Where(mc => mc.IsUsed && !mc.IsDeleted)
+                .Include(mc => mc.SubCategories.OrderBy(sc => sc.SequenceNumber))
+                .Include(mc => mc.MenuItems.OrderBy(mi => mi.SequenceNumber))
+                .ThenInclude(mi => mi.MenuItemIngredientRels)
+                .ThenInclude(mii => mii.Ingredient)
+                .ThenInclude(i => i.IngredientTagRels)
+                .ThenInclude(it => it.Tag)
+                .OrderBy(mc => mc.SequenceNumber)
                 .AsQueryable();
 
             if (request.MenuCategoryId.HasValue)
@@ -104,15 +146,22 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
             }
             if (request.SubCategoryId.HasValue)
             {
-                query = query.Where(mc => mc.SubCategories.Any(sc => sc.Id == request.SubCategoryId.Value));
+                query = query.Where(mc =>
+                    mc.SubCategories.Any(sc => sc.Id == request.SubCategoryId.Value)
+                );
             }
 
             if (request.TagIds != null && request.TagIds.Any())
             {
-                query = query.Where(mc => mc.MenuItems
-                    .Any(mi => mi.MenuItemIngredientRels
-                        .Any(mii => mii.Ingredient.IngredientTagRels
-                            .Any(it => request.TagIds.Contains(it.TagId)))));
+                query = query.Where(mc =>
+                    mc.MenuItems.Any(mi =>
+                        mi.MenuItemIngredientRels.Any(mii =>
+                            mii.Ingredient.IngredientTagRels.Any(it =>
+                                request.TagIds.Contains(it.TagId)
+                            )
+                        )
+                    )
+                );
             }
 
             var totalItems = await query.CountAsync();
@@ -142,7 +191,6 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
                 request.Page ?? 0,
                 request.PageSize ?? totalItems
             );
-
         }
         catch (Exception ex)
         {
@@ -155,36 +203,44 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
             {
                 IsSuccess = false,
                 ErrorMessage = $"An error occurred: {ex.Message}",
-                HttpStatusCode = HttpStatusCode.InternalServerError
+                HttpStatusCode = HttpStatusCode.InternalServerError,
             };
         }
     }
 
-    public async Task<ResultDto<MenuCategoryReadDto>> UpdateMenuCategory(Guid id, MenuCategoryUpdateDto menuCategoryUpdateDto)
+    public async Task<ResultDto<MenuCategoryReadDto>> UpdateMenuCategory(
+        Guid id,
+        MenuCategoryUpdateDto menuCategoryUpdateDto
+    )
     {
         try
         {
             var menuCategoryToUpdate = await orderingContext.MenuCategories.FindAsync(id);
 
             if (menuCategoryToUpdate == null)
-                return ResultDto<MenuCategoryReadDto>
-                    .Failure("MenuCategory not found or has been deleted.", HttpStatusCode.NotFound);
+                return ResultDto<MenuCategoryReadDto>.Failure(
+                    "MenuCategory not found or has been deleted.",
+                    HttpStatusCode.NotFound
+                );
 
             mapper.Map(menuCategoryUpdateDto, menuCategoryToUpdate);
             await orderingContext.SaveChangesAsync();
 
             var updatedMenuCategory = mapper.Map<MenuCategoryReadDto>(menuCategoryToUpdate);
 
-            var menuCategoryUpdatedEvent = mapper.Map<MenuCategoryUpdatedEvent>(menuCategoryToUpdate);
+            var menuCategoryUpdatedEvent = mapper.Map<MenuCategoryUpdatedEvent>(
+                menuCategoryToUpdate
+            );
             await eventHandlerService.HandleEventAsync(menuCategoryUpdatedEvent);
 
-            return ResultDto<MenuCategoryReadDto>
-                .Success(updatedMenuCategory, HttpStatusCode.OK);
+            return ResultDto<MenuCategoryReadDto>.Success(updatedMenuCategory, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
-            return ResultDto<MenuCategoryReadDto>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<MenuCategoryReadDto>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
@@ -195,12 +251,13 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
             var menuCategory = await orderingContext.MenuCategories.FindAsync(id);
 
             if (menuCategory == null)
-                return ResultDto<bool>
-                    .Failure("MenuCategory not found.", HttpStatusCode.NotFound);
+                return ResultDto<bool>.Failure("MenuCategory not found.", HttpStatusCode.NotFound);
 
             if (menuCategory.IsDeleted)
-                return ResultDto<bool>
-                    .Failure("MenuCategory has already been deleted.", HttpStatusCode.BadRequest);
+                return ResultDto<bool>.Failure(
+                    "MenuCategory has already been deleted.",
+                    HttpStatusCode.BadRequest
+                );
 
             menuCategory.IsDeleted = true;
             menuCategory.IsUsed = false;
@@ -210,13 +267,14 @@ public class MenuCategoryService(RestaurantOrderingContext orderingContext, IEve
             var menuCategoryDeletedEvent = mapper.Map<MenuCategoryDeletedEvent>(menuCategory);
             await eventHandlerService.HandleEventAsync(menuCategoryDeletedEvent);
 
-            return ResultDto<bool>
-                .Success(true, HttpStatusCode.OK);
+            return ResultDto<bool>.Success(true, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
-            return ResultDto<bool>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<bool>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 }

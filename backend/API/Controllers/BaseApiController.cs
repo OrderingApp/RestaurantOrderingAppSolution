@@ -1,4 +1,5 @@
-﻿using Application.Dtos.Common;
+﻿using System.Security.Claims;
+using Application.Dtos.Common;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -18,5 +19,17 @@ public abstract class BaseApiController : ControllerBase
             return NoContent();
 
         return StatusCode((int)result.HttpStatusCode, new { result.ErrorMessage });
+    }
+
+    [NonAction]
+    public Guid GetUserId()
+    {
+        var userIdClaim =
+            User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
+
+        if (Guid.TryParse(userIdClaim, out var userId))
+            return userId;
+
+        return Guid.Empty;
     }
 }

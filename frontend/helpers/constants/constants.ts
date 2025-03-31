@@ -11,7 +11,9 @@ import settingsSvg from '@/public/images/svg/settings.svg';
 
 export const COMPANY_NAME = 'piccolo';
 export const RESTAURANT_OPENING_HOUR = '14:00';
-export const RESTAURANT_ClOSING_HOUR = '24:00';
+export const RESTAURANT_CLOSING_HOUR = '24:00';
+export const MIN_ITEM_SELECT = 1;
+export const MAX_ITEM_SELECT = 99;
 
 export const MENU_BAR_ICONS: {
     [K in keyof languagePack['menuBar']]: StaticImport;
@@ -33,4 +35,19 @@ export const BACKEND_URL = 'http://localhost:5000/api';
 
 export enum BACKEND_PATHS {
     Areas = 'areas',
+<<<<<<< HEAD
+=======
+    Reservations = 'reservations',
+    MenuItems = 'menu-categories',
+}
+
+export enum SEARCH_PARAMS_NAMES {
+    CATEGORY = 'categoryId',
+    SUBCATEGORY = 'subcategoryId',
+    NAME = 'name',
+}
+
+export enum MENU_CATEGORY_NAMES {
+    ALL = 'all',
+>>>>>>> 80c954fc6beaaad83f96a0ce999d81e4463517c0
 }

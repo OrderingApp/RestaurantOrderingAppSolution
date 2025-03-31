@@ -116,6 +116,9 @@ namespace Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("SequenceNumber")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.ToTable("MenuCategories");
@@ -145,6 +148,9 @@ namespace Infrastructure.Database.Migrations
 
                     b.Property<decimal>("Price")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("SequenceNumber")
+                        .HasColumnType("INTEGER");
 
                     b.Property<Guid?>("SubCategoryId")
                         .HasColumnType("TEXT");
@@ -364,6 +370,9 @@ namespace Infrastructure.Database.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("SequenceNumber")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

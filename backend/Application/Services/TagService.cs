@@ -1,17 +1,22 @@
-﻿using Application.Contracts;
+﻿using System.Net;
+using Application.Contracts;
 using Application.Dtos.Common;
 using Application.Dtos.Tags;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Domain;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using RestaurantOrdering.Events.Application.Contracts;
 using RestaurantOrdering.Events.Domain.Tags;
-using System.Net;
 
 namespace Application.Services;
 
-public class TagService(RestaurantOrderingContext orderingContext, IEventHandlerService eventHandlerService, IMapper mapper) : ITagService
+public class TagService(
+    RestaurantOrderingContext orderingContext,
+    IEventHandlerService eventHandlerService,
+    IMapper mapper
+) : ITagService
 {
     public async Task<ResultDto<TagReadDto>> CreateTag(TagCreateDto tagCreateDto)
     {
@@ -27,13 +32,14 @@ public class TagService(RestaurantOrderingContext orderingContext, IEventHandler
             var tagCreatedEvent = mapper.Map<TagCreatedEvent>(tag);
             await eventHandlerService.HandleEventAsync(tagCreatedEvent);
 
-            return ResultDto<TagReadDto>
-                .Success(createdTag, HttpStatusCode.Created);
+            return ResultDto<TagReadDto>.Success(createdTag, HttpStatusCode.Created);
         }
         catch (Exception ex)
         {
-            return ResultDto<TagReadDto>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<TagReadDto>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
@@ -41,18 +47,27 @@ public class TagService(RestaurantOrderingContext orderingContext, IEventHandler
     {
         try
         {
-            var tags = await orderingContext.Tags
+            var tags = await orderingContext
+                .Tags.Where(t => t.IsUsed && !t.IsDeleted)
+                .ProjectTo<TagReadDto>(mapper.ConfigurationProvider)
                 .ToListAsync();
 
-            var tagDtos = mapper.Map<List<TagReadDto>>(tags);
+            if (!tags.Any())
+            {
+                return ResultDto<List<TagReadDto>>.Failure(
+                    "No tags found",
+                    HttpStatusCode.NotFound
+                );
+            }
 
-            return ResultDto<List<TagReadDto>>
-                .Success(tagDtos, HttpStatusCode.OK);
+            return ResultDto<List<TagReadDto>>.Success(tags, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
-            return ResultDto<List<TagReadDto>>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<List<TagReadDto>>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
@@ -60,22 +75,21 @@ public class TagService(RestaurantOrderingContext orderingContext, IEventHandler
     {
         try
         {
-            var tag = await orderingContext.Tags
-                .FirstOrDefaultAsync(t => t.Id == id);
+            var tag = await orderingContext.Tags.FirstOrDefaultAsync(t => t.Id == id);
 
             if (tag == null)
-                return ResultDto<TagReadDto>
-                    .Failure("Tag not found.", HttpStatusCode.NotFound);
+                return ResultDto<TagReadDto>.Failure("Tag not found.", HttpStatusCode.NotFound);
 
             var tagDto = mapper.Map<TagReadDto>(tag);
 
-            return ResultDto<TagReadDto>
-                .Success(tagDto, HttpStatusCode.OK);
+            return ResultDto<TagReadDto>.Success(tagDto, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
-            return ResultDto<TagReadDto>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<TagReadDto>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
@@ -86,8 +100,7 @@ public class TagService(RestaurantOrderingContext orderingContext, IEventHandler
             var tag = await orderingContext.Tags.FindAsync(id);
 
             if (tag == null)
-                return ResultDto<TagReadDto>
-                    .Failure("Tag not found.", HttpStatusCode.NotFound);
+                return ResultDto<TagReadDto>.Failure("Tag not found.", HttpStatusCode.NotFound);
 
             mapper.Map(tagUpdateDto, tag);
             await orderingContext.SaveChangesAsync();
@@ -97,13 +110,14 @@ public class TagService(RestaurantOrderingContext orderingContext, IEventHandler
             var tagUpdatedEvent = mapper.Map<TagUpdatedEvent>(tag);
             await eventHandlerService.HandleEventAsync(tagUpdatedEvent);
 
-            return ResultDto<TagReadDto>
-                .Success(updatedTag, HttpStatusCode.OK);
+            return ResultDto<TagReadDto>.Success(updatedTag, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
-            return ResultDto<TagReadDto>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<TagReadDto>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
@@ -114,8 +128,7 @@ public class TagService(RestaurantOrderingContext orderingContext, IEventHandler
             var tag = await orderingContext.Tags.FindAsync(id);
 
             if (tag == null)
-                return ResultDto<bool>
-                    .Failure("Tag not found.", HttpStatusCode.NotFound);
+                return ResultDto<bool>.Failure("Tag not found.", HttpStatusCode.NotFound);
 
             tag.IsDeleted = true;
             tag.IsUsed = false;
@@ -128,8 +141,10 @@ public class TagService(RestaurantOrderingContext orderingContext, IEventHandler
         }
         catch (Exception ex)
         {
-            return ResultDto<bool>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<bool>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 }

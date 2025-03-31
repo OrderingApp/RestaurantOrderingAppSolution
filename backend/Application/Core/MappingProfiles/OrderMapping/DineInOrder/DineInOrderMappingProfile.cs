@@ -15,7 +15,10 @@ public class DineInOrderMappingProfile : Profile
             .ForMember(dest => dest.OrderType, opt => opt.MapFrom(src => src.Type.ToString()))
             .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems))
             .ForMember(dest => dest.TableId, opt => opt.MapFrom(src => src.TableId))
-            .ForMember(dest => dest.CustomerInformation, opt => opt.MapFrom(src => src.CustomerInformation));
+            .ForMember(
+                dest => dest.CustomerInformation,
+                opt => opt.MapFrom(src => src.CustomerInformation)
+            );
 
         CreateMap<Order, OrderSummaryDto>()
             .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Status.ToString()))

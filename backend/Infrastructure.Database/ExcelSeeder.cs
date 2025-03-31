@@ -45,13 +45,18 @@ public class ExcelSeeder
 
                 for (int row = 2; row <= sheet.Dimension.End.Row; row++)
                 {
-                    entities.Add(new MenuCategory
-                    {
-                        Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
-                        Name = sheet.Cells[row, 2].Text,
-                        IsUsed = TryParseBool(sheet.Cells[row, 3].Text),
-                        IsDeleted = TryParseBool(sheet.Cells[row, 4].Text)
-                    });
+                    entities.Add(
+                        new MenuCategory
+                        {
+                            Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
+                            Name = sheet.Cells[row, 2].Text,
+                            IsUsed = TryParseBool(sheet.Cells[row, 3].Text),
+                            IsDeleted = TryParseBool(sheet.Cells[row, 4].Text),
+                            SequenceNumber =
+                                TryParseInt(sheet.Cells[row, 5].Text)
+                                ?? throw new Exception($"Invalid SequenceNumber at row {row}"),
+                        }
+                    );
                 }
 
                 await _context.MenuCategories.AddRangeAsync(entities);
@@ -76,14 +81,23 @@ public class ExcelSeeder
 
                 for (int row = 2; row <= sheet.Dimension.End.Row; row++)
                 {
-                    entities.Add(new SubCategory
-                    {
-                        Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
-                        Name = sheet.Cells[row, 2].Text,
-                        IsUsed = TryParseBool(sheet.Cells[row, 3].Text),
-                        IsDeleted = TryParseBool(sheet.Cells[row, 4].Text),
-                        MenuCategoryId = TryParseGuid(sheet.Cells[row, 5].Text) ?? throw new Exception($"Invalid GUID in MenuCategoryId at row {row}")
-                    });
+                    entities.Add(
+                        new SubCategory
+                        {
+                            Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
+                            Name = sheet.Cells[row, 2].Text,
+                            IsUsed = TryParseBool(sheet.Cells[row, 3].Text),
+                            IsDeleted = TryParseBool(sheet.Cells[row, 4].Text),
+                            MenuCategoryId =
+                                TryParseGuid(sheet.Cells[row, 5].Text)
+                                ?? throw new Exception(
+                                    $"Invalid GUID in MenuCategoryId at row {row}"
+                                ),
+                            SequenceNumber =
+                                TryParseInt(sheet.Cells[row, 6].Text)
+                                ?? throw new Exception($"Invalid SequenceNumber at row {row}"),
+                        }
+                    );
                 }
 
                 await _context.SubCategories.AddRangeAsync(entities);
@@ -108,17 +122,24 @@ public class ExcelSeeder
 
                 for (int row = 2; row <= sheet.Dimension.End.Row; row++)
                 {
-                    entities.Add(new MenuItem
-                    {
-                        Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
-                        Name = sheet.Cells[row, 2].Text,
-                        Description = string.IsNullOrWhiteSpace(sheet.Cells[row, 3].Text) ? null : sheet.Cells[row, 3].Text,
-                        Price = TryParseDecimal(sheet.Cells[row, 4].Text),
-                        IsUsed = TryParseBool(sheet.Cells[row, 5].Text),
-                        IsDeleted = TryParseBool(sheet.Cells[row, 6].Text),
-                        MenuCategoryId = TryParseGuid(sheet.Cells[row, 7].Text),
-                        SubCategoryId = TryParseGuid(sheet.Cells[row, 8].Text)
-                    });
+                    entities.Add(
+                        new MenuItem
+                        {
+                            Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
+                            Name = sheet.Cells[row, 2].Text,
+                            Description = string.IsNullOrWhiteSpace(sheet.Cells[row, 3].Text)
+                                ? null
+                                : sheet.Cells[row, 3].Text,
+                            Price = TryParseDecimal(sheet.Cells[row, 4].Text),
+                            IsUsed = TryParseBool(sheet.Cells[row, 5].Text),
+                            IsDeleted = TryParseBool(sheet.Cells[row, 6].Text),
+                            MenuCategoryId = TryParseGuid(sheet.Cells[row, 7].Text),
+                            SubCategoryId = TryParseGuid(sheet.Cells[row, 8].Text),
+                            SequenceNumber =
+                                TryParseInt(sheet.Cells[row, 9].Text)
+                                ?? throw new Exception($"Invalid SequenceNumber at row {row}"),
+                        }
+                    );
                 }
 
                 await _context.MenuItems.AddRangeAsync(entities);
@@ -143,14 +164,16 @@ public class ExcelSeeder
 
                 for (int row = 2; row <= sheet.Dimension.End.Row; row++)
                 {
-                    entities.Add(new Ingredient
-                    {
-                        Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
-                        Name = sheet.Cells[row, 2].Text,
-                        Price = TryParseDecimal(sheet.Cells[row, 3].Text),
-                        CanBeUsedAsExtra = TryParseBool(sheet.Cells[row, 4].Text),
-                        IsDeleted = TryParseBool(sheet.Cells[row, 5].Text)
-                    });
+                    entities.Add(
+                        new Ingredient
+                        {
+                            Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
+                            Name = sheet.Cells[row, 2].Text,
+                            Price = TryParseDecimal(sheet.Cells[row, 3].Text),
+                            CanBeUsedAsExtra = TryParseBool(sheet.Cells[row, 4].Text),
+                            IsDeleted = TryParseBool(sheet.Cells[row, 5].Text),
+                        }
+                    );
                 }
 
                 await _context.Ingredients.AddRangeAsync(entities);
@@ -187,15 +210,19 @@ public class ExcelSeeder
 
                     if (!menuItemExists || !ingredientExists)
                     {
-                        Console.WriteLine($"Skipping row {row}: MenuItem or Ingredient does not exist.");
+                        Console.WriteLine(
+                            $"Skipping row {row}: MenuItem or Ingredient does not exist."
+                        );
                         continue;
                     }
 
-                    entities.Add(new MenuItemIngredientRel
-                    {
-                        MenuItemId = menuItemId.Value,
-                        IngredientId = ingredientId.Value
-                    });
+                    entities.Add(
+                        new MenuItemIngredientRel
+                        {
+                            MenuItemId = menuItemId.Value,
+                            IngredientId = ingredientId.Value,
+                        }
+                    );
                 }
 
                 await _context.MenuItemIngredientRels.AddRangeAsync(entities);
@@ -208,7 +235,6 @@ public class ExcelSeeder
             Console.WriteLine($"Error seeding MenuItemIngredientRels: {ex.Message}");
         }
     }
-
 
     private async Task SeedIngredientTagRels(ExcelPackage package)
     {
@@ -236,11 +262,13 @@ public class ExcelSeeder
                         continue;
                     }
 
-                    entities.Add(new IngredientTagRel
-                    {
-                        IngredientId = ingredientId.Value,
-                        TagId = tagId.Value
-                    });
+                    entities.Add(
+                        new IngredientTagRel
+                        {
+                            IngredientId = ingredientId.Value,
+                            TagId = tagId.Value,
+                        }
+                    );
                 }
 
                 await _context.IngredientTagRels.AddRangeAsync(entities);
@@ -265,18 +293,24 @@ public class ExcelSeeder
 
                 for (int row = 2; row <= sheet.Dimension.End.Row; row++)
                 {
-                    entities.Add(new Order
-                    {
-                        Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
-                        DateTime = DateTime.Parse(sheet.Cells[row, 2].Text),
-                        TotalAmount = TryParseDecimal(sheet.Cells[row, 3].Text),
-                        Discount = TryParseDecimal(sheet.Cells[row, 4].Text),
-                        DeliveryPrice = TryParseDecimal(sheet.Cells[row, 5].Text),
-                        Status = TryParseEnum<OrderStatus>(sheet.Cells[row, 6].Text) ?? OrderStatus.Ongoing,
-                        Type = TryParseEnum<OrderType>(sheet.Cells[row, 7].Text) ?? OrderType.DineIn,
-                        TableId = TryParseGuid(sheet.Cells[row, 8].Text),
-                        CustomerInformationId = TryParseGuid(sheet.Cells[row, 9].Text)
-                    });
+                    entities.Add(
+                        new Order
+                        {
+                            Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
+                            DateTime = DateTime.Parse(sheet.Cells[row, 2].Text),
+                            TotalAmount = TryParseDecimal(sheet.Cells[row, 3].Text),
+                            Discount = TryParseDecimal(sheet.Cells[row, 4].Text),
+                            DeliveryPrice = TryParseDecimal(sheet.Cells[row, 5].Text),
+                            Status =
+                                TryParseEnum<OrderStatus>(sheet.Cells[row, 6].Text)
+                                ?? OrderStatus.Ongoing,
+                            Type =
+                                TryParseEnum<OrderType>(sheet.Cells[row, 7].Text)
+                                ?? OrderType.DineIn,
+                            TableId = TryParseGuid(sheet.Cells[row, 8].Text),
+                            CustomerInformationId = TryParseGuid(sheet.Cells[row, 9].Text),
+                        }
+                    );
                 }
 
                 await _context.Orders.AddRangeAsync(entities);
@@ -301,16 +335,22 @@ public class ExcelSeeder
 
                 for (int row = 2; row <= sheet.Dimension.End.Row; row++)
                 {
-                    entities.Add(new OrderItem
-                    {
-                        Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
-                        Price = TryParseDecimal(sheet.Cells[row, 2].Text),
-                        Discount = TryParseDecimal(sheet.Cells[row, 3].Text),
-                        SpecialInstructions = sheet.Cells[row, 4].Text,
-                        Status = TryParseEnum<OrderItemStatus>(sheet.Cells[row, 5].Text) ?? OrderItemStatus.Pending,
-                        OrderId = TryParseGuid(sheet.Cells[row, 6].Text) ?? Guid.NewGuid(),
-                        MenuItemId = TryParseGuid(sheet.Cells[row, 7].Text) ?? throw new Exception($"Invalid GUID in MenuItemId at row {row}")
-                    });
+                    entities.Add(
+                        new OrderItem
+                        {
+                            Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
+                            Price = TryParseDecimal(sheet.Cells[row, 2].Text),
+                            Discount = TryParseDecimal(sheet.Cells[row, 3].Text),
+                            SpecialInstructions = sheet.Cells[row, 4].Text,
+                            Status =
+                                TryParseEnum<OrderItemStatus>(sheet.Cells[row, 5].Text)
+                                ?? OrderItemStatus.Pending,
+                            OrderId = TryParseGuid(sheet.Cells[row, 6].Text) ?? Guid.NewGuid(),
+                            MenuItemId =
+                                TryParseGuid(sheet.Cells[row, 7].Text)
+                                ?? throw new Exception($"Invalid GUID in MenuItemId at row {row}"),
+                        }
+                    );
                 }
 
                 await _context.OrderItems.AddRangeAsync(entities);
@@ -335,16 +375,18 @@ public class ExcelSeeder
 
                 for (int row = 2; row <= sheet.Dimension.End.Row; row++)
                 {
-                    entities.Add(new Reservation
-                    {
-                        Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
-                        PhoneNumber = sheet.Cells[row, 2].Text,
-                        Name = sheet.Cells[row, 3].Text,
-                        DateTime = DateTime.Parse(sheet.Cells[row, 4].Text),
-                        CapacityNeeded = int.Parse(sheet.Cells[row, 5].Text),
-                        IsAssigned = TryParseBool(sheet.Cells[row, 6].Text),
-                        TableId = TryParseGuid(sheet.Cells[row, 7].Text)
-                    });
+                    entities.Add(
+                        new Reservation
+                        {
+                            Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
+                            PhoneNumber = sheet.Cells[row, 2].Text,
+                            Name = sheet.Cells[row, 3].Text,
+                            DateTime = DateTime.Parse(sheet.Cells[row, 4].Text),
+                            CapacityNeeded = int.Parse(sheet.Cells[row, 5].Text),
+                            IsAssigned = TryParseBool(sheet.Cells[row, 6].Text),
+                            TableId = TryParseGuid(sheet.Cells[row, 7].Text),
+                        }
+                    );
                 }
 
                 await _context.Reservations.AddRangeAsync(entities);
@@ -369,13 +411,15 @@ public class ExcelSeeder
 
                 for (int row = 2; row <= sheet.Dimension.End.Row; row++)
                 {
-                    entities.Add(new Tag
-                    {
-                        Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
-                        Name = sheet.Cells[row, 2].Text?.Trim(),
-                        IsUsed = TryParseBool(sheet.Cells[row, 3].Text),
-                        IsDeleted = TryParseBool(sheet.Cells[row, 4].Text)
-                    });
+                    entities.Add(
+                        new Tag
+                        {
+                            Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
+                            Name = sheet.Cells[row, 2].Text?.Trim(),
+                            IsUsed = TryParseBool(sheet.Cells[row, 3].Text),
+                            IsDeleted = TryParseBool(sheet.Cells[row, 4].Text),
+                        }
+                    );
                 }
 
                 await _context.Tags.AddRangeAsync(entities);
@@ -413,13 +457,15 @@ public class ExcelSeeder
 
                 for (int row = 2; row <= sheet.Dimension.End.Row; row++)
                 {
-                    areas.Add(new Area
-                    {
-                        Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
-                        Name = sheet.Cells[row, 2].Text,
-                        IsUsed = TryParseBool(sheet.Cells[row, 3].Text),
-                        IsDeleted = TryParseBool(sheet.Cells[row, 4].Text)
-                    });
+                    areas.Add(
+                        new Area
+                        {
+                            Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
+                            Name = sheet.Cells[row, 2].Text,
+                            IsUsed = TryParseBool(sheet.Cells[row, 3].Text),
+                            IsDeleted = TryParseBool(sheet.Cells[row, 4].Text),
+                        }
+                    );
                 }
 
                 await _context.Areas.AddRangeAsync(areas);
@@ -432,7 +478,6 @@ public class ExcelSeeder
             Console.WriteLine($"❌ Error seeding Areas: {ex.Message}");
         }
     }
-
 
     private async Task SeedTables(ExcelPackage package)
     {
@@ -447,23 +492,26 @@ public class ExcelSeeder
                 {
                     var areaId = TryParseGuid(sheet.Cells[row, 7].Text);
 
-
                     if (areaId == null || !_context.Areas.Any(a => a.Id == areaId))
                     {
                         Console.WriteLine($"Skipping row {row}: AreaId {areaId} does not exist.");
                         continue;
                     }
 
-                    tables.Add(new Table
-                    {
-                        Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
-                        Name = sheet.Cells[row, 2].Text,
-                        Capacity = int.Parse(sheet.Cells[row, 3].Text),
-                        IsUsed = TryParseBool(sheet.Cells[row, 4].Text),
-                        IsDeleted = TryParseBool(sheet.Cells[row, 5].Text),
-                        Status = TryParseEnum<TableStatus>(sheet.Cells[row, 6].Text) ?? TableStatus.Available,
-                        AreaId = areaId.Value
-                    });
+                    tables.Add(
+                        new Table
+                        {
+                            Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
+                            Name = sheet.Cells[row, 2].Text,
+                            Capacity = int.Parse(sheet.Cells[row, 3].Text),
+                            IsUsed = TryParseBool(sheet.Cells[row, 4].Text),
+                            IsDeleted = TryParseBool(sheet.Cells[row, 5].Text),
+                            Status =
+                                TryParseEnum<TableStatus>(sheet.Cells[row, 6].Text)
+                                ?? TableStatus.Available,
+                            AreaId = areaId.Value,
+                        }
+                    );
                 }
 
                 await _context.Tables.AddRangeAsync(tables);
@@ -477,7 +525,6 @@ public class ExcelSeeder
         }
     }
 
-
     private async Task SeedCustomerInformation(ExcelPackage package)
     {
         try
@@ -489,17 +536,25 @@ public class ExcelSeeder
 
                 for (int row = 2; row <= sheet.Dimension.End.Row; row++)
                 {
-                    entities.Add(new CustomerInformation
-                    {
-                        Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
-                        PhoneNumber = sheet.Cells[row, 2].Text,
-                        AdditionalInstructions = sheet.Cells[row, 3].Text,
-                        Address = sheet.Cells[row, 4].Text,
-                        ExpectedOrderCompletion = DateTime.Parse(sheet.Cells[row, 5].Text),
-                        OrderCompletionType = TryParseEnum<OrderCompletionType>(sheet.Cells[row, 6].Text) ?? OrderCompletionType.Scheduled,
-                        PreferredPaymentMethod = TryParseEnum<PreferredPaymentMethod>(sheet.Cells[row, 7].Text) ?? PreferredPaymentMethod.Cash,
-                        OrderId = TryParseGuid(sheet.Cells[row, 8].Text) ?? throw new Exception($"Invalid GUID in OrderId at row {row}")
-                    });
+                    entities.Add(
+                        new CustomerInformation
+                        {
+                            Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
+                            PhoneNumber = sheet.Cells[row, 2].Text,
+                            AdditionalInstructions = sheet.Cells[row, 3].Text,
+                            Address = sheet.Cells[row, 4].Text,
+                            ExpectedOrderCompletion = DateTime.Parse(sheet.Cells[row, 5].Text),
+                            OrderCompletionType =
+                                TryParseEnum<OrderCompletionType>(sheet.Cells[row, 6].Text)
+                                ?? OrderCompletionType.Scheduled,
+                            PreferredPaymentMethod =
+                                TryParseEnum<PreferredPaymentMethod>(sheet.Cells[row, 7].Text)
+                                ?? PreferredPaymentMethod.Cash,
+                            OrderId =
+                                TryParseGuid(sheet.Cells[row, 8].Text)
+                                ?? throw new Exception($"Invalid GUID in OrderId at row {row}"),
+                        }
+                    );
                 }
 
                 await _context.CustomerInformation.AddRangeAsync(entities);
@@ -520,7 +575,9 @@ public class ExcelSeeder
 
     private static bool TryParseBool(string value)
     {
-        return bool.TryParse(value, out var parsedBool) ? parsedBool : value.Trim().Equals("1") || value.Trim().ToLower() == "true";
+        return bool.TryParse(value, out var parsedBool)
+            ? parsedBool
+            : value.Trim().Equals("1") || value.Trim().ToLower() == "true";
     }
 
     private static decimal TryParseDecimal(string value)
@@ -528,9 +585,14 @@ public class ExcelSeeder
         return decimal.TryParse(value, out var parsedDecimal) ? parsedDecimal : 0m;
     }
 
-    private static TEnum? TryParseEnum<TEnum>(string value) where TEnum : struct
+    private static TEnum? TryParseEnum<TEnum>(string value)
+        where TEnum : struct
     {
         return Enum.TryParse(value, true, out TEnum result) ? result : (TEnum?)null;
     }
 
+    private int? TryParseInt(string input)
+    {
+        return int.TryParse(input, out int result) ? result : (int?)null;
+    }
 }

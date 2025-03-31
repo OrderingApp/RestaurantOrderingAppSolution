@@ -16,8 +16,10 @@ public class TableMappingProfile : Profile
             .ForMember(dest => dest.AreaId, opt => opt.MapFrom(src => src.AreaId));
 
         CreateMap<Table, TableReadDto>()
-            .ForMember(dest => dest.Reservation, opt => opt.MapFrom(src =>
-                src.Reservations.FirstOrDefault(r => !r.IsAssigned)));
+            .ForMember(
+                dest => dest.Reservation,
+                opt => opt.MapFrom(src => src.Reservations.FirstOrDefault(r => !r.IsAssigned))
+            );
 
         CreateMap<Table, TableSummaryDto>()
             .ForMember(dest => dest.Orders, opt => opt.MapFrom(src => src.Orders));

@@ -5,7 +5,7 @@ namespace Application.Contracts;
 
 public interface IAreaService
 {
-    Task<ResultDto<AreaReadDto>> CreateArea(AreaCreateDto areaCreateDto);
+    Task<ResultDto<AreaReadDto>> CreateArea(AreaCreateDto areaCreateDto, Guid userId);
     Task<ResultDto<AreaReadDto>> GetArea(Guid id);
     Task<ResultDto<List<AreaReadDto>>> GetAreas();
     Task<ResultDto<AreaReadDto>> UpdateArea(Guid id, AreaUpdateDto areaUpdateDto);

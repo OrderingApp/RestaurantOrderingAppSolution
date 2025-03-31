@@ -1,4 +1,5 @@
-﻿using Application.Contracts;
+﻿using System.Net;
+using Application.Contracts;
 using Application.Dtos.Areas;
 using Application.Dtos.Common;
 using AutoMapper;
@@ -6,13 +7,16 @@ using Domain;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using RestaurantOrdering.Events.Application.Contracts;
-using System.Net;
 
 namespace Application.Services;
 
-public class AreaService(RestaurantOrderingContext orderingContext, IEventHandlerService eventHandlerService, IMapper mapper) : IAreaService
+public class AreaService(
+    RestaurantOrderingContext orderingContext,
+    IEventHandlerService eventHandlerService,
+    IMapper mapper
+) : IAreaService
 {
-    public async Task<ResultDto<AreaReadDto>> CreateArea(AreaCreateDto areaCreateDto)
+    public async Task<ResultDto<AreaReadDto>> CreateArea(AreaCreateDto areaCreateDto, Guid userId)
     {
         try
         {
@@ -22,12 +26,13 @@ public class AreaService(RestaurantOrderingContext orderingContext, IEventHandle
 
             var areaReadDto = mapper.Map<AreaReadDto>(newArea);
             return ResultDto<AreaReadDto>.Success(areaReadDto, HttpStatusCode.Created);
-
         }
         catch (Exception ex)
         {
-            return ResultDto<AreaReadDto>
-                .Failure($"An error occured: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<AreaReadDto>.Failure(
+                $"An error occured: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
@@ -35,8 +40,8 @@ public class AreaService(RestaurantOrderingContext orderingContext, IEventHandle
     {
         try
         {
-            var area = await orderingContext.Areas
-                .Include(a => a.Tables)
+            var area = await orderingContext
+                .Areas.Include(a => a.Tables)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (area == null)
@@ -47,8 +52,10 @@ public class AreaService(RestaurantOrderingContext orderingContext, IEventHandle
         }
         catch (Exception ex)
         {
-            return ResultDto<AreaReadDto>
-                .Failure($"An error occured: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<AreaReadDto>.Failure(
+                $"An error occured: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
@@ -56,17 +63,17 @@ public class AreaService(RestaurantOrderingContext orderingContext, IEventHandle
     {
         try
         {
-            var areas = await orderingContext.Areas
-                .Include(a => a.Tables)
-                .ToListAsync();
+            var areas = await orderingContext.Areas.Include(a => a.Tables).ToListAsync();
 
             var areaReadDtos = mapper.Map<List<AreaReadDto>>(areas);
             return ResultDto<List<AreaReadDto>>.Success(areaReadDtos, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
-            return ResultDto<List<AreaReadDto>>
-                .Failure($"An error occured: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<List<AreaReadDto>>.Failure(
+                $"An error occured: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
@@ -84,12 +91,13 @@ public class AreaService(RestaurantOrderingContext orderingContext, IEventHandle
 
             var areaReadDto = mapper.Map<AreaReadDto>(area);
             return ResultDto<AreaReadDto>.Success(areaReadDto, HttpStatusCode.OK);
-
         }
         catch (Exception ex)
         {
-            return ResultDto<AreaReadDto>
-                .Failure($"An error occured: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<AreaReadDto>.Failure(
+                $"An error occured: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
@@ -108,9 +116,10 @@ public class AreaService(RestaurantOrderingContext orderingContext, IEventHandle
         }
         catch (Exception ex)
         {
-            return ResultDto<bool>
-                .Failure($"An error occured: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<bool>.Failure(
+                $"An error occured: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
-
 }

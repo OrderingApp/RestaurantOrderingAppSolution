@@ -17,7 +17,10 @@ public interface IOrderService
     // Get Orders
     Task<ResultDto<OrderReadDto>> GetOrder(Guid id);
     Task<ResultDto<List<OrderReadDto>>> GetOrders(OrderStatus? orderStatus);
-    Task<ResultDto<List<NonDineInOrderSummaryDto>>> GetOngoingNonDineInOrders(OrderType orderType);
+    Task<ResultDto<List<NonDineInOrderSummaryDto>>> GetOngoingNonDineInOrders(
+        OrderType orderType,
+        DateTime date
+    );
     Task<ResultDto<List<OrderSummaryDto>>> GetOngoingOrdersForTable(Guid tableId);
 
     // Update Orders
@@ -30,7 +33,11 @@ public interface IOrderService
     // Split/Join Order
     Task<ResultDto<OrderReadDto>> SplitOrder(Guid id, MoveOrderItemsDto splitOrderDto);
     Task<ResultDto<OrderReadDto>> JoinOrder(Guid sourceOrderId, Guid targetOrderId);
-    Task<ResultDto<OrderReadDto>> MoveOrderItems(Guid sourceOrderId, Guid targetOrderId, MoveOrderItemsDto moveOrderItemsDto);
+    Task<ResultDto<OrderReadDto>> MoveOrderItems(
+        Guid sourceOrderId,
+        Guid targetOrderId,
+        MoveOrderItemsDto moveOrderItemsDto
+    );
 
     // Delete Orders
     Task<ResultDto<bool>> DeleteOrder(Guid id);

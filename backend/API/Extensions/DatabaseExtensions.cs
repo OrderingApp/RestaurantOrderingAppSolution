@@ -6,7 +6,10 @@ namespace API.Extensions;
 
 public static class DatabaseExtensions
 {
-    public static IServiceCollection AddDatabaseServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddDatabaseServices(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
         services.AddDbContext<RestaurantOrderingContext>(opt =>
         {
@@ -28,12 +31,15 @@ public static class DatabaseExtensions
 
         try
         {
-            var restaurantOrderingContext = services.GetRequiredService<RestaurantOrderingContext>();
+            var restaurantOrderingContext =
+                services.GetRequiredService<RestaurantOrderingContext>();
             await restaurantOrderingContext.Database.MigrateAsync();
 
             var excelSeeder = new ExcelSeeder(restaurantOrderingContext);
 
-            await excelSeeder.SeedFromExcel(Path.Combine(Environment.CurrentDirectory, "SeedData.xlsx"));
+            await excelSeeder.SeedFromExcel(
+                Path.Combine(Environment.CurrentDirectory, "SeedData.xlsx")
+            );
 
             var eventsDatabaseContext = services.GetRequiredService<EventsDatabaseContext>();
             await eventsDatabaseContext.Database.MigrateAsync();

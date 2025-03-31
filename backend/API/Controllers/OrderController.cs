@@ -23,8 +23,9 @@ public class OrderController(IOrderService orderService) : BaseApiController
     [HttpPost("dinein")]
     [ProducesResponseType(typeof(OrderReadDto), 201)]
     [ProducesResponseType(400)]
-    public async Task<ActionResult<OrderReadDto>> CreateDineInOrder([FromBody] DineInOrderCreateDto dineInOrderDto) =>
-        HandleResult(await orderService.CreateDineInOrder(dineInOrderDto));
+    public async Task<ActionResult<OrderReadDto>> CreateDineInOrder(
+        [FromBody] DineInOrderCreateDto dineInOrderDto
+    ) => HandleResult(await orderService.CreateDineInOrder(dineInOrderDto));
 
     /// <summary>
     /// Creates a new takeaway order.
@@ -35,8 +36,9 @@ public class OrderController(IOrderService orderService) : BaseApiController
     [HttpPost("takeaway")]
     [ProducesResponseType(typeof(OrderReadDto), 201)]
     [ProducesResponseType(400)]
-    public async Task<ActionResult<OrderReadDto>> CreateTakeawayOrder([FromBody] TakeawayOrderCreateDto takeawayOrderDto) =>
-        HandleResult(await orderService.CreateTakeawayOrder(takeawayOrderDto));
+    public async Task<ActionResult<OrderReadDto>> CreateTakeawayOrder(
+        [FromBody] TakeawayOrderCreateDto takeawayOrderDto
+    ) => HandleResult(await orderService.CreateTakeawayOrder(takeawayOrderDto));
 
     /// <summary>
     /// Creates a new delivery order.
@@ -47,8 +49,9 @@ public class OrderController(IOrderService orderService) : BaseApiController
     [HttpPost("delivery")]
     [ProducesResponseType(typeof(OrderReadDto), 201)]
     [ProducesResponseType(400)]
-    public async Task<ActionResult<OrderReadDto>> CreateDeliveryOrder([FromBody] DeliveryOrderCreateDto deliveryOrderDto) =>
-        HandleResult(await orderService.CreateDeliveryOrder(deliveryOrderDto));
+    public async Task<ActionResult<OrderReadDto>> CreateDeliveryOrder(
+        [FromBody] DeliveryOrderCreateDto deliveryOrderDto
+    ) => HandleResult(await orderService.CreateDeliveryOrder(deliveryOrderDto));
 
     /// <summary>
     /// Retrieves a specific order by ID.
@@ -69,8 +72,9 @@ public class OrderController(IOrderService orderService) : BaseApiController
     /// <response code="200">Returns the list of orders.</response>
     [HttpGet]
     [ProducesResponseType(typeof(List<OrderReadDto>), 200)]
-    public async Task<ActionResult<List<OrderReadDto>>> GetOrders([FromQuery] OrderStatus? orderStatus) =>
-        HandleResult(await orderService.GetOrders(orderStatus));
+    public async Task<ActionResult<List<OrderReadDto>>> GetOrders(
+        [FromQuery] OrderStatus? orderStatus
+    ) => HandleResult(await orderService.GetOrders(orderStatus));
 
     /// <summary>
     /// Retrieves all ongoing non-dine-in orders based on order type.
@@ -79,8 +83,10 @@ public class OrderController(IOrderService orderService) : BaseApiController
     /// <response code="200">Returns the list of non-dine-in orders.</response>
     [HttpGet("non-dinein-orders")]
     [ProducesResponseType(typeof(List<NonDineInOrderSummaryDto>), 200)]
-    public async Task<ActionResult<List<NonDineInOrderSummaryDto>>> GetOngoingNonDineInOrders([FromQuery] OrderType orderType) =>
-        HandleResult(await orderService.GetOngoingNonDineInOrders(orderType));
+    public async Task<ActionResult<List<NonDineInOrderSummaryDto>>> GetOngoingNonDineInOrders(
+        [FromQuery] OrderType orderType,
+        [FromQuery] DateTime date
+    ) => HandleResult(await orderService.GetOngoingNonDineInOrders(orderType, date));
 
     /// <summary>
     /// Applies a discount to an existing order.
@@ -93,8 +99,10 @@ public class OrderController(IOrderService orderService) : BaseApiController
     [ProducesResponseType(typeof(OrderReadDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<OrderReadDto>> ApplyOrderDiscount([FromRoute] Guid id, [FromBody] decimal discount) =>
-        HandleResult(await orderService.ApplyOrderDiscount(id, discount));
+    public async Task<ActionResult<OrderReadDto>> ApplyOrderDiscount(
+        [FromRoute] Guid id,
+        [FromBody] decimal discount
+    ) => HandleResult(await orderService.ApplyOrderDiscount(id, discount));
 
     /// <summary>
     /// Changes the table assigned to a dine-in order.
@@ -105,8 +113,10 @@ public class OrderController(IOrderService orderService) : BaseApiController
     [ProducesResponseType(typeof(OrderReadDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<OrderReadDto>> ChangeOrderTable([FromRoute] Guid id, [FromBody] Guid newTableId) =>
-        HandleResult(await orderService.ChangeOrderTable(id, newTableId));
+    public async Task<ActionResult<OrderReadDto>> ChangeOrderTable(
+        [FromRoute] Guid id,
+        [FromBody] Guid newTableId
+    ) => HandleResult(await orderService.ChangeOrderTable(id, newTableId));
 
     /// <summary>
     /// Closes an order by ID.
@@ -125,8 +135,10 @@ public class OrderController(IOrderService orderService) : BaseApiController
     [ProducesResponseType(typeof(OrderReadDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<OrderReadDto>> UpdateOrderStatus([FromRoute] Guid id, [FromBody] OrderStatus newStatus) =>
-        HandleResult(await orderService.UpdateOrderStatus(id, newStatus));
+    public async Task<ActionResult<OrderReadDto>> UpdateOrderStatus(
+        [FromRoute] Guid id,
+        [FromBody] OrderStatus newStatus
+    ) => HandleResult(await orderService.UpdateOrderStatus(id, newStatus));
 
     /// <summary>
     /// Updates the type of an order (DineIn, Takeaway, Delivery).
@@ -141,8 +153,10 @@ public class OrderController(IOrderService orderService) : BaseApiController
     [ProducesResponseType(typeof(OrderReadDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<OrderReadDto>> UpdateOrderType([FromRoute] Guid id, [FromBody] OrderUpdateTypeDto updateTypeDto) =>
-        HandleResult(await orderService.UpdateOrderType(id, updateTypeDto));
+    public async Task<ActionResult<OrderReadDto>> UpdateOrderType(
+        [FromRoute] Guid id,
+        [FromBody] OrderUpdateTypeDto updateTypeDto
+    ) => HandleResult(await orderService.UpdateOrderType(id, updateTypeDto));
 
     /// <summary>
     /// Splits an existing order, moving specific items to a new order.
@@ -151,8 +165,10 @@ public class OrderController(IOrderService orderService) : BaseApiController
     [ProducesResponseType(typeof(OrderReadDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<OrderReadDto>> SplitOrder([FromRoute] Guid id, [FromBody] MoveOrderItemsDto splitOrderDto) =>
-        HandleResult(await orderService.SplitOrder(id, splitOrderDto));
+    public async Task<ActionResult<OrderReadDto>> SplitOrder(
+        [FromRoute] Guid id,
+        [FromBody] MoveOrderItemsDto splitOrderDto
+    ) => HandleResult(await orderService.SplitOrder(id, splitOrderDto));
 
     /// <summary>
     /// Joins an existing order into another order, merging all items and removing the source order.
@@ -164,8 +180,10 @@ public class OrderController(IOrderService orderService) : BaseApiController
     [ProducesResponseType(typeof(OrderReadDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<OrderReadDto>> JoinOrder(Guid sourceOrderId, Guid targetOrderId) =>
-        HandleResult(await orderService.JoinOrder(sourceOrderId, targetOrderId));
+    public async Task<ActionResult<OrderReadDto>> JoinOrder(
+        Guid sourceOrderId,
+        Guid targetOrderId
+    ) => HandleResult(await orderService.JoinOrder(sourceOrderId, targetOrderId));
 
     /// <summary>
     /// Moves specific order items from one order to another.
@@ -178,8 +196,14 @@ public class OrderController(IOrderService orderService) : BaseApiController
     [ProducesResponseType(typeof(OrderReadDto), 200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<OrderReadDto>> MoveOrderItems(Guid sourceOrderId, Guid targetOrderId, [FromBody] MoveOrderItemsDto moveOrderItemsDto) =>
-        HandleResult(await orderService.MoveOrderItems(sourceOrderId, targetOrderId, moveOrderItemsDto));
+    public async Task<ActionResult<OrderReadDto>> MoveOrderItems(
+        Guid sourceOrderId,
+        Guid targetOrderId,
+        [FromBody] MoveOrderItemsDto moveOrderItemsDto
+    ) =>
+        HandleResult(
+            await orderService.MoveOrderItems(sourceOrderId, targetOrderId, moveOrderItemsDto)
+        );
 
     /// <summary>
     /// Deletes an order by ID.

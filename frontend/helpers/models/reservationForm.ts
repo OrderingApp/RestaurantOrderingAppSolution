@@ -7,37 +7,31 @@ export const getReservationSchema = (lang: LanguageTypes) => {
         createReservationPage: {
             form: {
                 errors: {
-                    personalData: {
-                        min: minPersonalData,
-                        max: maxPersonalData,
-                    },
-                    noOfPeople,
+                    name: { min: minName, max: maxMame },
+                    capacityNeeded,
                     date,
                     time,
-                    phone,
+                    phoneNumber,
                 },
             },
         },
     } = languagePacks[lang];
 
     return z.object({
-        personalData: z
-            .string()
-            .min(3, minPersonalData)
-            .max(30, maxPersonalData),
-        noOfPeople: z
+        name: z.string().min(3, minName).max(30, maxMame),
+        capacityNeeded: z
             .string()
             .refine(
                 (val) =>
                     !Number.isNaN(parseInt(val, 10)) &&
                     +val > 0 &&
                     Number.isInteger(+val),
-                noOfPeople
+                capacityNeeded
             ),
         date: z.string().date(date),
         time: z.string().nonempty(time),
-        phone: z.string().refine((val) => /^\d{9}$/.test(val), {
-            message: phone,
+        phoneNumber: z.string().refine((val) => /^\d{9}$/.test(val), {
+            message: phoneNumber,
         }),
     });
 };

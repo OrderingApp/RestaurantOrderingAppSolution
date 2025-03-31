@@ -4,6 +4,8 @@ export const formatDate = (date: Date, language: string) => {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
     };
     const formatter = new Intl.DateTimeFormat(language, options);
     const formattedDate = formatter.formatToParts(date);
@@ -18,6 +20,7 @@ export const formatDate = (date: Date, language: string) => {
         day: findDatePart('day'),
         month: findDatePart('month'),
         year: findDatePart('year'),
+        time: `${findDatePart('hour')}:${findDatePart('minute')}`,
         fullDate: fullDateFormatted,
         fullDateFormatted: new Date(date.getTime()),
     };

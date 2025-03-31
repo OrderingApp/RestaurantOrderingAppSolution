@@ -7,6 +7,7 @@ public interface IMenuItemService
 {
     Task<ResultDto<MenuItemReadDto>> CreateMenuItem(MenuItemCreateDto menuItemCreateDto);
     Task<ResultDto<MenuItemReadDto>> GetMenuItem(Guid id);
+    Task<ResultDto<List<MenuItemReadDto>>> GetMenuItems();
     Task<ResultDto<MenuItemReadDto>> UpdateMenuItem(Guid id, MenuItemUpdateDto menuItemUpdateDto);
     Task<ResultDto<bool>> DeleteMenuItem(Guid id);
 }

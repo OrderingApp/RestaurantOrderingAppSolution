@@ -18,6 +18,7 @@ namespace RestaurantOrdering.Events.Infrastructure.Database
             optionsBuilder.AddInterceptors(new EventContextInterceptor(_middleware));
             base.OnConfiguring(optionsBuilder);
         }
+
         public DbSet<EventContext> EventContexts { get; set; }
 
         public override int SaveChanges()
@@ -26,7 +27,9 @@ namespace RestaurantOrdering.Events.Infrastructure.Database
             return base.SaveChanges();
         }
 
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public override async Task<int> SaveChangesAsync(
+            CancellationToken cancellationToken = default
+        )
         {
             TriggerMiddlewareForEventContext();
             return await base.SaveChangesAsync(cancellationToken);
@@ -34,7 +37,8 @@ namespace RestaurantOrdering.Events.Infrastructure.Database
 
         private void TriggerMiddlewareForEventContext()
         {
-            var addedEntities = ChangeTracker.Entries<EventContext>()
+            var addedEntities = ChangeTracker
+                .Entries<EventContext>()
                 .Where(e => e.State == EntityState.Added)
                 .Select(e => e.Entity)
                 .ToList();

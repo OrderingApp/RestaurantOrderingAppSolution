@@ -1,4 +1,5 @@
-﻿using Application.Contracts;
+﻿using System.Net;
+using Application.Contracts;
 using Application.Dtos.Common;
 using Application.Dtos.MenuItems;
 using AutoMapper;
@@ -8,13 +9,18 @@ using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using RestaurantOrdering.Events.Application.Contracts;
 using RestaurantOrdering.Events.Domain.MenuItems;
-using System.Net;
 
 namespace Application.Services;
 
-public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHandlerService eventHandlerService, IMapper mapper) : IMenuItemService
+public class MenuItemService(
+    RestaurantOrderingContext orderingContext,
+    IEventHandlerService eventHandlerService,
+    IMapper mapper
+) : IMenuItemService
 {
-    public async Task<ResultDto<MenuItemReadDto>> CreateMenuItem(MenuItemCreateDto menuItemCreateDto)
+    public async Task<ResultDto<MenuItemReadDto>> CreateMenuItem(
+        MenuItemCreateDto menuItemCreateDto
+    )
     {
         try
         {
@@ -22,15 +28,17 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
 
             if (menuItemCreateDto.IngredientIds.Any())
             {
-                var ingredients = await orderingContext.Ingredients
-                    .Where(i => menuItemCreateDto.IngredientIds.Contains(i.Id))
+                var ingredients = await orderingContext
+                    .Ingredients.Where(i => menuItemCreateDto.IngredientIds.Contains(i.Id))
                     .ToListAsync();
 
-                menuItem.MenuItemIngredientRels = ingredients.Select(ingredient => new MenuItemIngredientRel
-                {
-                    MenuItemId = menuItem.Id,
-                    IngredientId = ingredient.Id
-                }).ToList();
+                menuItem.MenuItemIngredientRels = ingredients
+                    .Select(ingredient => new MenuItemIngredientRel
+                    {
+                        MenuItemId = menuItem.Id,
+                        IngredientId = ingredient.Id,
+                    })
+                    .ToList();
             }
 
             await orderingContext.MenuItems.AddAsync(menuItem);
@@ -41,13 +49,14 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
             var menuItemCreatedEvent = mapper.Map<MenuItemCreatedEvent>(menuItem);
             await eventHandlerService.HandleEventAsync(menuItemCreatedEvent);
 
-            return ResultDto<MenuItemReadDto>
-                .Success(createdMenuItem, HttpStatusCode.Created);
+            return ResultDto<MenuItemReadDto>.Success(createdMenuItem, HttpStatusCode.Created);
         }
         catch (Exception ex)
         {
-            return ResultDto<MenuItemReadDto>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<MenuItemReadDto>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
@@ -55,41 +64,75 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
     {
         try
         {
-            var menuItem = await orderingContext.MenuItems
-                .Include(mi => mi.MenuCategory)
+            var menuItem = await orderingContext
+                .MenuItems.Include(mi => mi.MenuCategory)
                 .Include(mi => mi.MenuItemIngredientRels)
-                    .ThenInclude(rel => rel.Ingredient)
-                        .ThenInclude(ing => ing.IngredientTagRels)
-                            .ThenInclude(tagRel => tagRel.Tag)
+                .ThenInclude(rel => rel.Ingredient)
+                .ThenInclude(ing => ing.IngredientTagRels)
+                .ThenInclude(tagRel => tagRel.Tag)
                 .FirstOrDefaultAsync(mi => mi.Id == id);
 
             if (menuItem == null)
-                return ResultDto<MenuItemReadDto>
-                    .Failure("Menu item not found.", HttpStatusCode.NotFound);
+                return ResultDto<MenuItemReadDto>.Failure(
+                    "Menu item not found.",
+                    HttpStatusCode.NotFound
+                );
 
             var menuItemDto = mapper.Map<MenuItemReadDto>(menuItem);
 
-            return ResultDto<MenuItemReadDto>
-                .Success(menuItemDto, HttpStatusCode.OK);
+            return ResultDto<MenuItemReadDto>.Success(menuItemDto, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
-            return ResultDto<MenuItemReadDto>
-                .Failure($"An error occurred while fetching the menu item: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<MenuItemReadDto>.Failure(
+                $"An error occurred while fetching the menu item: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
-    public async Task<ResultDto<MenuItemReadDto>> UpdateMenuItem(Guid id, MenuItemUpdateDto menuItemUpdateDto)
+    public async Task<ResultDto<List<MenuItemReadDto>>> GetMenuItems()
     {
         try
         {
-            var menuItem = await orderingContext.MenuItems
+            var menuItems = await orderingContext
+                .MenuItems.Where(mi => mi.IsUsed && !mi.IsDeleted)
                 .Include(mi => mi.MenuItemIngredientRels)
+                .ThenInclude(rel => rel.Ingredient)
+                .ThenInclude(i => i.IngredientTagRels)
+                .ThenInclude(tagRel => tagRel.Tag)
+                .OrderBy(mi => mi.SequenceNumber)
+                .ToListAsync();
+
+            var menuItemDtos = mapper.Map<List<MenuItemReadDto>>(menuItems);
+
+            return ResultDto<List<MenuItemReadDto>>.Success(menuItemDtos, HttpStatusCode.OK);
+        }
+        catch (Exception ex)
+        {
+            return ResultDto<List<MenuItemReadDto>>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
+        }
+    }
+
+    public async Task<ResultDto<MenuItemReadDto>> UpdateMenuItem(
+        Guid id,
+        MenuItemUpdateDto menuItemUpdateDto
+    )
+    {
+        try
+        {
+            var menuItem = await orderingContext
+                .MenuItems.Include(mi => mi.MenuItemIngredientRels)
                 .FirstOrDefaultAsync(mi => mi.Id == id);
 
             if (menuItem == null)
-                return ResultDto<MenuItemReadDto>
-                    .Failure("Menu item not found.", HttpStatusCode.NotFound);
+                return ResultDto<MenuItemReadDto>.Failure(
+                    "Menu item not found.",
+                    HttpStatusCode.NotFound
+                );
 
             mapper.Map(menuItemUpdateDto, menuItem);
 
@@ -97,15 +140,17 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
             {
                 orderingContext.MenuItemIngredientRels.RemoveRange(menuItem.MenuItemIngredientRels);
 
-                var ingredients = await orderingContext.Ingredients
-                    .Where(i => menuItemUpdateDto.IngredientIds.Contains(i.Id))
+                var ingredients = await orderingContext
+                    .Ingredients.Where(i => menuItemUpdateDto.IngredientIds.Contains(i.Id))
                     .ToListAsync();
 
-                menuItem.MenuItemIngredientRels = ingredients.Select(ingredient => new MenuItemIngredientRel
-                {
-                    MenuItemId = menuItem.Id,
-                    IngredientId = ingredient.Id
-                }).ToList();
+                menuItem.MenuItemIngredientRels = ingredients
+                    .Select(ingredient => new MenuItemIngredientRel
+                    {
+                        MenuItemId = menuItem.Id,
+                        IngredientId = ingredient.Id,
+                    })
+                    .ToList();
             }
 
             await orderingContext.SaveChangesAsync();
@@ -115,13 +160,14 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
             var menuItemUpdatedEvent = mapper.Map<MenuItemUpdatedEvent>(menuItem);
             await eventHandlerService.HandleEventAsync(menuItemUpdatedEvent);
 
-            return ResultDto<MenuItemReadDto>
-                .Success(updatedMenuItemDto, HttpStatusCode.OK);
+            return ResultDto<MenuItemReadDto>.Success(updatedMenuItemDto, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
-            return ResultDto<MenuItemReadDto>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<MenuItemReadDto>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 
@@ -132,12 +178,13 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
             var menuItemToDelete = await orderingContext.MenuItems.FindAsync(id);
 
             if (menuItemToDelete == null)
-                return ResultDto<bool>
-                    .Failure("Menu item not found.", HttpStatusCode.NotFound);
+                return ResultDto<bool>.Failure("Menu item not found.", HttpStatusCode.NotFound);
 
             if (menuItemToDelete.IsDeleted)
-                return ResultDto<bool>
-                    .Failure("MenuItem has already been deleted.", HttpStatusCode.BadRequest);
+                return ResultDto<bool>.Failure(
+                    "MenuItem has already been deleted.",
+                    HttpStatusCode.BadRequest
+                );
 
             menuItemToDelete.IsDeleted = true;
             menuItemToDelete.IsUsed = false;
@@ -147,13 +194,14 @@ public class MenuItemService(RestaurantOrderingContext orderingContext, IEventHa
             var menuItemDeletedEvent = mapper.Map<MenuItemDeletedEvent>(menuItemToDelete);
             await eventHandlerService.HandleEventAsync(menuItemDeletedEvent);
 
-            return ResultDto<bool>
-                .Success(true, HttpStatusCode.OK);
+            return ResultDto<bool>.Success(true, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
-            return ResultDto<bool>
-                .Failure($"An error occurred: {ex.Message}", HttpStatusCode.InternalServerError);
+            return ResultDto<bool>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 }

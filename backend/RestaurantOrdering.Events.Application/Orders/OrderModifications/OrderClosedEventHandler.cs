@@ -12,8 +12,10 @@ public class OrderClosedEventHandler(RestaurantOrderingContext restaurantOrderin
         var today = DateTime.Now.Date;
 
         var totalAmount = orderClosedEvent.Payments.Sum(p => p.Amount);
-        var existingDailyRevenue = await restaurantOrderingContext.SalesRevenues
-            .FirstOrDefaultAsync(sr => sr.Date == today);
+        var existingDailyRevenue =
+            await restaurantOrderingContext.SalesRevenues.FirstOrDefaultAsync(sr =>
+                sr.Date == today
+            );
 
         if (existingDailyRevenue != null)
         {
@@ -21,16 +23,17 @@ public class OrderClosedEventHandler(RestaurantOrderingContext restaurantOrderin
         }
         else
         {
-            await restaurantOrderingContext.SalesRevenues.AddAsync(new SalesRevenue
-            {
-                Amount = totalAmount,
-                Date = today
-            });
+            await restaurantOrderingContext.SalesRevenues.AddAsync(
+                new SalesRevenue { Amount = totalAmount, Date = today }
+            );
         }
 
-        var menuItemIds = orderClosedEvent.OrderItems.Select(oi => oi.MenuItemId).Distinct().ToList();
-        var existingMenuItemSales = await restaurantOrderingContext.MenuItemSales
-            .Where(mi => menuItemIds.Contains(mi.MenuItemId) && mi.Date == today)
+        var menuItemIds = orderClosedEvent
+            .OrderItems.Select(oi => oi.MenuItemId)
+            .Distinct()
+            .ToList();
+        var existingMenuItemSales = await restaurantOrderingContext
+            .MenuItemSales.Where(mi => menuItemIds.Contains(mi.MenuItemId) && mi.Date == today)
             .ToDictionaryAsync(mi => mi.MenuItemId);
 
         List<MenuItemSale> newMenuItemSales = new();
@@ -43,12 +46,14 @@ public class OrderClosedEventHandler(RestaurantOrderingContext restaurantOrderin
             }
             else
             {
-                newMenuItemSales.Add(new MenuItemSale
-                {
-                    Amount = 1,
-                    Date = today,
-                    MenuItemId = orderItem.MenuItemId
-                });
+                newMenuItemSales.Add(
+                    new MenuItemSale
+                    {
+                        Amount = 1,
+                        Date = today,
+                        MenuItemId = orderItem.MenuItemId,
+                    }
+                );
             }
         }
 

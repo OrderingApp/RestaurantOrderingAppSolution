@@ -1,5 +1,5 @@
-﻿using Domain;
-using System;
+﻿using System;
+using Domain;
 
 public static class TableTestHelper
 {
@@ -10,7 +10,7 @@ public static class TableTestHelper
             Id = id ?? Guid.NewGuid(),
             Name = "P1",
             Capacity = 8,
-            Status = TableStatus.Available
+            Status = TableStatus.Available,
         };
     }
 }

@@ -1,10 +1,13 @@
-﻿using Application.Dtos.Common;
+﻿using System.Net;
+using Application.Dtos.Common;
 using FluentAssertions;
-using System.Net;
 
 public static class ResultDtoAssertions
 {
-    public static void ShouldBeSuccessful<T>(this ResultDto<T> result, HttpStatusCode expectedStatusCode)
+    public static void ShouldBeSuccessful<T>(
+        this ResultDto<T> result,
+        HttpStatusCode expectedStatusCode
+    )
     {
         result.Should().NotBeNull();
         result.IsSuccess.Should().BeTrue("expected result to be successful but it was not");
