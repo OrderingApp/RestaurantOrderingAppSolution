@@ -1,5 +1,7 @@
+import Menu from '@/components/pages/menu/Menu';
+
 const MenuPage = () => {
-    return <h1>elo</h1>;
+    return <Menu variant="card" />;
 };
 
 export default MenuPage;

@@ -44,7 +44,7 @@ const Button = ({
     return (
         <button
             className={clsx(
-                'transition-all duration-200',
+                'transition-all duration-200 shadow-[0px_4px_4px_0px_#00000040',
                 btnStyles.variants[variant],
                 btnStyles.sizes[size],
                 { 'opacity-50 cursor-not-allowed': disabled || isLoading },

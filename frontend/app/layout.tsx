@@ -9,6 +9,7 @@ import readLangCookie from '@/actions/readLangCookie';
 import languagePacks from '@/helpers/constants/languagePacks';
 
 import './globals.css';
+import OrdersProvider from '@/providers/OrdersContext';
 
 const geistSans = Geist({
     variable: '--font-geist-sans',
@@ -39,10 +40,10 @@ const RootLayout = async ({
             <body
                 className={`${geistSans.variable} ${geistMono.variable} flex justify-center items-center min-h-screen antialiased bg-page-gradient`}
             >
-                <div className="w-full max-w-[64rem]">
+                <div id="root" className="w-full max-w-[64rem] relative">
                     <QueryProvider>
                         <LanguageProvider language={lang}>
-                            {children}
+                            <OrdersProvider>{children}</OrdersProvider>
                         </LanguageProvider>
                     </QueryProvider>
                 </div>

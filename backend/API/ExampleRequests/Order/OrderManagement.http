@@ -83,7 +83,7 @@ Accept: application/json
 
 // To update the status of an order.
 
-PATCH {{API_HostAddress}}/orders/C93FA2FE-918A-4B90-9841-342C6A84E716/status
+PATCH {{API_HostAddress}}/orders/8793ab1d-61fd-4227-a739-1c29ccda3008/status
 Content-Type: application/json
 Accept: application/json
 

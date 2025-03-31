@@ -13,6 +13,8 @@ export default {
             backgroundImage: {
                 'page-gradient':
                     'linear-gradient(135deg, #2C5364 0%, #0F2027 100%)',
+                'modal-gradient':
+                    'linear-gradient(135deg, #6E8894 0%, #334046 100%)',
             },
             colors: {
                 primary: 'var(--primary)',
@@ -28,6 +30,9 @@ export default {
             fontFamily: {
                 serif: 'var(--serif)',
                 sans: 'var(--sans)',
+            },
+            boxShadow: {
+                'inner-lg': 'inset 0 0 10px 0 #00000040',
             },
         },
     },

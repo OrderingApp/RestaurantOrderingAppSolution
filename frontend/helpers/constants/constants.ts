@@ -38,16 +38,51 @@ export enum BACKEND_PATHS {
 <<<<<<< HEAD
 =======
     Reservations = 'reservations',
-    MenuItems = 'menu-categories',
+    MenuICategories = 'menu-categories',
+    MenuItems = 'menu-items',
+    Tags = 'tags',
+    Orders = 'orders',
 }
 
 export enum SEARCH_PARAMS_NAMES {
     CATEGORY = 'categoryId',
     SUBCATEGORY = 'subcategoryId',
     NAME = 'name',
+    TAG = 'tag',
+    ORDER_TYPE = 'orderType',
+    ORDER_ID = 'orderId',
+    MODAL = 'modal',
 }
 
 export enum MENU_CATEGORY_NAMES {
     ALL = 'all',
 >>>>>>> 80c954fc6beaaad83f96a0ce999d81e4463517c0
 }
+
+export enum FILTER_STATUS {
+    ONGOING = 'Ongoing',
+    CLOSED = 'Closed',
+}
+
+export const ordersTypes = {
+    pl: [
+        {
+            id: 'Takeaway',
+            name: 'Odbiór',
+        },
+        {
+            id: 'Delivery',
+            name: 'Dowóz',
+        },
+    ],
+    en: [
+        {
+            id: 'Takeaway',
+            name: 'Pickup',
+        },
+        {
+            id: 'Delivery',
+            name: 'Delivery',
+        },
+    ],
+};

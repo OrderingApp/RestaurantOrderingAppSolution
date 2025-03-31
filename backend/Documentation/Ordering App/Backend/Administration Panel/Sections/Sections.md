@@ -1,5 +1,0 @@
----
-tags:
-  - AdministrationPanel
----
-[[Administration Panel]]
