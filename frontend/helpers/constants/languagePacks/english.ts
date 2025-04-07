@@ -89,6 +89,15 @@ const enPack: languagePack = {
             delivery: 'Delivery',
         },
     },
+    paymentModal: {
+        title: 'Choose Payment Method',
+        inputLabel: 'Enter Amount',
+        paymentByCard: 'Pay by Card/BLIK',
+        paymentByCash: 'Pay by Cash',
+    },
+    discountModal: {
+        disscountTitle: "Add discount",
+    }
 };
 
 export default enPack;

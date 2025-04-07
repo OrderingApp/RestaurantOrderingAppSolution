@@ -89,6 +89,15 @@ const plPack: languagePack = {
             delivery: 'Dostawa',
         },
     },
+    paymentModal: {
+        title: 'Wybierz Formę Płatnośći',
+        inputLabel: 'Wpisz wartość',
+        paymentByCard: 'Płatność Kartą/Blikiem',
+        paymentByCash: 'Płatność Gotówką',
+    },
+    discountModal: {
+        disscountTitle: 'Dodaj zniżkę',
+    },
 };
 
 export default plPack;

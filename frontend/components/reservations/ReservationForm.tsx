@@ -145,7 +145,7 @@ const ReservationForm = () => {
                             {...register('capacityNeeded')}
                             min={1}
                             errors={errors.capacityNeeded}
-                            inputClassName="w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            inputClassName="w-full hide-input-number-icon"
                             defaultValue={formDefaultValues.capacityNeeded}
                         />
                         <Input
