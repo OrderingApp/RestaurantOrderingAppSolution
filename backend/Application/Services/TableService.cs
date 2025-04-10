@@ -171,6 +171,34 @@ public class TableService(
         }
     }
 
+    public async Task<ResultDto<TableReadDto>> TogglePreparation(Guid id)
+    {
+        try
+        {
+            var table = await orderingContext.Tables.FindAsync(id);
+
+            if (table == null || table.IsDeleted)
+                return ResultDto<TableReadDto>.Failure(
+                    "Table not found or has been deleted.",
+                    HttpStatusCode.NotFound
+                );
+
+            table.IsPrepared = !table.IsPrepared;
+            await orderingContext.SaveChangesAsync();
+
+            var dto = mapper.Map<TableReadDto>(table);
+
+            return ResultDto<TableReadDto>.Success(dto, HttpStatusCode.OK);
+        }
+        catch (Exception ex)
+        {
+            return ResultDto<TableReadDto>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
+        }
+    }
+
     public async Task<ResultDto<bool>> DeleteTable(Guid id)
     {
         try
