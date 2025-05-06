@@ -11,5 +11,6 @@ public interface ITableService
     Task<ResultDto<List<TableReadDto>>> GetTables();
     Task<ResultDto<TableReadDto>> UpdateTable(Guid id, TableUpdateDto tableUpdateDto);
     Task<ResultDto<TableReadDto>> UpdateStatus(Guid id, TableStatus tableStatus);
+    Task<ResultDto<TableReadDto>> TogglePreparation(Guid id);
     Task<ResultDto<bool>> DeleteTable(Guid id);
 }

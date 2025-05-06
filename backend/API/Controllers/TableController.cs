@@ -80,6 +80,20 @@ public class TableController(ITableService tableService) : BaseApiController
         HandleResult(await tableService.UpdateStatus(id, status));
 
     /// <summary>
+    /// Toggles the preparation status of a table (IsPrepared).
+    /// </summary>
+    /// <param name="id">The ID of the table to update.</param>
+    /// <returns>The updated table data with the new preparation status.</returns>
+    /// <response code="200">If the toggle was successful.</response>
+    /// <response code="404">If the table is not found.</response>
+    [HttpPatch("{id}/toggle-preparation")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> TogglePreparation(Guid id) =>
+        HandleResult(await tableService.TogglePreparation(id));
+
+
+    /// <summary>
     /// Deletes a table.
     /// </summary>
     /// <param name="id">The table ID to delete.</param>

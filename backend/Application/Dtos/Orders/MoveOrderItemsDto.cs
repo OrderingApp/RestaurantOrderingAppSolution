@@ -2,5 +2,5 @@
 
 public class MoveOrderItemsDto
 {
-    public List<Guid> OrderItemIds { get; set; } = new();
+    public List<SplitOrderGroupDto> SplitGroups { get; set; } = new();
 }

@@ -199,7 +199,7 @@ public class OrderController(IOrderService orderService) : BaseApiController
     public async Task<ActionResult<OrderReadDto>> MoveOrderItems(
         Guid sourceOrderId,
         Guid targetOrderId,
-        [FromBody] MoveOrderItemsDto moveOrderItemsDto
+        [FromBody] SplitOrderGroupDto moveOrderItemsDto
     ) =>
         HandleResult(
             await orderService.MoveOrderItems(sourceOrderId, targetOrderId, moveOrderItemsDto)
