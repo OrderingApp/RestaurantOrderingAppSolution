@@ -1,15 +1,48 @@
-import Button, { type ButtonProps } from '@/components/shared/Button/Button';
-import Item, { BaseItemProps, ButtonItemProps } from '../lists/Items/Item';
-import ItemsList from '../lists/Items/Items';
+import { useLanguage } from '@/providers/LanguageProvider';
+
+import Button, { type ButtonProps } from '@/components/shared/button/Button';
+import ItemsList, {
+    type ItemsListProps,
+} from '@/components/shared//lists/Items/Items';
+
+import { formatPriceStr } from '@/helpers/utils/prices';
+
+import type { Currency } from '@/helpers/type/types';
+import languagePacks from '@/helpers/constants/languagePacks';
+import PendingIcon from '@/public/images/svg/table-status-pending.svg';
+import ServedIcon from '@/public/images/svg/table-status-served.svg';
+import Image from 'next/image';
+
+import { AnimatePresence, motion } from 'motion/react';
+interface ButtonHeader {
+    price: number;
+    currency: Currency;
+    button: Omit<ButtonProps, 'children'> &
+        Partial<Pick<ButtonProps, 'children'>>;
+    served?: never;
+}
+
+interface RegularHeader {
+    served?: boolean;
+    price?: never;
+    currency?: never;
+    button?: never;
+}
+
+interface EmptyAside {
+    title?: never;
+    items?: never;
+}
+
+interface FilledAside {
+    title: string;
+    items?: ItemsListProps['items'];
+}
 
 type DetailsAsideProps = {
-    title: string;
-    items: BaseItemProps[];
     buttons?: Omit<ButtonProps, 'className'>[];
-} & (
-    | Omit<ButtonItemProps, 'name'>
-    | Partial<Record<keyof ButtonItemProps, never>>
-);
+} & (FilledAside | EmptyAside) &
+    (RegularHeader | ButtonHeader);
 
 const DetailsAside = ({
     title,
@@ -18,35 +51,74 @@ const DetailsAside = ({
     price,
     currency,
     button,
-}: DetailsAsideProps) => (
-    <aside className="flex flex-col gap-3 ml-auto py-6 h-full w-56 shadow-[-4px_0px_4px_0px_rgba(0,0,0,0.25)]">
-        {button ? (
-            <Item {...{ button, name: title, price, currency }} />
-        ) : (
-            <>
-                <h2 className="mb-2 text-center text-xl/8 font-semibold capitalize">
-                    {title}
-                </h2>
-                <div className="h-0.5 w-full bg-[#707070]"></div>
-            </>
-        )}
+    served,
+}: DetailsAsideProps) => {
+    const { language } = useLanguage();
+    const { detailsAside } = languagePacks[language];
 
-        <ItemsList items={items} />
+    return (
+        <aside className="flex flex-col gap-1.5 ml-auto py-6 h-full w-56 shadow-[-4px_0px_4px_0px_rgba(0,0,0,0.25)]">
+            {title &&
+                (button ? (
+                    <div className="flex flex-col items-center px-4 gap-1 mb-[18px]">
+                        <h2 className="text-xl/8 capitalize font-bold">
+                            {title}
+                        </h2>
 
-        {buttons && (
-            <menu className="mt-auto flex flex-col gap-3 px-5">
-                {buttons.map(({ children, ...btn }) => (
-                    <li key={children!.toString()}>
-                        <Button className="w-full capitalize" {...btn}>
-                            {children}
+                        <p className="text-primary font-bold">
+                            {formatPriceStr({ currency, price })}
+                        </p>
+                        <Button variant="tertiary" size="xs" {...button}>
+                            {button.children ?? detailsAside.info}
                         </Button>
-                    </li>
+                    </div>
+                ) : (
+                    <>
+                        <div className="mb-[18px] px-12 relative">
+                            <h2 className="text-center text-xl/8 font-semibold capitalize leading-10">
+                                {title}
+                            </h2>
+                            <AnimatePresence mode="wait" initial={false}>
+                                <motion.div
+                                    key={served ? 'served' : 'pending'}
+                                    initial={{ opacity: 0, scale: 0.75 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.75 }}
+                                    transition={{ duration: 0.5 }}
+                                    className="absolute top-0 right-3 w-10 h-10"
+                                >
+                                    <Image
+                                        src={served ? ServedIcon : PendingIcon}
+                                        alt={
+                                            served
+                                                ? 'Table served'
+                                                : 'Table pending'
+                                        }
+                                        fill
+                                        sizes="40px"
+                                    />
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
+                        <div className="h-0.5 w-full bg-[#707070]"></div>
+                    </>
                 ))}
-            </menu>
-        )}
-    </aside>
-);
 
-//TODO: implement a dropdown (list inside a list of items)
-//TODO: make buttons proper, needs to adjust variants/sizes in the component itself
+            {items && <ItemsList items={items} />}
+
+            {buttons && (
+                <menu className="mt-auto pt-[18px] flex flex-col gap-3 px-5">
+                    {buttons.map(({ children, ...btn }) => (
+                        <li key={children!.toString()}>
+                            <Button className="w-full capitalize" {...btn}>
+                                {children}
+                            </Button>
+                        </li>
+                    ))}
+                </menu>
+            )}
+        </aside>
+    );
+};
+// rather than having 'otworz rachunek' just create a + icon if table is empty, just like when u can add more receipts if u have at least 1
 export default DetailsAside;

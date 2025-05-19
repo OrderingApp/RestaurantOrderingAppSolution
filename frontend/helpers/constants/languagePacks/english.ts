@@ -6,6 +6,7 @@ const enPack: languagePack = {
         title: `${COMPANY_NAME} | Ordering App`,
         description: `Ordering application created for ${COMPANY_NAME}.`,
     },
+    detailsAside: { info: 'Information' },
     loginPage: {
         appName: 'order application',
         form: {

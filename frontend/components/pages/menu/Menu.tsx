@@ -92,13 +92,13 @@ const Menu = ({ variant = 'order', children }: MenuProps) => {
                         />
                     ))}
                 </div>
-                {displayedTags?.length! > 0 && (
+                {displayedTags?.length ? (
                     <ul className="flex gap-3 px-5 py-2">
                         {displayedTags?.map((tag) => (
                             <MenuTag {...tag} key={tag.id} />
                         ))}
                     </ul>
-                )}
+                ) : null}
 
                 <ul
                     className={clsx(

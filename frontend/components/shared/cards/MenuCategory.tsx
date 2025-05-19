@@ -51,15 +51,19 @@ const MenuCategory = ({
     const toggleSelectedCategory = () => {
         const newParams = new URLSearchParams(searchParams.toString());
 
-        type === 'category'
-            ? categoryId === id
-                ? newParams.delete('categoryId')
-                : newParams.set('categoryId', id)
-            : type === 'subcategory'
-              ? subcategoryId === id
-                  ? newParams.delete('subcategoryId')
-                  : newParams.set('subcategoryId', id)
-              : null;
+        if (type === 'category') {
+            if (categoryId === id) {
+                newParams.delete('categoryId');
+            } else {
+                newParams.set('categoryId', id);
+            }
+        } else if (type === 'subcategory') {
+            if (subcategoryId === id) {
+                newParams.delete('subcategoryId');
+            } else {
+                newParams.set('subcategoryId', id);
+            }
+        }
 
         const modalParam = newParams.get('modal')
             ? `modal=${newParams.get('modal')}`

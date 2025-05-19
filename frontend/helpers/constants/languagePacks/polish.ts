@@ -6,6 +6,7 @@ const plPack: languagePack = {
         title: `${COMPANY_NAME} | Aplikacja do zamówień`,
         description: `Aplikacja do zamówień stworzona dla ${COMPANY_NAME}.`,
     },
+    detailsAside: { info: 'Informacje' },
     loginPage: {
         appName: 'aplikacja do zamówień',
         form: {

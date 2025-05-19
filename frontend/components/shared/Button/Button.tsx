@@ -11,8 +11,8 @@ export type ButtonProps = {
     disabled?: boolean;
     variant?: keyof typeof btnStyles.variants;
     size?: keyof typeof btnStyles.sizes;
-    onClick?: (e?: MouseEvent<HTMLButtonElement>) => void;
-    action?: () => Promise<void>;
+    onClick?: (e?: MouseEvent<HTMLButtonElement>) => unknown;
+    action?: () => Promise<unknown>;
 };
 
 const Button = ({
@@ -36,6 +36,8 @@ const Button = ({
 
         try {
             await action();
+        } catch (e) {
+            console.error(e);
         } finally {
             setIsLoading(false);
         }
@@ -44,7 +46,7 @@ const Button = ({
     return (
         <button
             className={clsx(
-                'transition-all duration-200 shadow-[0px_4px_4px_0px_#00000040',
+                'flex items-center justify-center text-center transition-all duration-200 ',
                 btnStyles.variants[variant],
                 btnStyles.sizes[size],
                 { 'opacity-50 cursor-not-allowed': disabled || isLoading },
@@ -61,5 +63,5 @@ const Button = ({
 
 export default Button;
 //TODO: add a loading spinner before {children} if disabled, maybe accept a spinner? flag to do so only when needed
-
+// TODO: add hover/focus i guess
 // <img src="https://bazaikon.com/naszapaczka/{name} />

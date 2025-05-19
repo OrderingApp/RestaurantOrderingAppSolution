@@ -14,8 +14,15 @@ export const camelToKebab = (str: string): string => {
  * @param str - The string to capitalize.
  * @returns The string with the first letter capitalized.
  */
-export const capitalizeFirstLetter = (str: string) =>
-    str?.charAt(0).toUpperCase() + str?.slice(1);
+export const capitalizeFirstLetter = (str: string): string => {
+    const match = str.match(/[a-zA-Z]/);
+
+    if (!match) return str;
+
+    const index = match.index!;
+
+    return str.slice(0, index) + match[0].toUpperCase() + str.slice(index + 1);
+};
 
 export const fetchWithToken = (path: `${BACKEND_PATHS}`, params: string) =>
     fetch(`${BACKEND_URL}/${path}/${params}`).then((res) => res.json());
