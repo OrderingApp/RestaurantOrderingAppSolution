@@ -164,6 +164,7 @@ public class OrderService(
         }
     }
 
+    // Do we actually need this? we have other queries for orders in app
     public async Task<ResultDto<List<OrderReadDto>>> GetOrders(OrderStatus? orderStatus)
     {
         try
@@ -463,6 +464,7 @@ public class OrderService(
 
             order.Status = newStatus;
 
+            // We need to check if table have other orders than this only
             if (newStatus == OrderStatus.Closed && order.Table != null)
             {
                 order.Table.Status = TableStatus.Available;
@@ -600,6 +602,7 @@ public class OrderService(
 
                 var newOrder = mapper.Map<Order, Order>(originalOrder);
                 newOrder.Id = Guid.NewGuid();
+                // To fix? datetime shouldnt be set to now
                 newOrder.DateTime = DateTime.UtcNow;
                 newOrder.OrderItems = mapper.Map<List<OrderItem>>(itemsToMove);
                 newOrder.TotalAmount = Math.Max(0, newOrder.OrderItems.Sum(item => item.Price));

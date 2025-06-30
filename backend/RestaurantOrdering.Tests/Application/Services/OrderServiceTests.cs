@@ -36,7 +36,7 @@ public class OrderServiceTests
     public async Task CreateDineInOrder_ShouldReturnSuccess_WhenTableExists()
     {
         // Arrange
-        var table = TableTestHelper.CreateTable();
+        var table = TableTestHelper.CreateCorrectTable();
         var menuItem = MenuItemTestHelper.CreateMenuItem();
         var orderItem = OrderItemTestHelper.CreateOrderItem(menuItem.Id);
         var order = OrderTestHelper.CreateOrder(

@@ -91,6 +91,7 @@ public class MenuItemService(
         }
     }
 
+    // Do we actually need this if we have GetMenuCategoryWithHierarchy?
     public async Task<ResultDto<List<MenuItemReadDto>>> GetMenuItems()
     {
         try

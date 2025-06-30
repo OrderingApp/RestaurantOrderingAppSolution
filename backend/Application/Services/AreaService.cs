@@ -24,6 +24,7 @@ public class AreaService(
             orderingContext.Areas.Add(newArea);
             await orderingContext.SaveChangesAsync();
 
+
             var areaReadDto = mapper.Map<AreaReadDto>(newArea);
             return ResultDto<AreaReadDto>.Success(areaReadDto, HttpStatusCode.Created);
         }

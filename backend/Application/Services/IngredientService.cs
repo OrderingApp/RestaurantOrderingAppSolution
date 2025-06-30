@@ -44,11 +44,12 @@ public class IngredientService(
         }
     }
 
+    // To fix? create dto for tags?
     public async Task<ResultDto<List<IngredientReadDto>>> GetIngredients(List<string>? tags = null)
     {
         try
         {
-            var query = orderingContext
+            var query = orderingContext 
                 .Ingredients.Include(i => i.IngredientTagRels)
                 .ThenInclude(rel => rel.Tag)
                 .Where(i => i.CanBeUsedAsExtra && !i.IsDeleted)
@@ -102,6 +103,7 @@ public class IngredientService(
         }
     }
 
+    // Reconsider if you need to AddTagsToIngredient not just AddTagToIngredient do you need to add more than one tag at once
     public async Task<ResultDto<IngredientReadDto>> AddTagsToIngredient(Guid id, List<Guid> tagIds)
     {
         try
