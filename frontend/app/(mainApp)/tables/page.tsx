@@ -8,11 +8,12 @@ const TablesPage = () => {
         <DetailsAside
             title="stolik b2"
             items={items}
-            price={3}
-            currency="pln"
-            button={{
-                onClick: () => console.log('clicked'),
-            }}
+            served={true}
+            // price={3}
+            // currency="pln"
+            // button={{
+            //     onClick: () => console.log('clicked'),
+            // }}
             buttons={buttons}
         />
     );
@@ -20,107 +21,165 @@ const TablesPage = () => {
 
 const items = [
     {
-        name: 'rosa 1',
+        id: '1st',
+        name: 'Rachunek 1',
         price: 33,
         currency: 'pln' as keyof typeof CURRENCIES,
-        quantity: 1,
-    },
-
-    {
-        name: 'Pizza Margheritta',
-        price: 33,
-        currency: 'pln' as keyof typeof CURRENCIES,
-        quantity: 2,
-        annotation: 'dodatkowe składniki',
-    },
-    {
-        name: 'pizza Margheritta',
-        price: 33,
-        currency: 'pln' as keyof typeof CURRENCIES,
-        quantity: 1,
-    },
-
-    {
-        name: 'Pizza Margheritta',
-        price: 33,
-        currency: 'pln' as keyof typeof CURRENCIES,
-        quantity: 2,
-        annotation: 'dodatkowe składniki',
-    },
-    {
-        name: 'pizza Margheritta',
-        price: 33,
-        currency: 'pln' as keyof typeof CURRENCIES,
-        quantity: 1,
-    },
-
-    {
-        name: 'Pizza Margheritta',
-        price: 33,
-        currency: 'pln' as keyof typeof CURRENCIES,
-        quantity: 2,
-        annotation: 'dodatkowe składniki',
-    },
-    {
-        name: 'pizza Margheritta',
-        price: 33,
-        currency: 'pln' as keyof typeof CURRENCIES,
-        quantity: 1,
-    },
-
-    {
-        name: 'Pizza Margheritta',
-        price: 33,
-        currency: 'pln' as keyof typeof CURRENCIES,
-        quantity: 2,
-        annotation: 'dodatkowe składniki',
+        nestedItems: [
+            {
+                name: 'rosa 1',
+                price: 33,
+                currency: 'pln' as keyof typeof CURRENCIES,
+                quantity: 1,
+                onClick: () => {
+                    console.log(`item 1 clicked`);
+                },
+                isServed: true,
+            },
+            {
+                name: 'rosa 2',
+                price: 33,
+                currency: 'pln' as keyof typeof CURRENCIES,
+                quantity: 2,
+                annotation: ['+mozarella', '-mozzarella', '+mozarella'],
+                onClick: () => {
+                    console.log(`item 2 clicked`);
+                },
+            },
+            {
+                name: 'pizza Margheritta',
+                price: 33,
+                currency: 'pln' as keyof typeof CURRENCIES,
+                quantity: 1,
+                onClick: () => {
+                    console.log(`item 3 clicked`);
+                },
+                isServed: true,
+            },
+            {
+                name: 'rosa 3',
+                price: 33,
+                currency: 'pln' as keyof typeof CURRENCIES,
+                quantity: 2,
+                annotation: ['+mozarella', '-mozzarella'],
+                onClick: () => {
+                    console.log(`item 4 clicked`);
+                },
+            },
+        ],
     },
     {
-        name: 'pizza Margheritta',
+        id: '2nd',
+        name: 'Rachunek 2',
         price: 33,
         currency: 'pln' as keyof typeof CURRENCIES,
-        quantity: 1,
+        nestedItems: [
+            {
+                name: 'rosa 1',
+                price: 33,
+                currency: 'pln' as keyof typeof CURRENCIES,
+                quantity: 1,
+                onClick: () => {
+                    console.log(`item 1 clicked`);
+                },
+                isServed: true,
+            },
+            {
+                name: 'rosa 2',
+                price: 33,
+                currency: 'pln' as keyof typeof CURRENCIES,
+                quantity: 2,
+                annotation: ['+mozarella', '-mozzarella', '+mozarella'],
+                onClick: () => {
+                    console.log(`item 2 clicked`);
+                },
+            },
+            {
+                name: 'pizza Margheritta',
+                price: 33,
+                currency: 'pln' as keyof typeof CURRENCIES,
+                quantity: 1,
+                onClick: () => {
+                    console.log(`item 3 clicked`);
+                },
+                isServed: true,
+            },
+            {
+                name: 'rosa 3',
+                price: 33,
+                currency: 'pln' as keyof typeof CURRENCIES,
+                quantity: 2,
+                annotation: ['+mozarella', '-mozzarella'],
+                onClick: () => {
+                    console.log(`item 4 clicked`);
+                },
+            },
+        ],
     },
-
     {
-        name: 'Pizza Margheritta',
+        id: '3rd',
+        name: 'Rachunek 3',
         price: 33,
         currency: 'pln' as keyof typeof CURRENCIES,
-        quantity: 2,
-        annotation: 'dodatkowe składniki',
-    },
-    {
-        name: 'pizza Margheritta',
-        price: 33,
-        currency: 'pln' as keyof typeof CURRENCIES,
-        quantity: 1,
-    },
-
-    {
-        name: 'Pizza Margheritta',
-        price: 33,
-        currency: 'pln' as keyof typeof CURRENCIES,
-        quantity: 2,
-        annotation: 'dodatkowe składniki',
-    },
-    {
-        name: 'pizza Margheritta',
-        price: 33,
-        currency: 'pln' as keyof typeof CURRENCIES,
-        quantity: 1,
-    },
-
-    {
-        name: 'Pizza Margheritta',
-        price: 33,
-        currency: 'pln' as keyof typeof CURRENCIES,
-        quantity: 2,
-        annotation: 'dodatkowe składniki',
+        nestedItems: [
+            {
+                name: 'rosa 1',
+                price: 33,
+                currency: 'pln' as keyof typeof CURRENCIES,
+                quantity: 1,
+                onClick: () => {
+                    console.log(`item 1 clicked`);
+                },
+                isServed: true,
+            },
+            {
+                name: 'rosa 2',
+                price: 33,
+                currency: 'pln' as keyof typeof CURRENCIES,
+                quantity: 2,
+                annotation: ['+mozarella', '-mozzarella', '+mozarella'],
+                onClick: () => {
+                    console.log(`item 2 clicked`);
+                },
+            },
+            {
+                name: 'pizza Margheritta',
+                price: 33,
+                currency: 'pln' as keyof typeof CURRENCIES,
+                quantity: 1,
+                onClick: () => {
+                    console.log(`item 3 clicked`);
+                },
+                isServed: true,
+            },
+            {
+                name: 'rosa 3',
+                price: 33,
+                currency: 'pln' as keyof typeof CURRENCIES,
+                quantity: 2,
+                annotation: ['+mozarella', '-mozzarella'],
+                onClick: () => {
+                    console.log(`item 4 clicked`);
+                },
+            },
+        ],
     },
 ];
+// eslint-disable-next-line
+const ingredients = [
+    {
+        name: 'Mozarella',
+        price: 33,
+        currency: 'pln' as keyof typeof CURRENCIES,
+        isSingleItem: true,
+        onClick: () => console.log('ing clicked'),
+    },
+];
+
 const buttons = [
     {
         children: 'otwórz rachunek',
+        onClick: () => console.log('otworz clicked'),
     },
     { children: 'zamknij rachunek' },
 ];

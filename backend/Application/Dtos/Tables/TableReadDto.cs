@@ -8,6 +8,7 @@ public class TableReadDto
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
     public int Capacity { get; set; }
+    public bool IsPrepared { get; set; }
 
     public ReservationSummaryDto? Reservation { get; set; }
     public TableStatus Status { get; set; }

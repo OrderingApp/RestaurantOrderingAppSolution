@@ -36,7 +36,7 @@ public interface IOrderService
     Task<ResultDto<OrderReadDto>> MoveOrderItems(
         Guid sourceOrderId,
         Guid targetOrderId,
-        MoveOrderItemsDto moveOrderItemsDto
+        SplitOrderGroupDto moveOrderItemsDto
     );
 
     // Delete Orders

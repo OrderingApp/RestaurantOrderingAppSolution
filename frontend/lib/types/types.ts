@@ -1,4 +1,4 @@
-export default interface BasicStyles {
+export interface BasicStyles {
     variants: {
         primary: string;
         secondary: string;
@@ -7,8 +7,15 @@ export default interface BasicStyles {
         danger: string;
     };
     sizes: {
+        xs: string;
         sm: string;
         md: string;
         lg: string;
+        xl: string;
     };
 }
+
+// eslint-disable-next-line
+export type DistributiveOmitPartial<T, K extends keyof any> = T extends any
+    ? Omit<T, K> & Partial<Pick<T, K & keyof T>>
+    : never;

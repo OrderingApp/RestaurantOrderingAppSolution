@@ -1,10 +1,10 @@
-import BasicStyles from '../types/types';
+import type { BasicStyles } from '../types/types';
 
 const btnStyles: {
     variants: Omit<BasicStyles['variants'], 'secondary'> & {
         outline: string;
     };
-    sizes: BasicStyles['sizes'] & { xl: string };
+    sizes: BasicStyles['sizes'];
 } = {
     variants: {
         primary: 'bg-primary text-white',
@@ -14,10 +14,11 @@ const btnStyles: {
         outline: 'bg-white shadow-lg text-black border border-gray-200',
     },
     sizes: {
-        sm: 'w-[10.5rem] h-[3.125rem] text-[1rem]',
-        md: 'w-[11.25rem] h-[3.75rem] text-[1rem] rounded-lg',
-        lg: 'w-[23.75rem] h-[3.125rem] text-xl rounded-xl',
-        xl: 'px-[2.125rem] py-1 text-xl rounded-full',
+        xs: 'py-3 px-[60px] text-sm rounded-xl shadow-[0px_0px_5px_0px_#6A6A6A]',
+        sm: 'w-[10.5rem] h-[3.125rem] text-[1rem] shadow-[0px_4px_4px_0px_#00000040]',
+        md: 'w-[11.25rem] h-[3.75rem] text-[1rem] rounded-lg shadow-[0px_4px_4px_0px_#00000040]',
+        lg: 'w-[23.75rem] h-[3.125rem] text-xl rounded-xl shadow-[0px_4px_4px_0px_#00000040]',
+        xl: 'px-[2.125rem] py-1 text-xl rounded-full shadow-[0px_4px_4px_0px_#00000040]',
     },
 };
 //TODO: updates sizes and variants

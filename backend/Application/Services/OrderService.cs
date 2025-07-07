@@ -218,7 +218,6 @@ public class OrderService(
                 && o.DateTime < nextDay
             );
 
-            // Get only 10 latest closed orders for the day
             var closedOrdersQuery = orderingContext
                 .Orders.Where(o =>
                     o.Type == orderType
@@ -354,8 +353,14 @@ public class OrderService(
 
             if (order.Table != null)
             {
-                order.Table.Status = TableStatus.Available;
-                orderingContext.Tables.Update(order.Table);
+                bool hasOtherOpenOrders = await orderingContext.Orders
+                    .AnyAsync(o => o.TableId == order.TableId && o.Id != order.Id && o.Status != OrderStatus.Closed);
+
+                if (!hasOtherOpenOrders)
+                {
+                    order.Table.Status = TableStatus.Available;
+                    orderingContext.Tables.Update(order.Table);
+                }
             }
 
             newTable.Status = TableStatus.Ongoing;
@@ -414,8 +419,14 @@ public class OrderService(
 
             if (order.Table != null)
             {
-                order.Table.Status = TableStatus.Available;
-                orderingContext.Tables.Update(order.Table);
+                bool hasOtherOpenOrders = await orderingContext.Orders
+                    .AnyAsync(o => o.TableId == order.TableId && o.Id != order.Id && o.Status != OrderStatus.Closed);
+
+                if (!hasOtherOpenOrders)
+                {
+                    order.Table.Status = TableStatus.Available;
+                    orderingContext.Tables.Update(order.Table);
+                }
             }
 
             await orderingContext.SaveChangesAsync();
@@ -576,35 +587,40 @@ public class OrderService(
                     HttpStatusCode.BadRequest
                 );
 
-            var itemsToSplit = originalOrder
-                .OrderItems.Where(oi => splitOrderDto.OrderItemIds.Contains(oi.Id))
-                .ToList();
+            var createdOrders = new List<Order>();
 
-            if (!itemsToSplit.Any())
-                return ResultDto<OrderReadDto>.Failure(
-                    "No valid items selected for splitting.",
-                    HttpStatusCode.BadRequest
-                );
+            foreach (var group in splitOrderDto.SplitGroups)
+            {
+                var itemsToMove = originalOrder.OrderItems
+                    .Where(oi => group.OrderItemIds.Contains(oi.Id))
+                    .ToList();
 
-            var newOrder = mapper.Map<Order, Order>(originalOrder);
+                if (!itemsToMove.Any())
+                    continue;
 
-            newOrder.OrderItems = mapper.Map<List<OrderItem>>(itemsToSplit);
-            newOrder.Id = Guid.NewGuid();
-            newOrder.DateTime = DateTime.UtcNow;
+                var newOrder = mapper.Map<Order, Order>(originalOrder);
+                newOrder.Id = Guid.NewGuid();
+                newOrder.DateTime = DateTime.UtcNow;
+                newOrder.OrderItems = mapper.Map<List<OrderItem>>(itemsToMove);
+                newOrder.TotalAmount = Math.Max(0, newOrder.OrderItems.Sum(item => item.Price));
 
-            originalOrder.OrderItems.RemoveAll(oi => itemsToSplit.Contains(oi));
+                // Remove from original
+                originalOrder.OrderItems.RemoveAll(oi => group.OrderItemIds.Contains(oi.Id));
 
-            originalOrder.TotalAmount = Math.Max(
-                0,
-                originalOrder.OrderItems.Sum(item => item.Price)
-            );
-            newOrder.TotalAmount = Math.Max(0, newOrder.OrderItems.Sum(item => item.Price));
+                await orderingContext.Orders.AddAsync(newOrder);
+                createdOrders.Add(newOrder);
+            }
 
-            await orderingContext.Orders.AddAsync(newOrder);
+            // Recalculate original order total
+            originalOrder.TotalAmount = Math.Max(0, originalOrder.OrderItems.Sum(item => item.Price));
             await orderingContext.SaveChangesAsync();
 
-            var orderSplitEvent = mapper.Map<OrderSplitEvent>(newOrder);
-            await eventHandlerService.HandleEventAsync(orderSplitEvent);
+            // Fire events
+            foreach (var order in createdOrders)
+            {
+                var orderSplitEvent = mapper.Map<OrderSplitEvent>(order);
+                await eventHandlerService.HandleEventAsync(orderSplitEvent);
+            }
 
             return ResultDto<OrderReadDto>.Success(null, HttpStatusCode.Created);
         }
@@ -677,7 +693,7 @@ public class OrderService(
     public async Task<ResultDto<OrderReadDto>> MoveOrderItems(
         Guid sourceOrderId,
         Guid targetOrderId,
-        MoveOrderItemsDto moveOrderItemsDto
+        SplitOrderGroupDto moveOrderItemsDto
     )
     {
         try

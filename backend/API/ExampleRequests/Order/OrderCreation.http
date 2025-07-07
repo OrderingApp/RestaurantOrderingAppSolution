@@ -8,8 +8,8 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "dateTime": "2025-27-03T12:00:00Z",
-  "tableId": "74b952f6-9793-4d48-bbde-ce7f6b5cfecd",
+  "dateTime": "2025-10-04T19:00:00Z",
+  "tableId": "43ce39b4-cc59-4b76-884f-c4a2694cc374",
   "orderItems": [
     {
       "menuItemId": "0026375D-9736-4B94-ABA5-3E7644643DFF",
