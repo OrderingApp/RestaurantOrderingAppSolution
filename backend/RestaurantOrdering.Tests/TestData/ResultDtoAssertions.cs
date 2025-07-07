@@ -6,12 +6,27 @@ public static class ResultDtoAssertions
 {
     public static void ShouldBeSuccessful<T>(
         this ResultDto<T> result,
-        HttpStatusCode expectedStatusCode
+        HttpStatusCode expectedStatusCode,
+        string because = ""
     )
     {
-        result.Should().NotBeNull();
-        result.IsSuccess.Should().BeTrue("expected result to be successful but it was not");
-        result.HttpStatusCode.Should().Be(expectedStatusCode);
-        result.Data.Should().NotBeNull("expected result data to be present but it was null");
+        result.Should().NotBeNull(because);
+        result.IsSuccess.Should().BeTrue(because: because);
+        result.HttpStatusCode.Should().Be(expectedStatusCode, because);
+        result.Data.Should().NotBeNull(because);
+    }
+
+    public static void ShouldFailWith<T>(
+        this ResultDto<T> result,
+        HttpStatusCode expectedStatusCode,
+        string expectedErrorMessage,
+        string because = ""
+    )
+    {
+        result.Should().NotBeNull(because);
+        result.IsSuccess.Should().BeFalse(because: because);
+        result.HttpStatusCode.Should().Be(expectedStatusCode, because);
+        result.ErrorMessage.Should().Be(expectedErrorMessage, because);
+        result.Data.Should().BeNull(because);
     }
 }

@@ -20,6 +20,12 @@ public class AreaService(
     {
         try
         {
+            if (string.IsNullOrWhiteSpace(areaCreateDto.Name))
+                return ResultDto<AreaReadDto>.Failure("Area name is required", HttpStatusCode.BadRequest);
+
+            if (await orderingContext.Areas.AnyAsync(a => a.Name == areaCreateDto.Name))
+                return ResultDto<AreaReadDto>.Failure("Area name already exists", HttpStatusCode.Conflict);
+
             var newArea = mapper.Map<Area>(areaCreateDto);
             orderingContext.Areas.Add(newArea);
             await orderingContext.SaveChangesAsync();
@@ -32,7 +38,7 @@ public class AreaService(
         {
             return ResultDto<AreaReadDto>.Failure(
                 $"An error occured: {ex.Message}",
-                HttpStatusCode.InternalServerError
+                HttpStatusCode.BadRequest
             );
         }
     }
