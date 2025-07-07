@@ -14,8 +14,15 @@ export const camelToKebab = (str: string): string => {
  * @param str - The string to capitalize.
  * @returns The string with the first letter capitalized.
  */
-export const capitalizeFirstLetter = (str: string) =>
-    str?.charAt(0).toUpperCase() + str?.slice(1);
+export const capitalizeFirstLetter = (str: string): string => {
+    const match = str.match(/[a-zA-Z]/);
+
+    if (!match) return str;
+
+    const index = match.index!;
+
+    return str.slice(0, index) + match[0].toUpperCase() + str.slice(index + 1);
+};
 
 export const fetchWithToken = (path: `${BACKEND_PATHS}`, params: string) =>
     fetch(`${BACKEND_URL}/${path}/${params}`).then((res) => res.json());
@@ -25,18 +32,14 @@ export const getPluralForm = (
     titles: string[],
     lang: string
 ) => {
-    if (lang === 'pl') {
-        if (amount === 1) return titles[1];
-        if (
-            [2, 3, 4].includes(amount % 10) &&
-            ![12, 13, 14].includes(amount % 100)
-        ) {
-            return titles[2];
-        }
-        return titles[0];
-    } else if (lang === 'en') {
-        return amount === 1 ? titles[1] : titles[0];
-    } else {
-        return titles[0];
-    }
+    if (amount === 1) return titles[1];
+
+    if (
+        lang === 'pl' &&
+        [2, 3, 4].includes(amount % 10) &&
+        ![12, 13, 14].includes(amount % 100)
+    )
+        return titles[2];
+
+    return titles[0];
 };

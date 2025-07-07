@@ -19,6 +19,9 @@ export interface languagePack {
         title: string;
         description: string;
     };
+    detailsAside: {
+        info: string;
+    };
     loginPage: {
         appName: string;
         form: loginPageFormFields & {

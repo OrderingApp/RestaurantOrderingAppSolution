@@ -25,7 +25,10 @@ export default {
                 brown: 'var(--brown)',
                 white: 'var(--white)',
                 black: 'var(--black)',
+                'lighter-gray': 'var(--lighter-gray)',
                 'light-gray': 'var(--light-gray)',
+                gray: 'var(--gray)',
+                served: 'var(--served)',
             },
             fontFamily: {
                 serif: 'var(--serif)',

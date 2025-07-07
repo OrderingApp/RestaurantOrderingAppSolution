@@ -6,7 +6,7 @@ import { useState } from 'react';
 import useLanguage from '@/helpers/hooks/useLanguage';
 import useQueryReservations from '@/helpers/queries/reservations/useQueryReservations';
 
-import Button from '@/components/shared/Button/Button';
+import Button from '@/components/shared/button/Button';
 import DateCalendar from '@/components/shared/DateCalendar/DateCalendar';
 import ReservationCard from '@/components/shared/cards/ReservationCard';
 import languagePacks from '@/helpers/constants/languagePacks';

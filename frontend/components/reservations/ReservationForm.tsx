@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import Input from '../shared/Input/Input';
-import Button from '../shared/Button/Button';
+import Button from '../shared/button/Button';
 
 import { useLanguage } from '@/providers/LanguageProvider';
 import { useQueryReservationsById } from '@/helpers/queries/reservations/useQueryReservations';
