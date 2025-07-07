@@ -1,6 +1,6 @@
 ﻿using Domain;
 
-public static class OrderTestHelper
+public static class OrderTestData
 {
     public static Order CreateOrder(
         Guid? id = null,

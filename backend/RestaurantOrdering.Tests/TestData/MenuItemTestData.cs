@@ -1,6 +1,6 @@
 ﻿using Domain;
 
-public static class MenuItemTestHelper
+public static class MenuItemTestData
 {
     public static MenuItem CreateMenuItem(Guid? id = null, decimal price = 10m)
     {

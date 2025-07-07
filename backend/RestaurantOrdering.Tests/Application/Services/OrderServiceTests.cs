@@ -1,6 +1,4 @@
-﻿using System.Net;
-using Application.Dtos.OrderItems;
-using Application.Dtos.Orders;
+﻿using Application.Dtos.OrderItems;
 using Application.Dtos.Orders.OrderDineIn;
 using Application.Services;
 using AutoMapper;
@@ -36,10 +34,10 @@ public class OrderServiceTests
     public async Task CreateDineInOrder_ShouldReturnSuccess_WhenTableExists()
     {
         // Arrange
-        var table = TableTestHelper.CreateCorrectTable();
-        var menuItem = MenuItemTestHelper.CreateMenuItem();
-        var orderItem = OrderItemTestHelper.CreateOrderItem(menuItem.Id);
-        var order = OrderTestHelper.CreateOrder(
+        var table = TableTestData.CreateCorrectTable();
+        var menuItem = MenuItemTestData.CreateMenuItem();
+        var orderItem = OrderItemTestData.CreateOrderItem(menuItem.Id);
+        var order = OrderTestData.CreateOrder(
             tableId: table.Id,
             items: new List<OrderItem> { orderItem }
         );

@@ -2,7 +2,7 @@
 
 namespace RestaurantOrdering.Tests.TestHelpers;
 
-public static class OrderItemTestHelper
+public static class OrderItemTestData
 {
     public static OrderItem CreateOrderItem(
         Guid? menuItemId = null,

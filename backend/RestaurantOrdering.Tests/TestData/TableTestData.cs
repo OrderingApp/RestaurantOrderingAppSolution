@@ -1,6 +1,6 @@
 ﻿using Domain;
 
-public static class TableTestHelper
+public static class TableTestData
 {
     public static Table CreateCorrectTable(Guid? id = null)
     {

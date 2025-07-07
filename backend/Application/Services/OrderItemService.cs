@@ -301,6 +301,7 @@ public class OrderItemService(
         }
     }
 
+
     private decimal RecalculateOrderTotal(Order order)
     {
         return order.OrderItems.Sum(oi => oi.Price * (1 - (oi.Discount / 100))) - order.Discount;
