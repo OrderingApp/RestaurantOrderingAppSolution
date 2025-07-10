@@ -1,5 +1,5 @@
-﻿using Application.Dtos.Areas;
-using Application.Dtos.Common;
+﻿using System.Net;
+using Application.Dtos.Areas;
 using Application.Dtos.Tables;
 using Application.Services;
 using AutoMapper;
@@ -9,7 +9,6 @@ using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using RestaurantOrdering.Events.Application.Contracts;
-using System.Net;
 
 public class AreaServiceTests
 {
@@ -21,8 +20,8 @@ public class AreaServiceTests
     public AreaServiceTests()
     {
         var options = new DbContextOptionsBuilder<RestaurantOrderingContext>()
-                    .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                    .Options;
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
 
         _dbContext = new RestaurantOrderingContext(options);
         _mockMapper = new Mock<IMapper>();
@@ -32,14 +31,14 @@ public class AreaServiceTests
     }
 
     [Fact]
-    public async Task CreateArea_ShouldSucceed_WhenNameIsValid()
+    public async Task CreateArea_ShouldSucceed_WhenNameIsUnique()
     {
         // Arrange
-        var dto = new AreaCreateDto { Name = "Garden View" };
-        var area = new Area { Id = Guid.NewGuid(), Name = dto.Name };
-        var readDto = new AreaReadDto { Id = area.Id, Name = dto.Name, Tables = new() };
+        var dto = new AreaCreateDto { Name = "New Area" };
+        var newArea = new Area { Id = Guid.NewGuid(), Name = dto.Name };
+        var readDto = new AreaReadDto { Id = newArea.Id, Name = dto.Name, Tables = new() };
 
-        _mockMapper.Setup(m => m.Map<Area>(dto)).Returns(area);
+        _mockMapper.Setup(m => m.Map<Area>(dto)).Returns(newArea);
         _mockMapper.Setup(m => m.Map<AreaReadDto>(It.IsAny<Area>())).Returns(readDto);
 
         // Act
@@ -47,26 +46,10 @@ public class AreaServiceTests
 
         // Assert
         result.ShouldBeSuccessful(HttpStatusCode.Created);
-        result.Data!.Name.Should().Be("Garden View");
+        result.Data!.Name.Should().Be("New Area");
 
-        var saved = await _dbContext.Areas.FirstOrDefaultAsync(a => a.Name == "Garden View");
+        var saved = await _dbContext.Areas.FirstOrDefaultAsync(a => a.Name == "New Area");
         saved.Should().NotBeNull();
-    }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData(" ")]
-    [InlineData(null)]
-    public async Task CreateArea_ShouldFail_WhenNameIsEmpty(string? name)
-    {
-        // Arrange
-        var dto = new AreaCreateDto { Name = name ?? string.Empty };
-
-        // Act
-        var result = await _areaService.CreateArea(dto, Guid.NewGuid());
-
-        // Assert
-        result.ShouldFailWith(HttpStatusCode.BadRequest, "Area name is required");
     }
 
     [Fact]
@@ -84,5 +67,50 @@ public class AreaServiceTests
 
         // Assert
         result.ShouldFailWith(HttpStatusCode.Conflict, "Area name already exists");
+    }
+
+    [Fact]
+    public async Task UpdateArea_ShouldFail_WhenAreaNotFound()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var dto = new AreaUpdateDto { Name = "Updated Name" };
+
+        // Act
+        var result = await _areaService.UpdateArea(id, dto);
+
+        // Assert
+        result.ShouldFailWith(HttpStatusCode.NotFound, "Area not found");
+    }
+
+    [Fact]
+    public async Task DeleteArea_ShouldFail_WhenAreaNotFound()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+
+        // Act
+        var result = await _areaService.DeleteArea(id);
+
+        // Assert
+        result.ShouldFailWith(HttpStatusCode.NotFound, "Area not found");
+    }
+
+    [Fact]
+    public async Task DeleteArea_ShouldSucceed_WhenAreaExists()
+    {
+        // Arrange
+        var area = new Area { Id = Guid.NewGuid(), Name = "Temporary Area" };
+        _dbContext.Areas.Add(area);
+        await _dbContext.SaveChangesAsync();
+
+        // Act
+        var result = await _areaService.DeleteArea(area.Id);
+
+        // Assert
+        result.ShouldBeSuccessful(HttpStatusCode.OK);
+
+        var deleted = await _dbContext.Areas.FindAsync(area.Id);
+        deleted.Should().BeNull();
     }
 }

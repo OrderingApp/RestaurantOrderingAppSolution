@@ -27,6 +27,10 @@ public static class ResultDtoAssertions
         result.IsSuccess.Should().BeFalse(because: because);
         result.HttpStatusCode.Should().Be(expectedStatusCode, because);
         result.ErrorMessage.Should().Be(expectedErrorMessage, because);
-        result.Data.Should().BeNull(because);
+
+        if (!typeof(T).IsValueType || Nullable.GetUnderlyingType(typeof(T)) != null)
+        {
+            result.Data.Should().BeNull(because);
+        }
     }
 }
