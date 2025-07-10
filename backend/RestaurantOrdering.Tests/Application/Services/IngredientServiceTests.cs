@@ -54,9 +54,9 @@ public class IngredientServiceTests
 
         // Assert
         result.ShouldBeSuccessful(HttpStatusCode.Created);
-        result.Data!.Name.Should().Be("New Ingredient");
+        result.Data!.Name.Should().Be(dto.Name);
 
-        var saved = await _dbContext.Ingredients.FirstOrDefaultAsync(a => a.Name == "New Ingredient");
+        var saved = await _dbContext.Ingredients.FirstOrDefaultAsync(a => a.Name == dto.Name);
         saved.Should().NotBeNull();
     }
 

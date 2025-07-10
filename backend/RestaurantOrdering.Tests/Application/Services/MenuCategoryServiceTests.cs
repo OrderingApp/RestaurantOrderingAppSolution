@@ -353,5 +353,154 @@ public class MenuCategoryServiceTests
         result.ErrorMessage.Should().Contain("An error occurred:");
     }
 
+    [Fact]
+    public async Task UpdateMenuCategory_ShouldSucceed_WhenCategoryExists()
+    {
+        // Arrange
+        var categoryId = Guid.NewGuid();
+        var entity = new MenuCategory { Id = categoryId, Name = "Old Name" };
 
+        _dbContext.MenuCategories.Add(entity);
+        await _dbContext.SaveChangesAsync();
+
+        var updateDto = new MenuCategoryUpdateDto { Name = "Updated Name" };
+
+        _mockMapper.Setup(m => m.Map(updateDto, entity))
+            .Callback<MenuCategoryUpdateDto, MenuCategory>((src, dest) =>
+            {
+                dest.Name = src.Name!;
+            });
+
+        var updatedDto = new MenuCategoryReadDto { Id = categoryId, Name = "Updated Name" };
+        _mockMapper.Setup(m => m.Map<MenuCategoryReadDto>(entity)).Returns(updatedDto);
+        _mockMapper.Setup(m => m.Map<MenuCategoryUpdatedEvent>(entity))
+            .Returns(new MenuCategoryUpdatedEvent());
+
+        // Act
+        var result = await _service.UpdateMenuCategory(categoryId, updateDto);
+
+        // Assert
+        result.ShouldBeSuccessful(HttpStatusCode.OK);
+        result.Data!.Name.Should().Be("Updated Name");
+
+        _mockEventHandler.Verify(e => e.HandleEventAsync(It.IsAny<MenuCategoryUpdatedEvent>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateMenuCategory_ShouldReturnNotFound_WhenCategoryDoesNotExist()
+    {
+        // Arrange
+        var nonExistentId = Guid.NewGuid();
+        var updateDto = new MenuCategoryUpdateDto { Name = "Updated Name" };
+
+        // Act
+        var result = await _service.UpdateMenuCategory(nonExistentId, updateDto);
+
+        // Assert
+        result.ShouldFailWith(HttpStatusCode.NotFound, "MenuCategory not found or has been deleted.");
+    }
+
+    [Fact]
+    public async Task UpdateMenuCategory_ShouldReturnError_WhenExceptionThrown()
+    {
+        // Arrange
+        var id = Guid.NewGuid();
+        var updateDto = new MenuCategoryUpdateDto { Name = "Test" };
+
+        // Simulate exception
+        var mockService = new MenuCategoryService(null!, _mockEventHandler.Object, _mockMapper.Object);
+
+        // Act
+        var result = await mockService.UpdateMenuCategory(id, updateDto);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.HttpStatusCode.Should().Be(HttpStatusCode.InternalServerError);
+        result.ErrorMessage.Should().Contain("An error occurred:");
+    }
+
+    [Fact]
+    public async Task DeleteMenuCategory_ShouldSoftDelete_WhenCategoryExistsAndNotDeleted()
+    {
+        // Arrange
+        var categoryId = Guid.NewGuid();
+        var category = new MenuCategory
+        {
+            Id = categoryId,
+            Name = "Starters",
+            IsUsed = true,
+            IsDeleted = false
+        };
+
+        _dbContext.MenuCategories.Add(category);
+        await _dbContext.SaveChangesAsync();
+
+        _mockMapper.Setup(m => m.Map<MenuCategoryDeletedEvent>(category))
+            .Returns(new MenuCategoryDeletedEvent());
+
+        // Act
+        var result = await _service.DeleteMenuCategory(categoryId);
+
+        // Assert
+        result.ShouldBeSuccessful(HttpStatusCode.OK);
+
+        var deleted = await _dbContext.MenuCategories.FindAsync(categoryId);
+        deleted.Should().NotBeNull();
+        deleted!.IsDeleted.Should().BeTrue();
+        deleted.IsUsed.Should().BeFalse();
+
+        _mockEventHandler.Verify(e => e.HandleEventAsync(It.IsAny<MenuCategoryDeletedEvent>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteMenuCategory_ShouldReturnNotFound_WhenCategoryDoesNotExist()
+    {
+        // Arrange
+        var nonExistentId = Guid.NewGuid();
+
+        // Act
+        var result = await _service.DeleteMenuCategory(nonExistentId);
+
+        // Assert
+        result.ShouldFailWith(HttpStatusCode.NotFound, "MenuCategory not found.");
+    }
+
+    [Fact]
+    public async Task DeleteMenuCategory_ShouldReturnBadRequest_WhenCategoryAlreadyDeleted()
+    {
+        // Arrange
+        var categoryId = Guid.NewGuid();
+        var alreadyDeleted = new MenuCategory
+        {
+            Id = categoryId,
+            Name = "Archived",
+            IsDeleted = true
+        };
+
+        _dbContext.MenuCategories.Add(alreadyDeleted);
+        await _dbContext.SaveChangesAsync();
+
+        // Act
+        var result = await _service.DeleteMenuCategory(categoryId);
+
+        // Assert
+        result.ShouldFailWith(HttpStatusCode.BadRequest, "MenuCategory has already been deleted.");
+    }
+
+    [Fact]
+    public async Task DeleteMenuCategory_ShouldReturnError_WhenExceptionThrown()
+    {
+        // Arrange
+        var categoryId = Guid.NewGuid();
+
+        var mockService = new MenuCategoryService(null!, _mockEventHandler.Object, _mockMapper.Object);
+
+        // Act
+        var result = await mockService.DeleteMenuCategory(categoryId);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.HttpStatusCode.Should().Be(HttpStatusCode.InternalServerError);
+        result.ErrorMessage.Should().Contain("An error occurred:");
+    }
 }
