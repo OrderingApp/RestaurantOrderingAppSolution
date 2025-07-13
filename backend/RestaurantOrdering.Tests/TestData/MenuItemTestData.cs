@@ -2,7 +2,7 @@
 
 public static class MenuItemTestData
 {
-    public static MenuItem CreateMenuItem(Guid? id = null, decimal price = 10m)
+    public static MenuItem CreateMenuItem(string name, Guid? id = null, decimal price = 10m)
     {
         return new MenuItem
         {

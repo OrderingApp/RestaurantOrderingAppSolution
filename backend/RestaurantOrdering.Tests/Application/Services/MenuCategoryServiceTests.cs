@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using RestaurantOrdering.Events.Application.Contracts;
 using RestaurantOrdering.Events.Domain.MenuCategories;
+using RestaurantOrdering.Tests.TestData;
 using System.Net;
 
 
@@ -39,9 +40,9 @@ public class MenuCategoryServiceTests
     public async Task CreateMenuCategory_ShouldSucceed_WhenDataIsValid()
     {
         // Arrange
-        var createDto = new MenuCategoryCreateDto { Name = "Pizza" };
-        var entity = new MenuCategory { Id = Guid.NewGuid(), Name = "Pizza" };
-        var readDto = new MenuCategoryReadDto { Id = entity.Id, Name = "Pizza" };
+        var createDto = MenuCategoryTestData.CreateCreateDto();
+        var entity = MenuCategoryTestData.CreateValidCategory(name: createDto.Name);
+        var readDto = MenuCategoryTestData.CreateReadDto(entity.Id, entity.Name);
 
         _mockMapper.Setup(m => m.Map<MenuCategory>(createDto)).Returns(entity);
         _mockMapper.Setup(m => m.Map<MenuCategoryReadDto>(entity)).Returns(readDto);
@@ -52,20 +53,21 @@ public class MenuCategoryServiceTests
 
         // Assert
         result.ShouldBeSuccessful(HttpStatusCode.Created);
-        result.Data!.Name.Should().Be("Pizza");
+        result.Data!.Name.Should().Be(createDto.Name);
 
         var saved = await _dbContext.MenuCategories.FindAsync(entity.Id);
         saved.Should().NotBeNull();
-        saved!.Name.Should().Be("Pizza");
+        saved!.Name.Should().Be(createDto.Name);
 
         _mockEventHandler.Verify(e => e.HandleEventAsync(It.IsAny<MenuCategoryCreatedEvent>()), Times.Once);
     }
+
 
     [Fact]
     public async Task CreateMenuCategory_ShouldReturnError_WhenExceptionIsThrown()
     {
         // Arrange
-        var createDto = new MenuCategoryCreateDto { Name = "Exploding" };
+        var createDto = MenuCategoryTestData.CreateCreateDto("Exploding");
 
         _mockMapper.Setup(m => m.Map<MenuCategory>(createDto))
             .Throws(new Exception("Mapping exploded"));
@@ -84,8 +86,8 @@ public class MenuCategoryServiceTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var entity = new MenuCategory { Id = id, Name = "Drinks" };
-        var readDto = new MenuCategoryReadDto { Id = id, Name = "Drinks" };
+        var entity = MenuCategoryTestData.CreateValidCategory(id, "Drinks");
+        var readDto = MenuCategoryTestData.CreateReadDto(id, "Drinks");
 
         _dbContext.MenuCategories.Add(entity);
         await _dbContext.SaveChangesAsync();
@@ -144,29 +146,26 @@ public class MenuCategoryServiceTests
         // Arrange
         var categoryId = Guid.NewGuid();
         var subCategoryId = Guid.NewGuid();
+        var menuItemId = Guid.NewGuid();
 
-        var menuCategory = new MenuCategory
-        {
-            Id = categoryId,
-            Name = "Main",
-            IsUsed = true,
-            IsDeleted = false,
-            SequenceNumber = 1,
-            SubCategories = new List<SubCategory>
-        {
-            new SubCategory { Id = subCategoryId, Name = "Subs", SequenceNumber = 1 }
-        }
-        };
+        var subCategory = SubCategoryTestData.CreateValidSubCategory(
+            id: subCategoryId,
+            name: "Subs",
+            sequence: 1
+        );
 
-        var menuItem = new MenuItem
-        {
-            Id = Guid.NewGuid(),
-            Name = "Burger",
-            IsUsed = true,
-            IsDeleted = false,
-            MenuCategoryId = categoryId,
-            SubCategoryId = subCategoryId
-        };
+        var menuCategory = MenuCategoryTestData.CreateValidCategory(
+            id: categoryId,
+            name: "Main"
+        );
+        menuCategory.SubCategories.Add(subCategory);
+
+        var menuItem = MenuItemTestData.CreateMenuItem(menuItemId);
+        menuItem.Name = "Burger";
+        menuItem.IsUsed = true;
+        menuItem.IsDeleted = false;
+        menuItem.MenuCategoryId = categoryId;
+        menuItem.SubCategoryId = subCategoryId;
 
         await _dbContext.MenuCategories.AddAsync(menuCategory);
         await _dbContext.MenuItems.AddAsync(menuItem);
@@ -239,58 +238,33 @@ public class MenuCategoryServiceTests
     public async Task GetMenuCategoriesWithHierarchy_ShouldReturnFilteredResults_WhenFilteringApplied()
     {
         // Arrange
-        var tagId = Guid.NewGuid();
-        var subCategoryId = Guid.NewGuid();
-        var categoryId = Guid.NewGuid();
-        var ingredientId = Guid.NewGuid();
-        var menuItemId = Guid.NewGuid();
+        var tag = TagTestData.CreateTag("Vegan");
+        var ingredient = IngredientTestData.CreateTaggedIngredient("test", 1m, tag);
+        var subCategory = SubCategoryTestData.CreateSubCategory("Cold");
+        var menuItem = MenuItemTestData.CreateMenuItem(name: "Salad");
+        var menuCategory = MenuCategoryTestData.CreateValidCategory(name: "Starters");
 
-        var tag = new Tag { Id = tagId, Name = "Vegan" };
-        var ingredient = new Ingredient
-        {
-            Id = ingredientId,
-            Name = "test",
-            IngredientTagRels = new List<IngredientTagRel> { new() { TagId = tagId, Tag = tag } }
-        };
-        var menuItem = new MenuItem
-        {
-            Id = menuItemId,
-            Name = "Salad",
-            IsUsed = true,
-            IsDeleted = false,
-            SubCategoryId = subCategoryId,
-            MenuItemIngredientRels = new List<MenuItemIngredientRel>
-        {
-            new() { Ingredient = ingredient, IngredientId = ingredientId }
-        }
-        };
-        var subCategory = new SubCategory { Id = subCategoryId, Name = "Cold", SequenceNumber = 1 };
-        var category = new MenuCategory
-        {
-            Id = categoryId,
-            Name = "Starters",
-            IsUsed = true,
-            IsDeleted = false,
-            SequenceNumber = 1,
-            SubCategories = new List<SubCategory> { subCategory },
-            MenuItems = new List<MenuItem> { menuItem }
-        };
+        // Link relationships
+        menuItem.MenuItemIngredientRels = [new() { Ingredient = ingredient, IngredientId = ingredient.Id }];
+        menuItem.SubCategoryId = subCategory.Id;
+        menuCategory.MenuItems.Add(menuItem);
+        menuCategory.SubCategories.Add(subCategory);
 
         await _dbContext.Tags.AddAsync(tag);
         await _dbContext.Ingredients.AddAsync(ingredient);
         await _dbContext.MenuItems.AddAsync(menuItem);
         await _dbContext.SubCategories.AddAsync(subCategory);
-        await _dbContext.MenuCategories.AddAsync(category);
+        await _dbContext.MenuCategories.AddAsync(menuCategory);
         await _dbContext.SaveChangesAsync();
 
         var expectedDto = new MenuCategoryHierarchyReadDto
         {
-            Id = categoryId,
-            Name = "Starters",
+            Id = menuCategory.Id,
+            Name = menuCategory.Name,
             SubCategories = new(),
             MenuItems = new List<MenuItemReadDto>
         {
-            new() { Id = menuItemId, Name = "Salad" }
+            new() { Id = menuItem.Id, Name = "Salad" }
         }
         };
 
@@ -299,9 +273,9 @@ public class MenuCategoryServiceTests
 
         var request = new GetMenuCategoryHierarchyRequest
         {
-            MenuCategoryId = categoryId,
-            SubCategoryId = subCategoryId,
-            TagIds = new List<Guid> { tagId }
+            MenuCategoryId = menuCategory.Id,
+            SubCategoryId = subCategory.Id,
+            TagIds = new List<Guid> { tag.Id }
         };
 
         // Act
@@ -313,6 +287,7 @@ public class MenuCategoryServiceTests
         result.Data.Should().ContainSingle();
         result.TotalCount.Should().Be(1);
     }
+
 
     [Fact]
     public async Task GetMenuCategoriesWithHierarchy_ShouldReturnEmpty_WhenNoMatches()
