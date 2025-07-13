@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using RestaurantOrdering.Events.Application.Contracts;
 using RestaurantOrdering.Events.Domain.Ingredients;
+using RestaurantOrdering.Tests.TestData;
 using System.Net;
 
 namespace RestaurantOrdering.Tests.Application.Services;
@@ -35,17 +36,12 @@ public class IngredientServiceTests
     public async Task CreateIngredient_ShouldSucceed_WhenDataIsValid()
     {
         // Arrange
-        var dto = new IngredientCreateDto { Name = "New Ingredient", Price = 2 };
-        var ingredient = new Ingredient { Id = Guid.NewGuid(), Name = dto.Name, Price = dto.Price };
-        
-        _mockMapper.Setup(m => m.Map<Ingredient>(dto)).Returns(ingredient);
-        _mockMapper.Setup(m => m.Map<IngredientReadDto>(ingredient)).Returns(new IngredientReadDto
-        {
-            Id = ingredient.Id,
-            Name = ingredient.Name,
-            Price = ingredient.Price
-        });
+        var dto = IngredientTestData.CreateCreateDto();
+        var ingredient = IngredientTestData.CreateValidIngredient(name: dto.Name, price: dto.Price);
+        var readDto = IngredientTestData.CreateReadDto(ingredient.Id, ingredient.Name, ingredient.Price);
 
+        _mockMapper.Setup(m => m.Map<Ingredient>(dto)).Returns(ingredient);
+        _mockMapper.Setup(m => m.Map<IngredientReadDto>(ingredient)).Returns(readDto);
         _mockMapper.Setup(m => m.Map<IngredientCreatedEvent>(It.IsAny<Ingredient>()))
             .Returns(new IngredientCreatedEvent());
 
@@ -56,7 +52,7 @@ public class IngredientServiceTests
         result.ShouldBeSuccessful(HttpStatusCode.Created);
         result.Data!.Name.Should().Be(dto.Name);
 
-        var saved = await _dbContext.Ingredients.FirstOrDefaultAsync(a => a.Name == dto.Name);
+        var saved = await _dbContext.Ingredients.FirstOrDefaultAsync(i => i.Name == dto.Name);
         saved.Should().NotBeNull();
     }
 
@@ -64,9 +60,8 @@ public class IngredientServiceTests
     public async Task CreateIngredient_ShouldReturnError_WhenExceptionIsThrown()
     {
         // Arrange
-        var dto = new IngredientCreateDto { Name = "Exploding Ingredient", Price = 5 };
+        var dto = IngredientTestData.CreateCreateDto(name: "Exploding Ingredient", price: 5);
 
-        // Simulate a mapping exception
         _mockMapper.Setup(m => m.Map<Ingredient>(dto))
             .Throws(new Exception("Something went wrong during mapping"));
 
@@ -80,43 +75,18 @@ public class IngredientServiceTests
         result.Data.Should().BeNull();
     }
 
+
     [Fact]
     public async Task GetIngredients_ShouldReturnAllIngredients_WhenNoTagsGiven()
     {
         // Arrange
-        var ingredient1 = new Ingredient
-        {
-            Id = Guid.NewGuid(),
-            Name = "Cheese",
-            Price = 1.5m,
-            CanBeUsedAsExtra = true,
-            IsDeleted = false
-        };
-
-        var ingredient2 = new Ingredient
-        {
-            Id = Guid.NewGuid(),
-            Name = "Tomato",
-            Price = 1m,
-            CanBeUsedAsExtra = true,
-            IsDeleted = false
-        };
-
-        var ingredient3 = new Ingredient
-        {
-            Id = Guid.NewGuid(),
-            Name = "Bacon",
-            Price = 2m,
-            CanBeUsedAsExtra = false, // Should be excluded
-            IsDeleted = false
-        };
-
-        _dbContext.Ingredients.AddRange(ingredient1, ingredient2, ingredient3);
+        var ingredients = IngredientTestData.CreateDefaultIngredients();
+        _dbContext.Ingredients.AddRange(ingredients);
         await _dbContext.SaveChangesAsync();
 
         _mockMapper.Setup(m => m.Map<List<IngredientReadDto>>(It.IsAny<List<Ingredient>>()))
-            .Returns<List<Ingredient>>(ingredients =>
-                ingredients.Select(i => new IngredientReadDto
+            .Returns<List<Ingredient>>(ing =>
+                ing.Select(i => new IngredientReadDto
                 {
                     Id = i.Id,
                     Name = i.Name,
@@ -130,58 +100,29 @@ public class IngredientServiceTests
         // Assert
         result.ShouldBeSuccessful(HttpStatusCode.OK);
         result.Data.Should().HaveCount(2);
-        result.Data!.Select(i => i.Name).Should().Contain(new[] { "Cheese", "Tomato" });
-        result.Data!.Select(i => i.Name).Should().NotContain("Bacon");
+        result.Data!.Select(i => i.Name).Should().Contain(new[] {
+        IngredientTestData.CheeseName,
+        IngredientTestData.TomatoName
+    });
+        result.Data!.Select(i => i.Name).Should().NotContain(IngredientTestData.BaconName);
     }
 
     [Fact]
     public async Task GetIngredients_ShouldFilterByTags_WhenTagsAreProvided()
     {
         // Arrange
-        var tag1 = new Tag { Id = Guid.NewGuid(), Name = "vegan" };
-        var tag2 = new Tag { Id = Guid.NewGuid(), Name = "spicy" };
+        var veganTag = TagTestData.CreateTag(TagTestData.VeganTag);
+        var spicyTag = TagTestData.CreateTag(TagTestData.SpicyTag);
 
-        var ingredient1 = new Ingredient
-        {
-            Id = Guid.NewGuid(),
-            Name = "Tofu",
-            Price = 3,
-            CanBeUsedAsExtra = true,
-            IsDeleted = false,
-            IngredientTagRels = new List<IngredientTagRel>
-        {
-            new IngredientTagRel { Tag = tag1, TagId = tag1.Id }
-        }
-        };
+        var cheese = IngredientTestData.CreateTaggedIngredient(IngredientTestData.CheeseName, 3m, veganTag);
+        var tomato = IngredientTestData.CreateTaggedIngredient(IngredientTestData.TomatoName, 1.5m, spicyTag);
+        var bacon = IngredientTestData.CreateUntaggedIngredient(IngredientTestData.BaconName, 2m);
 
-        var ingredient2 = new Ingredient
-        {
-            Id = Guid.NewGuid(),
-            Name = "Chili",
-            Price = 1.5m,
-            CanBeUsedAsExtra = true,
-            IsDeleted = false,
-            IngredientTagRels = new List<IngredientTagRel>
-        {
-            new IngredientTagRel { Tag = tag2, TagId = tag2.Id }
-        }
-        };
-
-        var ingredient3 = new Ingredient
-        {
-            Id = Guid.NewGuid(),
-            Name = "Cheese",
-            Price = 2,
-            CanBeUsedAsExtra = true,
-            IsDeleted = false,
-            IngredientTagRels = new List<IngredientTagRel>() // No tags
-        };
-
-        _dbContext.Tags.AddRange(tag1, tag2);
-        _dbContext.Ingredients.AddRange(ingredient1, ingredient2, ingredient3);
+        _dbContext.Tags.AddRange(veganTag, spicyTag);
+        _dbContext.Ingredients.AddRange(tomato, bacon, cheese);
         await _dbContext.SaveChangesAsync();
 
-        var inputTags = new List<string> { "vegan" };
+        var inputTags = new List<string> { TagTestData.VeganTag };
 
         _mockMapper.Setup(m => m.Map<List<IngredientReadDto>>(It.IsAny<List<Ingredient>>()))
             .Returns<List<Ingredient>>(ingredients =>
@@ -199,14 +140,14 @@ public class IngredientServiceTests
         // Assert
         result.ShouldBeSuccessful(HttpStatusCode.OK);
         result.Data.Should().HaveCount(1);
-        result.Data!.First().Name.Should().Be("Tofu");
+        result.Data!.First().Name.Should().Be(IngredientTestData.CheeseName);
     }
 
     [Fact]
     public async Task GetIngredients_ShouldReturnError_WhenExceptionIsThrown()
     {
         // Arrange
-        var tags = new List<string> { "vegan" };
+        var tags = new List<string> { TagTestData.VeganTag };
 
         // Force an exception by mocking the DbContext if desired, 
         // Another valid approach is to pass `null` to simulate bad setup.
@@ -226,17 +167,22 @@ public class IngredientServiceTests
     [Fact]
     public async Task GetIngredient_ShouldReturnData_WhenIngredientExists()
     {
-        var ingredient = new Ingredient { Id = Guid.NewGuid(), Name = "Olive", Price = 1.5m };
+        var ingredient = IngredientTestData.CreateValidIngredient();
         await _dbContext.Ingredients.AddAsync(ingredient);
         await _dbContext.SaveChangesAsync();
 
         _mockMapper.Setup(m => m.Map<IngredientReadDto>(ingredient))
-            .Returns(new IngredientReadDto { Id = ingredient.Id, Name = "Olive", Price = 1.5m });
+            .Returns(new IngredientReadDto
+            {
+                Id = ingredient.Id,
+                Name = ingredient.Name,
+                Price = ingredient.Price
+            });
 
         var result = await _service.GetIngredient(ingredient.Id);
 
         result.ShouldBeSuccessful(HttpStatusCode.OK);
-        result.Data!.Name.Should().Be("Olive");
+        result.Data!.Name.Should().Be(ingredient.Name);
     }
 
     [Fact]
@@ -259,16 +205,9 @@ public class IngredientServiceTests
     public async Task AddTagsToIngredient_ShouldSucceed_WhenNewTagsAreAdded()
     {
         // Arrange
-        var ingredientId = Guid.NewGuid();
-        var tag1 = new Tag { Id = Guid.NewGuid(), Name = "Vegan" };
-        var tag2 = new Tag { Id = Guid.NewGuid(), Name = "Spicy" };
-
-        var ingredient = new Ingredient
-        {
-            Id = ingredientId,
-            Name = "Tomato",
-            IngredientTagRels = new List<IngredientTagRel>()
-        };
+        var ingredient = IngredientTestData.CreateValidIngredient(name: IngredientTestData.TomatoName);
+        var tag1 = TagTestData.CreateTag(TagTestData.VeganTag);
+        var tag2 = TagTestData.CreateTag(TagTestData.SpicyTag);
 
         await _dbContext.Ingredients.AddAsync(ingredient);
         await _dbContext.Tags.AddRangeAsync(tag1, tag2);
@@ -281,73 +220,65 @@ public class IngredientServiceTests
             {
                 Id = ingredient.Id,
                 Name = ingredient.Name,
-                Tags = new List<string> { "Vegan", "Spicy" }
+                Tags = new List<string> { TagTestData.VeganTag, TagTestData.SpicyTag }
             });
 
         // Act
-        var result = await _service.AddTagsToIngredient(ingredientId, tagIds);
+        var result = await _service.AddTagsToIngredient(ingredient.Id, tagIds);
 
         // Assert
         result.ShouldBeSuccessful(HttpStatusCode.OK);
-        result.Data!.Tags.Should().Contain(new[] { "Vegan", "Spicy" });
+        result.Data!.Tags.Should().Contain(new[] { TagTestData.VeganTag, TagTestData.SpicyTag });
 
         var updatedIngredient = await _dbContext.Ingredients
             .Include(i => i.IngredientTagRels)
             .ThenInclude(r => r.Tag)
-            .FirstOrDefaultAsync(i => i.Id == ingredientId);
+            .FirstOrDefaultAsync(i => i.Id == ingredient.Id);
 
-        updatedIngredient!.IngredientTagRels.Select(r => r.Tag.Name).Should().Contain(new[] { "Vegan", "Spicy" });
+        updatedIngredient!.IngredientTagRels.Select(r => r.Tag.Name)
+            .Should().Contain(new[] { TagTestData.VeganTag, TagTestData.SpicyTag });
     }
-
 
     [Fact]
     public async Task AddTagsToIngredient_ShouldNotAddDuplicateTags()
     {
         // Arrange
-        var ingredientId = Guid.NewGuid();
-        var tagId = Guid.NewGuid();
+        var tag = TagTestData.CreateTag(TagTestData.SpicyTag);
+        var ingredient = IngredientTestData.CreateValidIngredient(name: IngredientTestData.TomatoName);
+        var rel = new IngredientTagRel { IngredientId = ingredient.Id, TagId = tag.Id, Tag = tag };
 
-        var existingTag = new Tag { Id = tagId, Name = "Spicy" };
-
-        var ingredient = new Ingredient
-        {
-            Id = ingredientId,
-            Name = "Tomato",
-            IngredientTagRels = new List<IngredientTagRel>
-        {
-            new IngredientTagRel { IngredientId = ingredientId, TagId = tagId, Tag = existingTag }
-        }
-        };
+        ingredient.IngredientTagRels.Add(rel);
 
         await _dbContext.Ingredients.AddAsync(ingredient);
-        await _dbContext.Tags.AddAsync(existingTag);
+        await _dbContext.Tags.AddAsync(tag);
         await _dbContext.SaveChangesAsync();
 
-        var tagIds = new List<Guid> { tagId }; // Try to add the same tag again
+        var tagIds = new List<Guid> { tag.Id };
 
         _mockMapper.Setup(m => m.Map<IngredientReadDto>(It.IsAny<Ingredient>()))
             .Returns(new IngredientReadDto
             {
                 Id = ingredient.Id,
                 Name = ingredient.Name,
-                Tags = new List<string> { "Spicy" }
+                Tags = new List<string> { TagTestData.SpicyTag }
             });
 
         // Act
-        var result = await _service.AddTagsToIngredient(ingredientId, tagIds);
+        var result = await _service.AddTagsToIngredient(ingredient.Id, tagIds);
 
         // Assert
         result.ShouldBeSuccessful(HttpStatusCode.OK);
-        result.Data!.Tags.Should().ContainSingle(t => t == "Spicy");
+        result.Data!.Tags.Should().ContainSingle(t => t == TagTestData.SpicyTag);
 
         var updatedIngredient = await _dbContext.Ingredients
             .Include(i => i.IngredientTagRels)
             .ThenInclude(r => r.Tag)
-            .FirstOrDefaultAsync(i => i.Id == ingredientId);
+            .FirstOrDefaultAsync(i => i.Id == ingredient.Id);
 
         updatedIngredient!.IngredientTagRels.Should().HaveCount(1);
-        updatedIngredient.IngredientTagRels.First().TagId.Should().Be(tagId);
+        updatedIngredient.IngredientTagRels.First().TagId.Should().Be(tag.Id);
     }
+
 
     [Fact]
     public async Task AddTagsToIngredient_ShouldReturnNotFound_WhenIngredientDoesNotExist()
@@ -367,22 +298,12 @@ public class IngredientServiceTests
     public async Task UpdateIngredient_ShouldSucceed_WhenIngredientExists()
     {
         // Arrange
-        var id = Guid.NewGuid();
-        var ingredient = new Ingredient
-        {
-            Id = id,
-            Name = "Old Name",
-            Price = 1.5m,
-            CanBeUsedAsExtra = true
-        };
-        _dbContext.Ingredients.Add(ingredient);
+        var ingredient = IngredientTestData.CreateValidIngredient(name: "Old Name", price: 1.5m);
+        await _dbContext.Ingredients.AddAsync(ingredient);
         await _dbContext.SaveChangesAsync();
 
-        var updateDto = new IngredientUpdateDto
-        {
-            Name = "Updated Name",
-            Price = 3.0m
-        };
+        var updateDto = IngredientTestData.CreateUpdateDto();
+        var expectedReadDto = IngredientTestData.CreateReadDto(ingredient.Id, updateDto.Name!, updateDto.Price!.Value);
 
         _mockMapper.Setup(m => m.Map(updateDto, ingredient))
             .Callback<IngredientUpdateDto, Ingredient>((src, dest) =>
@@ -392,35 +313,32 @@ public class IngredientServiceTests
             });
 
         _mockMapper.Setup(m => m.Map<IngredientReadDto>(It.IsAny<Ingredient>()))
-            .Returns(new IngredientReadDto { Id = id, Name = "Updated Name", Price = 3.0m });
+            .Returns(expectedReadDto);
 
         _mockMapper.Setup(m => m.Map<IngredientUpdatedEvent>(It.IsAny<Ingredient>()))
-            .Returns(new IngredientUpdatedEvent { IngredientId = id });
+            .Returns(new IngredientUpdatedEvent { IngredientId = ingredient.Id });
 
         // Act
-        var result = await _service.UpdateIngredient(id, updateDto);
+        var result = await _service.UpdateIngredient(ingredient.Id, updateDto);
 
         // Assert
         result.ShouldBeSuccessful(HttpStatusCode.OK);
-        result.Data!.Name.Should().Be("Updated Name");
+        result.Data!.Name.Should().Be(IngredientTestData.UpdatedIngredientName);
 
-        var saved = await _dbContext.Ingredients.FindAsync(id);
-        saved!.Name.Should().Be("Updated Name");
-        saved.Price.Should().Be(3.0m);
+        var saved = await _dbContext.Ingredients.FindAsync(ingredient.Id);
+        saved!.Name.Should().Be(IngredientTestData.UpdatedIngredientName);
+        saved.Price.Should().Be(updateDto.Price);
 
         _mockEventHandler.Verify(e => e.HandleEventAsync(It.IsAny<IngredientUpdatedEvent>()), Times.Once);
     }
+
 
     [Fact]
     public async Task UpdateIngredient_ShouldReturnNotFound_WhenIngredientDoesNotExist()
     {
         // Arrange
         var nonExistentId = Guid.NewGuid();
-        var updateDto = new IngredientUpdateDto
-        {
-            Name = "Non-existent Ingredient",
-            Price = 4.0m
-        };
+        var updateDto = IngredientTestData.CreateUpdateDto("Non-existent Ingredient", 4.0m);
 
         // Act
         var result = await _service.UpdateIngredient(nonExistentId, updateDto);
@@ -429,26 +347,27 @@ public class IngredientServiceTests
         result.ShouldFailWith(HttpStatusCode.NotFound, "Ingredient not found.");
     }
 
+
     [Fact]
     public async Task DeleteIngredient_ShouldSoftDelete_WhenIngredientExists()
     {
         // Arrange
-        var ingredient = new Ingredient
+        var ingredient = IngredientTestData.CreateValidIngredient(
+            name: "Parsley",
+            price: 0.50m
+        );
+
+        ingredient.MenuItemIngredientRels.Add(new MenuItemIngredientRel
         {
-            Id = Guid.NewGuid(),
-            Name = "Parsley",
-            Price = 0.50m,
-            CanBeUsedAsExtra = true,
-            IsDeleted = false,
-            MenuItemIngredientRels = new List<MenuItemIngredientRel>
+            IngredientId = ingredient.Id,
+            MenuItemId = Guid.NewGuid()
+        });
+
+        ingredient.IngredientTagRels.Add(new IngredientTagRel
         {
-            new MenuItemIngredientRel { IngredientId = Guid.NewGuid(), MenuItemId = Guid.NewGuid() }
-        },
-            IngredientTagRels = new List<IngredientTagRel>
-        {
-            new IngredientTagRel { IngredientId = Guid.NewGuid(), TagId = Guid.NewGuid() }
-        }
-        };
+            IngredientId = ingredient.Id,
+            TagId = Guid.NewGuid()
+        });
 
         _dbContext.Ingredients.Add(ingredient);
         await _dbContext.SaveChangesAsync();
@@ -477,6 +396,7 @@ public class IngredientServiceTests
             .ToListAsync();
         relatedTagRels.Should().BeEmpty();
     }
+
 
     [Fact]
     public async Task DeleteIngredient_ShouldReturnNotFound_WhenIngredientDoesNotExist()
