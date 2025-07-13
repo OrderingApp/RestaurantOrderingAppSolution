@@ -1,6 +1,4 @@
-﻿using System.Net;
-using Application.Dtos.Common;
-using Application.Dtos.CustomerInformations;
+﻿using Application.Dtos.CustomerInformations;
 using Application.Services;
 using AutoMapper;
 using Domain;
@@ -10,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using RestaurantOrdering.Events.Application.Contracts;
 using RestaurantOrdering.Events.Domain.CustomerInformations;
+using RestaurantOrdering.Tests.TestData;
+using System.Net;
 
 public class CustomerInformationServiceTests
 {
@@ -34,7 +34,7 @@ public class CustomerInformationServiceTests
     public async Task UpdateCustomerInformation_ShouldFail_WhenCustomerNotFound()
     {
         var id = Guid.NewGuid();
-        var dto = new CustomerInformationUpdateDto { PhoneNumber = "123456789" };
+        var dto = CustomerInformationTestData.CreateUpdateDto();
 
         var result = await _service.UpdateCustomerInformation(id, dto);
 
@@ -44,22 +44,11 @@ public class CustomerInformationServiceTests
     [Fact]
     public async Task UpdateCustomerInformation_ShouldSucceed_WhenDataIsValid()
     {
-        var customer = new CustomerInformation
-        {
-            Id = Guid.NewGuid(),
-            PhoneNumber = "111",
-            OrderCompletionType = OrderCompletionType.Immediate,
-            PreferredPaymentMethod = PreferredPaymentMethod.Cash
-        };
+        var customer = CustomerInformationTestData.CreateValidCustomer();
         _dbContext.CustomerInformation.Add(customer);
         await _dbContext.SaveChangesAsync();
 
-        var dto = new CustomerInformationUpdateDto
-        {
-            PhoneNumber = "999",
-            OrderCompletionType = OrderCompletionType.Scheduled,
-            PreferedPaymentMethod = PreferredPaymentMethod.Card
-        };
+        var dto = CustomerInformationTestData.CreateUpdateDto();
 
         _mockMapper.Setup(m => m.Map(dto, customer))
             .Callback<CustomerInformationUpdateDto, CustomerInformation>((src, dest) =>
@@ -70,18 +59,18 @@ public class CustomerInformationServiceTests
             });
 
         _mockMapper.Setup(m => m.Map<CustomerInformationReadDto>(It.IsAny<CustomerInformation>()))
-            .Returns(new CustomerInformationReadDto { PhoneNumber = dto.PhoneNumber });
+            .Returns(CustomerInformationTestData.CreateReadDto(customer.Id));
 
         _mockMapper.Setup(m => m.Map<CustomerInformationUpdatedEvent>(It.IsAny<CustomerInformation>()))
-            .Returns(new CustomerInformationUpdatedEvent { CustomerId = customer.Id } );
+            .Returns(new CustomerInformationUpdatedEvent { CustomerId = customer.Id });
 
         var result = await _service.UpdateCustomerInformation(customer.Id, dto);
 
         result.ShouldBeSuccessful(HttpStatusCode.OK);
-        result.Data!.PhoneNumber.Should().Be("999");
+        result.Data!.PhoneNumber.Should().Be(CustomerInformationTestData.UpdatedPhone);
 
         var saved = await _dbContext.CustomerInformation.FindAsync(customer.Id);
-        saved!.PhoneNumber.Should().Be("999");
+        saved!.PhoneNumber.Should().Be(CustomerInformationTestData.UpdatedPhone);
 
         _mockEventHandler.Verify(e => e.HandleEventAsync(It.IsAny<CustomerInformationUpdatedEvent>()), Times.Once);
     }
@@ -97,11 +86,7 @@ public class CustomerInformationServiceTests
     [Fact]
     public async Task GetCustomerInformation_ShouldSucceed_WhenFound()
     {
-        var customer = new CustomerInformation
-        {
-            Id = Guid.NewGuid(),
-            PhoneNumber = "555",
-        };
+        var customer = CustomerInformationTestData.CreateValidCustomer();
 
         _dbContext.CustomerInformation.Add(customer);
         await _dbContext.SaveChangesAsync();
@@ -112,6 +97,6 @@ public class CustomerInformationServiceTests
         var result = await _service.GetCustomerInformation(customer.Id);
 
         result.ShouldBeSuccessful(HttpStatusCode.OK);
-        result.Data!.PhoneNumber.Should().Be("555");
+        result.Data!.PhoneNumber.Should().Be(customer.PhoneNumber);
     }
 }

@@ -9,6 +9,7 @@ using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using RestaurantOrdering.Events.Application.Contracts;
+using RestaurantOrdering.Tests.TestData;
 
 public class AreaServiceTests
 {
@@ -34,9 +35,9 @@ public class AreaServiceTests
     public async Task CreateArea_ShouldSucceed_WhenNameIsUnique()
     {
         // Arrange
-        var dto = new AreaCreateDto { Name = "New Area" };
-        var newArea = new Area { Id = Guid.NewGuid(), Name = dto.Name };
-        var readDto = new AreaReadDto { Id = newArea.Id, Name = dto.Name, Tables = new() };
+        var dto = AreaTestData.AreaDtoTestData.CreateAreaDto();
+        var newArea = AreaTestData.CreateValidArea(name: dto.Name);
+        var readDto = new AreaReadDto { Id = newArea.Id, Name = dto.Name, Tables = [] };
 
         _mockMapper.Setup(m => m.Map<Area>(dto)).Returns(newArea);
         _mockMapper.Setup(m => m.Map<AreaReadDto>(It.IsAny<Area>())).Returns(readDto);
@@ -46,9 +47,9 @@ public class AreaServiceTests
 
         // Assert
         result.ShouldBeSuccessful(HttpStatusCode.Created);
-        result.Data!.Name.Should().Be("New Area");
+        result.Data!.Name.Should().Be(dto.Name);
 
-        var saved = await _dbContext.Areas.FirstOrDefaultAsync(a => a.Name == "New Area");
+        var saved = await _dbContext.Areas.FirstOrDefaultAsync(a => a.Name == dto.Name);
         saved.Should().NotBeNull();
     }
 
@@ -56,11 +57,11 @@ public class AreaServiceTests
     public async Task CreateArea_ShouldFail_WhenNameAlreadyExists()
     {
         // Arrange
-        var existingArea = new Area { Id = Guid.NewGuid(), Name = "Main Hall" };
+        var existingArea = AreaTestData.CreateValidArea(name: AreaTestData.ExistingAreaName);
         _dbContext.Areas.Add(existingArea);
         await _dbContext.SaveChangesAsync();
 
-        var dto = new AreaCreateDto { Name = "Main Hall" };
+        var dto = AreaTestData.AreaDtoTestData.CreateAreaDto(name: AreaTestData.ExistingAreaName);
 
         // Act
         var result = await _areaService.CreateArea(dto, Guid.NewGuid());
@@ -74,7 +75,7 @@ public class AreaServiceTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var dto = new AreaUpdateDto { Name = "Updated Name" };
+        var dto = AreaTestData.AreaDtoTestData.UpdateAreaDto();
 
         // Act
         var result = await _areaService.UpdateArea(id, dto);
@@ -100,7 +101,7 @@ public class AreaServiceTests
     public async Task DeleteArea_ShouldSucceed_WhenAreaExists()
     {
         // Arrange
-        var area = new Area { Id = Guid.NewGuid(), Name = "Temporary Area" };
+        var area = AreaTestData.CreateValidArea(name: AreaTestData.TemporaryAreaName);
         _dbContext.Areas.Add(area);
         await _dbContext.SaveChangesAsync();
 
