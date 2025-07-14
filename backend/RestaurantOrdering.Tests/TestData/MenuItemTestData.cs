@@ -2,13 +2,14 @@
 
 public static class MenuItemTestData
 {
-    public static MenuItem CreateMenuItem(string name, Guid? id = null, decimal price = 10m)
+    public const string MenuItem = "Pizza";
+    public static MenuItem CreateMenuItem(Guid? id = null, string? name = null, decimal price = 10m)
     {
         return new MenuItem
         {
             Id = id ?? Guid.NewGuid(),
+            Name = name ?? MenuItem,
             Price = price,
-            Name = "Test Menu Item",
         };
     }
 }

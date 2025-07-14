@@ -333,12 +333,12 @@ public class MenuCategoryServiceTests
     {
         // Arrange
         var categoryId = Guid.NewGuid();
-        var entity = new MenuCategory { Id = categoryId, Name = "Old Name" };
+        var entity = MenuCategoryTestData.CreateValidCategory(id: categoryId, name: "Old Name");
 
-        _dbContext.MenuCategories.Add(entity);
+        await _dbContext.MenuCategories.AddAsync(entity);
         await _dbContext.SaveChangesAsync();
 
-        var updateDto = new MenuCategoryUpdateDto { Name = "Updated Name" };
+        var updateDto = MenuCategoryTestData.CreateUpdateDto(name: MenuCategoryTestData.UpdatedCategoryName);
 
         _mockMapper.Setup(m => m.Map(updateDto, entity))
             .Callback<MenuCategoryUpdateDto, MenuCategory>((src, dest) =>
@@ -346,7 +346,8 @@ public class MenuCategoryServiceTests
                 dest.Name = src.Name!;
             });
 
-        var updatedDto = new MenuCategoryReadDto { Id = categoryId, Name = "Updated Name" };
+        var updatedDto = MenuCategoryTestData.CreateReadDto(categoryId, MenuCategoryTestData.UpdatedCategoryName);
+
         _mockMapper.Setup(m => m.Map<MenuCategoryReadDto>(entity)).Returns(updatedDto);
         _mockMapper.Setup(m => m.Map<MenuCategoryUpdatedEvent>(entity))
             .Returns(new MenuCategoryUpdatedEvent());
@@ -356,7 +357,7 @@ public class MenuCategoryServiceTests
 
         // Assert
         result.ShouldBeSuccessful(HttpStatusCode.OK);
-        result.Data!.Name.Should().Be("Updated Name");
+        result.Data!.Name.Should().Be(MenuCategoryTestData.UpdatedCategoryName);
 
         _mockEventHandler.Verify(e => e.HandleEventAsync(It.IsAny<MenuCategoryUpdatedEvent>()), Times.Once);
     }
@@ -366,7 +367,7 @@ public class MenuCategoryServiceTests
     {
         // Arrange
         var nonExistentId = Guid.NewGuid();
-        var updateDto = new MenuCategoryUpdateDto { Name = "Updated Name" };
+        var updateDto = MenuCategoryTestData.CreateUpdateDto("Updated Name");
 
         // Act
         var result = await _service.UpdateMenuCategory(nonExistentId, updateDto);
@@ -380,7 +381,7 @@ public class MenuCategoryServiceTests
     {
         // Arrange
         var id = Guid.NewGuid();
-        var updateDto = new MenuCategoryUpdateDto { Name = "Test" };
+        var updateDto = MenuCategoryTestData.CreateUpdateDto("Test");
 
         // Simulate exception
         var mockService = new MenuCategoryService(null!, _mockEventHandler.Object, _mockMapper.Object);
@@ -399,13 +400,12 @@ public class MenuCategoryServiceTests
     {
         // Arrange
         var categoryId = Guid.NewGuid();
-        var category = new MenuCategory
-        {
-            Id = categoryId,
-            Name = "Starters",
-            IsUsed = true,
-            IsDeleted = false
-        };
+        var category = MenuCategoryTestData.CreateValidCategory(
+            id: categoryId,
+            name: "Starters",
+            isDeleted: false,
+            isUsed: true
+        );
 
         _dbContext.MenuCategories.Add(category);
         await _dbContext.SaveChangesAsync();
@@ -445,12 +445,11 @@ public class MenuCategoryServiceTests
     {
         // Arrange
         var categoryId = Guid.NewGuid();
-        var alreadyDeleted = new MenuCategory
-        {
-            Id = categoryId,
-            Name = "Archived",
-            IsDeleted = true
-        };
+        var alreadyDeleted = MenuCategoryTestData.CreateValidCategory(
+            id: categoryId,
+            name: "Archived",
+            isDeleted: true
+        );
 
         _dbContext.MenuCategories.Add(alreadyDeleted);
         await _dbContext.SaveChangesAsync();
