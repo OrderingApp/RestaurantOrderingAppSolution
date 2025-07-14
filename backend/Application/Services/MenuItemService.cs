@@ -1,14 +1,13 @@
-﻿using System.Net;
-using Application.Contracts;
+﻿using Application.Contracts;
 using Application.Dtos.Common;
 using Application.Dtos.MenuItems;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Domain;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using RestaurantOrdering.Events.Application.Contracts;
 using RestaurantOrdering.Events.Domain.MenuItems;
+using System.Net;
 
 namespace Application.Services;
 

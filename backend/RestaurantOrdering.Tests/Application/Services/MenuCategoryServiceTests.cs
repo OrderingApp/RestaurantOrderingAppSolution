@@ -13,8 +13,6 @@ using RestaurantOrdering.Events.Domain.MenuCategories;
 using RestaurantOrdering.Tests.TestData;
 using System.Net;
 
-
-
 namespace RestaurantOrdering.Tests.Application.Services;
 
 public class MenuCategoryServiceTests
