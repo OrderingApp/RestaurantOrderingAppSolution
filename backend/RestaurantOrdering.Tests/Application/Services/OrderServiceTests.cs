@@ -8,8 +8,7 @@ using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using RestaurantOrdering.Events.Application.Contracts;
-using RestaurantOrdering.Tests.TestHelpers;
-
+using RestaurantOrdering.Tests.TestData;
 public class OrderServiceTests
 {
     private readonly RestaurantOrderingContext _dbContext;
