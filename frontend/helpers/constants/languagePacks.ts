@@ -91,6 +91,15 @@ export interface languagePack {
             delivery: string;
         };
     };
+    paymentModal: {
+        title: string;
+        inputLabel: string;
+        paymentByCard: string;
+        paymentByCash: string;
+    };
+    discountModal: {
+        disscountTitle: string;
+    }
 }
 
 interface loginPageFormFields {

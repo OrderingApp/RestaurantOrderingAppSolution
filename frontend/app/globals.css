@@ -37,3 +37,11 @@ body {
         display: none;
     }
 }
+
+.hide-input-number-icon {
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+        appearance: none;
+        margin: 0;
+    }
+}

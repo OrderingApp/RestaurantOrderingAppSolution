@@ -12,7 +12,8 @@ export const inputStyles: {
 } = {
     variants: {
         primary: 'bg-[#E6E6E6] text-[#2B5162]',
-        secondary: '',
+        secondary:
+            'bg-white shadow-inner-md rounded-lg text-center hide-input-number-icon',
         tertiary: '',
     },
     sizes: {

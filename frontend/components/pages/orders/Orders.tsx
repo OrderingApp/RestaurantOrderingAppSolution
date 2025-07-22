@@ -52,17 +52,24 @@ const Orders = () => {
     const toggleSelected = (id: string) => {
         const params = new URLSearchParams(seachParams.toString());
 
-        selectedId === id
-            ? (setSelectedId(null), params.delete('orderId'))
-            : (setSelectedId(id), params.set('orderId', id));
-
+        if (selectedId === id) {
+            setSelectedId(null);
+            params.delete('orderId');
+        } else {
+            setSelectedId(id);
+            params.set('orderId', id);
+        }
         router.push(`/orders?${params.toString()}`);
     };
 
     const toggleModal = () => {
         const params = new URLSearchParams(seachParams.toString());
 
-        modal === 'true' ? params.delete('modal') : params.set('modal', 'true');
+        if (modal === 'true') {
+            params.delete('modal');
+        } else {
+            params.set('modal', 'true');
+        }
 
         router.push(`/orders?${params.toString()}`);
     };
