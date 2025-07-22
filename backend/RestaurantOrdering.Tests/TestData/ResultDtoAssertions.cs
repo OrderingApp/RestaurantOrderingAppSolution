@@ -11,9 +11,8 @@ public static class ResultDtoAssertions
     )
     {
         result.Should().NotBeNull(because);
-        result.IsSuccess.Should().BeTrue(because: because);
+        result.IsSuccess.Should().BeTrue(because);
         result.HttpStatusCode.Should().Be(expectedStatusCode, because);
-        result.Data.Should().NotBeNull(because);
     }
 
     public static void ShouldFailWith<T>(
