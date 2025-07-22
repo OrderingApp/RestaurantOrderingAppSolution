@@ -23,7 +23,8 @@ import { menuStyles } from '@/lib/styles/menu';
 
 import useFilterMenu from '@/helpers/hooks/useFilterMenu';
 import useLanguage from '@/helpers/hooks/useLanguage';
-import MenuItemInformation from '@/components/shared/modals/MenuItemInformation';
+
+import Payment from '@/components/shared/modals/Payment';
 
 interface MenuProps {
     variant?: 'card' | 'order';
@@ -123,9 +124,7 @@ const Menu = ({ variant = 'order', children }: MenuProps) => {
             </div>
             {isModalOpen && (
                 <Modal onClose={() => setIsModalOpen(false)}>
-                    <MenuItemInformation
-                        onClick={() => setIsModalOpen(false)}
-                    />
+                    <Payment onClick={() => setIsModalOpen(false)} />
                 </Modal>
             )}
 

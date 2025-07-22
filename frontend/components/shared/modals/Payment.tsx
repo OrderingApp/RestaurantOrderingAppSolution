@@ -16,6 +16,9 @@ const Payment = ({ onClick }: { onClick: () => void }) => {
         paymentModal: { title, inputLabel, paymentByCard, paymentByCash },
     } = languagePacks[language];
 
+    const btnStyle =
+        'w-[198px] h-[98px] flex flex-col justify-center items-center gap-2 shadow-[0px_0px_6px_0px_#00000029] rounded-xl';
+
     return (
         <div className="w-[445px] h-[445px] bg-payment-modal-gradient rounded-2xl relative ">
             <button
@@ -40,14 +43,22 @@ const Payment = ({ onClick }: { onClick: () => void }) => {
                     />
                 </div>
                 <ul className="flex gap-2 mt-2">
-                    <button className="w-[198px] h-[98px] flex flex-col justify-center items-center gap-2 shadow-[0px_0px_6px_0px_#00000029] rounded-xl">
-                        <p className="text-[10px] font-bold">{paymentByCard}</p>
-                        <Image src={paymentCard} alt="card-icon" />
-                    </button>
-                    <button className="w-[198px] h-[98px] flex flex-col justify-center items-center gap-2  shadow-[0px_0px_6px_0px_#00000029] rounded-xl">
-                        <p className="text-[10px] font-bold">{paymentByCash}</p>
-                        <Image src={paymentCash} alt="cash-icon" />
-                    </button>
+                    <li>
+                        <button className={btnStyle}>
+                            <p className="text-[10px] font-bold">
+                                {paymentByCard}
+                            </p>
+                            <Image src={paymentCard} alt="card-icon" />
+                        </button>
+                    </li>
+                    <li>
+                        <button className={btnStyle}>
+                            <p className="text-[10px] font-bold">
+                                {paymentByCash}
+                            </p>
+                            <Image src={paymentCash} alt="cash-icon" />
+                        </button>
+                    </li>
                 </ul>
             </div>
         </div>
