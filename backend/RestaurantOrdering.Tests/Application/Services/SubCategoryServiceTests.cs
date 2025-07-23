@@ -96,7 +96,13 @@ public class SubCategoryServiceTests
     public async Task GetSubCategory_ShouldSucceed_WhenSubCategoryExists()
     {
         // Arrange
+        var menuCategory = MenuCategoryTestData.CreateValidCategory();
+        await _dbContext.MenuCategories.AddAsync(menuCategory);
+        await _dbContext.SaveChangesAsync();
+
         var subCategory = SubCategoryTestData.CreateValidSubCategory();
+        subCategory.MenuCategoryId = menuCategory.Id;
+
         await _dbContext.SubCategories.AddAsync(subCategory);
         await _dbContext.SaveChangesAsync();
 
@@ -106,7 +112,8 @@ public class SubCategoryServiceTests
             Name = subCategory.Name
         };
 
-        _mockMapper.Setup(m => m.Map<SubCategoryReadDto>(subCategory)).Returns(subCategoryDto);
+        _mockMapper.Setup(m => m.Map<SubCategoryReadDto>(It.Is<SubCategory>(sc => sc.Id == subCategory.Id)))
+            .Returns(subCategoryDto);
 
         // Act
         var result = await _service.GetSubCategory(subCategory.Id);
