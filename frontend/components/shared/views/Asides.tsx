@@ -33,7 +33,12 @@ const AsidesView = ({
             )}
         />
 
-        <div className={clsx(!isBottomAsideShown && 'row-span-full')}>
+        <div
+            className={clsx(
+                'px-4 py-6',
+                !isBottomAsideShown && 'row-span-full'
+            )}
+        >
             {children}
         </div>
 
