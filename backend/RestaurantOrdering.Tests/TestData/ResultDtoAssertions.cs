@@ -1,0 +1,35 @@
+﻿using System.Net;
+using Application.Dtos.Common;
+using FluentAssertions;
+
+public static class ResultDtoAssertions
+{
+    public static void ShouldBeSuccessful<T>(
+        this ResultDto<T> result,
+        HttpStatusCode expectedStatusCode,
+        string because = ""
+    )
+    {
+        result.Should().NotBeNull(because);
+        result.IsSuccess.Should().BeTrue(because);
+        result.HttpStatusCode.Should().Be(expectedStatusCode, because);
+    }
+
+    public static void ShouldFailWith<T>(
+        this ResultDto<T> result,
+        HttpStatusCode expectedStatusCode,
+        string expectedErrorMessage,
+        string because = ""
+    )
+    {
+        result.Should().NotBeNull(because);
+        result.IsSuccess.Should().BeFalse(because: because);
+        result.HttpStatusCode.Should().Be(expectedStatusCode, because);
+        result.ErrorMessage.Should().Be(expectedErrorMessage, because);
+
+        if (!typeof(T).IsValueType || Nullable.GetUnderlyingType(typeof(T)) != null)
+        {
+            result.Data.Should().BeNull(because);
+        }
+    }
+}

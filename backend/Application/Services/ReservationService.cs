@@ -96,6 +96,7 @@ public class ReservationService(
         }
     }
 
+    // fix name it should be assign reservation to table not reverse
     public async Task<ResultDto<ReservationReadDto>> AssignTableToReservation(Guid id, Guid tableId)
     {
         try

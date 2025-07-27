@@ -17,6 +17,7 @@ public class MenuCategoryService(
     IMapper mapper
 ) : IMenuCategoryService
 {
+    // TODO: Add sequencenumber when creating new menuCategory
     public async Task<ResultDto<MenuCategoryReadDto>> CreateMenuCategory(
         MenuCategoryCreateDto menuCategoryCreateDto
     )
@@ -123,6 +124,7 @@ public class MenuCategoryService(
         }
     }
 
+    // Check if you need both methods
     public async Task<PagedResultDto<MenuCategoryHierarchyReadDto>> GetMenuCategoriesWithHierarchy(
         GetMenuCategoryHierarchyRequest request
     )

@@ -1,7 +1,5 @@
-﻿using API.Authorization;
-using Application.Contracts;
+﻿using Application.Contracts;
 using Application.Dtos.Areas;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;

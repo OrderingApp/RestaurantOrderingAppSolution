@@ -18,6 +18,7 @@ public class OrderItemService(
     IMapper mapper
 ) : IOrderItemService
 {
+    // Change name to AddOrderItemsToOrder
     public async Task<ResultDto<OrderReadDto>> AddOrderItems(
         Guid orderId,
         List<OrderItemCreateDto> orderItemDtos
@@ -300,6 +301,7 @@ public class OrderItemService(
             );
         }
     }
+
 
     private decimal RecalculateOrderTotal(Order order)
     {
