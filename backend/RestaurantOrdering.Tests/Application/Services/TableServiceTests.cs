@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Application.Dtos.Tables;
+﻿using Application.Dtos.Tables;
 using Application.Services;
 using AutoMapper;
 using Domain;
@@ -10,7 +9,7 @@ using Moq;
 using RestaurantOrdering.Events.Application.Contracts;
 using RestaurantOrdering.Events.Domain.Tables;
 using RestaurantOrdering.Tests.TestData;
-using Xunit;
+using System.Net;
 
 namespace RestaurantOrdering.Tests.Application.Services;
 
