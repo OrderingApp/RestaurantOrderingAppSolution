@@ -10,7 +10,9 @@ export interface BottomAsideProps {
 
 const BottomAside = ({ reservations, className }: BottomAsideProps) => {
     return (
-        <aside className={clsx('p-4 w-full shadow-inner-sm', className)}>
+        <aside
+            className={clsx('p-4 w-full shadow-inner-sm bg-white', className)}
+        >
             {reservations.length > 0 ? (
                 <ul className="flex gap-4 ">
                     {reservations.map((r) => (

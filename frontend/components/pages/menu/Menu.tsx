@@ -56,7 +56,7 @@ const Menu = ({ variant = 'order', children }: MenuProps) => {
     const openModalHandler = () => setIsModalOpen(true);
 
     return (
-        <div className="bg-[#F6F6F6] w-full rounded-3xl h-full flex flex-row ">
+        <div className="bg-light-gray w-full rounded-3xl h-full flex flex-row ">
             <div
                 className={clsx(
                     'pt-10 flex flex-col',
