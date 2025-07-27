@@ -37,8 +37,10 @@ export default {
                 sans: 'var(--sans)',
             },
             boxShadow: {
+                'inner-sm': 'inset 0px 4px 4px 0px #00000040',
                 'inner-md': 'inset 0 0 5px rgba(0,0,0,0.5)',
                 'inner-lg': 'inset 0 0 10px 0 #00000040',
+                'sm-left': '-4px 0px 4px 0px #00000040',
             },
         },
     },

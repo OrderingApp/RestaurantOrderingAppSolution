@@ -8,9 +8,9 @@ import languagePacks from '@/helpers/constants/languagePacks';
 import { getPluralForm } from '@/helpers/utils/utils';
 import { formatDate } from '@/helpers/utils/dates';
 
-interface ReservationCardProps
+export interface ReservationCardProps
     extends Omit<ItemCardProps, 'variant' | 'children' | 'title'>,
-        Partial<Reservation> {
+        Reservation {
     capacityNeeded: number;
     dateTime: string;
 }

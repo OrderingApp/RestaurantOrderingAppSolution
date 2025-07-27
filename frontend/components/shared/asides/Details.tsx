@@ -1,19 +1,20 @@
+import Image from 'next/image';
+import { AnimatePresence, motion } from 'motion/react';
+import clsx from 'clsx';
+
 import { useLanguage } from '@/providers/LanguageProvider';
-
-import Button, { type ButtonProps } from '@/components/shared/button/Button';
-import ItemsList, {
-    type ItemsListProps,
-} from '@/components/shared//lists/Items/Items';
-
 import { formatPriceStr } from '@/helpers/utils/prices';
 
-import type { Currency } from '@/helpers/type/types';
 import languagePacks from '@/helpers/constants/languagePacks';
 import PendingIcon from '@/public/images/svg/table-status-pending.svg';
 import ServedIcon from '@/public/images/svg/table-status-served.svg';
-import Image from 'next/image';
 
-import { AnimatePresence, motion } from 'motion/react';
+import ItemsList, {
+    type ItemsListProps,
+} from '@/components/shared//lists/Items/Items';
+import Button, { type ButtonProps } from '@/components/shared/button/Button';
+import type { Currency } from '@/helpers/type/types';
+
 interface ButtonHeader {
     price: number;
     currency: Currency;
@@ -39,10 +40,10 @@ interface FilledAside {
     items?: ItemsListProps['items'];
 }
 
-type DetailsAsideProps = {
+export type DetailsAsideProps = {
     buttons?: Omit<ButtonProps, 'className'>[];
 } & (FilledAside | EmptyAside) &
-    (RegularHeader | ButtonHeader);
+    (RegularHeader | ButtonHeader) & { className?: string };
 
 const DetailsAside = ({
     title,
@@ -52,12 +53,18 @@ const DetailsAside = ({
     currency,
     button,
     served,
+    className,
 }: DetailsAsideProps) => {
     const { language } = useLanguage();
     const { detailsAside } = languagePacks[language];
 
     return (
-        <aside className="flex flex-col gap-1.5 ml-auto py-6 h-full w-56 shadow-[-4px_0px_4px_0px_rgba(0,0,0,0.25)]">
+        <aside
+            className={clsx(
+                'flex flex-col gap-1.5 ml-auto py-6 h-full w-56 shadow-sm-left',
+                className
+            )}
+        >
             {title &&
                 (button ? (
                     <div className="flex flex-col items-center px-4 gap-1 mb-[18px]">
