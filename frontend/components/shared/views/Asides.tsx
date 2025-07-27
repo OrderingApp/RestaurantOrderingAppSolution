@@ -11,9 +11,10 @@ interface AsidesViewProps {
     isBottomAsideShown?: boolean;
 }
 const AsidesView = ({
-    isBottomAsideShown,
+    children,
     details,
     bottom,
+    isBottomAsideShown,
 }: AsidesViewProps) => (
     <div className="grid grid-cols-[1fr_224px] grid-rows-[1fr_minmax(126px,auto)] h-full">
         {/* Divs to make the desired box-shadow work */}
@@ -32,7 +33,9 @@ const AsidesView = ({
             )}
         />
 
-        <div className={clsx(!isBottomAsideShown && 'row-span-full')}></div>
+        <div className={clsx(!isBottomAsideShown && 'row-span-full')}>
+            {children}
+        </div>
 
         {isBottomAsideShown && <BottomAside {...bottom} />}
     </div>
