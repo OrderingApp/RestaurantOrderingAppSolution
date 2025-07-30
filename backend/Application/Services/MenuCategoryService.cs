@@ -17,26 +17,43 @@ public class MenuCategoryService(
     IMapper mapper
 ) : IMenuCategoryService
 {
-    // TODO: Add sequencenumber when creating new menuCategory
     public async Task<ResultDto<MenuCategoryReadDto>> CreateMenuCategory(
         MenuCategoryCreateDto menuCategoryCreateDto
     )
     {
         try
         {
+            // Load all existing categories ordered by SequenceNumber
             var categories = await orderingContext.MenuCategories
-                        .OrderBy(c => c.SequenceNumber)
-                        .ToListAsync();
+                .OrderBy(c => c.SequenceNumber)
+                .ToListAsync();
 
             int newSequenceNumber;
 
+            // Validate incoming SequenceNumber (must be >= 1)
             if (menuCategoryCreateDto.SequenceNumber.HasValue)
             {
-                // Clamp the requested position (can't be less than 1 or more than last + 1)
-                newSequenceNumber = Math.Max(1, menuCategoryCreateDto.SequenceNumber.Value);
-                newSequenceNumber = Math.Min(newSequenceNumber, categories.Count + 1);
+                newSequenceNumber = menuCategoryCreateDto.SequenceNumber.Value;
 
-                // Shift other categories down if inserting in the middle
+                if (newSequenceNumber < 1)
+                {
+                    return ResultDto<MenuCategoryReadDto>.Failure(
+                        "SequenceNumber must be 1 or greater.",
+                        HttpStatusCode.BadRequest
+                    );
+                }
+
+                // If the requested number is greater than the last + 1 → reject (no gaps allowed)
+                var maxSequence = categories.Any() ? categories.Max(c => c.SequenceNumber) : 0;
+                if (newSequenceNumber > maxSequence + 1)
+                {
+                    return ResultDto<MenuCategoryReadDto>.Failure(
+                        $"SequenceNumber cannot skip positions. The next available position is {maxSequence + 1}.",
+                        HttpStatusCode.BadRequest
+                    );
+                }
+
+                // Shift all categories starting at the requested position
                 foreach (var category in categories.Where(c => c.SequenceNumber >= newSequenceNumber))
                 {
                     category.SequenceNumber++;
@@ -44,15 +61,17 @@ public class MenuCategoryService(
             }
             else
             {
-                // If not specified, put it at the end
+                // If not specified, place it at the end (max + 1)
                 var maxSequence = categories.Any() ? categories.Max(c => c.SequenceNumber) : 0;
                 newSequenceNumber = maxSequence + 1;
             }
 
+            // Create and set the sequence number
             var menuCategory = mapper.Map<MenuCategory>(menuCategoryCreateDto);
             menuCategory.SequenceNumber = newSequenceNumber;
 
             await orderingContext.MenuCategories.AddAsync(menuCategory);
+
             await orderingContext.SaveChangesAsync();
 
             var createdMenuCategory = mapper.Map<MenuCategoryReadDto>(menuCategory);
@@ -60,10 +79,7 @@ public class MenuCategoryService(
             var menuCategoryCreatedEvent = mapper.Map<MenuCategoryCreatedEvent>(menuCategory);
             await eventHandlerService.HandleEventAsync(menuCategoryCreatedEvent);
 
-            return ResultDto<MenuCategoryReadDto>.Success(
-                createdMenuCategory,
-                HttpStatusCode.Created
-            );
+            return ResultDto<MenuCategoryReadDto>.Success(createdMenuCategory, HttpStatusCode.Created);
         }
         catch (Exception ex)
         {
@@ -73,6 +89,8 @@ public class MenuCategoryService(
             );
         }
     }
+
+
 
     public async Task<ResultDto<MenuCategoryReadDto>> GetMenuCategory(Guid id)
     {
@@ -292,6 +310,8 @@ public class MenuCategoryService(
 
             await orderingContext.SaveChangesAsync();
 
+            await NormalizeMenuCategorySequenceAsync();
+
             var menuCategoryDeletedEvent = mapper.Map<MenuCategoryDeletedEvent>(menuCategory);
             await eventHandlerService.HandleEventAsync(menuCategoryDeletedEvent);
 
@@ -305,4 +325,21 @@ public class MenuCategoryService(
             );
         }
     }
+
+    private async Task NormalizeMenuCategorySequenceAsync()
+    {
+        var activeCategories = await orderingContext.MenuCategories
+            .Where(c => !c.IsDeleted) // only normalize active ones
+            .OrderBy(c => c.SequenceNumber)
+            .ToListAsync();
+
+        int current = 1;
+        foreach (var category in activeCategories)
+        {
+            category.SequenceNumber = current++;
+        }
+
+        await orderingContext.SaveChangesAsync();
+    }
+
 }
