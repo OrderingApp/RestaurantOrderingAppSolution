@@ -24,7 +24,33 @@ public class MenuCategoryService(
     {
         try
         {
+            var categories = await orderingContext.MenuCategories
+                        .OrderBy(c => c.SequenceNumber)
+                        .ToListAsync();
+
+            int newSequenceNumber;
+
+            if (menuCategoryCreateDto.SequenceNumber.HasValue)
+            {
+                // Clamp the requested position (can't be less than 1 or more than last + 1)
+                newSequenceNumber = Math.Max(1, menuCategoryCreateDto.SequenceNumber.Value);
+                newSequenceNumber = Math.Min(newSequenceNumber, categories.Count + 1);
+
+                // Shift other categories down if inserting in the middle
+                foreach (var category in categories.Where(c => c.SequenceNumber >= newSequenceNumber))
+                {
+                    category.SequenceNumber++;
+                }
+            }
+            else
+            {
+                // If not specified, put it at the end
+                var maxSequence = categories.Any() ? categories.Max(c => c.SequenceNumber) : 0;
+                newSequenceNumber = maxSequence + 1;
+            }
+
             var menuCategory = mapper.Map<MenuCategory>(menuCategoryCreateDto);
+            menuCategory.SequenceNumber = newSequenceNumber;
 
             await orderingContext.MenuCategories.AddAsync(menuCategory);
             await orderingContext.SaveChangesAsync();
