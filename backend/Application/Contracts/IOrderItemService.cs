@@ -7,7 +7,7 @@ namespace Application.Contracts;
 
 public interface IOrderItemService
 {
-    Task<ResultDto<OrderReadDto>> AddOrderItems(
+    Task<ResultDto<OrderReadDto>> AddOrderItemsToOrder(
         Guid orderId,
         List<OrderItemCreateDto> orderItemDtos
     );

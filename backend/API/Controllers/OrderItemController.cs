@@ -23,10 +23,10 @@ public class OrderItemController(IOrderItemService orderItemService) : BaseApiCo
     [HttpPost]
     [ProducesResponseType(typeof(OrderReadDto), 201)]
     [ProducesResponseType(400)]
-    public async Task<ActionResult<OrderReadDto>> AddOrderItems(
+    public async Task<ActionResult<OrderReadDto>> AddOrderItemsToOrder(
         [FromRoute] Guid orderId,
         [FromBody] List<OrderItemCreateDto> orderItemDtos
-    ) => HandleResult(await orderItemService.AddOrderItems(orderId, orderItemDtos));
+    ) => HandleResult(await orderItemService.AddOrderItemsToOrder(orderId, orderItemDtos));
 
     /// <summary>
     /// Retrieves a specific order item by ID.
