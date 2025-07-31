@@ -6,6 +6,7 @@ using Application.Dtos.Orders;
 using Application.Dtos.Orders.OrderDelivery;
 using Application.Dtos.Orders.OrderDineIn;
 using Application.Dtos.Orders.OrderTakeAway;
+using Application.Helpers;
 using AutoMapper;
 using Domain;
 using Infrastructure.Database;
@@ -43,11 +44,13 @@ public class OrderService(
 
             var dineInOrder = mapper.Map<Order>(dineInOrderDto);
 
-            dineInOrder.OrderItems = await PopulateOrderItemsAsync(
+            dineInOrder.OrderItems = await OrderCalculationHelper.PopulateOrderItemsAsync(
+                orderingContext,
                 dineInOrderDto.OrderItems,
                 dineInOrder.Id
             );
-            dineInOrder.TotalAmount = dineInOrder.OrderItems.Sum(oi => oi.Price);
+
+            dineInOrder.TotalAmount = OrderCalculationHelper.RecalculateOrderTotal(dineInOrder);
 
             table.Status = dineInOrder.OrderItems.Any()
                 ? TableStatus.PendingServingOrderItems
@@ -80,11 +83,14 @@ public class OrderService(
         {
             var takeawayOrder = mapper.Map<Order>(takeawayOrderDto);
 
-            takeawayOrder.OrderItems = await PopulateOrderItemsAsync(
+
+            takeawayOrder.OrderItems = await OrderCalculationHelper.PopulateOrderItemsAsync(
+                orderingContext,
                 takeawayOrderDto.OrderItems,
                 takeawayOrder.Id
             );
-            takeawayOrder.TotalAmount = takeawayOrder.OrderItems.Sum(oi => oi.Price);
+
+            takeawayOrder.TotalAmount = OrderCalculationHelper.RecalculateOrderTotal(takeawayOrder);
 
             var result = await orderingContext.Orders.AddAsync(takeawayOrder);
             await orderingContext.SaveChangesAsync();
@@ -113,11 +119,13 @@ public class OrderService(
         {
             var deliveryOrder = mapper.Map<Order>(deliveryOrderDto);
 
-            deliveryOrder.OrderItems = await PopulateOrderItemsAsync(
+            deliveryOrder.OrderItems = await OrderCalculationHelper.PopulateOrderItemsAsync(
+                orderingContext,
                 deliveryOrderDto.OrderItems,
                 deliveryOrder.Id
             );
-            deliveryOrder.TotalAmount = deliveryOrder.OrderItems.Sum(oi => oi.Price);
+
+            deliveryOrder.TotalAmount = OrderCalculationHelper.RecalculateOrderTotal(deliveryOrder);
 
             var result = await orderingContext.Orders.AddAsync(deliveryOrder);
             await orderingContext.SaveChangesAsync();
@@ -299,7 +307,7 @@ public class OrderService(
                 );
 
             order.Discount = discountPercentage;
-            order.TotalAmount = RecalculateOrderTotal(order);
+            order.TotalAmount = OrderCalculationHelper.RecalculateOrderTotal(order);
 
             await orderingContext.SaveChangesAsync();
 
@@ -605,7 +613,7 @@ public class OrderService(
                 // To fix? datetime shouldnt be set to now
                 newOrder.CreatedAt = DateTime.UtcNow;
                 newOrder.OrderItems = mapper.Map<List<OrderItem>>(itemsToMove);
-                newOrder.TotalAmount = Math.Max(0, newOrder.OrderItems.Sum(item => item.Price));
+                newOrder.TotalAmount = OrderCalculationHelper.RecalculateOrderTotal(newOrder);
 
                 // Remove from original
                 originalOrder.OrderItems.RemoveAll(oi => group.OrderItemIds.Contains(oi.Id));
@@ -615,7 +623,7 @@ public class OrderService(
             }
 
             // Recalculate original order total
-            originalOrder.TotalAmount = Math.Max(0, originalOrder.OrderItems.Sum(item => item.Price));
+            originalOrder.TotalAmount = OrderCalculationHelper.RecalculateOrderTotal(originalOrder);
             await orderingContext.SaveChangesAsync();
 
             // Fire events
@@ -674,7 +682,7 @@ public class OrderService(
 
             targetOrder.OrderItems.AddRange(sourceOrder.OrderItems);
 
-            targetOrder.TotalAmount = Math.Max(0, targetOrder.OrderItems.Sum(item => item.Price));
+            targetOrder.TotalAmount = OrderCalculationHelper.RecalculateOrderTotal(targetOrder);
 
             orderingContext.Orders.Remove(sourceOrder);
             await orderingContext.SaveChangesAsync();
@@ -746,8 +754,8 @@ public class OrderService(
             targetOrder.OrderItems.AddRange(itemsToMove);
             sourceOrder.OrderItems.RemoveAll(oi => itemsToMove.Contains(oi));
 
-            sourceOrder.TotalAmount = Math.Max(0, sourceOrder.OrderItems.Sum(item => item.Price));
-            targetOrder.TotalAmount = Math.Max(0, targetOrder.OrderItems.Sum(item => item.Price));
+            sourceOrder.TotalAmount = OrderCalculationHelper.RecalculateOrderTotal(sourceOrder);
+            targetOrder.TotalAmount = OrderCalculationHelper.RecalculateOrderTotal(targetOrder);
 
             await orderingContext.SaveChangesAsync();
 
@@ -795,87 +803,6 @@ public class OrderService(
                 HttpStatusCode.InternalServerError
             );
         }
-    }
-
-    private async Task<List<OrderItem>> PopulateOrderItemsAsync(
-        IEnumerable<OrderItemCreateDto> orderItemDtos,
-        Guid orderId
-    )
-    {
-        var menuItemIds = orderItemDtos.Select(oi => oi.MenuItemId).Distinct().ToList();
-
-        var menuItems = await orderingContext
-            .MenuItems.Where(mi => menuItemIds.Contains(mi.Id))
-            .Include(mi => mi.MenuItemIngredientRels)
-            .ThenInclude(rel => rel.Ingredient)
-            .ToDictionaryAsync(mi => mi.Id);
-
-        var allIngredientIds = orderItemDtos
-            .SelectMany(dto =>
-                dto.ExtraIngredients.Select(ei => ei.IngredientId).Concat(dto.RemovedIngredientIds)
-            )
-            .Distinct()
-            .ToList();
-
-        var allIngredients = await orderingContext
-            .Ingredients.Where(ing => allIngredientIds.Contains(ing.Id))
-            .ToDictionaryAsync(ing => ing.Id);
-
-        var orderItems = new List<OrderItem>();
-
-        foreach (var dto in orderItemDtos)
-        {
-            if (!menuItems.TryGetValue(dto.MenuItemId, out var menuItem))
-                throw new KeyNotFoundException($"MenuItem with ID {dto.MenuItemId} not found.");
-
-            var orderItem = new OrderItem
-            {
-                Id = Guid.NewGuid(),
-                OrderId = orderId,
-                MenuItemId = dto.MenuItemId,
-                SpecialInstructions = dto.SpecialInstructions,
-                Price = menuItem.Price,
-            };
-
-            // Handling Extra Ingredients
-            foreach (var extra in dto.ExtraIngredients)
-            {
-                if (allIngredients.TryGetValue(extra.IngredientId, out var ingredient))
-                {
-                    orderItem.Price += ingredient.Price * extra.Quantity;
-                    orderItem.ExtraIngredients.Add(
-                        new OrderItemIngredient
-                        {
-                            Id = Guid.NewGuid(),
-                            Name = ingredient.Name,
-                            Price = ingredient.Price,
-                            Quantity = extra.Quantity,
-                        }
-                    );
-                }
-            }
-
-            // Handling Removed Ingredients
-            foreach (var removedId in dto.RemovedIngredientIds)
-            {
-                if (allIngredients.TryGetValue(removedId, out var ingredient))
-                {
-                    orderItem.RemovedIngredients.Add(
-                        new OrderItemIngredient
-                        {
-                            Id = removedId,
-                            Name = ingredient.Name,
-                            Price = 0,
-                            Quantity = 1,
-                        }
-                    );
-                }
-            }
-
-            orderItems.Add(orderItem);
-        }
-
-        return orderItems;
     }
 
     private async Task HandleDineInTransition(Order order, Guid? tableId)
@@ -957,17 +884,5 @@ public class OrderService(
             order.CustomerInformation.AdditionalInstructions = additionalInstructions;
             order.CustomerInformation.Address = address;
         }
-    }
-
-    private decimal RecalculateOrderTotal(Order order)
-    {
-        var total = order.OrderItems.Sum(oi => oi.Price);
-
-        if (order.Discount > 0)
-        {
-            total = total * (1 - order.Discount / 100);
-        }
-
-        return total;
     }
 }
