@@ -23,59 +23,35 @@ public class MenuCategoryService(
     {
         try
         {
-            // Load all existing categories ordered by SequenceNumber
-            var categories = await orderingContext.MenuCategories
-                .OrderBy(c => c.SequenceNumber)
-                .ToListAsync();
+            int sequenceNumber;
 
-            int newSequenceNumber;
-
-            // Validate incoming SequenceNumber (must be >= 1)
             if (menuCategoryCreateDto.SequenceNumber.HasValue)
             {
-                newSequenceNumber = menuCategoryCreateDto.SequenceNumber.Value;
-
-                if (newSequenceNumber < 1)
+                var sequenceResult = await InsertMenuCategoryIntoSequenceAsync(null, menuCategoryCreateDto.SequenceNumber.Value);
+                if (!sequenceResult.IsSuccess)
                 {
-                    return ResultDto<MenuCategoryReadDto>.Failure(
-                        "SequenceNumber must be 1 or greater.",
-                        HttpStatusCode.BadRequest
-                    );
+                    return ResultDto<MenuCategoryReadDto>.Failure(sequenceResult.ErrorMessage!, sequenceResult.HttpStatusCode);
                 }
 
-                // If the requested number is greater than the last + 1 → reject (no gaps allowed)
-                var maxSequence = categories.Any() ? categories.Max(c => c.SequenceNumber) : 0;
-                if (newSequenceNumber > maxSequence + 1)
-                {
-                    return ResultDto<MenuCategoryReadDto>.Failure(
-                        $"SequenceNumber cannot skip positions. The next available position is {maxSequence + 1}.",
-                        HttpStatusCode.BadRequest
-                    );
-                }
-
-                // Shift all categories starting at the requested position
-                foreach (var category in categories.Where(c => c.SequenceNumber >= newSequenceNumber))
-                {
-                    category.SequenceNumber++;
-                }
+                sequenceNumber = sequenceResult.Data!;
             }
             else
             {
-                // If not specified, place it at the end (max + 1)
-                var maxSequence = categories.Any() ? categories.Max(c => c.SequenceNumber) : 0;
-                newSequenceNumber = maxSequence + 1;
+                // Get the next available position (no gaps)
+                var maxSequence = await orderingContext.MenuCategories
+                    .Where(c => !c.IsDeleted)
+                    .MaxAsync(c => (int?)c.SequenceNumber) ?? 0;
+
+                sequenceNumber = maxSequence + 1;
             }
 
-            // Create and set the sequence number
             var menuCategory = mapper.Map<MenuCategory>(menuCategoryCreateDto);
-            menuCategory.SequenceNumber = newSequenceNumber;
+            menuCategory.SequenceNumber = sequenceNumber;
 
             await orderingContext.MenuCategories.AddAsync(menuCategory);
-
             await orderingContext.SaveChangesAsync();
 
             var createdMenuCategory = mapper.Map<MenuCategoryReadDto>(menuCategory);
-
             var menuCategoryCreatedEvent = mapper.Map<MenuCategoryCreatedEvent>(menuCategory);
             await eventHandlerService.HandleEventAsync(menuCategoryCreatedEvent);
 
@@ -269,14 +245,33 @@ public class MenuCategoryService(
                     HttpStatusCode.NotFound
                 );
 
+
+            // Handle sequence change if requested
+            if (menuCategoryUpdateDto.SequenceNumber.HasValue)
+            {
+                var sequenceResult = await InsertMenuCategoryIntoSequenceAsync(
+                    id,
+                    menuCategoryUpdateDto.SequenceNumber.Value
+                );
+
+                if (!sequenceResult.IsSuccess)
+                {
+                    return ResultDto<MenuCategoryReadDto>.Failure(
+                        sequenceResult.ErrorMessage!,
+                        HttpStatusCode.BadRequest
+                    );
+                }
+
+                menuCategoryToUpdate.SequenceNumber = sequenceResult.Data!;
+            }
+
+            // Handle other fields
             mapper.Map(menuCategoryUpdateDto, menuCategoryToUpdate);
+
             await orderingContext.SaveChangesAsync();
 
             var updatedMenuCategory = mapper.Map<MenuCategoryReadDto>(menuCategoryToUpdate);
-
-            var menuCategoryUpdatedEvent = mapper.Map<MenuCategoryUpdatedEvent>(
-                menuCategoryToUpdate
-            );
+            var menuCategoryUpdatedEvent = mapper.Map<MenuCategoryUpdatedEvent>(menuCategoryToUpdate);
             await eventHandlerService.HandleEventAsync(menuCategoryUpdatedEvent);
 
             return ResultDto<MenuCategoryReadDto>.Success(updatedMenuCategory, HttpStatusCode.OK);
@@ -325,6 +320,49 @@ public class MenuCategoryService(
             );
         }
     }
+
+    private async Task<ResultDto<int>> InsertMenuCategoryIntoSequenceAsync(
+    Guid? updatingId, // null for Create, actual Id for Update
+    int requestedSequence
+)
+    {
+        if (requestedSequence < 1)
+        {
+            return ResultDto<int>.Failure("SequenceNumber must be 1 or greater.", HttpStatusCode.BadRequest);
+        }
+
+        var activeCategories = await orderingContext.MenuCategories
+            .Where(c => !c.IsDeleted && (!updatingId.HasValue || c.Id != updatingId.Value))
+            .OrderBy(c => c.SequenceNumber)
+            .ToListAsync();
+
+        int maxAllowed = activeCategories.Count + 1;
+
+        if (requestedSequence > maxAllowed)
+        {
+            return ResultDto<int>.Failure(
+                $"Invalid SequenceNumber. The allowed range is 1 to {maxAllowed}.",
+                HttpStatusCode.BadRequest
+            );
+        }
+
+        // Insert placeholder or updated category into list
+        activeCategories.Insert(requestedSequence - 1, null!); // null as placeholder
+
+        // Reassign 1..N
+        for (int i = 0; i < activeCategories.Count; i++)
+        {
+            if (activeCategories[i] != null)
+                activeCategories[i].SequenceNumber = i + 1;
+        }
+
+        // Save shifted categories
+        await orderingContext.SaveChangesAsync();
+
+        // Return the correct sequence number for the new/updated item
+        return ResultDto<int>.Success(requestedSequence, HttpStatusCode.OK);
+    }
+
 
     private async Task NormalizeMenuCategorySequenceAsync()
     {
