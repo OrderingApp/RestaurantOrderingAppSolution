@@ -7,7 +7,7 @@ public class TakeawayOrderCreateDtoValidator : AbstractValidator<TakeawayOrderCr
 {
     public TakeawayOrderCreateDtoValidator()
     {
-        RuleFor(x => x.DateTime)
+        RuleFor(x => x.CreatedAt)
             .NotEmpty()
             .WithMessage("OrderDateTime is required.")
             .Must(BeAValidDate)

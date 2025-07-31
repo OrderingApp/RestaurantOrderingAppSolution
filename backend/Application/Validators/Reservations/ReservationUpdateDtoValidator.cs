@@ -5,10 +5,10 @@ public class ReservationUpdateDtoValidator : AbstractValidator<ReservationUpdate
 {
     public ReservationUpdateDtoValidator()
     {
-        RuleFor(x => x.DateTime)
+        RuleFor(x => x.ScheduledFor)
             .GreaterThan(DateTime.UtcNow)
             .WithMessage("Reservation date and time must be in the future.")
-            .When(x => x.DateTime.HasValue);
+            .When(x => x.ScheduledFor.HasValue);
 
         RuleFor(x => x.CapacityNeeded)
             .GreaterThan(0)

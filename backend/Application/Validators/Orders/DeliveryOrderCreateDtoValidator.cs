@@ -7,7 +7,7 @@ public class DeliveryOrderCreateDtoValidator : AbstractValidator<DeliveryOrderCr
 {
     public DeliveryOrderCreateDtoValidator()
     {
-        RuleFor(x => x.DateTime)
+        RuleFor(x => x.CreatedAt)
             .NotEmpty()
             .WithMessage("Order date and time is required.")
             .Must(BeAValidDate)

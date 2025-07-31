@@ -17,7 +17,7 @@ public class ReservationCreateDtoValidator : AbstractValidator<ReservationCreate
             .MaximumLength(100)
             .WithMessage("Name must not exceed 100 characters.");
 
-        RuleFor(x => x.DateTime)
+        RuleFor(x => x.ScheduledFor)
             .NotNull()
             .WithMessage("Reservation date and time is required.")
             .GreaterThan(DateTime.UtcNow)

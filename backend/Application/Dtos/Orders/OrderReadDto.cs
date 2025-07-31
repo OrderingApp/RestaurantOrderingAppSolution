@@ -6,7 +6,7 @@ namespace Application.Dtos.Orders;
 public class OrderReadDto
 {
     public Guid Id { get; set; }
-    public DateTime DateTime { get; set; }
+    public DateTime CreatedAt { get; set; }
     public decimal TotalAmount { get; set; }
     public decimal Discount { get; set; }
     public string OrderStatus { get; set; } = null!;

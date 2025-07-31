@@ -10,7 +10,7 @@ public class DineInOrderMappingProfile : Profile
     public DineInOrderMappingProfile()
     {
         CreateMap<Order, OrderReadDto>()
-            .ForMember(dest => dest.DateTime, opt => opt.MapFrom(src => src.DateTime))
+            .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
             .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Status.ToString()))
             .ForMember(dest => dest.OrderType, opt => opt.MapFrom(src => src.Type.ToString()))
             .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems))

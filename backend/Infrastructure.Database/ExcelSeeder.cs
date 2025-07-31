@@ -297,7 +297,7 @@ public class ExcelSeeder
                         new Order
                         {
                             Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
-                            DateTime = DateTime.Parse(sheet.Cells[row, 2].Text),
+                            CreatedAt = DateTime.Parse(sheet.Cells[row, 2].Text),
                             TotalAmount = TryParseDecimal(sheet.Cells[row, 3].Text),
                             Discount = TryParseDecimal(sheet.Cells[row, 4].Text),
                             DeliveryPrice = TryParseDecimal(sheet.Cells[row, 5].Text),
@@ -381,7 +381,7 @@ public class ExcelSeeder
                             Id = TryParseGuid(sheet.Cells[row, 1].Text) ?? Guid.NewGuid(),
                             PhoneNumber = sheet.Cells[row, 2].Text,
                             Name = sheet.Cells[row, 3].Text,
-                            DateTime = DateTime.Parse(sheet.Cells[row, 4].Text),
+                            CreatedAt = DateTime.Parse(sheet.Cells[row, 4].Text),
                             CapacityNeeded = int.Parse(sheet.Cells[row, 5].Text),
                             IsAssigned = TryParseBool(sheet.Cells[row, 6].Text),
                             TableId = TryParseGuid(sheet.Cells[row, 7].Text),

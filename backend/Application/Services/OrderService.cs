@@ -215,18 +215,18 @@ public class OrderService(
             var ongoingOrdersQuery = orderingContext.Orders.Where(o =>
                 o.Type == orderType
                 && o.Status == OrderStatus.Ongoing
-                && o.DateTime >= date
-                && o.DateTime < nextDay
+                && o.CreatedAt >= date
+                && o.CreatedAt < nextDay
             );
 
             var closedOrdersQuery = orderingContext
                 .Orders.Where(o =>
                     o.Type == orderType
                     && o.Status == OrderStatus.Closed
-                    && o.DateTime >= date
-                    && o.DateTime < nextDay
+                    && o.CreatedAt >= date
+                    && o.CreatedAt < nextDay
                 )
-                .OrderByDescending(o => o.DateTime)
+                .OrderByDescending(o => o.CreatedAt)
                 .Take(10);
 
             var ordersQuery = ongoingOrdersQuery
@@ -603,7 +603,7 @@ public class OrderService(
                 var newOrder = mapper.Map<Order, Order>(originalOrder);
                 newOrder.Id = Guid.NewGuid();
                 // To fix? datetime shouldnt be set to now
-                newOrder.DateTime = DateTime.UtcNow;
+                newOrder.CreatedAt = DateTime.UtcNow;
                 newOrder.OrderItems = mapper.Map<List<OrderItem>>(itemsToMove);
                 newOrder.TotalAmount = Math.Max(0, newOrder.OrderItems.Sum(item => item.Price));
 

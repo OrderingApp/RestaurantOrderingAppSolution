@@ -3,7 +3,8 @@
 public class Order
 {
     public Guid Id { get; set; }
-    public DateTime DateTime { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? LastModified { get; set; }
 
     public decimal TotalAmount { get; set; }
     public decimal Discount { get; set; }
