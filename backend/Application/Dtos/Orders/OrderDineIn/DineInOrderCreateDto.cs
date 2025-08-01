@@ -6,5 +6,6 @@ public class DineInOrderCreateDto
 {
     public DateTime CreatedAt { get; set; }
     public Guid TableId { get; set; }
+    public decimal? Discount { get; set; }
     public List<OrderItemCreateDto> OrderItems { get; set; } = new List<OrderItemCreateDto>();
 }

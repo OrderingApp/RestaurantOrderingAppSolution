@@ -172,7 +172,6 @@ public class OrderService(
         }
     }
 
-    // Do we actually need this? we have other queries for orders in app
     public async Task<ResultDto<List<OrderReadDto>>> GetOrders(OrderStatus? orderStatus)
     {
         try
@@ -472,11 +471,19 @@ public class OrderService(
 
             order.Status = newStatus;
 
-            // We need to check if table have other orders than this only
-            if (newStatus == OrderStatus.Closed && order.Table != null)
+            if (newStatus == OrderStatus.Closed && order.TableId != null)
             {
-                order.Table.Status = TableStatus.Available;
-                orderingContext.Tables.Update(order.Table);
+                var otherOpenOrdersExist = await orderingContext.Orders.AnyAsync(o =>
+                    o.TableId == order.TableId &&
+                    o.Id != order.Id &&
+                    o.Status != OrderStatus.Closed
+                );
+
+                if (!otherOpenOrdersExist)
+                {
+                    order.Table!.Status = TableStatus.Available;
+                    orderingContext.Tables.Update(order.Table);
+                }
             }
 
             await orderingContext.SaveChangesAsync();
