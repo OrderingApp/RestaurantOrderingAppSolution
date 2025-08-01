@@ -79,7 +79,7 @@ public class ReservationService(
         try
         {
             var reservations = await orderingContext
-                .Reservations.Where(r => r.ScheduledFor.Date == date.Date)
+                .Reservations.Where(r => r.ScheduledFor.Date == date.Date && !r.IsAssigned)
                 .Include(r => r.Table)
                 .ToListAsync();
 
@@ -96,8 +96,7 @@ public class ReservationService(
         }
     }
 
-    // fix name it should be assign reservation to table not reverse
-    public async Task<ResultDto<ReservationReadDto>> AssignTableToReservation(Guid id, Guid tableId)
+    public async Task<ResultDto<ReservationReadDto>> AssignReservationToTable(Guid id, Guid tableId)
     {
         try
         {

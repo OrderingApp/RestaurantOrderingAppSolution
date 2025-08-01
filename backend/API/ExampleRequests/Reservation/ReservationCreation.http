@@ -10,8 +10,8 @@ Accept: application/json
 
 {
   "phoneNumber": "123456789",
-  "name": "Smith",
-  "dateTime": "2025-02-10T19:00:00Z",
+  "name": "Tom",
+  "scheduledFor": "2025-08-01T19:00:00Z",
   "capacityNeeded": 4
 }
 

@@ -12,6 +12,6 @@ public interface IReservationService
         Guid id,
         ReservationUpdateDto reservationUpdate
     );
-    Task<ResultDto<ReservationReadDto>> AssignTableToReservation(Guid id, Guid tableId);
+    Task<ResultDto<ReservationReadDto>> AssignReservationToTable(Guid id, Guid tableId);
     Task<ResultDto<bool>> DeleteReservation(Guid id);
 }

@@ -61,8 +61,8 @@ public class ReservationController(IReservationService reservationService) : Bas
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> AssignTableToReservation(Guid id, Guid tableId) =>
-        HandleResult(await reservationService.AssignTableToReservation(id, tableId));
+    public async Task<IActionResult> AssignReservationToTable(Guid id, Guid tableId) =>
+        HandleResult(await reservationService.AssignReservationToTable(id, tableId));
 
     /// <summary>
     /// Updates a reservation.
