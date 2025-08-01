@@ -144,7 +144,6 @@ public class MenuCategoryService(
         }
     }
 
-    // Check if you need both methods
     public async Task<PagedResultDto<MenuCategoryHierarchyReadDto>> GetMenuCategoriesWithHierarchy(
         GetMenuCategoryHierarchyRequest request
     )

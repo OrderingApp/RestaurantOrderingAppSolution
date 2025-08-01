@@ -103,7 +103,6 @@ public class IngredientService(
         }
     }
 
-    // Reconsider if you need to AddTagsToIngredient not just AddTagToIngredient do you need to add more than one tag at once
     public async Task<ResultDto<IngredientReadDto>> AddTagsToIngredient(Guid id, List<Guid> tagIds)
     {
         try
