@@ -617,7 +617,6 @@ public class OrderService(
 
                 var newOrder = mapper.Map<Order, Order>(originalOrder);
                 newOrder.Id = Guid.NewGuid();
-                // To fix? datetime shouldnt be set to now
                 newOrder.CreatedAt = DateTime.UtcNow;
                 newOrder.OrderItems = mapper.Map<List<OrderItem>>(itemsToMove);
                 newOrder.TotalAmount = OrderCalculationHelper.RecalculateOrderTotal(newOrder);

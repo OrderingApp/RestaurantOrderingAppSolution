@@ -42,6 +42,7 @@ public static class OrderCalculationHelper
             {
                 Id = Guid.NewGuid(),
                 OrderId = orderId,
+                Discount = dto.Discount ?? 0,
                 MenuItemId = dto.MenuItemId,
                 SpecialInstructions = dto.SpecialInstructions,
                 Price = menuItem.Price,
@@ -92,13 +93,22 @@ public static class OrderCalculationHelper
         MenuItem menuItem
     )
     {
-        var removableIngredients = menuItem.MenuItemIngredientRels
-            .Select(r => r.Ingredient)
-            .Where(i => dto.RemovedIngredientIds.Contains(i.Id))
-            .ToList();
+        var menuIngredientIds = menuItem.MenuItemIngredientRels
+            .Select(rel => rel.IngredientId)
+            .ToHashSet();
 
-        foreach (var ingredient in removableIngredients)
+        foreach (var removedId in dto.RemovedIngredientIds)
         {
+            if (!menuIngredientIds.Contains(removedId))
+            {
+                throw new InvalidOperationException(
+                    $"Ingredient {removedId} cannot be removed because it's not part of the MenuItem."
+                );
+            }
+
+            var ingredient = menuItem.MenuItemIngredientRels
+                .First(rel => rel.IngredientId == removedId).Ingredient;
+
             orderItem.RemovedIngredients.Add(new OrderItemIngredient
             {
                 Id = Guid.NewGuid(),
@@ -108,6 +118,7 @@ public static class OrderCalculationHelper
             });
         }
     }
+
 
     public static decimal RecalculateOrderTotal(Order order)
     {

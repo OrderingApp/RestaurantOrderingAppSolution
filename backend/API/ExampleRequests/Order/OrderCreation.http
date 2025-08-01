@@ -14,6 +14,7 @@ Accept: application/json
   "orderItems": [
     {
       "menuItemId": "0026375D-9736-4B94-ABA5-3E7644643DFF",
+      "discount": 30,
       "specialInstructions": "No onions, extra cheese",
       "extraIngredients": [
         {
