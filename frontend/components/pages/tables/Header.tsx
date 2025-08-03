@@ -1,34 +1,67 @@
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Button from '@/components/shared/button/Button';
 
 import EditIcon from '@/public/images/svg/edit.svg';
-import { useEffect, useRef, useState } from 'react';
-import { cn } from '@/lib/utils';
 
+export type TabValue = (typeof tabsMock)[number]['value'];
 interface TablesHeaderProps {
-    onTabChange: (newTab: (typeof tabsMock)[number]['value']) => void;
+    onTabChange: (newTabValue: TabValue) => void;
 }
 
 const TablesHeader = ({ onTabChange }: TablesHeaderProps) => {
     const [isDesktopAndOverflowing, setIsDesktopAndOverflowing] =
         useState(false);
+    const [activeTabValue, setActiveTabValue] = useState(tabsMock[0].value);
     const tabsRef = useRef<HTMLDivElement>(null);
 
+    // Check overflow
     useEffect(() => {
-        if (!tabsRef.current) return;
+        const checkOverflow = () => {
+            if (!tabsRef.current) return;
 
-        const isTouchDevice =
-            'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const isTouchDevice =
+                'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-        if (isTouchDevice) return;
+            if (isTouchDevice) return setIsDesktopAndOverflowing(false);
 
-        const isOverflowing =
-            tabsRef.current.scrollWidth > tabsRef.current.clientWidth;
+            const isOverflowing =
+                tabsRef.current.scrollWidth > tabsRef.current.clientWidth;
 
-        setIsDesktopAndOverflowing(isOverflowing);
+            setIsDesktopAndOverflowing(isOverflowing);
+        };
+
+        checkOverflow();
+        window.addEventListener('resize', checkOverflow);
+
+        return () => {
+            window.removeEventListener('resize', checkOverflow);
+        };
     }, []);
+
+    // Scroll to active tab
+    useEffect(() => {
+        if (!tabsRef.current || !activeTabValue) return;
+
+        const activeTabTrigger = tabsRef.current.querySelector(
+            `[data-state="active"]`
+        );
+
+        if (!activeTabTrigger) return;
+
+        activeTabTrigger.scrollIntoView({
+            behavior: 'smooth',
+            inline: 'nearest',
+        });
+    }, [activeTabValue]);
+
+    const handleTabChange = (newTabValue: TabValue) => {
+        setActiveTabValue(newTabValue);
+        onTabChange(newTabValue);
+    };
 
     return (
         <header
@@ -37,11 +70,11 @@ const TablesHeader = ({ onTabChange }: TablesHeaderProps) => {
                 isDesktopAndOverflowing ? 'mb-3.5' : 'mb-2'
             )}
         >
-            {/* [PRIO-1] TODO: add skeleton for tags */}
+            {/* [PRIO-1] TODO: add skeleton for tabs -- blocked by lack of API endpoint */}
             <Tabs
                 ref={tabsRef}
-                defaultValue={tabsMock[0].value}
-                onValueChange={onTabChange}
+                value={activeTabValue}
+                onValueChange={handleTabChange}
                 className={cn(
                     'max-w-[547px] pb-2 overflow-x-auto scrollbar',
                     isDesktopAndOverflowing ? '-mb-3.5' : '-mb-2'
@@ -77,6 +110,7 @@ const tabsMock = [
     { label: 'Bilardownia', value: 'bilardownia' },
     { label: 'Góra', value: 'góra' },
     { label: 'Ogródek', value: 'ogródek' },
+    { label: 'Przód', value: 'przód' },
 ];
 
 export default TablesHeader;
