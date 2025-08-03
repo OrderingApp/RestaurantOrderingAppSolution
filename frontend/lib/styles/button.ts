@@ -9,11 +9,13 @@ const btnStyles: {
     variants: {
         primary: 'bg-primary text-white',
         tertiary: 'bg-tertiary text-white',
+        quaternary: 'bg-quaternary text-white',
         success: 'bg-[#2B622F] text-white',
         danger: 'bg-danger text-white ',
         outline: 'bg-white shadow-lg text-black border border-gray-200',
     },
     sizes: {
+        xxs: 'p-2',
         xs: 'py-3 px-[60px] text-sm rounded-xl shadow-[0px_0px_5px_0px_#6A6A6A]',
         sm: 'w-[10.5rem] h-[3.125rem] text-[1rem] shadow-[0px_4px_4px_0px_#00000040]',
         md: 'w-[11.25rem] h-[3.75rem] text-[1rem] rounded-lg shadow-[0px_4px_4px_0px_#00000040]',

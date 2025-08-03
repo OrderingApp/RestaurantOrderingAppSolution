@@ -3,10 +3,12 @@ export interface BasicStyles {
         primary: string;
         secondary: string;
         tertiary: string;
+        quaternary: string;
         success: string;
         danger: string;
     };
     sizes: {
+        xxs: string;
         xs: string;
         sm: string;
         md: string;
