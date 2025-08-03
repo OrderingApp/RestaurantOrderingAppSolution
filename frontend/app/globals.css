@@ -38,6 +38,24 @@ body {
     }
 }
 
+.scrollbar::-webkit-scrollbar {
+    height: 6px;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 9999px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scrollbar {
+    scrollbar-color: var(--primary) transparent;
+    scrollbar-width: thin;
+}
+
 .hide-input-number-icon {
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
