@@ -84,7 +84,6 @@ export interface languagePack {
         orderDelivery: string;
         createOrder: string;
         editOrder: string;
-        deleteOrder: string;
         payment: string;
         orderCard: {
             pickup: string;
@@ -97,9 +96,17 @@ export interface languagePack {
         paymentByCard: string;
         paymentByCash: string;
     };
+    paymentDetails: {
+        bill: string;
+        product: string;
+        quantity: string;
+        productPrice: string;
+        total: string;
+    };
+
     discountModal: {
         disscountTitle: string;
-    }
+    };
 }
 
 interface loginPageFormFields {

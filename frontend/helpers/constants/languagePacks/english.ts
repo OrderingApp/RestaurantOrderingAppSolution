@@ -83,8 +83,8 @@ const enPack: languagePack = {
         orderDelivery: 'Delivery',
         createOrder: 'Create',
         editOrder: 'Edit',
-        deleteOrder: 'Delete',
-        payment: 'Payment',
+
+        payment: 'Close Order',
         orderCard: {
             pickup: 'Pickup',
             delivery: 'Delivery',
@@ -96,9 +96,16 @@ const enPack: languagePack = {
         paymentByCard: 'Pay by Card/BLIK',
         paymentByCash: 'Pay by Cash',
     },
+    paymentDetails: {
+        bill: 'Bill',
+        product: 'Product',
+        quantity: 'Quantity',
+        productPrice: 'Product Price',
+        total: 'Total',
+    },
     discountModal: {
-        disscountTitle: "Add discount",
-    }
+        disscountTitle: 'Add discount',
+    },
 };
 
 export default enPack;

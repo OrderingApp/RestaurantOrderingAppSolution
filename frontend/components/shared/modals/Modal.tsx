@@ -9,7 +9,7 @@ const Modal = ({
     onClose: () => void;
 }) =>
     createPortal(
-        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
+        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-100">
             <div
                 onClick={onClose}
                 className="absolute top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.8)]"

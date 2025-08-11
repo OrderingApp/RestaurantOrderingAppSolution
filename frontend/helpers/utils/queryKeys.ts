@@ -14,6 +14,7 @@ enum MENU_ITEMS {
 
 enum ORDERS_KEYS {
     BY_TYPE = 'orderType',
+    BY_ID = 'orderId',
 }
 
 const QUERY_KEYS = {

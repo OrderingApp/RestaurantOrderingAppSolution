@@ -10,7 +10,13 @@ import Input from '../Input/Input';
 import useLanguage from '@/helpers/hooks/useLanguage';
 import languagePacks from '@/helpers/constants/languagePacks';
 
-const Payment = ({ onClick }: { onClick: () => void }) => {
+const Payment = ({
+    onClick,
+    totalAmount,
+}: {
+    onClick: () => void;
+    totalAmount: number;
+}) => {
     const { language } = useLanguage();
     const {
         paymentModal: { title, inputLabel, paymentByCard, paymentByCash },
@@ -37,6 +43,7 @@ const Payment = ({ onClick }: { onClick: () => void }) => {
                         type="number"
                         label={inputLabel}
                         min={1}
+                        defaultValue={totalAmount}
                         variant="secondary"
                         inputClassName="w-full"
                         labelClassName="text-xl font-bold text-center pb-4"
