@@ -83,18 +83,25 @@ const plPack: languagePack = {
         orderDelivery: 'Dowóz',
         createOrder: 'Utwórz',
         editOrder: 'Edytuj',
-        deleteOrder: 'Usuń',
-        payment: 'Płatność',
+        payment: 'Zamknij zamówienie',
         orderCard: {
             pickup: 'Odbiór',
             delivery: 'Dostawa',
         },
+        asideTitle: 'Zamówienie',
     },
     paymentModal: {
         title: 'Wybierz Formę Płatnośći',
         inputLabel: 'Wpisz wartość',
         paymentByCard: 'Płatność Kartą/Blikiem',
         paymentByCash: 'Płatność Gotówką',
+    },
+    paymentDetails: {
+        bill: 'Rachunek',
+        product: 'Produkt',
+        quantity: 'Ilość',
+        productPrice: 'Cena za produkt',
+        total: 'Razem',
     },
     discountModal: {
         disscountTitle: 'Dodaj zniżkę',

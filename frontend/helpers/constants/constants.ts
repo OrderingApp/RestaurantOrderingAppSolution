@@ -50,6 +50,8 @@ export enum SEARCH_PARAMS_NAMES {
     ORDER_TYPE = 'orderType',
     ORDER_ID = 'orderId',
     MODAL = 'modal',
+    PAYMENT = 'payment',
+    CLOSE_ORDER = 'closeOrder',
 }
 
 export enum MENU_CATEGORY_NAMES {
