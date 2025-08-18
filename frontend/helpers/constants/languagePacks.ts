@@ -89,6 +89,7 @@ export interface languagePack {
             pickup: string;
             delivery: string;
         };
+        asideTitle: string;
     };
     paymentModal: {
         title: string;

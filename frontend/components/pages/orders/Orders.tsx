@@ -13,7 +13,7 @@ import languagePacks from '@/helpers/constants/languagePacks';
 import useLanguage from '@/helpers/hooks/useLanguage';
 import useQueryOrdersByType from '@/helpers/queries/orders/useQueryOrders';
 
-import Button from '@/components/shared/Button/Button';
+import Button from '@/components/shared/button/Button';
 import OverviewModal from '@/components/shared/modals/OverviewModal';
 import ToggleSwitch from '@/components/shared/toggleSwitch/ToggleSwitch';
 import Menu from '../menu/Menu';
@@ -30,13 +30,16 @@ const Orders = () => {
 
     const [selectedId, setSelectedId] = useState<string | null>(null);
 
-    const orderId = useSearchParams().get(SEARCH_PARAMS_NAMES.ORDER_ID);
-    const modal = useSearchParams().get(SEARCH_PARAMS_NAMES.MODAL);
-    const closeOrder = useSearchParams().get('closeOrder');
+    const params = Object.fromEntries(searchParams.entries());
 
-    const orderType =
-        useSearchParams().get(SEARCH_PARAMS_NAMES.ORDER_TYPE) ||
-        ordersTypes[language][0]?.id;
+    const {
+        [SEARCH_PARAMS_NAMES.ORDER_ID]: orderId,
+        [SEARCH_PARAMS_NAMES.MODAL]: modal,
+        [SEARCH_PARAMS_NAMES.CLOSE_ORDER]: closeOrder,
+        [SEARCH_PARAMS_NAMES.ORDER_TYPE]: orderTypeParam,
+    } = params;
+
+    const orderType = orderTypeParam || ordersTypes[language][0]?.id;
 
     const { data } = useQueryOrdersByType(orderType);
 
@@ -47,6 +50,7 @@ const Orders = () => {
             createOrder,
             editOrder,
             payment,
+            asideTitle,
         },
     } = languagePacks[language];
 
@@ -56,22 +60,18 @@ const Orders = () => {
     const onGoingOrders = filterDataByStatus(FILTER_STATUS.ONGOING);
     const closedOrders = filterDataByStatus(FILTER_STATUS.CLOSED);
 
-    const toggleQueryParam = (
-        paramName: string,
-        value: string | null = 'true'
-    ) => {
+    const toggleQueryParam = (paramName: string, value: string = 'true') => {
         const params = new URLSearchParams(searchParams.toString());
 
         if (params.get(paramName) === value) {
             params.delete(paramName);
         } else {
-            if (value !== null) {
-                params.set(paramName, value);
-            }
+            params.set(paramName, value);
         }
 
         router.push(`/orders?${params.toString()}`);
     };
+
     const toggleSelected = (id: string) => {
         const params = new URLSearchParams(searchParams.toString());
 
@@ -120,6 +120,7 @@ const Orders = () => {
         {
             children: 'Płatność',
             onClick: () => finalizePayment(),
+            variant: 'primary',
         },
     ];
 
@@ -270,33 +271,12 @@ const Orders = () => {
         },
     ];
 
-    const invoiceItems = [
-        {
-            product: 'Pizza Margheritta',
-            quantity: 3,
-            pricePerUnit: 33,
-            total: 99,
-        },
-        {
-            product: 'Pizza Margheritta',
-            quantity: 3,
-            pricePerUnit: 33,
-            total: 99,
-        },
-        {
-            product: 'Pizza Margheritta',
-            quantity: 3,
-            pricePerUnit: 33,
-            total: 99,
-        },
-    ];
-
     if (modal === 'true') {
         return (
             <OverviewModal>
                 <Menu variant="order">
                     <DetailsAside
-                        title="Odbiór"
+                        title={asideTitle}
                         items={orders}
                         price={3}
                         currency="pln"
@@ -310,9 +290,9 @@ const Orders = () => {
     if (closeOrder === 'true') {
         return (
             <OverviewModal>
-                <PaymentDetails items={invoiceItems}>
+                <PaymentDetails>
                     <DetailsAside
-                        title="stolik b2"
+                        title={asideTitle}
                         items={items}
                         served={true}
                         buttons={buttonsPayment}
@@ -326,7 +306,7 @@ const Orders = () => {
         <div className="flex flex-col h-full p-4 pb-0">
             <div className="flex p-4 justify-between items-center">
                 <ToggleSwitch items={ordersTypes[language]} />
-                <ul className="flex gap-4">
+                <div className="flex gap-4">
                     <Button onClick={toggleModal} variant="primary">
                         {orderId ? editOrder : createOrder}
                     </Button>
@@ -335,7 +315,7 @@ const Orders = () => {
                             {payment}
                         </Button>
                     )}
-                </ul>
+                </div>
             </div>
             <div className="flex justify-around w-full mt-20 h-full">
                 <div className="flex-1 text-center text-5xl">
@@ -361,3 +341,5 @@ const Orders = () => {
 };
 
 export default Orders;
+
+//TODO change details aside

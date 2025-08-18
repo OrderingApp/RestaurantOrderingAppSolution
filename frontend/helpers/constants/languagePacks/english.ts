@@ -89,6 +89,7 @@ const enPack: languagePack = {
             pickup: 'Pickup',
             delivery: 'Delivery',
         },
+        asideTitle: 'Order',
     },
     paymentModal: {
         title: 'Choose Payment Method',

@@ -10,13 +10,12 @@ import Input from '../Input/Input';
 import useLanguage from '@/helpers/hooks/useLanguage';
 import languagePacks from '@/helpers/constants/languagePacks';
 
-const Payment = ({
-    onClick,
-    totalAmount,
-}: {
+interface PaymentProps {
     onClick: () => void;
     totalAmount: number;
-}) => {
+}
+
+const Payment = ({ onClick, totalAmount }: PaymentProps) => {
     const { language } = useLanguage();
     const {
         paymentModal: { title, inputLabel, paymentByCard, paymentByCash },

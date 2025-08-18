@@ -88,6 +88,7 @@ const plPack: languagePack = {
             pickup: 'Odbiór',
             delivery: 'Dostawa',
         },
+        asideTitle: 'Zamówienie',
     },
     paymentModal: {
         title: 'Wybierz Formę Płatnośći',
