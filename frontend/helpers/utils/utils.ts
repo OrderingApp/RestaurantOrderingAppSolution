@@ -1,4 +1,6 @@
+import { ReadonlyURLSearchParams } from 'next/navigation';
 import { BACKEND_PATHS, BACKEND_URL } from '../constants/constants';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
 /**
  * Converts a camelCase string to kebab-case.
@@ -42,4 +44,22 @@ export const getPluralForm = (
         return titles[2];
 
     return titles[0];
+};
+
+export const toggleQueryParam = (
+    paramName: string,
+    value: string | undefined = undefined,
+    searchParams: ReadonlyURLSearchParams,
+    router: AppRouterInstance,
+    pathname: string
+) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (value === undefined || params.get(paramName) === value) {
+        params.delete(paramName);
+    } else {
+        params.set(paramName, value);
+    }
+
+    router.push(`${pathname}?${params.toString()}`);
 };

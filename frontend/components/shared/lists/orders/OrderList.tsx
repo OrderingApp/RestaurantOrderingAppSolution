@@ -8,7 +8,7 @@ interface OrderListPops {
 
 const OrderList = ({ orders, toggleSelected, selectedId }: OrderListPops) => {
     return (
-        <ul className="flex mt-5 gap-2">
+        <ul className="grid grid-cols-3 mt-5 gap-2">
             {orders?.map((order) => (
                 <OrderCard
                     onClick={() => toggleSelected(order.id)}

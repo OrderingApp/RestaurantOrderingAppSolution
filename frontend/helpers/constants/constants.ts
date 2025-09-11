@@ -49,9 +49,11 @@ export enum SEARCH_PARAMS_NAMES {
     TAG = 'tag',
     ORDER_TYPE = 'orderType',
     ORDER_ID = 'orderId',
+    MENU_ITEM_ID = 'menuItemId',
     MODAL = 'modal',
     PAYMENT = 'payment',
     CLOSE_ORDER = 'closeOrder',
+    OPTIONS = 'options',
 }
 
 export enum MENU_CATEGORY_NAMES {

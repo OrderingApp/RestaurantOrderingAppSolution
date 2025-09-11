@@ -50,7 +50,7 @@ const Item = ({
     return isList(props) || isSingleItem ? (
         <button
             onClick={(e) => props.onClick(props.id || e)}
-            className={`grid grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-0.5 py-2 px-2 shadow-[0px_0px_7px_0px_rgba(0,_0,_0,_0.4)] ${className}`}
+            className={`grid grid-cols-[1fr_auto_auto] items-center w-full gap-x-4 gap-y-0.5 py-2 px-2 shadow-[0px_0px_7px_0px_rgba(0,_0,_0,_0.4)] ${className}`}
         >
             <dt className="justify-self-start text-left text-balance font-bold leading-none">
                 {capitalizeFirstLetter(name)}

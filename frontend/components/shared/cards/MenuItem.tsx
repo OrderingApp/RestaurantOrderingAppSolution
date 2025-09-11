@@ -40,7 +40,7 @@ const MenuItem = ({ id, name, price, variant, handleClick }: MenuItemProps) => {
 
     const newItem = {
         id,
-        name: name,
+        name,
         price,
         discount: 0,
         quantity: inputValue,

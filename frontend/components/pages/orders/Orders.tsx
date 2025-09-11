@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import {
     CURRENCIES,
@@ -16,16 +16,19 @@ import useQueryOrdersByType from '@/helpers/queries/orders/useQueryOrders';
 import Button from '@/components/shared/button/Button';
 import OverviewModal from '@/components/shared/modals/OverviewModal';
 import ToggleSwitch from '@/components/shared/toggleSwitch/ToggleSwitch';
-import Menu from '../menu/Menu';
+
 import DetailsAside from '@/components/shared/asides/Details';
-import { useOrdersContext } from '@/providers/OrdersContext';
+
 import OrderList from '@/components/shared/lists/orders/OrderList';
 import PaymentDetails from '@/components/shared/modals/PaymentDetails';
+import EditOrder from './EditOrder';
+import CreateOrder from './CreateOrder';
+import { toggleQueryParam } from '@/helpers/utils/utils';
 
 const Orders = () => {
     const { language } = useLanguage();
-    const { orders } = useOrdersContext();
     const searchParams = useSearchParams();
+    const pathname = usePathname();
     const router = useRouter();
 
     const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -60,18 +63,6 @@ const Orders = () => {
     const onGoingOrders = filterDataByStatus(FILTER_STATUS.ONGOING);
     const closedOrders = filterDataByStatus(FILTER_STATUS.CLOSED);
 
-    const toggleQueryParam = (paramName: string, value: string = 'true') => {
-        const params = new URLSearchParams(searchParams.toString());
-
-        if (params.get(paramName) === value) {
-            params.delete(paramName);
-        } else {
-            params.set(paramName, value);
-        }
-
-        router.push(`/orders?${params.toString()}`);
-    };
-
     const toggleSelected = (id: string) => {
         const params = new URLSearchParams(searchParams.toString());
 
@@ -86,30 +77,34 @@ const Orders = () => {
     };
 
     const toggleModal = () => {
-        toggleQueryParam('modal');
+        toggleQueryParam(
+            SEARCH_PARAMS_NAMES.MODAL,
+            'true',
+            searchParams,
+            router,
+            pathname
+        );
     };
 
     const closeOrderHandler = () => {
-        toggleQueryParam('closeOrder');
+        toggleQueryParam(
+            SEARCH_PARAMS_NAMES.CLOSE_ORDER,
+            'true',
+            searchParams,
+            router,
+            pathname
+        );
     };
 
     const finalizePayment = () => {
-        toggleQueryParam('payment');
+        toggleQueryParam(
+            SEARCH_PARAMS_NAMES.PAYMENT,
+            'true',
+            searchParams,
+            router,
+            pathname
+        );
     };
-
-    const buttons = [
-        {
-            children: 'Dodaj zniżkę',
-        },
-        {
-            children: 'Zatwierdź',
-        },
-        {
-            children: 'Zamknij bez zmian',
-            onClick: () => toggleModal(),
-            variant: 'tertiary',
-        },
-    ];
 
     const buttonsPayment = [
         {
@@ -271,18 +266,18 @@ const Orders = () => {
         },
     ];
 
-    if (modal === 'true') {
+    if (modal === 'true' && !orderId) {
         return (
             <OverviewModal>
-                <Menu variant="order">
-                    <DetailsAside
-                        title={asideTitle}
-                        items={orders}
-                        price={3}
-                        currency="pln"
-                        buttons={buttons}
-                    />
-                </Menu>
+                <CreateOrder toggleModal={toggleModal} />
+            </OverviewModal>
+        );
+    }
+
+    if (modal === 'true' && orderId) {
+        return (
+            <OverviewModal>
+                <EditOrder toggleModal={toggleModal} />
             </OverviewModal>
         );
     }
