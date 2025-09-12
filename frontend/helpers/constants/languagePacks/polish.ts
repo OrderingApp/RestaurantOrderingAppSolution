@@ -88,6 +88,42 @@ const plPack: languagePack = {
             pickup: 'Odbiór',
             delivery: 'Dostawa',
         },
+        orderCustomerInformationForm: {
+            title: 'Dane',
+            buttons: {
+                takeway: 'Odbiór',
+                delivery: 'Dostawa',
+            },
+            aside: {
+                title: 'Do zapłaty',
+                buttons: {
+                    accept: 'Zatwierdź',
+                    cancel: 'Zamknij bez zmian',
+                },
+            },
+            form: {
+                fields: {
+                    name: 'Dane',
+                    time: 'Godzina',
+                    phoneNumber: 'Numer telefonu',
+                    address: 'Adres',
+                },
+                errors: {
+                    name: {
+                        min: 'Proszę podać co najmniej 3 znaki',
+                        max: 'Proszę podać maksymalnie 30 znaków',
+                    },
+                    time: 'Proszę podać poprawną godzinę',
+                    phoneNumber:
+                        'Proszę podać poprawny 9-cyfrowy numer telefonu',
+                    address: {
+                        min: 'Proszę podać adres o długości conajmniej 5 znaków',
+                        max: 'Proszę podać adres o długości maksymalnie 100 znaków',
+                    },
+                },
+            },
+        },
+
         asideTitle: 'Zamówienie',
     },
     paymentModal: {

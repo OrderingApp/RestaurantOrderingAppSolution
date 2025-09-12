@@ -12,7 +12,7 @@ const btnStyles: {
         quaternary: 'bg-quaternary text-white',
         success: 'bg-[#2B622F] text-white',
         danger: 'bg-danger text-white ',
-        outline: 'bg-white shadow-lg text-black border border-gray-200',
+        outline: 'bg-white shadow-xl text-black ',
     },
     sizes: {
         xxs: 'p-2',

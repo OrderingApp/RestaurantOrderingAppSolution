@@ -54,6 +54,7 @@ export enum SEARCH_PARAMS_NAMES {
     PAYMENT = 'payment',
     CLOSE_ORDER = 'closeOrder',
     OPTIONS = 'options',
+    USER_DATA = 'userData',
 }
 
 export enum MENU_CATEGORY_NAMES {

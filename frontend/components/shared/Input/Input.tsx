@@ -35,7 +35,7 @@ const Input = ({
             <label
                 htmlFor={id}
                 className={clsx(
-                    'pl-2 font-semibold text-black',
+                    'pl-2 font-semibold ',
                     inputStyles.sizes[inputSize].label,
                     labelClassName
                 )}

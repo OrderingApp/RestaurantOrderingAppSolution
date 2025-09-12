@@ -90,6 +90,24 @@ export interface languagePack {
             delivery: string;
         };
         asideTitle: string;
+        orderCustomerInformationForm: {
+            title: string;
+            buttons: {
+                takeway: string;
+                delivery: string;
+            };
+            aside: {
+                title: string;
+                buttons: {
+                    accept: string;
+                    cancel: string;
+                };
+            };
+            form: {
+                fields: orderFormFields;
+                errors: orderFormErrorFields;
+            };
+        };
     };
     paymentModal: {
         title: string;
@@ -120,6 +138,26 @@ interface createReservationPageFormFields {
     date: string;
     time: string;
     phoneNumber: string;
+}
+
+interface orderFormFields {
+    name: string;
+    time: string;
+    phoneNumber: string;
+    address: string;
+}
+
+interface orderFormErrorFields {
+    name: {
+        min: string;
+        max: string;
+    };
+    time: string;
+    phoneNumber: string;
+    address: {
+        min: string;
+        max: string;
+    };
 }
 
 export default languagePacks;

@@ -89,6 +89,40 @@ const enPack: languagePack = {
             pickup: 'Pickup',
             delivery: 'Delivery',
         },
+        orderCustomerInformationForm: {
+            title: 'Data',
+            buttons: {
+                takeway: 'Pickup',
+                delivery: 'Delivery',
+            },
+            aside: {
+                title: 'Order',
+                buttons: {
+                    accept: 'Accept',
+                    cancel: 'Close without changes',
+                },
+            },
+            form: {
+                fields: {
+                    name: 'Name',
+                    time: 'Time',
+                    phoneNumber: 'Phone Number',
+                    address: 'Address',
+                },
+                errors: {
+                    name: {
+                        min: 'Please enter at least 3 characters',
+                        max: 'Please enter max 30 characters',
+                    },
+                    time: 'Plese enter a correct time',
+                    phoneNumber: 'Please enter a valid 9-digit phone number',
+                    address: {
+                        min: 'Address must be at least 5 characters long',
+                        max: 'Address can be up to 100 characters long',
+                    },
+                },
+            },
+        },
         asideTitle: 'Order',
     },
     paymentModal: {
