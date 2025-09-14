@@ -107,7 +107,7 @@ const DetailsAside = ({
                                 </motion.div>
                             </AnimatePresence>
                         </div>
-                        <div className="h-0.5 w-full bg-[#707070]"></div>
+                        <div className="h-0.5 w-full bg-dark-gray"></div>
                     </>
                 ))}
 
