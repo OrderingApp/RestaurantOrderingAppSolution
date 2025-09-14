@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import Button from '../button/Button';
+import Button from '../Button/Button';
 import Input from '../Input/Input';
 
 import useLanguage from '@/helpers/hooks/useLanguage';

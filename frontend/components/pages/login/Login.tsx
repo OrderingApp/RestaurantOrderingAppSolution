@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useLanguage } from '@/providers/LanguageProvider';
 
 import Input from '@/components/shared/Input/Input';
-import Button from '@/components/shared/button/Button';
+import Button from '@/components/shared/Button/Button';
 
 import languagePacks from '@/helpers/constants/languagePacks';
 import { COMPANY_NAME } from '@/helpers/constants/constants';
