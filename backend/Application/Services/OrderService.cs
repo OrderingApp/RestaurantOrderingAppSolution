@@ -153,6 +153,8 @@ public class OrderService(
             var order = await orderingContext
                 .Orders.Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.MenuItem)
+                        .ThenInclude(mi => mi.MenuItemIngredientRels)
+                            .ThenInclude(rel => rel.Ingredient)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (order == null)
@@ -178,6 +180,8 @@ public class OrderService(
             var query = orderingContext
                 .Orders.Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.MenuItem)
+                        .ThenInclude(mi => mi.MenuItemIngredientRels)
+                            .ThenInclude(rel => rel.Ingredient)
                 .Include(o => o.CustomerInformation)
                 .AsQueryable();
 
@@ -256,6 +260,7 @@ public class OrderService(
         }
     }
 
+    // is this needed here? we do the same in tableservice
     public async Task<ResultDto<List<OrderSummaryDto>>> GetOngoingOrdersForTable(Guid tableId)
     {
         try

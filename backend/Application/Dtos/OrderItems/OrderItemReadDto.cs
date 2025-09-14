@@ -14,6 +14,4 @@ public class OrderItemReadDto
     public List<OrderItemIngredientReadDto> RemovedIngredients { get; set; } = new();
 
     public MenuItemDetailedDto MenuItem { get; set; } = null!;
-
-    public List<EffectiveIngredientDto> EffectiveIngredients { get; set; } = new();
 }

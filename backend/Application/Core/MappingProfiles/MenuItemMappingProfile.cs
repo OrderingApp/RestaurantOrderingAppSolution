@@ -17,9 +17,12 @@ public class MenuItemMappingProfile : Profile
                     )
             );
 
-        CreateMap<MenuItem, MenuItemDetailedDto>();
+        CreateMap<MenuItemIngredientRel, MenuItemIngredientReadDto>()
+            .ForMember(d => d.Id, o => o.MapFrom(s => s.IngredientId))
+            .ForMember(d => d.Name, o => o.MapFrom(s => s.Ingredient.Name));
 
-        CreateMap<Ingredient, MenuItemIngredientReadDto>();
+        CreateMap<MenuItem, MenuItemDetailedDto>()
+            .ForMember(d => d.BaseIngredients, o => o.MapFrom(s => s.MenuItemIngredientRels));
 
         CreateMap<MenuItemCreateDto, MenuItem>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
