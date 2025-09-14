@@ -152,8 +152,7 @@ public class OrderService(
         {
             var order = await orderingContext
                 .Orders.Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.MenuItem)
-                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.MenuItem)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (order == null)
@@ -178,7 +177,7 @@ public class OrderService(
         {
             var query = orderingContext
                 .Orders.Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.MenuItem)
+                    .ThenInclude(oi => oi.MenuItem)
                 .Include(o => o.CustomerInformation)
                 .AsQueryable();
 
