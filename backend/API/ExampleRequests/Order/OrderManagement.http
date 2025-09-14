@@ -6,7 +6,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "dateTime": "2026-02-07T12:00:00Z",
+  "createdAt": "2026-02-07T12:00:00Z",
   "tableId": "C9B75583-CAB5-457B-B87B-C89B9E2E6A36",
   "orderItems": [
     {

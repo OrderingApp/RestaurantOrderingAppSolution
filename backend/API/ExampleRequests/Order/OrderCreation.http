@@ -46,7 +46,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "dateTime": "2025-03-27T19:00:00Z",
+  "createdAt": "2025-03-27T19:00:00Z",
   "customerInformation": {
     "phoneNumber": "123456789",
     "additionalInstructions": "Please call on arrival.",
@@ -90,7 +90,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "dateTime": "2026-02-07T13:00:00Z",
+  "createdAt": "2026-02-07T13:00:00Z",
   "customerInformation": {
     "phoneNumber": "123456789",
     "address": "123 Main Street, City, Country",
