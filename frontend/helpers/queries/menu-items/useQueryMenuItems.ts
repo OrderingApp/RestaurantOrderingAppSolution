@@ -12,6 +12,7 @@ interface SubCategory extends NamedEntity {
 }
 
 interface Ingredient extends NamedEntity {
+    id:string
     tagIds: string[];
 }
 

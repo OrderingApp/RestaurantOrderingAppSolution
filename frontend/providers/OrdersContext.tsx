@@ -1,9 +1,16 @@
 'use client';
 import { OrderProps } from '@/components/shared/cards/OrderCard';
+import { CURRENCIES } from '@/helpers/constants/constants';
+import { OrderItem } from '@/helpers/interfaces/orders';
 import { createContext, useState, ReactNode, useCallback, use } from 'react';
 
-interface OrderContextType extends OrderProps {
+interface OrderContextType {
+    id: string;
+    name: string;
+    price: number;
     quantity: number;
+    discount: number;
+    currency: keyof typeof CURRENCIES;
 }
 
 interface OrdersContextType {
@@ -19,6 +26,8 @@ const OrdersProvider = ({ children }: { children: ReactNode }) => {
     const [orders, setOrders] = useState<OrderContextType[]>([]);
 
     const addOrderHandler = useCallback((order: OrderContextType) => {
+        console.log(order);
+
         setOrders((prevOrders) => {
             const existingOrderIndex = prevOrders.findIndex(
                 (item) => item.id === order.id

@@ -5,25 +5,19 @@ import ItemCard, { ItemCardProps } from './ItemCard';
 import { formatDate } from '@/helpers/utils/dates';
 import useLanguage from '@/helpers/hooks/useLanguage';
 import languagePacks from '@/helpers/constants/languagePacks';
+import { NotDineInOrder } from '@/helpers/interfaces/orders';
 
 export interface OrderProps
-    extends Omit<ItemCardProps, 'variant' | 'children' | 'title'> {
-    id: string;
-    orderType: 'Takeaway' | 'Delivery';
-    orderStatus: 'Ongoing' | 'Closed';
-    dateTime: Date;
-    totalAmount: string;
-    phoneNumber: number;
-    address?: string;
-}
+    extends Omit<ItemCardProps, 'variant' | 'children' | 'title'>,
+        NotDineInOrder {}
 
 const OrderCard = ({
     orderType,
-    dateTime,
     orderStatus,
     totalAmount,
     phoneNumber,
     address,
+    expectedOrderCompletion,
     className,
     onClick,
 }: OrderProps) => {
@@ -37,7 +31,9 @@ const OrderCard = ({
     return (
         <ItemCard
             title={orderType === 'Takeaway' ? pickup : delivery}
-            subtitle={formatDate(new Date(dateTime), language).time}
+            subtitle={
+                formatDate(new Date(expectedOrderCompletion), language).time
+            }
             variant={
                 orderStatus === FILTER_STATUS.ONGOING
                     ? 'orderActive'

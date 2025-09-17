@@ -9,6 +9,16 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toggleQueryParam } from '@/helpers/utils/utils';
 import OrderOptionsModal from '@/components/shared/modals/OrderOptionsModal';
 import CustomerInformationForm from './CustomerInformationForm';
+import { ItemProps } from '@/components/shared/lists/Items/Item';
+import { ButtonProps } from '@/components/shared/button/Button';
+
+export interface BillProps {
+    id: string;
+    name: string;
+    price: number;
+    currency: keyof typeof CURRENCIES;
+    nestedItems: ItemProps[];
+}
 
 const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
     const { orders } = useOrdersContext();
@@ -17,7 +27,7 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
     const searchParams = useSearchParams();
     const menuItemId = searchParams.get(SEARCH_PARAMS_NAMES.MENU_ITEM_ID);
     const userData = searchParams.get(SEARCH_PARAMS_NAMES.USER_DATA);
-    const buttons = [
+    const buttons: ButtonProps[] = [
         {
             children: 'Dodaj zniżkę',
             variant: 'primary',
@@ -52,7 +62,7 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
         setSelectedId(id);
     };
 
-    const bill = [
+    const bill: BillProps[] = [
         {
             id: '1st',
             name: 'Rachunek 1',
@@ -62,13 +72,19 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
             ),
             currency: 'pln' as keyof typeof CURRENCIES,
             nestedItems: orders.map((order) => ({
-                ...order,
-                isServed: true,
+                name: order.name,
+                price: order.price,
+                currency: 'pln',
+                quantity: order.quantity,
                 onClick: () => toggleSelect(order.id),
                 className: menuItemId === order.id ? 'bg-red-200' : '',
             })),
         },
     ];
+
+    const orderItems = orders.map((order) => ({
+        menuItemId: order.id,
+    }));
 
     const toggleOptionsModal = () => {
         toggleQueryParam(
@@ -102,7 +118,7 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
             {menuItemId && <OrderOptionsModal onClose={toggleOptionsModal} />}
         </Menu>
     ) : (
-        <CustomerInformationForm bill={bill} toggleModal={toggleModal} />
+        <CustomerInformationForm bill={bill} orderItems={orderItems} />
     );
 };
 

@@ -24,4 +24,4 @@ const QUERY_KEYS = {
     OrdersItems: { ...ORDERS_KEYS },
 } as const;
 
-export const { Areas, Reservations, MenuItems, OrdersItems } = QUERY_KEYS;
+export const { Areas, Reservations, MenuItems, OrdersItems, } = QUERY_KEYS;

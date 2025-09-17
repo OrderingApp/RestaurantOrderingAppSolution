@@ -1,17 +1,20 @@
 'use client';
 import DetailsAside from '@/components/shared/asides/Details';
-import Button from '@/components/shared/button/Button';
+import Button, { ButtonProps } from '@/components/shared/button/Button';
 import Input from '@/components/shared/Input/Input';
 import { ICONS } from '@/helpers/constants/icons/icons';
 import languagePacks from '@/helpers/constants/languagePacks';
+import { OrderDto } from '@/helpers/interfaces/orders';
 import { getOrderDeliverySchema } from '@/helpers/models/orderDeliveryForm';
 import { getOrderTakewaySchema } from '@/helpers/models/orderTakewayForm';
+import useOrderMutation from '@/helpers/queries/orders/useOrdersMutation';
 import { useLanguage } from '@/providers/LanguageProvider';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { BillProps } from './CreateOrder';
 
 const formDefaultValues = {
     name: '',
@@ -21,13 +24,30 @@ const formDefaultValues = {
     address: '',
 };
 
-const CustomerInformationForm = ({ bill }: { bill: unknown }) => {
+interface FormData {
+    name: string;
+    time: string;
+    phoneNumber: string;
+    address?: string;
+}
+
+const CustomerInformationForm = ({
+    bill,
+    orderItems,
+}: {
+    bill: BillProps[];
+
+    orderItems: { menuItemId: string }[];
+}) => {
     const [isDelivery, setIsDelivery] = useState(false);
     const { language } = useLanguage();
     const pathname = usePathname();
     const router = useRouter();
     const deliverySchema = getOrderDeliverySchema(language);
     const takewaySchema = getOrderTakewaySchema(language);
+
+    const createTakewayOrderMutation = useOrderMutation('create', 'Takeaway');
+    const createDeliveryOrderMutation = useOrderMutation('create', 'Delivery');
 
     const {
         ordersPage: {
@@ -54,11 +74,33 @@ const CustomerInformationForm = ({ bill }: { bill: unknown }) => {
         defaultValues: formDefaultValues,
     });
 
-    const submitFormHandler = (data) => {
-        console.log(data);
+    const submitFormHandler = (data: FormData) => {
+        const today = new Date();
+        const dateStr = today.toISOString().split('T')[0];
+        const dateTimeStr = `${dateStr}T${data.time}:00`;
+
+        const order: OrderDto = {
+            createdAt: dateTimeStr,
+            discount: 0,
+            customerInformation: {
+                phoneNumber: data.phoneNumber,
+                orderCompletionType: 'Immediate',
+                preferredPaymentMethod: 'Card',
+                additionalInstructions: '',
+                address: isDelivery ? data.address : '',
+                expectedOrderCompletion: dateTimeStr,
+            },
+            orderItems: orderItems,
+        };
+
+        if (!isDelivery) {
+            createTakewayOrderMutation.mutate({ data: order });
+        } else {
+            createDeliveryOrderMutation.mutate({ data: order });
+        }
     };
 
-    const buttons = [
+    const buttons: ButtonProps[] = [
         {
             children: 'Dodaj zniżkę',
             variant: 'primary',
@@ -74,6 +116,11 @@ const CustomerInformationForm = ({ bill }: { bill: unknown }) => {
             variant: 'tertiary',
         },
     ];
+
+    const button = {
+        children: 'Info',
+        variant: 'tertiary' as const,
+    };
 
     return (
         <div className="bg-light-gray w-full rounded-3xl h-full flex flex-row ">
@@ -144,6 +191,7 @@ const CustomerInformationForm = ({ bill }: { bill: unknown }) => {
                 price={3}
                 currency="pln"
                 buttons={buttons}
+                button={button}
             />
         </div>
     );

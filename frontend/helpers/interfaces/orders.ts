@@ -1,11 +1,25 @@
-interface CustomerInformation {
-    id: string;
-    phoneNumber: string;
-    additionalInstructions: string;
-    address: string;
-    orderCompletionType: 'Immediate' | 'Scheduled';
-    preferredPaymentMethod: 'Card' | 'Cash' | 'Digital';
-    expectedOrderCompletion: string;
+export type OrderKind = 'dinein' | 'Takeaway' | 'Delivery';
+
+export type OrderType = 'dinein' | 'Takeaway' | 'Delivery';
+
+export type OrderCompletionType = 'Immediate' | 'Scheduled';
+
+export type PaymentMethod = 'Card' | 'Cash' | 'Online';
+
+export type OrderStatus = 'Ongoing' | 'PendingPayment' | 'Cancelled' | 'Closed';
+
+export interface ExtraIngredient {
+    ingredientId: string;
+    ingredientName: string;
+    quantity: number;
+    price: number;
+}
+
+export interface RemovedIngredient {
+    ingredientId: string;
+    ingredientName: string;
+    quantity: number;
+    price: number;
 }
 
 interface Ingredient {
@@ -15,31 +29,73 @@ interface Ingredient {
     price: number;
 }
 
+interface BaseIngredient {
+    id: string;
+    name: string;
+}
+
 interface MenuItem {
     id: string;
     name: string;
-    description: string;
+    description: string | null;
     price: number;
+    baseIngredients: BaseIngredient[];
 }
 
-interface OrderItem {
+export interface OrderItem {
     id: string;
     price: number;
-    specialInstructions: string;
+    specialInstructions?: string | null;
     discount: number;
-    extraIngredients: Ingredient[];
-    removedIngredients: Ingredient[];
+    extraIngredients?: Ingredient[];
+    removedIngredients?: BaseIngredient[];
     menuItem: MenuItem;
+}
+
+interface CustomerInformation {
+    phoneNumber: string;
+    additionalInstructions: string | null;
+    address?: string | null;
+    orderCompletionType: OrderCompletionType;
+    preferredPaymentMethod: PaymentMethod;
+    expectedOrderCompletion: string;
 }
 
 export interface Order {
     id: string;
-    dateTime: string;
+    createdAt: string;
     totalAmount: number;
     discount: number;
-    orderStatus: string;
-    orderType: string;
-    tableId: string;
+    orderStatus: OrderStatus;
+    orderType: OrderType;
+    tableId: string | null;
     customerInformation: CustomerInformation;
     orderItems: OrderItem[];
+}
+
+export interface NotDineInOrder {
+    id: string;
+    createdAt: string;
+    expectedOrderCompletion: string;
+    totalAmount: number;
+    orderStatus: OrderStatus;
+    orderType: OrderType;
+    phoneNumber: string;
+    address: string | null;
+}
+
+export interface OrderDto {
+    createdAt: string;
+    discount: number;
+    customerInformation: {
+        phoneNumber: string;
+        orderCompletionType: OrderCompletionType;
+        preferredPaymentMethod: PaymentMethod;
+        additionalInstructions?: string;
+        expectedOrderCompletion: string;
+        address?: string;
+    };
+    orderItems: {
+        menuItemId: string;
+    }[];
 }
