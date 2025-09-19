@@ -2,8 +2,8 @@
 
 public abstract class AuditableEntity
 {
-    public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset? LastModified { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime? LastModified { get; set; }
 }
 
 public class Order : AuditableEntity

@@ -6,22 +6,25 @@ namespace Infrastructure.Database;
 
 public sealed class AuditTimestampsInterceptor : SaveChangesInterceptor
 {
+    private static readonly TimeZoneInfo PolandTz =
+        TimeZoneInfo.FindSystemTimeZoneById("Europe/Warsaw");
+
     private static void Stamp(EntityEntry entry)
     {
         if (entry.Entity is not Domain.AuditableEntity auditable) return;
 
-        var now = DateTimeOffset.UtcNow;
+        var nowPl = TimeZoneInfo.ConvertTime(DateTime.UtcNow, PolandTz);
 
-        if(entry.State == EntityState.Added)
+        if (entry.State == EntityState.Added)
         {
             if(auditable.CreatedAt == default)
-                auditable.CreatedAt = now;
+                auditable.CreatedAt = nowPl;
 
             auditable.LastModified = null;
         }
         else if(entry.State == EntityState.Modified)
         {
-            auditable.LastModified = now;
+            auditable.LastModified = nowPl;
 
             entry.Property(nameof(Domain.AuditableEntity.CreatedAt)).IsModified = false;
         }
