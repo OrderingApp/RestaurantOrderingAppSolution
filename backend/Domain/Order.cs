@@ -1,10 +1,14 @@
 ﻿namespace Domain;
 
-public class Order
+public abstract class AuditableEntity
+{
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset? LastModified { get; set; }
+}
+
+public class Order : AuditableEntity
 {
     public Guid Id { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? LastModified { get; set; }
 
     public decimal TotalAmount { get; set; }
     public decimal Discount { get; set; }

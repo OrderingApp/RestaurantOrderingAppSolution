@@ -265,7 +265,7 @@ public class OrderService(
         }
     }
 
-    // is this needed here? we do the same in tableservice
+    // this is for orders for this table its needed
     public async Task<ResultDto<List<OrderSummaryDto>>> GetOngoingOrdersForTable(Guid tableId)
     {
         try
