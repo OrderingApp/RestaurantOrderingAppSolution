@@ -9,7 +9,7 @@ public class CustomerInformation
 
     public DateTime? ExpectedOrderCompletion { get; set; }
     public OrderCompletionType OrderCompletionType { get; set; } = OrderCompletionType.Immediate;
-    public PreferredPaymentMethod PreferredPaymentMethod { get; set; }
+    public PreferredPaymentMethod PreferredPaymentMethod { get; set; } // we dont actually need this
 
     public Guid OrderId { get; set; }
     public Order Order { get; set; } = null!;

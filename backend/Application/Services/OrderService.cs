@@ -227,20 +227,21 @@ public class OrderService(
             var baseQuery = orderingContext.Orders
                         .AsNoTracking()
                         .Where(o => o.Type == orderType)
-                        .Include(o => o.CustomerInformation)
-                        .Include(o => o.OrderItems); // only needed if you compute TotalAmount from items
+                        .Include(o => o.CustomerInformation);
 
             // Ongoing: due today or overdue (Expected < end of day)
             var ongoing = await baseQuery
-                .Where(o => o.Status == OrderStatus.Ongoing &&
-                            ((o.CustomerInformation!.ExpectedOrderCompletion ?? o.CreatedAt) < nextDay))
+                .Where(o => o.Status == OrderStatus.Ongoing
+                    && ((o.CustomerInformation != null ? o.CustomerInformation.ExpectedOrderCompletion : null) ?? o.CreatedAt) >= day
+                    && ((o.CustomerInformation != null ? o.CustomerInformation.ExpectedOrderCompletion : null) ?? o.CreatedAt) < nextDay)
                 .ToListAsync();
+
 
             // Closed: within today's expected window, latest 10
             var closed = await baseQuery
-                .Where(o => o.Status == OrderStatus.Closed &&
-                            ((o.CustomerInformation!.ExpectedOrderCompletion ?? o.CreatedAt) >= day) &&
-                            ((o.CustomerInformation.ExpectedOrderCompletion ?? o.CreatedAt) < nextDay))
+                .Where(o => o.Status == OrderStatus.Closed
+                    && ((o.CustomerInformation != null ? o.CustomerInformation.ExpectedOrderCompletion : null) ?? o.CreatedAt) >= day
+                    && ((o.CustomerInformation != null ? o.CustomerInformation.ExpectedOrderCompletion : null) ?? o.CreatedAt) < nextDay)
                 .OrderByDescending(o => o.CreatedAt)
                 .Take(10)
                 .ToListAsync();
