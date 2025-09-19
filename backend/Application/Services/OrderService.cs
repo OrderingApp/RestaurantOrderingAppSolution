@@ -205,7 +205,7 @@ public class OrderService(
         }
     }
 
-    public async Task<ResultDto<List<NonDineInOrderSummaryDto>>> GetOngoingNonDineInOrders(
+    public async Task<ResultDto<List<NonDineInOrderSummaryDto>>> GetOngoingAndClosedNonDineInOrders(
         OrderType orderType,
         DateTime? date = null
     )
