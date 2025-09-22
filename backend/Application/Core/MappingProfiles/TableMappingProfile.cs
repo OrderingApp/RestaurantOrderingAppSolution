@@ -17,8 +17,8 @@ public class TableMappingProfile : Profile
 
         CreateMap<Table, TableReadDto>()
             .ForMember(
-                dest => dest.Reservation,
-                opt => opt.MapFrom(src => src.Reservations.FirstOrDefault(r => !r.IsAssigned))
+                dest => dest.Reservations,
+                opt => opt.MapFrom(src => src.Reservations.Where(r => r.IsAssigned))
             );
 
         CreateMap<Table, TableSummaryDto>()
