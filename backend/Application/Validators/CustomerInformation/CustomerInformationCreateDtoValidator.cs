@@ -20,10 +20,6 @@ public class CustomerInformationCreateDtoValidator : AbstractValidator<CustomerI
             .IsInEnum()
             .WithMessage("Invalid order completion type.");
 
-        RuleFor(x => x.PreferredPaymentMethod)
-            .IsInEnum()
-            .WithMessage("Invalid preferred payment method.");
-
         RuleFor(x => x.ExpectedOrderCompletion)
             .GreaterThan(DateTime.UtcNow)
             .WithMessage("Expected completion must be in the future.")

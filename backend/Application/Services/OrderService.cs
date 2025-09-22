@@ -888,7 +888,6 @@ public class OrderService(
                 AdditionalInstructions = additionalInstructions,
                 Address = address,
                 OrderCompletionType = OrderCompletionType.Immediate,
-                PreferredPaymentMethod = PreferredPaymentMethod.Cash,
                 ExpectedOrderCompletion = null,
             };
             orderingContext.CustomerInformation.Add(order.CustomerInformation);
