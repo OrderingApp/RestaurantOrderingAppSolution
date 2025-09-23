@@ -2,7 +2,7 @@
 
 // To assign a reservation to a table.
 
-PUT {{API_HostAddress}}/reservations/13108707-9eee-4ac9-9e3d-80b527e54439/table?tableId=d1c9326d-1744-4835-b3f3-038c1a765b79
+PUT {{API_HostAddress}}/reservations/c219b6b8-da4a-4c67-b929-ffe784ece7c6/table?tableId=d1c9326d-1744-4835-b3f3-038c1a765b79
 Accept: application/json
 
 ###
