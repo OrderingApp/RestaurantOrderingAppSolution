@@ -14,6 +14,8 @@ public class DeliveryOrderMappingProfile : Profile
             .ForMember(dest => dest.TotalAmount, opt => opt.Ignore())
             .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => OrderStatus.Ongoing))
             .ForMember(dest => dest.OrderItems, opt => opt.Ignore())
+            .ForMember(dest => dest.Discount, opt => opt.MapFrom(src => src.Discount ?? 0m))
+            .ForMember(dest => dest.DeliveryPrice, opt => opt.MapFrom(src => src.DeliveryPrice ?? 0m))
             .ForMember(
                 dest => dest.CustomerInformation,
                 opt => opt.MapFrom(src => src.CustomerInformation)
