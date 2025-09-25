@@ -20,6 +20,12 @@ public class OrderItemMappingProfile : Profile
                 opt => opt.MapFrom(src => src.RemovedIngredients)
             );
 
+        CreateMap<OrderItemIngredient, OrderItemIngredientReadDto>()
+            .ForMember(d => d.IngredientId, o => o.MapFrom(s => s.Id))
+            .ForMember(d => d.IngredientName, o => o.MapFrom(s => s.Name))
+            .ForMember(d => d.Quantity, o => o.MapFrom(s => s.Quantity))
+            .ForMember(d => d.Price, o => o.MapFrom(s => s.Price));
+
         CreateMap<OrderItemCreateDto, OrderItem>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => OrderItemStatus.Pending))

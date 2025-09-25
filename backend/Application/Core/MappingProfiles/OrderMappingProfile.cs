@@ -26,6 +26,11 @@ public class OrderMappingProfile : Profile
             .ForMember(dest => dest.Payments, opt => opt.MapFrom(src => src.Payments));
 
         CreateMap<Order, NonDineInOrderSummaryDto>()
+            .ForMember(d => d.ExpectedOrderCompletion,
+                o => o.MapFrom(s =>
+                    s.CustomerInformation != null && s.CustomerInformation.ExpectedOrderCompletion.HasValue
+                        ? s.CustomerInformation.ExpectedOrderCompletion.Value
+                        : s.CreatedAt))
             .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Status.ToString()))
             .ForMember(dest => dest.OrderType, opt => opt.MapFrom(src => src.Type.ToString()))
             .ForMember(

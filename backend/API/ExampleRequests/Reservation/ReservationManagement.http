@@ -1,8 +1,8 @@
 @API_HostAddress = http://localhost:5000/api
 
-// To assign a table to a reservation.
+// To assign a reservation to a table.
 
-PUT {{API_HostAddress}}/reservations/e5923a9a-b482-4955-83de-13bc5180b9d8/table/CD226385-8F34-4ADF-BD08-9C812B4763A0
+PUT {{API_HostAddress}}/reservations/c219b6b8-da4a-4c67-b929-ffe784ece7c6/table?tableId=d1c9326d-1744-4835-b3f3-038c1a765b79
 Accept: application/json
 
 ###

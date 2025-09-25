@@ -122,6 +122,14 @@ public static class OrderCalculationHelper
 
     public static decimal RecalculateOrderTotal(Order order)
     {
-        return order.OrderItems.Sum(oi => oi.Price * (1 - (oi.Discount / 100))) - order.Discount;
+        var itemsTotal = order.OrderItems.Sum(oi => oi.Price * (1 - (oi.Discount / 100m)));
+        var subtotal = itemsTotal - order.Discount;
+
+        if (order.Type == OrderType.Delivery)
+            subtotal += order.DeliveryPrice ?? 0m;
+
+        if (subtotal < 0m) subtotal = 0m;
+
+        return Math.Round(subtotal, 2, MidpointRounding.AwayFromZero);
     }
 }

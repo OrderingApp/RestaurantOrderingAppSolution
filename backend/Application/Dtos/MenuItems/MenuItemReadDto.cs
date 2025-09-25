@@ -11,5 +11,5 @@ public class MenuItemReadDto
     public Guid? SubCategoryId { get; set; }
     public Guid? MenuCategoryId { get; set; }
 
-    public List<MenuItemIngredientReadDto> Ingredients { get; set; } = new();
+    public List<MenuItemIngredientWithTagsDto> Ingredients { get; set; } = new();
 }

@@ -547,9 +547,6 @@ public class ExcelSeeder
                             OrderCompletionType =
                                 TryParseEnum<OrderCompletionType>(sheet.Cells[row, 6].Text)
                                 ?? OrderCompletionType.Scheduled,
-                            PreferredPaymentMethod =
-                                TryParseEnum<PreferredPaymentMethod>(sheet.Cells[row, 7].Text)
-                                ?? PreferredPaymentMethod.Cash,
                             OrderId =
                                 TryParseGuid(sheet.Cells[row, 8].Text)
                                 ?? throw new Exception($"Invalid GUID in OrderId at row {row}"),

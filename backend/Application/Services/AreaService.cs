@@ -70,7 +70,11 @@ public class AreaService(
     {
         try
         {
-            var areas = await orderingContext.Areas.Include(a => a.Tables).ToListAsync();
+            var areas = await orderingContext.Areas
+                .Include(a => a.Tables)
+                    .ThenInclude(t => t.Reservations)
+                .AsNoTracking()
+                .ToListAsync();
 
             var areaReadDtos = mapper.Map<List<AreaReadDto>>(areas);
             return ResultDto<List<AreaReadDto>>.Success(areaReadDtos, HttpStatusCode.OK);
