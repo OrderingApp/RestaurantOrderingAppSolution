@@ -152,8 +152,9 @@ public class OrderService(
         {
             var order = await orderingContext
                 .Orders.Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.MenuItem)
-                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.MenuItem)
+                        .ThenInclude(mi => mi.MenuItemIngredientRels)
+                            .ThenInclude(rel => rel.Ingredient)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (order == null)
@@ -178,7 +179,9 @@ public class OrderService(
         {
             var query = orderingContext
                 .Orders.Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.MenuItem)
+                    .ThenInclude(oi => oi.MenuItem)
+                        .ThenInclude(mi => mi.MenuItemIngredientRels)
+                            .ThenInclude(rel => rel.Ingredient)
                 .Include(o => o.CustomerInformation)
                 .AsQueryable();
 
@@ -202,9 +205,9 @@ public class OrderService(
         }
     }
 
-    public async Task<ResultDto<List<NonDineInOrderSummaryDto>>> GetOngoingNonDineInOrders(
+    public async Task<ResultDto<List<NonDineInOrderSummaryDto>>> GetOngoingAndClosedNonDineInOrders(
         OrderType orderType,
-        DateTime date
+        DateTime? date = null
     )
     {
         try
@@ -217,36 +220,41 @@ public class OrderService(
                 );
             }
 
-            var nextDay = date.AddDays(1);
+            var day = (date ?? DateTime.Now).Date;
 
-            var ongoingOrdersQuery = orderingContext.Orders.Where(o =>
-                o.Type == orderType
-                && o.Status == OrderStatus.Ongoing
-                && o.CreatedAt >= date
-                && o.CreatedAt < nextDay
-            );
+            var nextDay = day.AddDays(1);
 
-            var closedOrdersQuery = orderingContext
-                .Orders.Where(o =>
-                    o.Type == orderType
-                    && o.Status == OrderStatus.Closed
-                    && o.CreatedAt >= date
-                    && o.CreatedAt < nextDay
-                )
+            var baseQuery = orderingContext.Orders
+                        .AsNoTracking()
+                        .Where(o => o.Type == orderType)
+                        .Include(o => o.CustomerInformation);
+
+            // Ongoing: due today or overdue (Expected < end of day)
+            var ongoing = await baseQuery
+                .Where(o => o.Status == OrderStatus.Ongoing
+                    && ((o.CustomerInformation != null ? o.CustomerInformation.ExpectedOrderCompletion : null) ?? o.CreatedAt) >= day
+                    && ((o.CustomerInformation != null ? o.CustomerInformation.ExpectedOrderCompletion : null) ?? o.CreatedAt) < nextDay)
+                .ToListAsync();
+
+
+            // Closed: within today's expected window, latest 10
+            var closed = await baseQuery
+                .Where(o => o.Status == OrderStatus.Closed
+                    && ((o.CustomerInformation != null ? o.CustomerInformation.ExpectedOrderCompletion : null) ?? o.CreatedAt) >= day
+                    && ((o.CustomerInformation != null ? o.CustomerInformation.ExpectedOrderCompletion : null) ?? o.CreatedAt) < nextDay)
                 .OrderByDescending(o => o.CreatedAt)
-                .Take(10);
+                .Take(10)
+                .ToListAsync();
 
-            var ordersQuery = ongoingOrdersQuery
-                .Union(closedOrdersQuery)
-                .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.MenuItem)
-                .Include(o => o.CustomerInformation);
+            // Merge and sort by expected completion (coalesced), so UI is “what’s due next”
+            var combined = ongoing
+                .Concat(closed)
+                .OrderBy(o => o.CustomerInformation!.ExpectedOrderCompletion ?? o.CreatedAt)
+                .ToList();
 
-            var orders = await ordersQuery.ToListAsync();
+            var dtos = mapper.Map<List<NonDineInOrderSummaryDto>>(combined);
 
-            var orderDtos = mapper.Map<List<NonDineInOrderSummaryDto>>(orders);
-
-            return ResultDto<List<NonDineInOrderSummaryDto>>.Success(orderDtos, HttpStatusCode.OK);
+            return ResultDto<List<NonDineInOrderSummaryDto>>.Success(dtos, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
@@ -257,6 +265,7 @@ public class OrderService(
         }
     }
 
+    // this is for orders for this table its needed
     public async Task<ResultDto<List<OrderSummaryDto>>> GetOngoingOrdersForTable(Guid tableId)
     {
         try
@@ -879,7 +888,6 @@ public class OrderService(
                 AdditionalInstructions = additionalInstructions,
                 Address = address,
                 OrderCompletionType = OrderCompletionType.Immediate,
-                PreferredPaymentMethod = PreferredPaymentMethod.Cash,
                 ExpectedOrderCompletion = null,
             };
             orderingContext.CustomerInformation.Add(order.CustomerInformation);

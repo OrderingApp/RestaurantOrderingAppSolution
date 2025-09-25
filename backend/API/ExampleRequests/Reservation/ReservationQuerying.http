@@ -15,7 +15,7 @@ Accept: application/json
 ###
 // To get reservations for a specific date.
 
-GET {{API_HostAddress}}/reservations/by-date?date=2025-10-03
+GET {{API_HostAddress}}/reservations/by-date/2025-09-23
 Accept: application/json
 
 ###

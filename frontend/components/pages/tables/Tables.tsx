@@ -1,19 +1,68 @@
 'use client';
 
+import { useState } from 'react';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import { cn } from '@/lib/utils';
+
+import TablesHeader from './Header';
+import Table from './Table';
 import AsidesView from '@/components/shared/views/Asides';
 import { CURRENCIES } from '@/helpers/constants/constants';
-import TablesHeader from './Header';
 
-const Tables = () => (
-    <AsidesView
-        details={detailsMock}
-        bottom={bottomMock}
-        isBottomAsideShown={true}
-    >
-        <TablesHeader onTabChange={console.log} />
-        <p>elo</p>
-    </AsidesView>
-);
+const INITIAL_TABLES_DATA = [
+    { id: 'table-alpha', layout: [3] },
+    { id: 'table-beta', layout: [2, 1] },
+    { id: 'table-gamma', layout: [1, 2] },
+    { id: 'table-delta', layout: [4, 2, 1] },
+    { id: 'table-deltaa', layout: [2, 2, 1] },
+];
+
+const Tables = () => {
+    const [isPanning, setIsPanning] = useState(false);
+
+    return (
+        <AsidesView
+            details={detailsMock}
+            bottom={bottomMock}
+            isBottomAsideShown={true}
+        >
+            <TablesHeader onTabChange={console.log} />
+
+            <section>
+                <TransformWrapper
+                    initialScale={0.55}
+                    minScale={0.25}
+                    maxScale={1.25}
+                    centerOnInit={true}
+                    limitToBounds={true}
+                    onPanningStart={() => setIsPanning(true)}
+                    onPanningStop={() => setIsPanning(false)}
+                >
+                    <TransformComponent
+                        wrapperClass={cn(
+                            '!h-full !w-full',
+                            isPanning ? 'cursor-grabbing' : 'cursor-grab'
+                        )}
+                    >
+                        {/* automate grid cols depending on the tables? so e.g.
+                        semi-smart distribution, or baed on the user input how
+                        he put it in edit mode? */}
+                        <ul className="grid grid-cols-[1fr,1fr,1fr] gap-y-[52px] gap-x-24 items-center p-8 pt-20">
+                            {INITIAL_TABLES_DATA.map((table) => (
+                                <li key={table.id}>
+                                    <Table
+                                        id={table.id}
+                                        layout={table.layout}
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    </TransformComponent>
+                </TransformWrapper>
+            </section>
+        </AsidesView>
+    );
+};
 
 const items = [
     {
@@ -188,17 +237,6 @@ const mockReservationCards = [
         name: 'Elon Musk',
         isAssigned: 1,
         tableId: 'Tbl-VIP',
-    },
-];
-
-// eslint-disable-next-line
-const ingredients = [
-    {
-        name: 'Mozarella',
-        price: 33,
-        currency: 'pln' as keyof typeof CURRENCIES,
-        isSingleItem: true,
-        onClick: () => console.log('ing clicked'),
     },
 ];
 

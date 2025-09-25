@@ -81,14 +81,6 @@ public class RestaurantOrderingContext : DbContext
                 oc => (OrderCompletionType)Enum.Parse(typeof(OrderCompletionType), oc)
             );
 
-        modelBuilder
-            .Entity<CustomerInformation>()
-            .Property(ci => ci.PreferredPaymentMethod)
-            .HasConversion(
-                pm => pm.ToString(),
-                pm => (PreferredPaymentMethod)Enum.Parse(typeof(PreferredPaymentMethod), pm)
-            );
-
         // ✅ Order and OrderItem relationship (One-to-Many)
         modelBuilder
             .Entity<Order>()

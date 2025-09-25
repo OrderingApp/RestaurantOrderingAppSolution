@@ -7,11 +7,16 @@ public class DeliveryOrderCreateDtoValidator : AbstractValidator<DeliveryOrderCr
 {
     public DeliveryOrderCreateDtoValidator()
     {
-        RuleFor(x => x.CreatedAt)
-            .NotEmpty()
-            .WithMessage("Order date and time is required.")
-            .Must(BeAValidDate)
-            .WithMessage("Order date and time must be in the future.");
+        RuleFor(x => x.DeliveryPrice)
+            .GreaterThanOrEqualTo(0).WithMessage("Delivery price cannot be negative.")
+            .When(x => x.DeliveryPrice.HasValue);
+
+        RuleFor(x => x.Discount)
+            .GreaterThanOrEqualTo(0).WithMessage("Discount cannot be negative.")
+            .When(x => x.Discount.HasValue);
+
+        RuleFor(x => x.OrderItems)
+            .NotEmpty().WithMessage("At least one order item is required.");
 
         RuleFor(x => x.CustomerInformation)
             .NotNull()
@@ -19,10 +24,5 @@ public class DeliveryOrderCreateDtoValidator : AbstractValidator<DeliveryOrderCr
             .SetValidator(new CustomerInformationCreateDtoValidator());
 
         RuleForEach(x => x.OrderItems).SetValidator(new OrderItemCreateDtoValidator());
-    }
-
-    private bool BeAValidDate(DateTime date)
-    {
-        return date > DateTime.UtcNow;
     }
 }

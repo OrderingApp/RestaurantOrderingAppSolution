@@ -11,9 +11,13 @@ public static class DatabaseExtensions
         IConfiguration configuration
     )
     {
-        services.AddDbContext<RestaurantOrderingContext>(opt =>
+
+        services.AddSingleton<AuditTimestampsInterceptor>();
+
+        services.AddDbContext<RestaurantOrderingContext>((sp, opt) =>
         {
             opt.UseSqlite(configuration.GetConnectionString("DefaultConnection"));
+            opt.AddInterceptors(sp.GetRequiredService<AuditTimestampsInterceptor>());
         });
 
         services.AddDbContext<EventsDatabaseContext>(opt =>

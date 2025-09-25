@@ -10,6 +10,6 @@ public class TableReadDto
     public int Capacity { get; set; }
     public bool IsPrepared { get; set; }
 
-    public ReservationSummaryDto? Reservation { get; set; }
+    public List<ReservationSummaryDto> Reservations { get; set; } = new();
     public TableStatus Status { get; set; }
 }

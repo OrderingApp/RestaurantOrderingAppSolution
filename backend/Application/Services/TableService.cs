@@ -87,7 +87,10 @@ public class TableService(
     {
         try
         {
-            var tables = await orderingContext.Tables.Include(t => t.Reservations).ToListAsync();
+            var tables = await orderingContext.Tables
+                .Include(t => t.Reservations)
+                .AsNoTracking()
+                .ToListAsync();
 
             var tablesDto = mapper.Map<List<TableReadDto>>(tables);
 
