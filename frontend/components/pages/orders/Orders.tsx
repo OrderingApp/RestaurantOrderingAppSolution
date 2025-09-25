@@ -13,7 +13,7 @@ import languagePacks from '@/helpers/constants/languagePacks';
 import useLanguage from '@/helpers/hooks/useLanguage';
 import useQueryOrdersByType from '@/helpers/queries/orders/useQueryOrders';
 
-import Button from '@/components/shared/button/Button';
+import Button from '@/components/shared/Button/Button';
 import OverviewModal from '@/components/shared/modals/OverviewModal';
 import ToggleSwitch from '@/components/shared/toggleSwitch/ToggleSwitch';
 import Menu from '../menu/Menu';

@@ -43,15 +43,7 @@ body {
 .scrollbar::-webkit-scrollbar-thumb {
     background: hsl(var(--primary));
     border-radius: 9999px;
-}
-
-.scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.scrollbar {
-    scrollbar-color: hsl(var(--primary)) transparent;
-    scrollbar-width: thin;
+    color: hsl(var(--primary)) transparent;
 }
 
 .hide-input-number-icon {
