@@ -38,6 +38,7 @@ export default {
                 'lighter-gray': 'var(--lighter-gray)',
                 'light-gray': 'var(--light-gray)',
                 gray: 'var(--gray)',
+                'dark-gray': 'var(--dark-gray)',
                 served: 'var(--served)',
                 background: 'hsl(var(--background))',
                 foreground: 'hsl(var(--foreground))',

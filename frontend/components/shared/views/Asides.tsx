@@ -35,7 +35,7 @@ const AsidesView = ({
 
         <div
             className={clsx(
-                'px-4 py-6',
+                'relative max-h-[600px] overflow-hidden',
                 !isBottomAsideShown && 'row-span-full'
             )}
         >
