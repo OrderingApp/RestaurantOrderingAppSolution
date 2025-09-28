@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+// import { DndContext } from '@dnd-kit/core';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { cn } from '@/lib/utils';
 
@@ -9,26 +10,57 @@ import Table from './Table';
 import AsidesView from '@/components/shared/views/Asides';
 import { CURRENCIES } from '@/helpers/constants/constants';
 
-const INITIAL_TABLES_DATA = [
-    { id: 'table-alpha', layout: [3] },
-    { id: 'table-beta', layout: [2, 1] },
-    { id: 'table-gamma', layout: [1, 2] },
-    { id: 'table-delta', layout: [4, 2, 1] },
-    { id: 'table-deltaa', layout: [2, 2, 1] },
+export interface TableData {
+    id: string;
+    layout: number[]; // This now defines rows/seats within the table
+    x?: number; // Keep for future canvas dragging
+    y?: number; // Keep for future canvas dragging
+}
+
+const INITIAL_TABLES_DATA: TableData[] = [
+    { id: 'table-alpha', layout: [3], x: 0, y: 0 },
+    { id: 'table-beta', layout: [2, 1], x: 250, y: 0 },
+    { id: 'table-gamma', layout: [1, 2], x: 350, y: 0 },
+    // ... rest of your tables
 ];
+
+// const INITIAL_TABLES_DATA = [
+//     { id: 'table-alpha', layout: [3] },
+//     { id: 'table-beta', layout: [2, 1] },
+//     { id: 'table-gamma', layout: [1, 2] },
+//     { id: 'table-delta', layout: [4, 2, 1] },
+//     { id: 'table-deltaa', layout: [2, 2, 1] },
+// ];
 
 const Tables = () => {
     const [isPanning, setIsPanning] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [isSeatDragging, setIsSeatDragging] = useState(false);
 
+    const handleSeatDragChange = (isDragging: boolean) => {
+        setIsSeatDragging(isDragging);
+    };
+
+    const detailsMockExtended = {
+        ...detailsMock,
+        buttons: [
+            {
+                children: isEditing ? 'Zapisz edycję' : 'Edytuj',
+                onClick: () => setIsEditing((p) => !p),
+            },
+            ...detailsMock.buttons,
+        ],
+    };
     return (
         <AsidesView
-            details={detailsMock}
+            details={detailsMockExtended}
             bottom={bottomMock}
             isBottomAsideShown={true}
         >
             <TablesHeader onTabChange={console.log} />
 
             <section>
+                {/* <DndContext> */}
                 <TransformWrapper
                     initialScale={0.55}
                     minScale={0.25}
@@ -37,6 +69,13 @@ const Tables = () => {
                     limitToBounds={true}
                     onPanningStart={() => setIsPanning(true)}
                     onPanningStop={() => setIsPanning(false)}
+                    panning={{
+                        disabled: isSeatDragging,
+                        velocityDisabled: isSeatDragging,
+                    }}
+                    pinch={{ disabled: isSeatDragging }}
+                    wheel={{ disabled: isSeatDragging }}
+                    doubleClick={{ disabled: isSeatDragging }}
                 >
                     <TransformComponent
                         wrapperClass={cn(
@@ -53,12 +92,14 @@ const Tables = () => {
                                     <Table
                                         id={table.id}
                                         layout={table.layout}
+                                        onSeatDragChange={handleSeatDragChange}
                                     />
                                 </li>
                             ))}
                         </ul>
                     </TransformComponent>
                 </TransformWrapper>
+                {/* </DndContext> */}
             </section>
         </AsidesView>
     );
