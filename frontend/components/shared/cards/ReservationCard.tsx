@@ -12,11 +12,11 @@ export interface ReservationCardProps
     extends Omit<ItemCardProps, 'variant' | 'children' | 'title'>,
         Reservation {
     capacityNeeded: number;
-    dateTime: string;
+    scheduledFor: string;
 }
 
 const ReservationCard = ({
-    dateTime,
+    scheduledFor,
     name,
     capacityNeeded,
     onClick,
@@ -35,7 +35,7 @@ const ReservationCard = ({
     return (
         <ItemCard
             title={title}
-            subtitle={formatDate(new Date(dateTime), language).time}
+            subtitle={formatDate(new Date(scheduledFor), language).time}
             variant="reservation"
             onClick={onClick}
             className={className}

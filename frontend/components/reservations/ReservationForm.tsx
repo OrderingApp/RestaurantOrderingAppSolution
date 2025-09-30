@@ -81,7 +81,7 @@ const ReservationForm = () => {
         const dateTimeStr = `${date}T${time}:00`;
         const newReservation = {
             ...data,
-            dateTime: dateTimeStr,
+            scheduledFor: dateTimeStr,
         };
         if (editParam) {
             updateReservationMutation.mutate({

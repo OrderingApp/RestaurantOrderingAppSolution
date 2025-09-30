@@ -87,6 +87,7 @@ export interface NotDineInOrder {
 export interface OrderDto {
     createdAt: string;
     discount: number;
+    deliveryPrice: number;
     customerInformation: {
         phoneNumber: string;
         orderCompletionType: OrderCompletionType;

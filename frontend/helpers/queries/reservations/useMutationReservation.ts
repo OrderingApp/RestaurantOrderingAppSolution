@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 export interface ReservationDto {
     phoneNumber: string;
     name: string;
-    dateTime: string;
+    scheduledFor: string;
     capacityNeeded: string;
 }
 

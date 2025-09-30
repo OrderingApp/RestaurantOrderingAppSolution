@@ -51,3 +51,13 @@ export const checkMaxAndMinDate = () => {
 
     return { minDateString, maxDateString };
 };
+
+export const getFutureTime = (minutes: number): string => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + minutes);
+    return now.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+    });
+};

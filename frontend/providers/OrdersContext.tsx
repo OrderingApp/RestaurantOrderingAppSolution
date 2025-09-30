@@ -15,6 +15,7 @@ interface OrderContextType {
 
 interface OrdersContextType {
     orders: OrderContextType[];
+    deliveryPrice?: number;
     addOrder: (order: OrderContextType) => void;
 }
 

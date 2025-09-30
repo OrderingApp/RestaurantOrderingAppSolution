@@ -15,6 +15,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { BillProps } from './CreateOrder';
+import { getFutureTime } from '@/helpers/utils/dates';
+import DeliveryInput from './DeliveryInput';
 
 const formDefaultValues = {
     name: '',
@@ -40,6 +42,7 @@ const CustomerInformationForm = ({
     orderItems: { menuItemId: string }[];
 }) => {
     const [isDelivery, setIsDelivery] = useState(false);
+    const [isCustomDate, setIsCustomDate] = useState<string | null>(null);
     const { language } = useLanguage();
     const pathname = usePathname();
     const router = useRouter();
@@ -68,11 +71,25 @@ const CustomerInformationForm = ({
     const {
         handleSubmit,
         register,
+        setValue,
         formState: { errors },
     } = useForm({
         resolver: zodResolver(isDelivery ? deliverySchema : takewaySchema),
         defaultValues: formDefaultValues,
     });
+
+    const timeButtonFn = (time: string, id: string) => {
+        setValue('time', getFutureTime(parseInt(time)), {
+            shouldDirty: true,
+            shouldValidate: true,
+        });
+        if (isCustomDate === id) {
+            setIsCustomDate(null);
+            setValue('time', '');
+        } else {
+            setIsCustomDate(id);
+        }
+    };
 
     const submitFormHandler = (data: FormData) => {
         const today = new Date();
@@ -122,6 +139,29 @@ const CustomerInformationForm = ({
         variant: 'tertiary' as const,
     };
 
+    const timeBtns = [
+        {
+            id: '10',
+            value: 'Jak Najszybciej',
+        },
+        {
+            id: '15',
+            value: '15min',
+        },
+        {
+            id: '20',
+            value: '20min',
+        },
+        {
+            id: '30',
+            value: '30min',
+        },
+        {
+            id: '60',
+            value: '60min',
+        },
+    ];
+
     return (
         <div className="bg-light-gray w-full rounded-3xl h-full flex flex-row ">
             <div className="px-3 py-8">
@@ -142,7 +182,7 @@ const CustomerInformationForm = ({
                 </div>
                 <form
                     onSubmit={handleSubmit(submitFormHandler)}
-                    className="flex flex-col gap-5 mt-16"
+                    className="flex flex-col gap-5 mt-6"
                 >
                     <Input
                         type="text"
@@ -160,8 +200,27 @@ const CustomerInformationForm = ({
                         label={time}
                         {...register('time')}
                         errors={errors.time}
-                        inputClassName="w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0"
+                        disabled={!!isCustomDate}
+                        labelClassName={`${isCustomDate && 'text-[rgba(0,0,0,0.5)]'}`}
+                        inputClassName={`w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0 ${isCustomDate && 'opacity-90'} `}
                     />
+                    <div className="flex gap-2">
+                        {timeBtns.map((btn) => (
+                            <Input
+                                type="button"
+                                id={btn.id}
+                                key={btn.id}
+                                value={btn.value}
+                                inputClassName={`${isCustomDate === btn.id ? 'bg-primary text-white' : 'bg-white'} focus:outline-none focus:ring-0 w-auto text-sm  shadow-xl rounded-xl`}
+                                onClick={(e) =>
+                                    timeButtonFn(
+                                        e.currentTarget.id as string,
+                                        btn.id
+                                    )
+                                }
+                            />
+                        ))}
+                    </div>
                     <Input
                         type="phone"
                         id="phoneNumber"
@@ -171,17 +230,11 @@ const CustomerInformationForm = ({
                         errors={errors.phoneNumber}
                         inputClassName="w-full"
                     />
-                    <Input
-                        type="address"
-                        id="address"
-                        icon={<Image src={ICONS.MARKER} alt="usersIcon" />}
-                        iconClassName="w-4 h-4"
-                        label={address}
-                        {...register('address')}
-                        errors={errors.address}
-                        labelClassName={`${!isDelivery && 'text-[rgba(0,0,0,0.5)]'}`}
-                        inputClassName={`w-full ${!isDelivery && 'opacity-90'}`}
-                        disabled={!isDelivery}
+                    <DeliveryInput
+                        address={address}
+                        isDelivery={isDelivery}
+                        errors={errors}
+                        register={register}
                     />
                 </form>
             </div>
