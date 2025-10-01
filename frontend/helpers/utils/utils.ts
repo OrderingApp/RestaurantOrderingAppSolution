@@ -63,3 +63,7 @@ export const toggleQueryParam = (
 
     router.push(`${pathname}?${params.toString()}`);
 };
+
+export const formatPhoneNumber = (phoneNumber: string) => {
+    return phoneNumber.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+};

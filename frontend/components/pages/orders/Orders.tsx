@@ -12,18 +12,16 @@ import {
 import languagePacks from '@/helpers/constants/languagePacks';
 import useLanguage from '@/helpers/hooks/useLanguage';
 import useQueryOrdersByType from '@/helpers/queries/orders/useQueryOrders';
+import { toggleQueryParam } from '@/helpers/utils/utils';
 
-import Button from '@/components/shared/button/Button';
+import Button, { ButtonProps } from '@/components/shared/button/Button';
 import OverviewModal from '@/components/shared/modals/OverviewModal';
 import ToggleSwitch from '@/components/shared/toggleSwitch/ToggleSwitch';
-
 import DetailsAside from '@/components/shared/asides/Details';
-
 import OrderList from '@/components/shared/lists/orders/OrderList';
 import PaymentDetails from '@/components/shared/modals/PaymentDetails';
 import EditOrder from './EditOrder';
 import CreateOrder from './CreateOrder';
-import { toggleQueryParam } from '@/helpers/utils/utils';
 
 const Orders = () => {
     const { language } = useLanguage();
@@ -106,7 +104,7 @@ const Orders = () => {
         );
     };
 
-    const buttonsPayment = [
+    const buttonsPayment: ButtonProps[] = [
         {
             children: 'Zamknij bez zmian',
             onClick: () => closeOrderHandler(),
@@ -314,7 +312,7 @@ const Orders = () => {
             </div>
             <div className="flex justify-around w-full mt-20 h-full">
                 <div className="flex-1 text-center text-5xl">
-                    <h2 className="text-2xl font-bold">{ordersActiveTitle}</h2>
+                    <h2 className="text-3xl font-bold">{ordersActiveTitle}</h2>
                     <OrderList
                         orders={onGoingOrders}
                         toggleSelected={toggleSelected}
@@ -323,7 +321,7 @@ const Orders = () => {
                 </div>
                 <hr className="w-[0.1rem] h-full bg-black" />
                 <div className="flex-1 text-center text-5xl">
-                    <h2 className="text-2xl font-bold">{ordersClosedTitle}</h2>
+                    <h2 className="text-3xl font-bold">{ordersClosedTitle}</h2>
                     <OrderList
                         orders={closedOrders}
                         toggleSelected={toggleSelected}
@@ -336,5 +334,3 @@ const Orders = () => {
 };
 
 export default Orders;
-
-//TODO change details aside

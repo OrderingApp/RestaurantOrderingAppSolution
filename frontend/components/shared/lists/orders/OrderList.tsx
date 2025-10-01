@@ -14,7 +14,14 @@ const OrderList = ({ orders, toggleSelected, selectedId }: OrderListPops) => {
                     onClick={() => toggleSelected(order.id)}
                     key={order.id}
                     {...order}
-                    className={selectedId === order.id ? 'scale-110' : ''}
+                    className={
+                        selectedId === order.id
+                            ? 'bg-[#f0b281] scale-105 transition-all'
+                            : ''
+                    }
+                    variantClassName={
+                        selectedId === order.id ? 'text-black' : 'text-white'
+                    }
                 />
             ))}
         </ul>

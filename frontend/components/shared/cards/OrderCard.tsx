@@ -6,6 +6,7 @@ import { formatDate } from '@/helpers/utils/dates';
 import useLanguage from '@/helpers/hooks/useLanguage';
 import languagePacks from '@/helpers/constants/languagePacks';
 import { NotDineInOrder } from '@/helpers/interfaces/orders';
+import { formatPhoneNumber } from '@/helpers/utils/utils';
 
 export interface OrderProps
     extends Omit<ItemCardProps, 'variant' | 'children' | 'title'>,
@@ -19,6 +20,7 @@ const OrderCard = ({
     address,
     expectedOrderCompletion,
     className,
+    variantClassName,
     onClick,
 }: OrderProps) => {
     const { language } = useLanguage();
@@ -40,14 +42,17 @@ const OrderCard = ({
                     : 'orderCompleted'
             }
             className={className}
+            variantClassName={variantClassName}
             onClick={onClick}
         >
             <div>
-                <p className="text-left text-[11px] font-bold">
+                <p className="text-left text-[11px] font-bold pb-[2px]">
                     {totalAmount}
                     {CURRENCIES.pln}
                 </p>
-                <p className="text-left text-[11px] font-bold">{phoneNumber}</p>
+                <p className="text-left text-[11px] font-bold">
+                    {formatPhoneNumber(phoneNumber)}
+                </p>
                 {address && (
                     <p className="text-left text-[11px] font-bold">{address}</p>
                 )}
@@ -57,5 +62,3 @@ const OrderCard = ({
 };
 
 export default OrderCard;
-
-//TODO CHANGE NAMES FROM LANGUAGE PACKS AND CURRENCIES

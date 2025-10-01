@@ -10,7 +10,7 @@ export const itemCardStyles = {
         [variantTableMap.ACTIVE]: 'bg-[#008080] text-white',
         [variantTableMap.IN_PROGGRESS]: 'bg-[#CD5700] text-black',
         [variantTableMap.PAYMENT]: 'bg-[#C70039] text-white',
-        orderActive: 'bg-[#CD5700] text-black',
+        orderActive: 'bg-[#CD5700] text-white',
         orderCompleted: 'bg-[#008080] text-white',
     },
 };
