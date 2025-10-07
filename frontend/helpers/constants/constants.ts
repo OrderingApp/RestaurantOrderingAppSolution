@@ -40,6 +40,7 @@ export enum BACKEND_PATHS {
     MenuItems = 'menu-items',
     Tags = 'tags',
     Orders = 'orders',
+    Ingredients = 'ingredients',
 }
 
 export enum SEARCH_PARAMS_NAMES {

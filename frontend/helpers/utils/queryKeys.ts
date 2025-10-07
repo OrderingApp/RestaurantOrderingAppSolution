@@ -10,6 +10,8 @@ enum MENU_ITEMS {
     All = 'menu-categories',
     ITEMS = 'menu-items',
     TAGS = 'tags',
+    INGREDIENTS = 'ingredients',
+    BY_ID = 'by-id',
 }
 
 enum ORDERS_KEYS {
@@ -24,4 +26,4 @@ const QUERY_KEYS = {
     OrdersItems: { ...ORDERS_KEYS },
 } as const;
 
-export const { Areas, Reservations, MenuItems, OrdersItems, } = QUERY_KEYS;
+export const { Areas, Reservations, MenuItems, OrdersItems } = QUERY_KEYS;

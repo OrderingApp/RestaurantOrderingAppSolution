@@ -7,7 +7,6 @@ import { useOrdersContext } from '@/providers/OrdersContext';
 import { useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toggleQueryParam } from '@/helpers/utils/utils';
-import OrderOptionsModal from '@/components/shared/modals/OrderOptionsModal';
 import CustomerInformationForm from './CustomerInformationForm';
 import { ItemProps } from '@/components/shared/lists/Items/Item';
 import { ButtonProps } from '@/components/shared/button/Button';
@@ -86,16 +85,6 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
         menuItemId: order.id,
     }));
 
-    const toggleOptionsModal = () => {
-        toggleQueryParam(
-            SEARCH_PARAMS_NAMES.MENU_ITEM_ID,
-            undefined,
-            searchParams,
-            router,
-            pathname
-        );
-    };
-
     const toogleUserDataModal = () => {
         toggleQueryParam(
             SEARCH_PARAMS_NAMES.USER_DATA,
@@ -115,7 +104,7 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
                 currency="pln"
                 buttons={buttons}
             />
-            {menuItemId && <OrderOptionsModal onClose={toggleOptionsModal} />}
+            {/* {menuItemId && <OrderOptionsModal onClose={toggleOptionsModal} />} */}
         </Menu>
     ) : (
         <CustomerInformationForm bill={bill} orderItems={orderItems} />

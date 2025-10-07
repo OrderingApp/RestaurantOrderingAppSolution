@@ -12,8 +12,13 @@ interface SubCategory extends NamedEntity {
 }
 
 interface Ingredient extends NamedEntity {
-    id:string
-    tagIds: string[];
+    id: string;
+    tags: string[];
+}
+
+export interface IngredientWithTags extends Ingredient {
+    name: string;
+    price: number;
 }
 
 export interface MenuItemType {
@@ -46,7 +51,7 @@ export const useQueryMenuCategory = () =>
     useQuery({
         queryKey: [MenuItems.All],
         queryFn: () =>
-            fetchWithToken('menu-categories', '').then(
+            fetchWithToken(MenuItems.All, '').then(
                 (response) => response as MenuCategoryType[]
             ),
         staleTime: 14400000,
@@ -56,8 +61,18 @@ export const useQueryMenuItems = () =>
     useQuery({
         queryKey: [MenuItems.ITEMS],
         queryFn: () =>
-            fetchWithToken('menu-items', '').then(
+            fetchWithToken(MenuItems.ITEMS, '').then(
                 (response) => response as MenuItemType[]
+            ),
+        staleTime: 14400000,
+    });
+
+export const useQueryMenuItem = (id: string) =>
+    useQuery({
+        queryKey: [MenuItems.BY_ID],
+        queryFn: () =>
+            fetchWithToken(MenuItems.ITEMS, id).then(
+                (response) => response as MenuItemType
             ),
         staleTime: 14400000,
     });
@@ -66,8 +81,18 @@ export const useQueryMenuTags = () =>
     useQuery({
         queryKey: [MenuItems.TAGS],
         queryFn: () =>
-            fetchWithToken('tags', '').then(
+            fetchWithToken(MenuItems.TAGS, '').then(
                 (response) => response as TagType[]
+            ),
+        staleTime: 14400000,
+    });
+
+export const useQueryMenuIngredients = () =>
+    useQuery({
+        queryKey: [MenuItems.INGREDIENTS],
+        queryFn: () =>
+            fetchWithToken(MenuItems.INGREDIENTS, '').then(
+                (response) => response as IngredientWithTags[]
             ),
         staleTime: 14400000,
     });
