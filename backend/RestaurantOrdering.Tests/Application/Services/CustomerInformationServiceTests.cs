@@ -55,7 +55,6 @@ public class CustomerInformationServiceTests
             {
                 dest.PhoneNumber = src.PhoneNumber;
                 dest.OrderCompletionType = src.OrderCompletionType;
-                dest.PreferredPaymentMethod = src.PreferedPaymentMethod;
             });
 
         _mockMapper.Setup(m => m.Map<CustomerInformationReadDto>(It.IsAny<CustomerInformation>()))

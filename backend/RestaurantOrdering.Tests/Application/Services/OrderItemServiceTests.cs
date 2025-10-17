@@ -71,7 +71,7 @@ public class OrderItemServiceTests
             .Returns(new OrderReadDto { Id = order.Id });
 
         // Act
-        var result = await _service.AddOrderItems(order.Id, [dto]);
+        var result = await _service.AddOrderItemsToOrder(order.Id, [dto]);
 
         // Assert
         result.ShouldBeSuccessful(HttpStatusCode.OK);
@@ -87,7 +87,7 @@ public class OrderItemServiceTests
         var dto = OrderItemTestData.CreateCreateDto(Guid.NewGuid());
 
         // Act
-        var result = await _service.AddOrderItems(fakeOrderId, [dto]);
+        var result = await _service.AddOrderItemsToOrder(fakeOrderId, [dto]);
 
         // Assert
         result.ShouldFailWith(HttpStatusCode.NotFound, "Order not found.");
@@ -104,7 +104,7 @@ public class OrderItemServiceTests
         var dto = OrderItemTestData.CreateCreateDto(Guid.NewGuid());
 
         // Act
-        var result = await _service.AddOrderItems(order.Id, [dto]);
+        var result = await _service.AddOrderItemsToOrder(order.Id, [dto]);
 
         // Assert
         result.ShouldFailWith(HttpStatusCode.BadRequest, $"MenuItem with ID {dto.MenuItemId} not found.");
@@ -115,7 +115,7 @@ public class OrderItemServiceTests
     {
         // Arrange
         var service = new OrderItemService(null!, _mockEventHandler.Object, _mockMapper.Object);
-        var result = await service.AddOrderItems(Guid.NewGuid(), []);
+        var result = await service.AddOrderItemsToOrder(Guid.NewGuid(), []);
 
         // Assert
         result.IsSuccess.Should().BeFalse();

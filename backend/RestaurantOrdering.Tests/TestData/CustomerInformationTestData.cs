@@ -15,7 +15,6 @@ public static class CustomerInformationTestData
             Id = id ?? Guid.NewGuid(),
             PhoneNumber = DefaultPhone,
             OrderCompletionType = OrderCompletionType.Immediate,
-            PreferredPaymentMethod = PreferredPaymentMethod.Cash,
             OrderId = Guid.NewGuid(),
             Order = new Order()
         };
@@ -25,7 +24,6 @@ public static class CustomerInformationTestData
     {
         PhoneNumber = UpdatedPhone,
         OrderCompletionType = OrderCompletionType.Scheduled,
-        PreferedPaymentMethod = PreferredPaymentMethod.Card
     };
 
     public static CustomerInformationReadDto CreateReadDto(Guid id) => new()

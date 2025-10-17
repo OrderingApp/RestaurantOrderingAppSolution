@@ -38,7 +38,7 @@ public class ReservationServiceTests
     {
         // Arrange
         var dto = ReservationTestData.CreateReservationCreateDto();
-        var reservation = ReservationTestData.CreateReservation(phoneNumber: dto.PhoneNumber, name: dto.Name, dateTime: dto.DateTime, capacityNeeded: dto.CapacityNeeded);
+        var reservation = ReservationTestData.CreateReservation(phoneNumber: dto.PhoneNumber, name: dto.Name, scheduledFor: dto.ScheduledFor, capacityNeeded: dto.CapacityNeeded);
         var reservationReadDto = ReservationTestData.CreateReservationReadDto(reservation);
 
         _mockMapper.Setup(m => m.Map<Reservation>(dto)).Returns(reservation);
@@ -141,8 +141,8 @@ public class ReservationServiceTests
 
         var reservations = new List<Reservation>
     {
-        ReservationTestData.CreateReservation(dateTime: date.AddHours(10)),
-        ReservationTestData.CreateReservation(dateTime: date.AddHours(12))
+        ReservationTestData.CreateReservation(scheduledFor: date.AddHours(10)),
+        ReservationTestData.CreateReservation(scheduledFor: date.AddHours(12))
     };
 
         await _dbContext.Reservations.AddRangeAsync(reservations);
@@ -153,7 +153,7 @@ public class ReservationServiceTests
             Id = r.Id,
             PhoneNumber = r.PhoneNumber,
             Name = r.Name,
-            DateTime = r.DateTime,
+            ScheduledFor = r.ScheduledFor,
             CapacityNeeded = r.CapacityNeeded,
             IsAssigned = r.IsAssigned
         }).ToList();
@@ -222,7 +222,7 @@ public class ReservationServiceTests
             Id = reservation.Id,
             PhoneNumber = reservation.PhoneNumber,
             Name = reservation.Name,
-            DateTime = reservation.DateTime,
+            ScheduledFor = reservation.ScheduledFor,
             CapacityNeeded = reservation.CapacityNeeded,
             IsAssigned = true,
             TableName = table.Name
@@ -236,7 +236,7 @@ public class ReservationServiceTests
             .Returns(reservationDto);
 
         // Act
-        var result = await _service.AssignTableToReservation(reservation.Id, table.Id);
+        var result = await _service.AssignReservationToTable(reservation.Id, table.Id);
 
         // Assert
         result.ShouldBeSuccessful(HttpStatusCode.OK);
@@ -255,7 +255,7 @@ public class ReservationServiceTests
         await _dbContext.SaveChangesAsync();
 
         // Act
-        var result = await _service.AssignTableToReservation(Guid.NewGuid(), table.Id);
+        var result = await _service.AssignReservationToTable(Guid.NewGuid(), table.Id);
 
         // Assert
         result.ShouldFailWith<ReservationReadDto>(
@@ -274,7 +274,7 @@ public class ReservationServiceTests
         await _dbContext.SaveChangesAsync();
 
         // Act
-        var result = await _service.AssignTableToReservation(reservation.Id, Guid.NewGuid());
+        var result = await _service.AssignReservationToTable(reservation.Id, Guid.NewGuid());
 
         // Assert
         result.ShouldFailWith<ReservationReadDto>(
@@ -299,7 +299,7 @@ public class ReservationServiceTests
             It.IsAny<(Reservation, Guid)>())).Throws(new Exception("Mapping failed"));
 
         // Act
-        var result = await _service.AssignTableToReservation(reservation.Id, table.Id);
+        var result = await _service.AssignReservationToTable(reservation.Id, table.Id);
 
         // Assert
         result.ShouldFailWith<ReservationReadDto>(
@@ -321,7 +321,7 @@ public class ReservationServiceTests
             PhoneNumber = "987654321",
             Name = "Updated Name",
             CapacityNeeded = 5,
-            DateTime = reservation.DateTime.AddHours(2)
+            ScheduledFor = reservation.ScheduledFor.AddHours(2)
         };
 
         var updatedReservationDto = new ReservationReadDto
@@ -330,7 +330,7 @@ public class ReservationServiceTests
             PhoneNumber = updateDto.PhoneNumber!,
             Name = updateDto.Name!,
             CapacityNeeded = updateDto.CapacityNeeded!.Value,
-            DateTime = updateDto.DateTime!.Value,
+            ScheduledFor = updateDto.ScheduledFor!.Value,
             IsAssigned = reservation.IsAssigned,
         };
 
