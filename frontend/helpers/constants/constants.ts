@@ -49,6 +49,7 @@ export enum SEARCH_PARAMS_NAMES {
     NAME = 'name',
     TAG = 'tag',
     ORDER_TYPE = 'orderType',
+    ORDER_STATUS = 'orderStatus',
     ORDER_ID = 'orderId',
     MENU_ITEM_ID = 'menuItemId',
     MODAL = 'modal',
@@ -65,6 +66,7 @@ export enum MENU_CATEGORY_NAMES {
 export enum FILTER_STATUS {
     ONGOING = 'Ongoing',
     CLOSED = 'Closed',
+    PAIDANDREADYTOPREPARE = 'PaidAndReadyToPrepare',
 }
 
 export const ordersTypes = {

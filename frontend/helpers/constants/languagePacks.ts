@@ -78,8 +78,6 @@ export interface languagePack {
         };
     };
     ordersPage: {
-        ordersActiveTitle: string;
-        ordersClosedTitle: string;
         orderPickup: string;
         orderDelivery: string;
         createOrder: string;

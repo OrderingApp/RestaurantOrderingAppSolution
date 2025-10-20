@@ -77,8 +77,7 @@ const enPack: languagePack = {
         },
     },
     ordersPage: {
-        ordersActiveTitle: 'Open',
-        ordersClosedTitle: 'Closed',
+    
         orderPickup: 'Pickup',
         orderDelivery: 'Delivery',
         createOrder: 'Create',

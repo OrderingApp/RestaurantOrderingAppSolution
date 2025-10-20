@@ -6,9 +6,10 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 interface SearchInputProps {
     placeholder?: string;
+    className?: string;
 }
 
-const SearchInput = ({ placeholder }: SearchInputProps) => {
+const SearchInput = ({ placeholder, className }: SearchInputProps) => {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -22,7 +23,7 @@ const SearchInput = ({ placeholder }: SearchInputProps) => {
         <Input
             type="search"
             placeholder={placeholder}
-            inputClassName="w-[70%] [&::placeholder]:text-black bg-white shadow-[0px_4px_4px_0px_#00000040] pl-8 ml-4"
+            inputClassName={`w-full [&::placeholder]:text-black bg-white shadow-[0px_4px_4px_0px_#00000040] pl-8 ml-4 ${className}`}
             icon={<Image src={searchSvg} alt="searchIcon" />}
             iconClassName="left-7 top-[11px] w-4"
             onChange={changeInputValue}

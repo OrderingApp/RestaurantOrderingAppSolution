@@ -77,8 +77,6 @@ const plPack: languagePack = {
         },
     },
     ordersPage: {
-        ordersActiveTitle: 'Otwarte',
-        ordersClosedTitle: 'Zamknięte',
         orderPickup: 'Odbiór',
         orderDelivery: 'Dowóz',
         createOrder: 'Utwórz',
