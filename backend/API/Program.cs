@@ -107,6 +107,11 @@ app.UseCustomMiddlewares();
 app.MapControllers();
 
 // Database Migration and Seeding
-await app.Services.UseDatabaseMigrationAndSeeding();
+if (!app.Environment.IsEnvironment("Test"))
+{
+    await app.Services.UseDatabaseMigrationAndSeeding();
+}
 
 app.Run();
+
+public partial class Program { }
