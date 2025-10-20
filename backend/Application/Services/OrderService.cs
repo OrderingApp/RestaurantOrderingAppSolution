@@ -207,53 +207,51 @@ public class OrderService(
 
     public async Task<ResultDto<List<NonDineInOrderSummaryDto>>> GetOngoingAndClosedNonDineInOrders(
         OrderType orderType,
+        IReadOnlyCollection<OrderStatus> statuses,
         DateTime? date = null
     )
     {
         try
         {
-            if (orderType != OrderType.Delivery && orderType != OrderType.Takeaway)
-            {
+            if (orderType is not (OrderType.Delivery or OrderType.Takeaway))
                 return ResultDto<List<NonDineInOrderSummaryDto>>.Failure(
                     "Invalid order type. Only 'Delivery' and 'Takeaway' types are allowed.",
                     HttpStatusCode.BadRequest
                 );
-            }
 
             var day = (date ?? DateTime.Now).Date;
-
             var nextDay = day.AddDays(1);
 
-            var baseQuery = orderingContext.Orders
-                        .AsNoTracking()
-                        .Where(o => o.Type == orderType)
-                        .Include(o => o.CustomerInformation);
+            var statusArr = statuses?.ToArray() ?? Array.Empty<OrderStatus>();
+            var closedOnly = statusArr.Length == 1 && statusArr[0] == OrderStatus.Closed;
 
-            // Ongoing: due today or overdue (Expected < end of day)
-            var ongoing = await baseQuery
-                .Where(o => o.Status == OrderStatus.Ongoing
-                    && ((o.CustomerInformation != null ? o.CustomerInformation.ExpectedOrderCompletion : null) ?? o.CreatedAt) >= day
-                    && ((o.CustomerInformation != null ? o.CustomerInformation.ExpectedOrderCompletion : null) ?? o.CreatedAt) < nextDay)
+            // Base + projection with computed DueAt (ExpectedOrderCompletion ?? CreatedAt)
+            var q = orderingContext.Orders
+                .AsNoTracking()
+                .Where(o => o.Type == orderType && statusArr.Contains(o.Status))
+                .Select(o => new
+                {
+                    Order = o,
+                    DueAt = (o.CustomerInformation != null
+                                ? (DateTime?)(o.CustomerInformation.ExpectedOrderCompletion)
+                                : null) ?? o.CreatedAt
+                });
+
+            // Filter by today using the projected DueAt
+            q = q.Where(x => x.DueAt >= day && x.DueAt < nextDay);
+
+            // Sort: closed -> newest; else -> by DueAt
+            q = closedOnly
+                ? q.OrderByDescending(x => x.Order.CreatedAt).ThenByDescending(x => x.Order.Id)
+                : q.OrderBy(x => x.DueAt).ThenBy(x => x.Order.Id);
+
+            // Bring back the entity for mapping
+            var entities = await q
+                .Select(x => x.Order)
+                .Include(o => o.CustomerInformation)   // keep if your DTO needs it
                 .ToListAsync();
 
-
-            // Closed: within today's expected window, latest 10
-            var closed = await baseQuery
-                .Where(o => o.Status == OrderStatus.Closed
-                    && ((o.CustomerInformation != null ? o.CustomerInformation.ExpectedOrderCompletion : null) ?? o.CreatedAt) >= day
-                    && ((o.CustomerInformation != null ? o.CustomerInformation.ExpectedOrderCompletion : null) ?? o.CreatedAt) < nextDay)
-                .OrderByDescending(o => o.CreatedAt)
-                .Take(10)
-                .ToListAsync();
-
-            // Merge and sort by expected completion (coalesced), so UI is “what’s due next”
-            var combined = ongoing
-                .Concat(closed)
-                .OrderBy(o => o.CustomerInformation!.ExpectedOrderCompletion ?? o.CreatedAt)
-                .ToList();
-
-            var dtos = mapper.Map<List<NonDineInOrderSummaryDto>>(combined);
-
+            var dtos = mapper.Map<List<NonDineInOrderSummaryDto>>(entities);
             return ResultDto<List<NonDineInOrderSummaryDto>>.Success(dtos, HttpStatusCode.OK);
         }
         catch (Exception ex)
@@ -264,6 +262,66 @@ public class OrderService(
             );
         }
     }
+
+    //public async Task<ResultDto<List<NonDineInOrderSummaryDto>>> GetOngoingAndClosedNonDineInOrders(
+    //    OrderType orderType,
+    //    DateTime? date = null
+    //)
+    //{
+    //    try
+    //    {
+    //        if (orderType != OrderType.Delivery && orderType != OrderType.Takeaway)
+    //        {
+    //            return ResultDto<List<NonDineInOrderSummaryDto>>.Failure(
+    //                "Invalid order type. Only 'Delivery' and 'Takeaway' types are allowed.",
+    //                HttpStatusCode.BadRequest
+    //            );
+    //        }
+
+    //        var day = (date ?? DateTime.Now).Date;
+
+    //        var nextDay = day.AddDays(1);
+
+    //        var baseQuery = orderingContext.Orders
+    //                    .AsNoTracking()
+    //                    .Where(o => o.Type == orderType)
+    //                    .Include(o => o.CustomerInformation);
+
+    //        // Ongoing: due today or overdue (Expected < end of day)
+    //        var ongoing = await baseQuery
+    //            .Where(o => o.Status == OrderStatus.Ongoing
+    //                && ((o.CustomerInformation != null ? o.CustomerInformation.ExpectedOrderCompletion : null) ?? o.CreatedAt) >= day
+    //                && ((o.CustomerInformation != null ? o.CustomerInformation.ExpectedOrderCompletion : null) ?? o.CreatedAt) < nextDay)
+    //            .ToListAsync();
+
+
+    //        // Closed: within today's expected window, latest 10
+    //        var closed = await baseQuery
+    //            .Where(o => o.Status == OrderStatus.Closed
+    //                && ((o.CustomerInformation != null ? o.CustomerInformation.ExpectedOrderCompletion : null) ?? o.CreatedAt) >= day
+    //                && ((o.CustomerInformation != null ? o.CustomerInformation.ExpectedOrderCompletion : null) ?? o.CreatedAt) < nextDay)
+    //            .OrderByDescending(o => o.CreatedAt)
+    //            .Take(10)
+    //            .ToListAsync();
+
+    //        // Merge and sort by expected completion (coalesced), so UI is “what’s due next”
+    //        var combined = ongoing
+    //            .Concat(closed)
+    //            .OrderBy(o => o.CustomerInformation!.ExpectedOrderCompletion ?? o.CreatedAt)
+    //            .ToList();
+
+    //        var dtos = mapper.Map<List<NonDineInOrderSummaryDto>>(combined);
+
+    //        return ResultDto<List<NonDineInOrderSummaryDto>>.Success(dtos, HttpStatusCode.OK);
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return ResultDto<List<NonDineInOrderSummaryDto>>.Failure(
+    //            $"An error occurred: {ex.Message}",
+    //            HttpStatusCode.InternalServerError
+    //        );
+    //    }
+    //}
 
     // this is for orders for this table its needed
     public async Task<ResultDto<List<OrderSummaryDto>>> GetOngoingOrdersForTable(Guid tableId)

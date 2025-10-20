@@ -104,8 +104,9 @@ public class OrderController(IOrderService orderService) : BaseApiController
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<List<NonDineInOrderSummaryDto>>> GetOngoingAndClosedNonDineInOrders(
         [FromQuery] OrderType orderType,
+        [FromQuery] IReadOnlyCollection<OrderStatus> statuses,
         [FromQuery] DateTime? date = null
-    ) => HandleResult(await orderService.GetOngoingAndClosedNonDineInOrders(orderType, date));
+    ) => HandleResult(await orderService.GetOngoingAndClosedNonDineInOrders(orderType, statuses, date));
 
     /// <summary>
     /// Applies a discount to an existing order.
