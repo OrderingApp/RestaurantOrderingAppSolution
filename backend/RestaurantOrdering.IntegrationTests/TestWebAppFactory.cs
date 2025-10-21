@@ -61,8 +61,6 @@ public class TestWebAppFactory : WebApplicationFactory<Program>
 
             var eventsDb = scope.ServiceProvider.GetRequiredService<EventsDatabaseContext>();
             eventsDb.Database.EnsureCreated();
-
-            // Uwaga: NIE wywołujemy tutaj UseDatabaseMigrationAndSeeding()!
         });
     }
     private static void RemoveDbContext<TContext>(IServiceCollection services)

@@ -8,9 +8,8 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "createdAt": "2025-10-04T19:00:00Z",
   "discount": 10,
-  "tableId": "43ce39b4-cc59-4b76-884f-c4a2694cc374",
+  "tableId": "0E85B353-9DA3-40EA-9AEA-37DC701C56AA",
   "orderItems": [
     {
       "menuItemId": "0026375D-9736-4B94-ABA5-3E7644643DFF",
