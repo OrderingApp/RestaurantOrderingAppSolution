@@ -83,6 +83,15 @@ public class OrderService(
         {
             var takeawayOrder = mapper.Map<Order>(takeawayOrderDto);
 
+            // Ensure the nested CI is tracked and the FK is set explicitly
+            if (takeawayOrder.CustomerInformation != null)
+            {
+                // New CI => Added; if someday you pass an Id, switch to Unchanged.
+                orderingContext.Entry(takeawayOrder.CustomerInformation).State = EntityState.Added;
+
+                // With Guid PKs, EF will generate the CI.Id on Add, so you can assign FK now:
+                takeawayOrder.CustomerInformationId = takeawayOrder.CustomerInformation.Id;
+            }
 
             takeawayOrder.OrderItems = await OrderCalculationHelper.PopulateOrderItemsAsync(
                 orderingContext,
@@ -118,6 +127,16 @@ public class OrderService(
         try
         {
             var deliveryOrder = mapper.Map<Order>(deliveryOrderDto);
+
+            // Ensure the nested CI is tracked and the FK is set explicitly
+            if (deliveryOrder.CustomerInformation != null)
+            {
+                // New CI => Added; if someday you pass an Id, switch to Unchanged.
+                orderingContext.Entry(deliveryOrder.CustomerInformation).State = EntityState.Added;
+
+                // With Guid PKs, EF will generate the CI.Id on Add, so you can assign FK now:
+                deliveryOrder.CustomerInformationId = deliveryOrder.CustomerInformation.Id;
+            }
 
             deliveryOrder.OrderItems = await OrderCalculationHelper.PopulateOrderItemsAsync(
                 orderingContext,
@@ -155,6 +174,7 @@ public class OrderService(
                     .ThenInclude(oi => oi.MenuItem)
                         .ThenInclude(mi => mi.MenuItemIngredientRels)
                             .ThenInclude(rel => rel.Ingredient)
+                .Include(o => o.CustomerInformation)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (order == null)

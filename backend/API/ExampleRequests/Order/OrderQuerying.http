@@ -4,7 +4,7 @@
 
 // To get a specific order by its ID.
 
-GET {{API_HostAddress}}/orders/C93FA2FE-918A-4B90-9841-342C6A84E716
+GET {{API_HostAddress}}/orders/9428E762-0AFA-4475-8AAD-F74754ED127E
 Accept: application/json
 
 ###
