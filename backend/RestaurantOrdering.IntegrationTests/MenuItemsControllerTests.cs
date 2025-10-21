@@ -1,5 +1,4 @@
-﻿// RestaurantOrdering.IntegrationTests/MenuItemsControllerTests.cs
-using FluentAssertions;
+﻿using FluentAssertions;
 using System.Net;
 
 public class MenuItemsControllerTests : IClassFixture<TestWebAppFactory>

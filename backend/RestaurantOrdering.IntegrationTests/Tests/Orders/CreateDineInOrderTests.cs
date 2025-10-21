@@ -1,5 +1,4 @@
-﻿// IntegrationTests/Orders/CreateDineInOrderTests.cs
-using FluentAssertions;
+﻿using FluentAssertions;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -52,7 +51,7 @@ public class CreateDineInOrderTests : IClassFixture<TestWebAppFactory>, IAsyncLi
 
         var dto = await resp.Content.ReadFromJsonAsync<OrderReadDto>();
         dto.Should().NotBeNull();
-        dto!.TotalAmount.Should().Be(22m); // 20 + (1*2)
+        dto!.TotalAmount.Should().Be(22m);
 
         // DB verify
         var saved = await db.Orders.Include(o => o.OrderItems).FirstAsync(o => o.Id == dto.Id);

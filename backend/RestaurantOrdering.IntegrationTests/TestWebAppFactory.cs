@@ -1,5 +1,4 @@
-﻿// RestaurantOrdering.IntegrationTests/TestWebAppFactory.cs
-using Infrastructure.Database;
+﻿using Infrastructure.Database;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;

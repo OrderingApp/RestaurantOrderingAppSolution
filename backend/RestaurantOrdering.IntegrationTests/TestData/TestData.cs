@@ -1,5 +1,4 @@
-﻿// IntegrationTests/TestData/TestData.cs
-using Infrastructure.Database;
+﻿using Infrastructure.Database;
 
 public sealed class TestData
 {
