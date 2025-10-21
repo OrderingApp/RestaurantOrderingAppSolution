@@ -121,6 +121,16 @@ const plPack: languagePack = {
                 },
             },
         },
+        orderOptionsModal: {
+            titleDelivery: 'Dowóz',
+            titleTakeway: 'Odbiór',
+            paymentDue: 'Do Zapłaty',
+            customerInformation: {
+                time: 'Godzina',
+                phoneNumber: 'Numer telefonu',
+                address: 'Adres',
+            },
+        },
 
         asideTitle: 'Zamówienie',
     },

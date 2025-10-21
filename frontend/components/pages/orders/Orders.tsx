@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import Image from 'next/image';
@@ -24,14 +23,14 @@ import PaymentDetails from '@/components/shared/modals/PaymentDetails';
 import EditOrder from './EditOrder';
 import CreateOrder from './CreateOrder';
 import SearchInput from '@/components/shared/Input/SearchInput';
+import OrderOptionsModal from '@/components/shared/modals/OrderOptionsModal';
+import Modal from '@/components/shared/modals/Modal';
 
 const Orders = () => {
     const { language } = useLanguage();
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const router = useRouter();
-
-    const [selectedId, setSelectedId] = useState<string | null>(null);
 
     const params = Object.fromEntries(searchParams.entries());
 
@@ -44,21 +43,8 @@ const Orders = () => {
     const { filteredOrders } = useFilterOrders();
 
     const {
-        ordersPage: { createOrder, editOrder, payment, asideTitle },
+        ordersPage: { createOrder, editOrder, asideTitle },
     } = languagePacks[language];
-
-    const toggleSelected = (id: string) => {
-        const params = new URLSearchParams(searchParams.toString());
-
-        if (selectedId === id) {
-            setSelectedId(null);
-            params.delete('orderId');
-        } else {
-            setSelectedId(id);
-            params.set('orderId', id);
-        }
-        router.push(`/orders?${params.toString()}`);
-    };
 
     const toggleModal = () => {
         toggleQueryParam(
@@ -154,62 +140,79 @@ const Orders = () => {
         if (param === value) return value;
     };
 
+    const closeOrderOptionsModal = () => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete(SEARCH_PARAMS_NAMES.ORDER_ID);
+        router.push(`/orders?${params.toString()}`);
+    };
+
+    const openOrderOptionsModal = (id: string) => {
+        toggleQueryParam(
+            SEARCH_PARAMS_NAMES.ORDER_ID,
+            id,
+            searchParams,
+            router,
+            pathname
+        );
+    };
+
     return (
-        <div className="flex flex-col h-full p-4 pb-0">
-            <div className="flex p-4 justify-between items-center h-auto">
-                <ToggleSwitch items={ordersTypes[language]} />
-                <div className="flex gap-4">
-                    <Button onClick={toggleModal} variant="primary">
-                        {orderId ? editOrder : createOrder}
-                    </Button>
-                    {orderId && (
-                        <Button onClick={closeOrderHandler} variant="primary">
-                            {payment}
+        <>
+            {orderId && modal !== 'true' && (
+                <Modal onClose={closeOrderOptionsModal}>
+                    <OrderOptionsModal onClose={closeOrderOptionsModal} />
+                </Modal>
+            )}
+            <div className="flex flex-col h-full p-4 pb-0">
+                <div className="flex p-4 justify-between items-center h-auto">
+                    <ToggleSwitch items={ordersTypes[language]} />
+                    <div className="flex gap-4">
+                        <Button onClick={toggleModal} variant="primary">
+                            {orderId ? editOrder : createOrder}
                         </Button>
-                    )}
+                    </div>
                 </div>
-            </div>
-            <div className="flex justify-around w-full mt-20  h-auto">
-                <div className="flex items-start justify-between w-full">
-                    <div className="flex gap-4 mb-4 w-2/5 ">
-                        {buttons.map((btn) => (
-                            <button
-                                className={`${isActive(btn.value) === btn.value ? 'bg-primary' : 'bg-[#F6F6F6]'} p-3 rounded-lg shadow-xl`}
-                                onClick={() =>
-                                    toggleQueryParam(
-                                        'orderStatus',
-                                        btn.value,
-                                        searchParams,
-                                        router,
-                                        pathname
-                                    )
-                                }
-                                key={btn.value}
-                            >
-                                <Image
-                                    src={
-                                        isActive(btn.value) === btn.value
-                                            ? btn.iconActive
-                                            : btn.icon
+                <div className="flex justify-around w-full mt-20  h-auto">
+                    <div className="flex items-start justify-between w-full">
+                        <div className="flex gap-4 mb-4 w-2/5 ">
+                            {buttons.map((btn) => (
+                                <button
+                                    className={`${isActive(btn.value) === btn.value ? 'bg-primary' : 'bg-[#F6F6F6]'} p-3 rounded-lg shadow-xl`}
+                                    onClick={() =>
+                                        toggleQueryParam(
+                                            'orderStatus',
+                                            btn.value,
+                                            searchParams,
+                                            router,
+                                            pathname
+                                        )
                                     }
-                                    alt="iconList"
-                                />
-                            </button>
-                        ))}
-                    </div>
-                    <div className="w-3/5 mr-5">
-                        <SearchInput placeholder="Wyszukaj" />
+                                    key={btn.value}
+                                >
+                                    <Image
+                                        src={
+                                            isActive(btn.value) === btn.value
+                                                ? btn.iconActive
+                                                : btn.icon
+                                        }
+                                        alt="iconList"
+                                    />
+                                </button>
+                            ))}
+                        </div>
+                        <div className="w-3/5 mr-5">
+                            <SearchInput placeholder="Wyszukaj" />
+                        </div>
                     </div>
                 </div>
+                <div className="flex-1 text-center text-5xl">
+                    <OrderList
+                        orders={filteredOrders}
+                        openModal={openOrderOptionsModal}
+                    />
+                </div>
             </div>
-            <div className="flex-1 text-center text-5xl">
-                <OrderList
-                    orders={filteredOrders}
-                    toggleSelected={toggleSelected}
-                    selectedId={selectedId}
-                />
-            </div>
-        </div>
+        </>
     );
 };
 

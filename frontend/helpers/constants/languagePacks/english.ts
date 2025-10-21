@@ -77,7 +77,6 @@ const enPack: languagePack = {
         },
     },
     ordersPage: {
-    
         orderPickup: 'Pickup',
         orderDelivery: 'Delivery',
         createOrder: 'Create',
@@ -120,6 +119,16 @@ const enPack: languagePack = {
                         max: 'Address can be up to 100 characters long',
                     },
                 },
+            },
+        },
+        orderOptionsModal: {
+            titleDelivery: 'Delivery',
+            titleTakeway: 'Pickup',
+            paymentDue: 'Payment Due',
+            customerInformation: {
+                time: 'Time',
+                phoneNumber: 'Phone Number',
+                address: 'Adress',
             },
         },
         asideTitle: 'Order',

@@ -10,6 +10,11 @@ import listSvg from '@/public/images/svg/list.svg';
 import listWhiteSvg from '@/public/images/svg/list-white.svg';
 import menuOpenSvg from '@/public/images/svg/menu_open.svg';
 import menuOpenWhiteSvg from '@/public/images/svg/menu_open-white.svg';
+import previewSvg from '@/public/images/svg/Book open.svg';
+import editOrderSvg from '@/public/images/svg/edit-order.svg';
+import deleteSvg from '@/public/images/svg/delete.svg';
+import dollarWhiteSvg from '@/public/images/svg/dollar-white.svg';
+import mapMarkerSvg from '@/public/images/svg/map-marker.svg';
 
 export const ICONS = {
     USER: userSvg,
@@ -24,4 +29,9 @@ export const ICONS = {
     LIST_WHITE: listWhiteSvg,
     MENU_OPEN: menuOpenSvg,
     MENU_OPEN_WHITE: menuOpenWhiteSvg,
+    PREVIEW: previewSvg,
+    EDIT_ORDER: editOrderSvg,
+    DELETE: deleteSvg,
+    DOLLAR_WHITE: dollarWhiteSvg,
+    MAP_MARKER: mapMarkerSvg,
 } as const;

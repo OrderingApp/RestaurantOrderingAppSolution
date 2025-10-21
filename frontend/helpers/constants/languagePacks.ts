@@ -106,6 +106,16 @@ export interface languagePack {
                 errors: orderFormErrorFields;
             };
         };
+        orderOptionsModal: {
+            titleTakeway: string;
+            titleDelivery: string;
+            paymentDue: string;
+            customerInformation: {
+                time: string;
+                phoneNumber: string;
+                address: string;
+            };
+        };
     };
     paymentModal: {
         title: string;

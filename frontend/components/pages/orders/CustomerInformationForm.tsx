@@ -110,6 +110,8 @@ const CustomerInformationForm = ({
             orderItems: orderItems,
         };
 
+        console.log(order);
+
         if (!isDelivery) {
             createTakewayOrderMutation.mutate({ data: order });
         } else {

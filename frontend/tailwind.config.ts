@@ -18,6 +18,8 @@ export default {
                     'linear-gradient(135deg, #6E8894 0%, #334046 100%)',
                 'payment-modal-gradient':
                     'linear-gradient(135deg, #CD5700 0%, #843901 100%)',
+                'order-card-gradient':
+                    'linear-gradient(135deg, #CD5700 0%, #843901 100%)',
             },
             colors: {
                 primary: {
