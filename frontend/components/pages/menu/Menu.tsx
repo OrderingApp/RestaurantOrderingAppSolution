@@ -60,7 +60,10 @@ const Menu = ({ variant = 'order', children }: MenuProps) => {
                         menuStyles.variants[variant].container
                     )}
                 >
-                    <SearchInput placeholder={searchInputPlaceholder} />
+                    <SearchInput
+                        placeholder={searchInputPlaceholder}
+                        className="w-[90%]"
+                    />
                     <div className="p-5 flex items-center gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
                         <MenuCategory
                             id={MENU_CATEGORY_NAMES.ALL}

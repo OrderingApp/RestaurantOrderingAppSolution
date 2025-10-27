@@ -43,7 +43,10 @@ interface FilledAside {
 export type DetailsAsideProps = {
     buttons?: Omit<ButtonProps, 'className'>[];
 } & (FilledAside | EmptyAside) &
-    (RegularHeader | ButtonHeader) & { className?: string };
+    (RegularHeader | ButtonHeader) & { className?: string } & {
+        isDelivery?: boolean;
+        deliveryPrice?: number;
+    };
 
 const DetailsAside = ({
     title,
@@ -54,6 +57,8 @@ const DetailsAside = ({
     button,
     served,
     className,
+    isDelivery,
+    deliveryPrice,
 }: DetailsAsideProps) => {
     const { language } = useLanguage();
     const { detailsAside } = languagePacks[language];
@@ -112,7 +117,15 @@ const DetailsAside = ({
                 ))}
 
             {items && <ItemsList items={items} />}
-
+            {isDelivery && (
+                <div>
+                    <div className="h-0.5 w-full bg-[#707070] my-2"></div>
+                    <div className="flex justify-between px-4">
+                        <p className="font-medium">Dostawa</p>
+                        <p className="font-bold">{deliveryPrice}</p>
+                    </div>
+                </div>
+            )}
             {buttons && (
                 <menu className="mt-auto pt-[18px] flex flex-col gap-3 px-5">
                     {buttons.map(({ children, ...btn }) => (

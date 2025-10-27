@@ -43,7 +43,7 @@ const Orders = () => {
     const { filteredOrders } = useFilterOrders();
 
     const {
-        ordersPage: { createOrder, editOrder, asideTitle },
+        ordersPage: { createOrder, asideTitle },
     } = languagePacks[language];
 
     const toggleModal = () => {
@@ -168,7 +168,7 @@ const Orders = () => {
                     <ToggleSwitch items={ordersTypes[language]} />
                     <div className="flex gap-4">
                         <Button onClick={toggleModal} variant="primary">
-                            {orderId ? editOrder : createOrder}
+                            {createOrder}
                         </Button>
                     </div>
                 </div>
@@ -201,7 +201,10 @@ const Orders = () => {
                             ))}
                         </div>
                         <div className="w-3/5 mr-5">
-                            <SearchInput placeholder="Wyszukaj" />
+                            <SearchInput
+                                placeholder="Wyszukaj"
+                                className="w-full"
+                            />
                         </div>
                     </div>
                 </div>

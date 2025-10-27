@@ -28,9 +28,10 @@ const Input = ({
     iconClassName,
     icon,
     errors,
+    className,
     ...props
 }: InputProps) => (
-    <div className="flex flex-col relative">
+    <div className={clsx('relative flex flex-col', className)}>
         {label && (
             <label
                 htmlFor={id}

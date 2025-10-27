@@ -8,7 +8,7 @@ export const getOrderTakewaySchema = (lang: LanguageTypes) => {
             orderCustomerInformationForm: {
                 form: {
                     errors: {
-                        name: { min: minName, max: maxMame },
+                        comment: { max: maxMame },
                         time,
                         phoneNumber,
                     },
@@ -18,11 +18,11 @@ export const getOrderTakewaySchema = (lang: LanguageTypes) => {
     } = languagePacks[lang];
 
     return z.object({
-        name: z.string().min(3, minName).max(30, maxMame),
         time: z.string().nonempty(time),
         phoneNumber: z.string().refine((val) => /^\d{9}$/.test(val), {
             message: phoneNumber,
         }),
+        comment: z.string().max(100, maxMame).optional(),
     });
 };
 

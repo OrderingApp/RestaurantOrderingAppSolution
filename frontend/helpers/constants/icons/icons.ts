@@ -15,6 +15,7 @@ import editOrderSvg from '@/public/images/svg/edit-order.svg';
 import deleteSvg from '@/public/images/svg/delete.svg';
 import dollarWhiteSvg from '@/public/images/svg/dollar-white.svg';
 import mapMarkerSvg from '@/public/images/svg/map-marker.svg';
+import mapSvg from '@/public/images/svg/Map.svg';
 
 export const ICONS = {
     USER: userSvg,
@@ -34,4 +35,5 @@ export const ICONS = {
     DELETE: deleteSvg,
     DOLLAR_WHITE: dollarWhiteSvg,
     MAP_MARKER: mapMarkerSvg,
+    MAP: mapSvg,
 } as const;

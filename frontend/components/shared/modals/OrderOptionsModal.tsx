@@ -1,6 +1,6 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 
 import { SEARCH_PARAMS_NAMES } from '@/helpers/constants/constants';
@@ -8,10 +8,14 @@ import { ICONS } from '@/helpers/constants/icons/icons';
 import languagePacks from '@/helpers/constants/languagePacks';
 import useLanguage from '@/helpers/hooks/useLanguage';
 import useQuerySingleOrder from '@/helpers/queries/orders/useQuerySingleOrder';
+import { toggleQueryParam } from '@/helpers/utils/utils';
+import { useRouter } from 'next/navigation';
 
 const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
     const { language } = useLanguage();
     const searchParms = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
     const orderId = searchParms.get(SEARCH_PARAMS_NAMES.ORDER_ID);
     const { data } = useQuerySingleOrder(orderId || '');
 
@@ -49,6 +53,16 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
         },
     ];
 
+    const closeOrderOnClick = () => {
+        toggleQueryParam(
+            SEARCH_PARAMS_NAMES.CLOSE_ORDER,
+            'true',
+            searchParms,
+            router,
+            pathname
+        );
+    };
+
     const actionsButtons = [
         {
             icon: ICONS.PREVIEW,
@@ -57,17 +71,18 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
         },
         {
             icon: ICONS.EDIT_ORDER,
-            color: '#2B5162',
+            color: '#008080',
             alt: 'edit icon',
         },
         {
             icon: ICONS.DOLLAR_WHITE,
-            color: '#FFE101',
+            color: '#008080',
             alt: 'payment icon',
+            onClick: closeOrderOnClick,
         },
         {
             icon: ICONS.DELETE,
-            color: '#BB0101',
+            color: '#008080',
             alt: 'delete icon',
         },
     ];
@@ -108,6 +123,7 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
                         {actionsButtons.map((btn) => (
                             <button
                                 key={btn.alt}
+                                onClick={btn.onClick}
                                 className={`w-16 h-16 bg-[${btn.color}] rounded-md shadow-md flex justify-center items-center`}
                             >
                                 <Image

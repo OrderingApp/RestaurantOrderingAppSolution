@@ -1,7 +1,19 @@
 'use client';
+
+import { useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import Image from 'next/image';
+
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import DetailsAside from '@/components/shared/asides/Details';
 import Button, { ButtonProps } from '@/components/shared/button/Button';
 import Input from '@/components/shared/Input/Input';
+import { BillProps } from './CreateOrder';
+import DeliveryInput from './DeliveryInput';
+
+import { getFutureTime } from '@/helpers/utils/dates';
 import { ICONS } from '@/helpers/constants/icons/icons';
 import languagePacks from '@/helpers/constants/languagePacks';
 import { OrderDto } from '@/helpers/interfaces/orders';
@@ -9,55 +21,46 @@ import { getOrderDeliverySchema } from '@/helpers/models/orderDeliveryForm';
 import { getOrderTakewaySchema } from '@/helpers/models/orderTakewayForm';
 import useOrderMutation from '@/helpers/queries/orders/useOrdersMutation';
 import { useLanguage } from '@/providers/LanguageProvider';
-import { zodResolver } from '@hookform/resolvers/zod';
-import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { BillProps } from './CreateOrder';
-import { getFutureTime } from '@/helpers/utils/dates';
-import DeliveryInput from './DeliveryInput';
+
+import { useOrdersContext } from '@/providers/OrdersContext';
 
 const formDefaultValues = {
-    name: '',
     date: '',
     time: '',
     phoneNumber: '',
     address: '',
+    comment: '',
 };
 
 interface FormData {
-    name: string;
     time: string;
     phoneNumber: string;
     address?: string;
+    comment: string;
+}
+
+interface CustomerInformationFormProps {
+    bill: BillProps[];
+    orderItems: { menuItemId: string }[];
 }
 
 const CustomerInformationForm = ({
     bill,
     orderItems,
-}: {
-    bill: BillProps[];
-
-    orderItems: { menuItemId: string }[];
-}) => {
-    const [isDelivery, setIsDelivery] = useState(false);
+}: CustomerInformationFormProps) => {
+    const [isDelivery, setIsDelivery] = useState<boolean>(false);
     const [isCustomDate, setIsCustomDate] = useState<string | null>(null);
-    const { language } = useLanguage();
     const pathname = usePathname();
     const router = useRouter();
-    const deliverySchema = getOrderDeliverySchema(language);
-    const takewaySchema = getOrderTakewaySchema(language);
-
-    const createTakewayOrderMutation = useOrderMutation('create', 'Takeaway');
-    const createDeliveryOrderMutation = useOrderMutation('create', 'Delivery');
+    const { language } = useLanguage();
+    const { deliveryPrice } = useOrdersContext();
 
     const {
         ordersPage: {
             orderCustomerInformationForm: {
                 title,
                 form: {
-                    fields: { name, time, phoneNumber, address },
+                    fields: { comment, time, phoneNumber, address },
                 },
                 buttons: { takeway, delivery },
                 aside: {
@@ -67,6 +70,12 @@ const CustomerInformationForm = ({
             },
         },
     } = languagePacks[language];
+
+    const deliverySchema = getOrderDeliverySchema(language);
+    const takewaySchema = getOrderTakewaySchema(language);
+
+    const createTakewayOrderMutation = useOrderMutation('create', 'Takeaway');
+    const createDeliveryOrderMutation = useOrderMutation('create', 'Delivery');
 
     const {
         handleSubmit,
@@ -78,7 +87,7 @@ const CustomerInformationForm = ({
         defaultValues: formDefaultValues,
     });
 
-    const timeButtonFn = (time: string, id: string) => {
+    const setInputValueHandler = (time: string, id: string) => {
         setValue('time', getFutureTime(parseInt(time)), {
             shouldDirty: true,
             shouldValidate: true,
@@ -103,14 +112,13 @@ const CustomerInformationForm = ({
                 phoneNumber: data.phoneNumber,
                 orderCompletionType: 'Immediate',
                 preferredPaymentMethod: 'Card',
-                additionalInstructions: '',
+                additionalInstructions: data.comment,
                 address: isDelivery ? data.address : '',
                 expectedOrderCompletion: dateTimeStr,
             },
             orderItems: orderItems,
+            deliveryPrice: deliveryPrice ? deliveryPrice : 0,
         };
-
-        console.log(order);
 
         if (!isDelivery) {
             createTakewayOrderMutation.mutate({ data: order });
@@ -187,15 +195,6 @@ const CustomerInformationForm = ({
                     className="flex flex-col gap-5 mt-6"
                 >
                     <Input
-                        type="text"
-                        id="name"
-                        icon={<Image src={ICONS.USER} alt="userIcon" />}
-                        label={name}
-                        {...register('name')}
-                        errors={errors.name}
-                        inputClassName="w-full"
-                    />
-                    <Input
                         type="time"
                         id="time"
                         icon={<Image src={ICONS.TIME} alt="timeIcon" />}
@@ -215,7 +214,7 @@ const CustomerInformationForm = ({
                                 value={btn.value}
                                 inputClassName={`${isCustomDate === btn.id ? 'bg-primary text-white' : 'bg-white'} focus:outline-none focus:ring-0 w-auto text-sm  shadow-xl rounded-xl`}
                                 onClick={(e) =>
-                                    timeButtonFn(
+                                    setInputValueHandler(
                                         e.currentTarget.id as string,
                                         btn.id
                                     )
@@ -232,12 +231,32 @@ const CustomerInformationForm = ({
                         errors={errors.phoneNumber}
                         inputClassName="w-full"
                     />
+
                     <DeliveryInput
                         address={address}
                         isDelivery={isDelivery}
                         errors={errors}
                         register={register}
                     />
+
+                    <div className="flex flex-col">
+                        <label
+                            htmlFor="comment"
+                            className="font-bold text-sm ml-2 mb-1"
+                        >
+                            {comment}
+                        </label>
+                        <textarea
+                            {...register('comment')}
+                            id="comment"
+                            className={`${errors.comment && 'bg-red-200'} h-40 rounded-xl bg-[#E6E6E6] text-[#2B5162] p-2 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        />
+                        {errors && (
+                            <p className="text-red-500 text-[10px] md:text-[12px] px-2">
+                                {errors.comment?.message}
+                            </p>
+                        )}
+                    </div>
                 </form>
             </div>
             <DetailsAside
@@ -247,6 +266,8 @@ const CustomerInformationForm = ({
                 currency="pln"
                 buttons={buttons}
                 button={button}
+                isDelivery={isDelivery}
+                deliveryPrice={deliveryPrice}
             />
         </div>
     );

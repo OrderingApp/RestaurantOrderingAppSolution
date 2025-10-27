@@ -8,7 +8,7 @@ export const getOrderDeliverySchema = (lang: LanguageTypes) => {
             orderCustomerInformationForm: {
                 form: {
                     errors: {
-                        name: { min: minName, max: maxMame },
+                        comment: { min: minName, max: maxMame },
                         time,
                         phoneNumber,
                         address: { min: minAdress, max: maxAdress },
@@ -19,12 +19,12 @@ export const getOrderDeliverySchema = (lang: LanguageTypes) => {
     } = languagePacks[lang];
 
     return z.object({
-        name: z.string().min(3, minName).max(30, maxMame),
         time: z.string().nonempty(time),
         phoneNumber: z.string().refine((val) => /^\d{9}$/.test(val), {
             message: phoneNumber,
         }),
         address: z.string().min(5, minAdress).max(100, maxAdress).optional(),
+        comment: z.string().max(100, maxMame).optional(),
     });
 };
 

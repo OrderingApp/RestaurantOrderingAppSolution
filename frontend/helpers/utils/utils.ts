@@ -67,3 +67,14 @@ export const toggleQueryParam = (
 export const formatPhoneNumber = (phoneNumber: string) => {
     return phoneNumber.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
 };
+
+export const calculateDeliveryPrice = (
+    distanceInKm: number,
+    perKmRate: number
+) => {
+    if (distanceInKm <= 3) {
+        return 0;
+    }
+    const extraDistance = distanceInKm - 3;
+    return Math.ceil(extraDistance) * perKmRate;
+};

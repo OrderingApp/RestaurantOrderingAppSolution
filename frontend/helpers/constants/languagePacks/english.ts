@@ -102,15 +102,14 @@ const enPack: languagePack = {
             },
             form: {
                 fields: {
-                    name: 'Name',
+                    comment: 'Comment',
                     time: 'Time',
                     phoneNumber: 'Phone Number',
                     address: 'Address',
                 },
                 errors: {
-                    name: {
-                        min: 'Please enter at least 3 characters',
-                        max: 'Please enter max 30 characters',
+                    comment: {
+                        max: 'Please enter max 100 characters',
                     },
                     time: 'Plese enter a correct time',
                     phoneNumber: 'Please enter a valid 9-digit phone number',
@@ -148,6 +147,9 @@ const enPack: languagePack = {
     },
     discountModal: {
         disscountTitle: 'Add discount',
+    },
+    delivertyMapModal: {
+        deliveryTitle: 'Delivery',
     },
 };
 

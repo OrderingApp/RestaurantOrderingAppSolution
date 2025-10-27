@@ -123,6 +123,7 @@ export interface languagePack {
         paymentByCard: string;
         paymentByCash: string;
     };
+
     paymentDetails: {
         bill: string;
         product: string;
@@ -133,6 +134,9 @@ export interface languagePack {
 
     discountModal: {
         disscountTitle: string;
+    };
+    delivertyMapModal: {
+        deliveryTitle: string;
     };
 }
 
@@ -149,15 +153,14 @@ interface createReservationPageFormFields {
 }
 
 interface orderFormFields {
-    name: string;
+    comment: string;
     time: string;
     phoneNumber: string;
     address: string;
 }
 
 interface orderFormErrorFields {
-    name: {
-        min: string;
+    comment: {
         max: string;
     };
     time: string;

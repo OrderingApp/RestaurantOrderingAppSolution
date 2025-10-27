@@ -101,15 +101,14 @@ const plPack: languagePack = {
             },
             form: {
                 fields: {
-                    name: 'Dane',
+                    comment: 'Dodaj Komentarz',
                     time: 'Godzina',
                     phoneNumber: 'Numer telefonu',
                     address: 'Adres',
                 },
                 errors: {
-                    name: {
-                        min: 'Proszę podać co najmniej 3 znaki',
-                        max: 'Proszę podać maksymalnie 30 znaków',
+                    comment: {
+                        max: 'Proszę podać maksymalnie 100 znaków',
                     },
                     time: 'Proszę podać poprawną godzinę',
                     phoneNumber:
@@ -149,6 +148,9 @@ const plPack: languagePack = {
     },
     discountModal: {
         disscountTitle: 'Dodaj zniżkę',
+    },
+    delivertyMapModal: {
+        deliveryTitle: 'Dostawa',
     },
 };
 
