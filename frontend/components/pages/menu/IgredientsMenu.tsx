@@ -2,33 +2,15 @@
 
 import MenuItem from '@/components/shared/cards/MenuItem';
 import SearchInput from '@/components/shared/Input/SearchInput';
-import { SEARCH_PARAMS_NAMES } from '@/helpers/constants/constants';
-import {
-    useQueryMenuIngredients,
-    useQueryMenuItem,
-} from '@/helpers/queries/menu-items/useQueryMenuItems';
+
+import { useQueryMenuIngredients } from '@/helpers/queries/menu-items/useQueryMenuItems';
 import clsx from 'clsx';
-import { useSearchParams } from 'next/navigation';
 
 const IgredientsMenu = () => {
     const { data, isError, isLoading } = useQueryMenuIngredients();
-    const searchParams = useSearchParams();
-    const menuItemId = searchParams.get(SEARCH_PARAMS_NAMES.MENU_ITEM_ID);
-    const { data: menuItem } = useQueryMenuItem(menuItemId || '');
 
     if (isLoading) return <div>Loading...</div>;
     if (isError) return <div>Error...</div>;
-
-    console.log(menuItem);
-
-    // const menuItemIngredients = menuItem?.ingredients || [];
-    // if (menuItemIngredients.length > 0) {
-    //     data?.filter((ingredient) => {
-    //         if (menuItemIngredients.includes(ingredient.id)) {
-    //             ingredient.defaultValue = 1;
-    //         }
-    //     });
-    // }
 
     return (
         <div className="py-10 pt-10 flex flex-col">
@@ -55,3 +37,5 @@ const IgredientsMenu = () => {
 };
 
 export default IgredientsMenu;
+
+//TODO - fix this comopnent

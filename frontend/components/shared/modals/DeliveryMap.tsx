@@ -49,7 +49,7 @@ const DeliveryMap = ({ onClose, addres }: DeliveryMapProps) => {
     useEffect(() => {
         if (!addres) return;
         handleRoute();
-    }, [addres]);
+    }, [addres, handleRoute]);
 
     if (!isLoaded) return <Skeleton />;
 
