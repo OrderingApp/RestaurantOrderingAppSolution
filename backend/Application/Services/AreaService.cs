@@ -1,5 +1,5 @@
-﻿using System.Net;
-using Application.Contracts;
+﻿using Application.Contracts;
+using Application.Core;
 using Application.Dtos.Areas;
 using Application.Dtos.Common;
 using AutoMapper;
@@ -7,6 +7,7 @@ using Domain;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using RestaurantOrdering.Events.Application.Contracts;
+using System.Net;
 
 namespace Application.Services;
 
@@ -18,29 +19,19 @@ public class AreaService(
 {
     public async Task<ResultDto<AreaReadDto>> CreateArea(AreaCreateDto areaCreateDto, Guid userId)
     {
-        try
-        {
-            if (string.IsNullOrWhiteSpace(areaCreateDto.Name))
-                return ResultDto<AreaReadDto>.Failure("Area name is required", HttpStatusCode.BadRequest);
+        if (string.IsNullOrWhiteSpace(areaCreateDto.Name))
+            throw new BadRequestException("Area name is required");
 
-            if (await orderingContext.Areas.AnyAsync(a => a.Name == areaCreateDto.Name))
-                return ResultDto<AreaReadDto>.Failure("Area name already exists", HttpStatusCode.Conflict);
+        if (await orderingContext.Areas.AnyAsync(a => a.Name == areaCreateDto.Name))
+            throw new ConflictException("Area name already exists");
 
-            var newArea = mapper.Map<Area>(areaCreateDto);
+        var newArea = mapper.Map<Area>(areaCreateDto);
             orderingContext.Areas.Add(newArea);
             await orderingContext.SaveChangesAsync();
 
 
             var areaReadDto = mapper.Map<AreaReadDto>(newArea);
             return ResultDto<AreaReadDto>.Success(areaReadDto, HttpStatusCode.Created);
-        }
-        catch (Exception ex)
-        {
-            return ResultDto<AreaReadDto>.Failure(
-                $"An error occured: {ex.Message}",
-                HttpStatusCode.BadRequest
-            );
-        }
     }
 
     public async Task<ResultDto<AreaReadDto>> GetArea(Guid id)
