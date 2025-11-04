@@ -28,6 +28,8 @@ import MenuItemInformation from '@/components/shared/modals/MenuItemInformation'
 import IgredientsMenu from './IgredientsMenu';
 import SearchInput from '@/components/shared/Input/SearchInput';
 
+import { PaginationWithLinks } from '@/components/ui/pagination-with-links';
+
 interface MenuProps {
     variant?: 'card' | 'order';
     children?: React.ReactNode;
@@ -37,12 +39,14 @@ const Menu = ({ variant = 'order', children }: MenuProps) => {
     const { language } = useLanguage();
     const searchParams = useSearchParams();
     const menuItemId = searchParams.get(SEARCH_PARAMS_NAMES.MENU_ITEM_ID);
+    const page = searchParams.get(SEARCH_PARAMS_NAMES.PAGE);
     const {
         displayedCategories,
         filteredMenuItems,
         totalItems,
         displayedTags,
-    } = useFilterMenu();
+        itemsPerPage,
+    } = useFilterMenu(variant);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const {
@@ -115,6 +119,12 @@ const Menu = ({ variant = 'order', children }: MenuProps) => {
                             />
                         ))}
                     </ul>
+                    <PaginationWithLinks
+                        page={page ? parseInt(page, 10) : 1}
+                        pageSize={itemsPerPage || 9}
+                        totalCount={totalItems || 0}
+                        navigationMode="router"
+                    />
                 </div>
             ) : (
                 <IgredientsMenu />

@@ -48,6 +48,7 @@ export enum SEARCH_PARAMS_NAMES {
     SUBCATEGORY = 'subcategoryId',
     NAME = 'name',
     TAG = 'tag',
+    PAGE = 'page',
     ORDER_TYPE = 'orderType',
     ORDER_STATUS = 'orderStatus',
     ORDER_ID = 'orderId',
