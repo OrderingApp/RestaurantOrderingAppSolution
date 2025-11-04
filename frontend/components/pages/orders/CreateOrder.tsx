@@ -7,7 +7,6 @@ import { useOrdersContext } from '@/providers/OrdersContext';
 import { useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toggleQueryParam } from '@/helpers/utils/utils';
-import CustomerInformationForm from './CustomerInformationForm';
 import { ItemProps } from '@/components/shared/lists/Items/Item';
 import { ButtonProps } from '@/components/shared/button/Button';
 
@@ -25,7 +24,6 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const menuItemId = searchParams.get(SEARCH_PARAMS_NAMES.MENU_ITEM_ID);
-    const userData = searchParams.get(SEARCH_PARAMS_NAMES.USER_DATA);
     const buttons: ButtonProps[] = [
         {
             children: 'Dodaj zniżkę',
@@ -81,10 +79,6 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
         },
     ];
 
-    const orderItems = orders.map((order) => ({
-        menuItemId: order.id,
-    }));
-
     const toogleUserDataModal = () => {
         toggleQueryParam(
             SEARCH_PARAMS_NAMES.USER_DATA,
@@ -95,7 +89,7 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
         );
     };
 
-    return !userData ? (
+    return (
         <Menu variant="order">
             <DetailsAside
                 title={'Zamówienie'}
@@ -104,10 +98,7 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
                 currency="pln"
                 buttons={buttons}
             />
-            {/* {menuItemId && <OrderOptionsModal onClose={toggleOptionsModal} />} */}
         </Menu>
-    ) : (
-        <CustomerInformationForm bill={bill} orderItems={orderItems} />
     );
 };
 
