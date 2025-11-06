@@ -103,7 +103,7 @@ const useFilterMenu = (variant: 'card' | 'order') => {
 
         totalItems = filteredMenuItems.length;
 
-        const itemsPerPage = variant === 'card' ? 12 : 6;
+        const itemsPerPage = variant === 'card' ? 12 : 8;
         if (page) {
             const pageNumber = parseInt(page, 10);
             const startIndex = (pageNumber - 1) * itemsPerPage;

@@ -62,8 +62,10 @@ const MenuItem = ({ id, name, price, variant, handleClick }: MenuItemProps) => {
                 alt="informationIcon"
                 className="absolute top-2 right-2"
             />
-            <div>
-                <h2 className="text-center text-[1.3rem] font-bold">{name}</h2>
+            <div className="h-[60px] flex flex-col justify-center">
+                <h2 className="text-center font-bold text-[1.1rem] leading-tight break-words">
+                    {name}
+                </h2>
                 <p className="text-center text-sm text-[#2B5162] font-bold">
                     {price} {CURRENCIES.pln}
                 </p>
@@ -94,9 +96,9 @@ const MenuItem = ({ id, name, price, variant, handleClick }: MenuItemProps) => {
                     </label>
                     <div className="flex flex-col gap-2">
                         <Button
-                            className="w-full rounded-lg py-4"
+                            className="w-full rounded-lg py-1"
                             onClick={() => addOrder(newItem)}
-                            size="md"
+                            size="sm"
                         >
                             Dodaj
                         </Button>

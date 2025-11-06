@@ -2,28 +2,31 @@
 
 import MenuItem from '@/components/shared/cards/MenuItem';
 import SearchInput from '@/components/shared/Input/SearchInput';
+import { PaginationWithLinks } from '@/components/ui/pagination-with-links';
+import { SEARCH_PARAMS_NAMES } from '@/helpers/constants/constants';
+import useFilterIngredients from '@/helpers/hooks/useFilterIngredients';
 
-import { useQueryMenuIngredients } from '@/helpers/queries/menu-items/useQueryMenuItems';
 import clsx from 'clsx';
+import { useSearchParams } from 'next/navigation';
 
 const IgredientsMenu = () => {
-    const { data, isError, isLoading } = useQueryMenuIngredients();
-
-    if (isLoading) return <div>Loading...</div>;
-    if (isError) return <div>Error...</div>;
+    const searchParams = useSearchParams();
+    const page = searchParams.get(SEARCH_PARAMS_NAMES.PAGE);
+    const { filteredIngredients, totalItems, itemsPerPage } =
+        useFilterIngredients();
 
     return (
         <div className="py-10 pt-10 flex flex-col">
-            <SearchInput placeholder="Wyszukaj" />
+            <SearchInput className="w-[70%]" placeholder="Wyszukaj" />
             <ul
                 className={clsx(
-                    'grid py-5 flex-wrap overflow-y-auto max-h-[500px] [&&::-webkit-scrollbar]:hidden gap-y-4 pl-5 w-[776px]'
+                    'grid py-5 flex-wrap gap-y-8 pl-5 w-[776px] mt-8 '
                 )}
                 style={{
-                    gridTemplateColumns: `repeat(3, minmax(0, 1fr))`,
+                    gridTemplateColumns: `repeat(4, minmax(0, 1fr))`,
                 }}
             >
-                {data?.map((item) => (
+                {filteredIngredients?.map((item) => (
                     <MenuItem
                         variant="order"
                         handleClick={() => {}}
@@ -32,10 +35,18 @@ const IgredientsMenu = () => {
                     />
                 ))}
             </ul>
+            <div
+                className={`absolute bottom-10 left-[calc(50%-112px)] -translate-x-1/2`}
+            >
+                <PaginationWithLinks
+                    page={page ? parseInt(page, 10) : 1}
+                    pageSize={itemsPerPage || 9}
+                    totalCount={totalItems || 0}
+                    navigationMode="router"
+                />
+            </div>
         </div>
     );
 };
 
 export default IgredientsMenu;
-
-//TODO - fix this comopnent

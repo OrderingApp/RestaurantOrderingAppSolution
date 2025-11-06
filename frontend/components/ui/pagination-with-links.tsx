@@ -120,7 +120,7 @@ export function PaginationWithLinks({
 
     const renderPageNumbers = () => {
         const items: ReactNode[] = [];
-        const maxVisiblePages = 5;
+        const maxVisiblePages = 10;
 
         const createPageItem = (pageNum: number) => {
             if (navigationMode === 'router') {
@@ -204,11 +204,6 @@ export function PaginationWithLinks({
                 className={cn({ 'md:justify-end': pageSizeSelectOptions })}
             >
                 <PaginationContent className="max-sm:gap-0">
-                    {isPending && navigationMode === 'router' && (
-                        <PaginationItem>
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                        </PaginationItem>
-                    )}
                     <PaginationItem>
                         {navigationMode === 'router' ? (
                             <PaginationPrevious

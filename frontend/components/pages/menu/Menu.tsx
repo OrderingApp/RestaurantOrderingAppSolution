@@ -92,7 +92,7 @@ const Menu = ({ variant = 'order', children }: MenuProps) => {
                         ))}
                     </div>
                     {displayedTags?.length ? (
-                        <ul className="flex gap-3 px-5 py-2">
+                        <ul className="flex gap-3 px-5 ">
                             {displayedTags?.map((tag) => (
                                 <MenuTag {...tag} key={tag.id} />
                             ))}
@@ -119,12 +119,16 @@ const Menu = ({ variant = 'order', children }: MenuProps) => {
                             />
                         ))}
                     </ul>
-                    <PaginationWithLinks
-                        page={page ? parseInt(page, 10) : 1}
-                        pageSize={itemsPerPage || 9}
-                        totalCount={totalItems || 0}
-                        navigationMode="router"
-                    />
+                    <div
+                        className={`absolute bottom-3  ${variant === 'order' ? 'left-[calc(50%-112px)] ' : 'left-1/2'} -translate-x-1/2`}
+                    >
+                        <PaginationWithLinks
+                            page={page ? parseInt(page, 10) : 1}
+                            pageSize={itemsPerPage || 9}
+                            totalCount={totalItems || 0}
+                            navigationMode="router"
+                        />
+                    </div>
                 </div>
             ) : (
                 <IgredientsMenu />
