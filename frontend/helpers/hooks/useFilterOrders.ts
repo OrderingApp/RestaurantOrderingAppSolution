@@ -23,7 +23,7 @@ const useFilterOrders = () => {
 
     const orderType = orderTypeParam || ordersTypes[language][0]?.id;
 
-    const orderStatus = () => {
+    const getOrderStatus = () => {
         if (orderStatusParam === 'Ongoing') {
             return [FILTER_STATUS.ONGOING, FILTER_STATUS.PAIDANDREADYTOPREPARE];
         }
@@ -34,7 +34,7 @@ const useFilterOrders = () => {
         }
     };
 
-    const { data } = useQueryOrdersByType(orderType, orderStatus());
+    const { data } = useQueryOrdersByType(orderType, getOrderStatus());
 
     const inputValue = searchParams.get(SEARCH_PARAMS_NAMES.NAME);
 

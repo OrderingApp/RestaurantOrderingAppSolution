@@ -1,5 +1,5 @@
 import { itemCardStyles } from '@/lib/styles/itemCard';
-import { twMerge } from 'tailwind-merge';
+import { cn } from '@/lib/utils';
 
 export interface ItemCardProps {
     title: string;
@@ -23,13 +23,13 @@ const ItemCard = ({
     <li>
         <button onClick={onClick}>
             <div
-                className={twMerge(
+                className={cn(
                     'w-32 h-28 border border-black rounded-lg overflow-hidden relative',
                     className
                 )}
             >
                 <div
-                    className={twMerge(
+                    className={cn(
                         'absolute left-[-2px] top-0 w-[130px] flex justify-between items-center px-2 h-8 border-b border-l border-r border-black text-white rounded-b-[10px]',
                         itemCardStyles.variants[variant],
                         variantClassName

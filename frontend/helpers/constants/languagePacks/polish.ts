@@ -133,6 +133,14 @@ const plPack: languagePack = {
 
         asideTitle: 'Zamówienie',
     },
+    createOrderPage: {
+        asideTitle: 'Zamówienie',
+        asideButtons: {
+            accept: 'Zatwierdź',
+            close: 'Zamknij bez zmian',
+            discount: 'Dodaj zniżkę',
+        },
+    },
     paymentModal: {
         title: 'Wybierz Formę Płatnośći',
         inputLabel: 'Wpisz wartość',

@@ -10,6 +10,8 @@ import { toggleQueryParam } from '@/helpers/utils/utils';
 import { ItemProps } from '@/components/shared/lists/Items/Item';
 import { ButtonProps } from '@/components/shared/button/Button';
 import { Currency } from '@/helpers/type/types';
+import useLanguage from '@/helpers/hooks/useLanguage';
+import languagePacks from '@/helpers/constants/languagePacks';
 
 export interface BillProps {
     id: string;
@@ -20,46 +22,40 @@ export interface BillProps {
 }
 
 const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
-    const { orders } = useOrdersContext();
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const menuItemId = searchParams.get(SEARCH_PARAMS_NAMES.MENU_ITEM_ID);
-    
+
+    const [selectedId, setSelectedId] = useState('');
+
+    const { orders } = useOrdersContext();
+
+    const { language } = useLanguage();
+
+    const {
+        createOrderPage: {
+            asideTitle,
+            asideButtons: { accept, close, discount },
+        },
+    } = languagePacks[language];
+
     const buttons: ButtonProps[] = [
         {
-            children: 'Dodaj zniżkę',
+            children: discount,
             variant: 'primary',
         },
         {
-            children: 'Zatwierdź',
+            children: accept,
             onClick: () => toogleUserDataModal(),
             variant: 'primary',
         },
         {
-            children: 'Zamknij bez zmian',
+            children: close,
             onClick: () => toggleModal(),
             variant: 'tertiary',
         },
     ];
-
-    const [selectedId, setSelectedId] = useState<string>('');
-
-    const toggleSelect = (id: string) => {
-        toggleQueryParam(
-            SEARCH_PARAMS_NAMES.MENU_ITEM_ID,
-            id,
-            searchParams,
-            router,
-            pathname
-        );
-
-        if (selectedId.includes(id)) {
-            setSelectedId('');
-            return;
-        }
-        setSelectedId(id);
-    };
 
     const bill: BillProps[] = [
         {
@@ -81,6 +77,22 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
         },
     ];
 
+    const toggleSelect = (id: string) => {
+        toggleQueryParam(
+            SEARCH_PARAMS_NAMES.MENU_ITEM_ID,
+            id,
+            searchParams,
+            router,
+            pathname
+        );
+
+        if (selectedId.includes(id)) {
+            setSelectedId('');
+            return;
+        }
+        setSelectedId(id);
+    };
+
     const toogleUserDataModal = () => {
         toggleQueryParam(
             SEARCH_PARAMS_NAMES.USER_DATA,
@@ -94,7 +106,7 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
     return (
         <Menu variant="order">
             <DetailsAside
-                title={'Zamówienie'}
+                title={asideTitle}
                 items={bill}
                 price={3}
                 currency="pln"
