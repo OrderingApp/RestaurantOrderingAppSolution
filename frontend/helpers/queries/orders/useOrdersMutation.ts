@@ -70,7 +70,7 @@ const useOrderMutation = (
             return { previousOrders };
         },
 
-        onError: (err, _, context) => {
+        onError: (_, __, context) => {
             if (context?.previousOrders) {
                 queryClient.setQueryData(
                     [OrdersItems.BY_TYPE, orderKind],

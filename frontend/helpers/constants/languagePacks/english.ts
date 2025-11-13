@@ -132,6 +132,14 @@ const enPack: languagePack = {
         },
         asideTitle: 'Order',
     },
+    createOrderPage: {
+        asideTitle: 'Order',
+        asideButtons: {
+            accept: 'Confirm',
+            close: 'Close',
+            discount: 'Add discount',
+        },
+    },
     paymentModal: {
         title: 'Choose Payment Method',
         inputLabel: 'Enter Amount',

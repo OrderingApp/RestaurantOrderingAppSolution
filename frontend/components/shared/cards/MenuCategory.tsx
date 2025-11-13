@@ -21,6 +21,9 @@ interface MenuCategoryProps {
     size?: 'lg' | 'sm';
 }
 
+export type MenuCategoryType = NonNullable<MenuCategoryProps['type']>;
+export type MenuCategorySize = NonNullable<MenuCategoryProps['size']>;
+
 const MenuCategory = ({
     id,
     icon,

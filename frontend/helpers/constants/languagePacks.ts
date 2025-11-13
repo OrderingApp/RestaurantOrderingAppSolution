@@ -117,6 +117,14 @@ export interface languagePack {
             };
         };
     };
+    createOrderPage: {
+        asideTitle: string;
+        asideButtons: {
+            accept: string;
+            close: string;
+            discount: string;
+        };
+    };
     paymentModal: {
         title: string;
         inputLabel: string;

@@ -30,8 +30,6 @@ const OrdersProvider = ({ children }: { children: ReactNode }) => {
     const [deliveryPrice, setDeliveryPrice] = useState(0);
 
     const addOrderHandler = useCallback((order: OrderContextType) => {
-        console.log(order);
-
         setOrders((prevOrders) => {
             const existingOrderIndex = prevOrders.findIndex(
                 (item) => item.id === order.id

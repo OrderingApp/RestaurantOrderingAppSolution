@@ -20,7 +20,7 @@ const ProtectedLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
     >;
 
     return (
-        <div className=" flex min-h-[48rem] max-h-screen">
+        <div className="flex min-h-[48rem] max-h-screen">
             <aside className="pt-11 pb-6 px-4 bg-[#000] bg-opacity-40 rounded-l-3xl">
                 <ul className="flex flex-col items-center gap-8 h-full">
                     {menuBarEntries.map(([key, name]) => {

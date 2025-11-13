@@ -46,7 +46,7 @@ const OrderCard = ({
             onClick={onClick}
         >
             <div>
-                <p className="text-left text-[11px] font-bold pb-[2px]">
+                <p className="text-left text-[11px] font-bold pb-0.5">
                     {totalAmount}
                     {CURRENCIES.pln}
                 </p>

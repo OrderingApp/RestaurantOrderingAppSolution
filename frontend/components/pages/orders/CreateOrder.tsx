@@ -10,12 +10,15 @@ import { toggleQueryParam } from '@/helpers/utils/utils';
 import CustomerInformationForm from './CustomerInformationForm';
 import { ItemProps } from '@/components/shared/lists/Items/Item';
 import { ButtonProps } from '@/components/shared/button/Button';
+import { Currency } from '@/helpers/type/types';
+import { useLanguage } from '@/providers/LanguageProvider';
+import languagePacks from '@/helpers/constants/languagePacks';
 
 export interface BillProps {
     id: string;
     name: string;
     price: number;
-    currency: keyof typeof CURRENCIES;
+    currency: Currency;
     nestedItems: ItemProps[];
 }
 
@@ -26,40 +29,34 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
     const searchParams = useSearchParams();
     const menuItemId = searchParams.get(SEARCH_PARAMS_NAMES.MENU_ITEM_ID);
     const userData = searchParams.get(SEARCH_PARAMS_NAMES.USER_DATA);
+
+    const [selectedId, setSelectedId] = useState('');
+
+    const { language } = useLanguage();
+
+    const {
+        createOrderPage: {
+            asideTitle,
+            asideButtons: { accept, close, discount },
+        },
+    } = languagePacks[language];
+
     const buttons: ButtonProps[] = [
         {
-            children: 'Dodaj zniżkę',
+            children: discount,
             variant: 'primary',
         },
         {
-            children: 'Zatwierdź',
+            children: accept,
             onClick: () => toogleUserDataModal(),
             variant: 'primary',
         },
         {
-            children: 'Zamknij bez zmian',
+            children: close,
             onClick: () => toggleModal(),
             variant: 'tertiary',
         },
     ];
-
-    const [selectedId, setSelectedId] = useState<string>('');
-
-    const toggleSelect = (id: string) => {
-        toggleQueryParam(
-            SEARCH_PARAMS_NAMES.MENU_ITEM_ID,
-            id,
-            searchParams,
-            router,
-            pathname
-        );
-
-        if (selectedId.includes(id)) {
-            setSelectedId('');
-            return;
-        }
-        setSelectedId(id);
-    };
 
     const bill: BillProps[] = [
         {
@@ -81,9 +78,21 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
         },
     ];
 
-    const orderItems = orders.map((order) => ({
-        menuItemId: order.id,
-    }));
+    const toggleSelect = (id: string) => {
+        toggleQueryParam(
+            SEARCH_PARAMS_NAMES.MENU_ITEM_ID,
+            id,
+            searchParams,
+            router,
+            pathname
+        );
+
+        if (selectedId.includes(id)) {
+            setSelectedId('');
+            return;
+        }
+        setSelectedId(id);
+    };
 
     const toogleUserDataModal = () => {
         toggleQueryParam(
@@ -95,10 +104,14 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
         );
     };
 
+    const orderItems = orders.map((order) => ({
+        menuItemId: order.id,
+    }));
+
     return !userData ? (
         <Menu variant="order">
             <DetailsAside
-                title={'Zamówienie'}
+                title={asideTitle}
                 items={bill}
                 price={3}
                 currency="pln"
