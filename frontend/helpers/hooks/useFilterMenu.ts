@@ -75,7 +75,7 @@ const useFilterMenu = () => {
             displayedTags = menuItemsTags.filter((tag) =>
                 filteredMenuItems.some((item) =>
                     item.ingredients.some((ingredient) =>
-                        ingredient.tagIds.some((id) => id === tag.id)
+                        ingredient.tags.some((id) => id === tag.id)
                     )
                 )
             );
@@ -83,7 +83,7 @@ const useFilterMenu = () => {
             if (tag.length > 0) {
                 filteredMenuItems = filteredMenuItems.filter((item) =>
                     item.ingredients.some((ingredient) =>
-                        ingredient.tagIds.some((id) => tag.includes(id))
+                        ingredient.tags.some((id) => tag.includes(id))
                     )
                 );
             }
