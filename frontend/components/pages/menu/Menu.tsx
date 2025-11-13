@@ -8,7 +8,10 @@ import { useSearchParams } from 'next/navigation';
 import menuSvg from '@/public/images/svg/calendar.svg';
 import menuSvgWhite from '@/public/images/svg/calendar-white.svg';
 
-import MenuCategory from '@/components/shared/cards/MenuCategory';
+import MenuCategory, {
+    MenuCategorySize,
+    MenuCategoryType,
+} from '@/components/shared/cards/MenuCategory';
 
 import MenuItem from '@/components/shared/cards/MenuItem';
 import Modal from '@/components/shared/modals/Modal';
@@ -25,7 +28,7 @@ import useFilterMenu from '@/helpers/hooks/useFilterMenu';
 import useLanguage from '@/helpers/hooks/useLanguage';
 
 import MenuItemInformation from '@/components/shared/modals/MenuItemInformation';
-import IgredientsMenu from './IgredientsMenu';
+import IngredientsMenu from './IngredientsMenu';
 import SearchInput from '@/components/shared/Input/SearchInput';
 
 interface MenuProps {
@@ -34,7 +37,6 @@ interface MenuProps {
 }
 
 const Menu = ({ variant = 'order', children }: MenuProps) => {
-    const { language } = useLanguage();
     const searchParams = useSearchParams();
     const menuItemId = searchParams.get(SEARCH_PARAMS_NAMES.MENU_ITEM_ID);
     const {
@@ -45,15 +47,21 @@ const Menu = ({ variant = 'order', children }: MenuProps) => {
     } = useFilterMenu();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    const { language } = useLanguage();
+
     const {
         menuPage: { searchInputPlaceholder, allCategories },
     } = languagePacks[language];
 
     const openModalHandler = () => setIsModalOpen(true);
 
+    const closeModalHandler = () => setIsModalOpen(false);
+
     return (
         <div className="bg-light-gray w-full rounded-3xl h-full flex flex-row ">
-            {!menuItemId ? (
+            {menuItemId && <IngredientsMenu />}
+
+            {!menuItemId && (
                 <div
                     className={clsx(
                         'pt-10 flex flex-col',
@@ -77,13 +85,9 @@ const Menu = ({ variant = 'order', children }: MenuProps) => {
                                 {...item}
                                 key={item.id}
                                 icon={menuSvg}
-                                size={(item?.size as 'sm') || 'lg'}
+                                size={item?.size as MenuCategorySize}
                                 iconActive={menuSvgWhite}
-                                type={
-                                    (item?.type as
-                                        | 'category'
-                                        | 'subcategory') || 'category'
-                                }
+                                type={item?.type as MenuCategoryType}
                             />
                         ))}
                     </div>
@@ -116,15 +120,11 @@ const Menu = ({ variant = 'order', children }: MenuProps) => {
                         ))}
                     </ul>
                 </div>
-            ) : (
-                <IgredientsMenu />
             )}
 
             {isModalOpen && (
-                <Modal onClose={() => setIsModalOpen(false)}>
-                    <MenuItemInformation
-                        onClick={() => setIsModalOpen(false)}
-                    />
+                <Modal onClose={closeModalHandler}>
+                    <MenuItemInformation onClick={closeModalHandler} />
                 </Modal>
             )}
 

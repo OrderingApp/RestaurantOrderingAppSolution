@@ -6,7 +6,7 @@ import SearchInput from '@/components/shared/Input/SearchInput';
 import { useQueryMenuIngredients } from '@/helpers/queries/menu-items/useQueryMenuItems';
 import clsx from 'clsx';
 
-const IgredientsMenu = () => {
+const IngredientsMenu = () => {
     const { data, isError, isLoading } = useQueryMenuIngredients();
 
     if (isLoading) return <div>Loading...</div>;
@@ -17,11 +17,8 @@ const IgredientsMenu = () => {
             <SearchInput placeholder="Wyszukaj" />
             <ul
                 className={clsx(
-                    'grid py-5 flex-wrap overflow-y-auto max-h-[500px] [&&::-webkit-scrollbar]:hidden gap-y-4 pl-5 w-[776px]'
+                    'grid py-5 flex-wrap overflow-y-auto max-h-[500px] [&&::-webkit-scrollbar]:hidden gap-y-4 pl-5 w-[776px] grid-cols-3'
                 )}
-                style={{
-                    gridTemplateColumns: `repeat(3, minmax(0, 1fr))`,
-                }}
             >
                 {data?.map((item) => (
                     <MenuItem
@@ -36,6 +33,6 @@ const IgredientsMenu = () => {
     );
 };
 
-export default IgredientsMenu;
+export default IngredientsMenu;
 
 //TODO - fix this comopnent

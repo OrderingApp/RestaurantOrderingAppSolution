@@ -9,12 +9,13 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toggleQueryParam } from '@/helpers/utils/utils';
 import { ItemProps } from '@/components/shared/lists/Items/Item';
 import { ButtonProps } from '@/components/shared/button/Button';
+import { Currency } from '@/helpers/type/types';
 
 export interface BillProps {
     id: string;
     name: string;
     price: number;
-    currency: keyof typeof CURRENCIES;
+    currency: Currency;
     nestedItems: ItemProps[];
 }
 
@@ -24,6 +25,7 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const menuItemId = searchParams.get(SEARCH_PARAMS_NAMES.MENU_ITEM_ID);
+    
     const buttons: ButtonProps[] = [
         {
             children: 'Dodaj zniżkę',

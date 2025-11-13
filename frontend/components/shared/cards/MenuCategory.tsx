@@ -11,7 +11,7 @@ import { getPluralForm } from '@/helpers/utils/utils';
 
 import useLanguage from '@/helpers/hooks/useLanguage';
 
-interface MenuCategoryProps {
+export interface MenuCategoryProps {
     id: string;
     icon: string;
     iconActive: string;
@@ -20,6 +20,9 @@ interface MenuCategoryProps {
     type?: 'category' | 'subcategory';
     size?: 'lg' | 'sm';
 }
+
+export type MenuCategoryType = NonNullable<MenuCategoryProps['type']>;
+export type MenuCategorySize = NonNullable<MenuCategoryProps['size']>;
 
 const MenuCategory = ({
     id,
