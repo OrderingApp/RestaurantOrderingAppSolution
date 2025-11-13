@@ -1,5 +1,6 @@
 ﻿namespace RestaurantOrdering.Events.Domain.Reservations;
 
+// change name
 public class TableAssignedToReservationEvent : BaseEvent
 {
     public Guid ReservationId { get; set; }

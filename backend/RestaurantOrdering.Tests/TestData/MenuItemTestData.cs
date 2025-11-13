@@ -52,7 +52,7 @@ public static class MenuItemTestData
 
     public static MenuItemReadDto CreateReadDto(
         MenuItem menuItem,
-        List<MenuItemIngredientReadDto>? ingredients = null
+        List<MenuItemIngredientWithTagsDto>? ingredients = null
     ) =>
         new()
         {

@@ -12,7 +12,7 @@ import ServedIcon from '@/public/images/svg/table-status-served.svg';
 import ItemsList, {
     type ItemsListProps,
 } from '@/components/shared//lists/Items/Items';
-import Button, { type ButtonProps } from '@/components/shared/button/Button';
+import Button, { type ButtonProps } from '@/components/shared/Button/Button';
 import type { Currency } from '@/helpers/type/types';
 
 interface ButtonHeader {
@@ -112,7 +112,7 @@ const DetailsAside = ({
                                 </motion.div>
                             </AnimatePresence>
                         </div>
-                        <div className="h-0.5 w-full bg-[#707070]"></div>
+                        <div className="h-0.5 w-full bg-dark-gray"></div>
                     </>
                 ))}
 

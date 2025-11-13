@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 
-import { type ButtonProps } from '@/components/shared/button/Button';
+import { type ButtonProps } from '@/components/shared/Button/Button';
 import Dish from '@/components/shared/lists/Items/Dish';
 
 import { capitalizeFirstLetter } from '@/helpers/utils/utils';

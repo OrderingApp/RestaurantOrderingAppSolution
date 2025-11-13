@@ -46,12 +46,10 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "dateTime": "2025-03-27T19:00:00Z",
   "customerInformation": {
     "phoneNumber": "123456789",
     "additionalInstructions": "Please call on arrival.",
     "orderCompletionType": "Immediate",
-    "preferredPaymentMethod": "Cash",
     "expectedOrderCompletion": null
   },
   "orderItems": [
@@ -90,19 +88,20 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "dateTime": "2026-02-07T13:00:00Z",
+  "deliveryPrice": 10,
+  "discount": 10,
   "customerInformation": {
     "phoneNumber": "123456789",
     "address": "123 Main Street, City, Country",
     "additionalInstructions": "Leave at the doorstep.",
     "orderCompletionType": "Immediate",
-    "preferredPaymentMethod": "Card",
     "expectedOrderCompletion": null
   },
   "orderItems": [
     {
       "menuItemId": "0026375D-9736-4B94-ABA5-3E7644643DFF",
       "specialInstructions": "Extra spicy",
+      "discount": 0,
       "extraIngredients": [
         {
           "ingredientId": "012BD3A0-F0A6-4A8D-9AE7-703EEE731302",

@@ -9,7 +9,6 @@ public static class OrderTestData
 {
     public static Order CreateOrder(
             Guid? id = null,
-            DateTime? date = null,
             OrderType type = OrderType.DineIn,
             OrderStatus status = OrderStatus.Ongoing,
             Guid? tableId = null,
@@ -25,7 +24,6 @@ public static class OrderTestData
             TableId = tableId,
             TotalAmount = totalAmount,
             Discount = discount,
-            DateTime = date ?? DateTime.UtcNow,
             OrderItems = new List<OrderItem>(),
             Payments = new List<Payment>(),
             CustomerInformation = null
@@ -41,14 +39,12 @@ public static class OrderTestData
     {
         return new TakeawayOrderCreateDto
         {
-            DateTime = DateTime.UtcNow,
             CustomerInformation = new CustomerInformationCreateDto
             {
                 PhoneNumber = phoneNumber,
                 AdditionalInstructions = "Please ring bell",
                 Address = null,
                 OrderCompletionType = OrderCompletionType.Immediate,
-                PreferredPaymentMethod = PreferredPaymentMethod.Cash,
                 ExpectedOrderCompletion = null
             },
             OrderItems =
@@ -75,14 +71,12 @@ public static class OrderTestData
     {
         return new DeliveryOrderCreateDto
         {
-            DateTime = DateTime.UtcNow,
             CustomerInformation = new CustomerInformationCreateDto
             {
                 PhoneNumber = "123456789",
                 AdditionalInstructions = "Leave at the door",
                 Address = "123 Street",
                 OrderCompletionType = OrderCompletionType.Immediate,
-                PreferredPaymentMethod = PreferredPaymentMethod.Cash,
                 ExpectedOrderCompletion = null
             },
             OrderItems = new List<OrderItemCreateDto>

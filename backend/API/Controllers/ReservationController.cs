@@ -49,7 +49,7 @@ public class ReservationController(IReservationService reservationService) : Bas
     ) => HandleResult(await reservationService.GetReservationsByDate(date));
 
     /// <summary>
-    /// Assigns a table to a reservation.
+    /// Assigns a reservation to a table.
     /// </summary>
     /// <param name="id">The reservation ID.</param>
     /// <param name="tableId">The table ID to assign.</param>

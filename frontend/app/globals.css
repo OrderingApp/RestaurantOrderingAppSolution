@@ -16,6 +16,7 @@
     --white: #fff;
     --black: #000;
     --gray: #ebe9e9;
+    --dark-gray: #707070;
     --ligther-gray: #f6f2f2;
     --light-gray: #f6f6f6;
     --served: #2b622d;
@@ -43,15 +44,7 @@ body {
 .scrollbar::-webkit-scrollbar-thumb {
     background: hsl(var(--primary));
     border-radius: 9999px;
-}
-
-.scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.scrollbar {
-    scrollbar-color: hsl(var(--primary)) transparent;
-    scrollbar-width: thin;
+    color: hsl(var(--primary)) transparent;
 }
 
 .hide-input-number-icon {

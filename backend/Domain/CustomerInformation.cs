@@ -9,7 +9,6 @@ public class CustomerInformation
 
     public DateTime? ExpectedOrderCompletion { get; set; }
     public OrderCompletionType OrderCompletionType { get; set; } = OrderCompletionType.Immediate;
-    public PreferredPaymentMethod PreferredPaymentMethod { get; set; }
 
     public Guid OrderId { get; set; }
     public Order Order { get; set; } = null!;
@@ -19,10 +18,4 @@ public enum OrderCompletionType
 {
     Immediate,
     Scheduled,
-}
-
-public enum PreferredPaymentMethod
-{
-    Card,
-    Cash,
 }

@@ -1,10 +1,14 @@
 ﻿namespace Domain;
 
-public class Order
+public abstract class AuditableEntity
+{
+    public DateTime CreatedAt { get; set; }
+    public DateTime? LastModified { get; set; }
+}
+
+public class Order : AuditableEntity
 {
     public Guid Id { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? LastModified { get; set; }
 
     public decimal TotalAmount { get; set; }
     public decimal Discount { get; set; }
@@ -28,6 +32,7 @@ public enum OrderStatus
 {
     Ongoing,
     PendingPayment,
+    PaidAndReadyToPrepare,
     Closed,
     Cancelled,
 }

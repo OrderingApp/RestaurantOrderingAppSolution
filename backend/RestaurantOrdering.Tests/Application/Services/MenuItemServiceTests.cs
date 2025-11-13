@@ -42,7 +42,7 @@ public class MenuItemServiceTests
 
         var createDto = MenuItemTestData.CreateCreateDto(ingredientIds: new() { ingredient.Id });
         var menuItem = MenuItemTestData.CreateMenuItem(name: createDto.Name, price: createDto.Price);
-        var readDto = MenuItemTestData.CreateReadDto(menuItem, new List<MenuItemIngredientReadDto>
+        var readDto = MenuItemTestData.CreateReadDto(menuItem, new List<MenuItemIngredientWithTagsDto>
             {
                 new() { Id = ingredient.Id, Name = ingredient.Name }
             });

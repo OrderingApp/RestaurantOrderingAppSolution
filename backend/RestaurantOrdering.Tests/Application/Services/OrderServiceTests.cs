@@ -63,7 +63,6 @@ public class OrderServiceTests
         {
             TableId = table.Id,
             OrderItems = new List<OrderItemCreateDto> { orderItemDto },
-            DateTime = DateTime.UtcNow
         };
 
         await _dbContext.Tables.AddAsync(table);
@@ -76,8 +75,7 @@ public class OrderServiceTests
             {
                 Id = Guid.NewGuid(),
                 TableId = dto.TableId,
-                Type = OrderType.DineIn,
-                DateTime = dto.DateTime
+                Type = OrderType.DineIn
             });
 
         _mockMapper.Setup(m => m.Map<OrderReadDto>(It.IsAny<Order>()))
@@ -117,7 +115,6 @@ public class OrderServiceTests
         var createDto = new DineInOrderCreateDto
         {
             TableId = nonExistentTableId,
-            DateTime = DateTime.UtcNow,
             OrderItems = new List<OrderItemCreateDto>()
         };
 
@@ -150,7 +147,6 @@ public class OrderServiceTests
             .Returns(new Order
             {
                 Id = Guid.NewGuid(),
-                DateTime = dto.DateTime,
                 Type = OrderType.Takeaway
             });
 
@@ -360,7 +356,7 @@ public class OrderServiceTests
         var date = DateTime.Today;
 
         // Act
-        var result = await _service.GetOngoingNonDineInOrders(invalidOrderType, date);
+        var result = await _service.GetOngoingAndClosedNonDineInOrders(invalidOrderType, date);
 
         // Assert
         result.ShouldFailWith<List<NonDineInOrderSummaryDto>>(
@@ -376,8 +372,7 @@ public class OrderServiceTests
         var date = DateTime.Today;
         var order = OrderTestData.CreateOrder(
             type: OrderType.Takeaway,
-            status: OrderStatus.Ongoing,
-            date: date.AddHours(10)
+            status: OrderStatus.Ongoing
         );
 
         await _dbContext.Orders.AddAsync(order);
@@ -388,7 +383,7 @@ public class OrderServiceTests
             .Returns(new List<NonDineInOrderSummaryDto> { expectedDto });
 
         // Act
-        var result = await _service.GetOngoingNonDineInOrders(OrderType.Takeaway, date);
+        var result = await _service.GetOngoingAndClosedNonDineInOrders(OrderType.Takeaway, date);
 
         // Assert
         result.ShouldBeSuccessful(HttpStatusCode.OK);
@@ -402,7 +397,7 @@ public class OrderServiceTests
         var service = new OrderService(null!, _mockEventHandler.Object, _mockMapper.Object);
 
         // Act
-        var result = await service.GetOngoingNonDineInOrders(OrderType.Delivery, DateTime.Today);
+        var result = await service.GetOngoingAndClosedNonDineInOrders(OrderType.Delivery, DateTime.Today);
 
         // Assert
         result.ShouldFailWith<List<NonDineInOrderSummaryDto>>(

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 
-import Button from '../button/Button';
+import Button from '../Button/Button';
 import informationIcon from '@/public/images/svg/Info.svg';
 import {
     CURRENCIES,

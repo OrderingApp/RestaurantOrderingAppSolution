@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import Button from '@/components/shared/button/Button';
+import Button from '@/components/shared/Button/Button';
 
 import EditIcon from '@/public/images/svg/edit.svg';
 
@@ -66,7 +66,7 @@ const TablesHeader = ({ onTabChange }: TablesHeaderProps) => {
     return (
         <header
             className={cn(
-                'flex justify-center items-center gap-9',
+                'fixed flex justify-center items-center gap-9 pt-4 px-5 z-50 backdrop-blur-sm',
                 isDesktopAndOverflowing ? 'mb-3.5' : 'mb-2'
             )}
         >

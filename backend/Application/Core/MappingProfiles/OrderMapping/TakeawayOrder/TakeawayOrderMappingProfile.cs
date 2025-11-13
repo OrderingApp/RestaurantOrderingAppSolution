@@ -9,14 +9,12 @@ public class TakeawayOrderMappingProfile : Profile
     public TakeawayOrderMappingProfile()
     {
         CreateMap<TakeawayOrderCreateDto, Order>()
-            .ForMember(dest => dest.Type, opt => opt.MapFrom(_ => OrderType.Takeaway))
-            .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
-            .ForMember(dest => dest.TotalAmount, opt => opt.Ignore())
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => OrderStatus.Ongoing))
-            .ForMember(dest => dest.OrderItems, opt => opt.Ignore())
-            .ForMember(
-                dest => dest.CustomerInformation,
-                opt => opt.MapFrom(src => src.CustomerInformation)
-            );
+            .ForMember(d => d.Type, o => o.MapFrom(_ => OrderType.Takeaway))
+            .ForMember(d => d.Id, o => o.MapFrom(_ => Guid.NewGuid()))
+            .ForMember(d => d.TotalAmount, o => o.Ignore())
+            .ForMember(d => d.Status, o => o.MapFrom(_ => OrderStatus.Ongoing))
+            .ForMember(d => d.OrderItems, o => o.Ignore())
+            .ForMember(d => d.Discount, o => o.MapFrom(s => s.Discount ?? 0m))
+            .ForMember(d => d.CustomerInformation, o => o.MapFrom(s => s.CustomerInformation));
     }
 }

@@ -77,16 +77,36 @@ public class OrderController(IOrderService orderService) : BaseApiController
     ) => HandleResult(await orderService.GetOrders(orderStatus));
 
     /// <summary>
-    /// Retrieves all ongoing non-dine-in orders based on order type.
+    /// Retrieves ongoing and recent closed non-dine-in orders (Delivery/Takeaway) for a given day,
+    /// sorted by expected completion time. Overdue ongoing orders remain visible until their status changes.
     /// </summary>
-    /// <param name="orderType">The type of the order (Takeaway or Delivery).</param>
-    /// <response code="200">Returns the list of non-dine-in orders.</response>
+    /// <param name="orderType">
+    /// The type of the order to filter by. Allowed values: <c>Delivery</c>, <c>Takeaway</c>.
+    /// </param>
+    /// <param name="date">
+    /// Optional calendar date (ISO <c>yyyy-MM-dd</c>) that defines the business day window.
+    /// If omitted, the server uses today's date. The endpoint returns:
+    /// - all <c>Ongoing</c> orders whose expected completion is before the end of that day (includes overdue),
+    /// - and up to 10 most recently created <c>Closed</c> orders whose expected completion falls on that day.
+    /// The time component (if provided) is ignored.
+    /// </param>
+    /// <response code="200">Returns the list of non-dine-in order summaries.</response>
+    /// <response code="400">Returned when <paramref name="orderType"/> is not Delivery or Takeaway.</response>
+    /// <response code="500">Unexpected error.</response>
+    /// <remarks>
+    /// Example:
+    /// GET /api/orders/non-dinein-orders?orderType=Delivery&date=2025-09-15
+    /// GET /api/orders/non-dinein-orders?orderType=Takeaway
+    /// </remarks>
     [HttpGet("non-dinein-orders")]
-    [ProducesResponseType(typeof(List<NonDineInOrderSummaryDto>), 200)]
-    public async Task<ActionResult<List<NonDineInOrderSummaryDto>>> GetOngoingNonDineInOrders(
+    [ProducesResponseType(typeof(List<NonDineInOrderSummaryDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<List<NonDineInOrderSummaryDto>>> GetOngoingAndClosedNonDineInOrders(
         [FromQuery] OrderType orderType,
-        [FromQuery] DateTime date
-    ) => HandleResult(await orderService.GetOngoingNonDineInOrders(orderType, date));
+        [FromQuery] IReadOnlyCollection<OrderStatus> statuses,
+        [FromQuery] DateTime? date = null
+    ) => HandleResult(await orderService.GetOngoingAndClosedNonDineInOrders(orderType, statuses, date));
 
     /// <summary>
     /// Applies a discount to an existing order.
