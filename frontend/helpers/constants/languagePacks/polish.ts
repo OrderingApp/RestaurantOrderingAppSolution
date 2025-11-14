@@ -24,7 +24,7 @@ const plPack: languagePack = {
         orders: 'zamówienia',
         menu: 'karta',
         reservations: 'rezerwacje',
-        endOfDay: 'koniec dnia',
+        daySummary: 'podsumowanie dnia',
         settings: 'ustawienia',
     },
     reservationsPage: {
@@ -159,6 +159,12 @@ const plPack: languagePack = {
     },
     delivertyMapModal: {
         deliveryTitle: 'Dostawa',
+    },
+    daySummaryPage: {
+        tabs: {
+            allOrders: 'Wszystkie Zamówienia',
+            summary: 'Podsumowanie',
+        },
     },
 };
 

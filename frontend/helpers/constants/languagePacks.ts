@@ -34,7 +34,7 @@ export interface languagePack {
         orders: string;
         menu: string;
         reservations: string;
-        endOfDay: string;
+        daySummary: string;
         settings: string;
     };
     reservationsPage: {
@@ -145,6 +145,12 @@ export interface languagePack {
     };
     delivertyMapModal: {
         deliveryTitle: string;
+    };
+    daySummaryPage: {
+        tabs: {
+            allOrders: string;
+            summary: string;
+        };
     };
 }
 

@@ -24,7 +24,7 @@ const enPack: languagePack = {
         orders: 'orders',
         menu: 'menu',
         reservations: 'reservations',
-        endOfDay: 'end of day',
+        daySummary: 'day summary',
         settings: 'settings',
     },
     reservationsPage: {
@@ -158,6 +158,12 @@ const enPack: languagePack = {
     },
     delivertyMapModal: {
         deliveryTitle: 'Delivery',
+    },
+    daySummaryPage: {
+        tabs: {
+            allOrders: 'All Orders',
+            summary: 'Summary',
+        },
     },
 };
 
