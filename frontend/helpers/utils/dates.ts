@@ -1,4 +1,16 @@
 export const formatDate = (date: Date, language: string) => {
+    if (isNaN(date.getTime())) {
+        return {
+            date: '',
+            day: '',
+            month: '',
+            year: '',
+            time: '--:--',
+            fullDate: '',
+            fullDateFormatted: new Date(), // fallback to now
+        };
+    }
+
     const options: Intl.DateTimeFormatOptions = {
         weekday: 'short',
         day: '2-digit',
