@@ -159,6 +159,15 @@ const enPack: languagePack = {
     delivertyMapModal: {
         deliveryTitle: 'Delivery',
     },
+    settingsPage: {
+        settings: {
+            printerSettings: 'Printer Settings',
+            editMenu: 'Edit Menu',
+            systemInfo: 'System Info',
+            archive: 'Archive',
+            users: 'Users',
+        },
+    },
 };
 
 export default enPack;
