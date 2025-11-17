@@ -150,6 +150,15 @@ export interface languagePack {
     delivertyMapModal: {
         deliveryTitle: string;
     };
+    settingsPage: {
+        settings: {
+            printerSettings: string;
+            editMenu: string;
+            systemInfo: string;
+            archive: string;
+            users: string;
+        };
+    };
 }
 
 interface loginPageFormFields {

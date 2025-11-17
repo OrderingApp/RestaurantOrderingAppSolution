@@ -164,6 +164,15 @@ const plPack: languagePack = {
     delivertyMapModal: {
         deliveryTitle: 'Dostawa',
     },
+    settingsPage: {
+        settings: {
+            printerSettings: 'Ustawienia Drukarki',
+            editMenu: 'Edytuj Menu',
+            systemInfo: 'Informacje o Systemie',
+            archive: 'Archiwum',
+            users: 'Użytkownicy',
+        },
+    },
 };
 
 export default plPack;
