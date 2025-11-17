@@ -97,7 +97,11 @@ const plPack: languagePack = {
                 buttons: {
                     accept: 'Zatwierdź',
                     cancel: 'Zamknij bez zmian',
+                    discount: 'Dodaj zniżkę',
                 },
+            },
+            timeBtns: {
+                asap: 'Jak najszybciej',
             },
             form: {
                 fields: {

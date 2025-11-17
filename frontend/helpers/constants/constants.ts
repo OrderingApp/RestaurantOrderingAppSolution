@@ -31,6 +31,11 @@ export const CURRENCIES = {
     eur: '€',
 };
 
+export const COMPANY_INITIAL_GEO_COORDS = {
+    lat: 50.05598658820353,
+    lng: 21.61245102578422,
+};
+
 export const BACKEND_URL = 'http://localhost:5000/api';
 
 export enum BACKEND_PATHS {

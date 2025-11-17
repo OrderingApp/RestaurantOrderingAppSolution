@@ -98,7 +98,11 @@ const enPack: languagePack = {
                 buttons: {
                     accept: 'Accept',
                     cancel: 'Close without changes',
+                    discount: 'Add Discount',
                 },
+            },
+            timeBtns: {
+                asap: 'Right now',
             },
             form: {
                 fields: {

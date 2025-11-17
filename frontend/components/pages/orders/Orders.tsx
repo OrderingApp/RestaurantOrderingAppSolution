@@ -23,6 +23,8 @@ import PaymentDetails from '@/components/shared/modals/PaymentDetails';
 import EditOrder from './EditOrder';
 import CreateOrder from './CreateOrder';
 import SearchInput from '@/components/shared/Input/SearchInput';
+import OrderOptionsModal from '@/components/shared/modals/OrderOptionsModal';
+import Modal from '@/components/shared/modals/Modal';
 
 const Orders = () => {
     const { language } = useLanguage();
@@ -138,6 +140,12 @@ const Orders = () => {
         if (param === value) return value;
     };
 
+    const closeOrderOptionsModal = () => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete(SEARCH_PARAMS_NAMES.ORDER_ID);
+        router.push(`/orders?${params.toString()}`);
+    };
+
     const openOrderOptionsModal = (id: string) => {
         toggleQueryParam(
             SEARCH_PARAMS_NAMES.ORDER_ID,
@@ -150,6 +158,11 @@ const Orders = () => {
 
     return (
         <>
+            {orderId && modal !== 'true' && (
+                <Modal onClose={closeOrderOptionsModal}>
+                    <OrderOptionsModal onClose={closeOrderOptionsModal} />
+                </Modal>
+            )}
             <div className="flex flex-col h-full p-4 pb-0">
                 <div className="flex p-4 justify-between items-center h-auto">
                     <ToggleSwitch items={ordersTypes[language]} />
