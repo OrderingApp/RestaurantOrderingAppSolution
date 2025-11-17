@@ -48,8 +48,10 @@ const CustomerInformationForm = ({
     bill,
     orderItems,
 }: CustomerInformationFormProps) => {
-    const [isDelivery, setIsDelivery] = useState<boolean>(false);
-    const [isCustomDate, setIsCustomDate] = useState<string | null>(null);
+    const [isDelivery, setIsDelivery] = useState(false);
+    const [selectedQuickTime, setSelectedQuickTime] = useState<string | null>(
+        null
+    );
     const pathname = usePathname();
     const router = useRouter();
     const { language } = useLanguage();
@@ -65,8 +67,9 @@ const CustomerInformationForm = ({
                 buttons: { takeway, delivery },
                 aside: {
                     title: asideTitle,
-                    buttons: { accept, cancel },
+                    buttons: { accept, cancel, discount },
                 },
+                timeBtns: { asap },
             },
         },
     } = languagePacks[language];
@@ -92,11 +95,11 @@ const CustomerInformationForm = ({
             shouldDirty: true,
             shouldValidate: true,
         });
-        if (isCustomDate === id) {
-            setIsCustomDate(null);
+        if (selectedQuickTime === id) {
+            setSelectedQuickTime(null);
             setValue('time', '');
         } else {
-            setIsCustomDate(id);
+            setSelectedQuickTime(id);
         }
     };
 
@@ -129,7 +132,7 @@ const CustomerInformationForm = ({
 
     const buttons: ButtonProps[] = [
         {
-            children: 'Dodaj zniżkę',
+            children: discount,
             variant: 'primary',
         },
         {
@@ -152,7 +155,7 @@ const CustomerInformationForm = ({
     const timeBtns = [
         {
             id: '10',
-            value: 'Jak Najszybciej',
+            value: asap,
         },
         {
             id: '15',
@@ -197,13 +200,13 @@ const CustomerInformationForm = ({
                     <Input
                         type="time"
                         id="time"
-                        icon={<Image src={ICONS.TIME} alt="timeIcon" />}
+                        icon={<Image src={ICONS.TIME} alt="time" />}
                         label={time}
                         {...register('time')}
                         errors={errors.time}
-                        disabled={!!isCustomDate}
-                        labelClassName={`${isCustomDate && 'text-[rgba(0,0,0,0.5)]'}`}
-                        inputClassName={`w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0 ${isCustomDate && 'opacity-90'} `}
+                        disabled={!!selectedQuickTime}
+                        labelClassName={`${selectedQuickTime && 'text-[rgba(0,0,0,0.5)]'}`}
+                        inputClassName={`w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0 ${selectedQuickTime && 'opacity-90'} `}
                     />
                     <div className="flex gap-2">
                         {timeBtns.map((btn) => (
@@ -212,7 +215,7 @@ const CustomerInformationForm = ({
                                 id={btn.id}
                                 key={btn.id}
                                 value={btn.value}
-                                inputClassName={`${isCustomDate === btn.id ? 'bg-primary text-white' : 'bg-white'} focus:outline-none focus:ring-0 w-auto text-sm  shadow-xl rounded-xl`}
+                                inputClassName={`${selectedQuickTime === btn.id ? 'bg-primary text-white' : 'bg-white'} focus:outline-none focus:ring-0 w-auto text-sm  shadow-xl rounded-xl`}
                                 onClick={(e) =>
                                     setInputValueHandler(
                                         e.currentTarget.id as string,
@@ -225,7 +228,7 @@ const CustomerInformationForm = ({
                     <Input
                         type="phone"
                         id="phoneNumber"
-                        icon={<Image src={ICONS.PHONE} alt="phoneIcon" />}
+                        icon={<Image src={ICONS.PHONE} alt="phone" />}
                         label={phoneNumber}
                         {...register('phoneNumber')}
                         errors={errors.phoneNumber}
@@ -274,3 +277,5 @@ const CustomerInformationForm = ({
 };
 
 export default CustomerInformationForm;
+
+//TODO - btn from aside to remove

@@ -99,7 +99,11 @@ export interface languagePack {
                 buttons: {
                     accept: string;
                     cancel: string;
+                    discount: string;
                 };
+            };
+            timeBtns: {
+                asap: string;
             };
             form: {
                 fields: orderFormFields;

@@ -35,8 +35,8 @@ const DeliveryInput = ({
     errors,
     address,
 }: DeliveryInputProps) => {
-    const [addres, setAddres] = useState<string>('');
-    const [showMap, setShowMap] = useState<boolean>(false);
+    const [addres, setAddres] = useState('');
+    const [isMapShown, setIsMapShown] = useState(false);
 
     const { handleRoute } = useDeliveryLocation({ addres });
 
@@ -51,7 +51,7 @@ const DeliveryInput = ({
                         <Image
                             onClick={() => handleRoute()}
                             src={ICONS.MAP_MARKER}
-                            alt="usersIcon"
+                            alt="users"
                         />
                     }
                     iconClassName="w-4 h-4"
@@ -67,14 +67,14 @@ const DeliveryInput = ({
                 <button
                     disabled={!isDelivery}
                     className={`${errors.address ? 'self-center' : 'self-end'} bg-white shadow-xl p-2 rounded-lg ${!isDelivery && 'opacity-50 cursor-not-allowed'}`}
-                    onClick={() => setShowMap(true)}
+                    onClick={() => setIsMapShown(true)}
                 >
-                    <Image src={ICONS.MAP} alt="mapIcon" className="w-6 h-6" />
+                    <Image src={ICONS.MAP} alt="map" className="w-6 h-6" />
                 </button>
             </div>
-            {showMap && (
+            {isMapShown && (
                 <DeliveryMap
-                    onClose={() => setShowMap(false)}
+                    onClose={() => setIsMapShown(false)}
                     addres={addres}
                 />
             )}

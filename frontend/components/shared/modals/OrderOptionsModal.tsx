@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 import { SEARCH_PARAMS_NAMES } from '@/helpers/constants/constants';
@@ -9,7 +10,7 @@ import languagePacks from '@/helpers/constants/languagePacks';
 import useLanguage from '@/helpers/hooks/useLanguage';
 import useQuerySingleOrder from '@/helpers/queries/orders/useQuerySingleOrder';
 import { toggleQueryParam } from '@/helpers/utils/utils';
-import { useRouter } from 'next/navigation';
+import { CURRENCIES } from '@/helpers/constants/constants';
 
 const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
     const { language } = useLanguage();
@@ -37,23 +38,23 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
                 .split('T')[1]
                 .slice(0, 5),
             icon: ICONS.TIME,
-            alt: 'time icon',
+            alt: 'time',
         },
         {
             label: phoneNumber,
             value: data?.customerInformation.phoneNumber,
             icon: ICONS.PHONE,
-            alt: 'phone icon',
+            alt: 'phone',
         },
         {
             label: address,
             value: data?.customerInformation.address,
             icon: ICONS.MAP_MARKER,
-            alt: 'address icon',
+            alt: 'address',
         },
     ];
 
-    const closeOrderOnClick = () => {
+    const closeOrder = () => {
         toggleQueryParam(
             SEARCH_PARAMS_NAMES.CLOSE_ORDER,
             'true',
@@ -67,42 +68,48 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
         {
             icon: ICONS.PREVIEW,
             color: '#008080',
-            alt: 'preview icon',
+            alt: 'preview',
         },
         {
             icon: ICONS.EDIT_ORDER,
             color: '#008080',
-            alt: 'edit icon',
+            alt: 'edit',
         },
         {
             icon: ICONS.DOLLAR_WHITE,
             color: '#008080',
-            alt: 'payment icon',
-            onClick: closeOrderOnClick,
+            alt: 'payment',
+            onClick: closeOrder,
         },
         {
             icon: ICONS.DELETE,
             color: '#008080',
-            alt: 'delete icon',
+            alt: 'delete',
         },
     ];
 
+    const MODAL_WIDTH = '445px';
+    const ORDER_TYPE = 'Takeaway';
+
     return (
-        <div className="w-[445px] h-[445px] bg-order-card-gradient rounded-2xl relative">
+        <div
+            className="aspect-square bg-order-card-gradient rounded-2xl relative"
+            style={{ width: MODAL_WIDTH }}
+        >
             <button onClick={onClose} className="absolute top-3 right-2 ">
-                <Image className="w-6 h-6" src={ICONS.CLOSE} alt="close icon" />
+                <Image className="w-6 h-6" src={ICONS.CLOSE} alt="close" />
             </button>
             <div className="bg-white mt-[0.4rem] rounded-2xl h-full p-4 flex flex-col">
                 <div className="flex justify-between items-start">
                     <h2 className="text-xl font-bold ">
-                        {data?.orderType === 'Takeaway'
+                        {data?.orderType === ORDER_TYPE
                             ? titleTakeway
                             : titleDelivery}
                     </h2>
                     <div className="bg-[#F6F6F6] flex justify-center items-center p-2 px-3 gap-3 mr-8 rounded-lg shadow-xl">
                         <span className="font-bold text-sm">{paymentDue}</span>
                         <span className="text-[#2B5162] font-bold">
-                            {data?.totalAmount}zł
+                            {data?.totalAmount + CURRENCIES.pln}
                         </span>
                     </div>
                 </div>

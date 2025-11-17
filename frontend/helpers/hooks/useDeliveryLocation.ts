@@ -4,11 +4,10 @@ import { useJsApiLoader } from '@react-google-maps/api';
 import { useState } from 'react';
 import { calculateDeliveryPrice } from '../utils/utils';
 import { useOrdersContext } from '@/providers/OrdersContext';
+import { COMPANY_INITIAL_GEO_COORDS } from '../constants/constants';
 
-const initial = {
-    lat: 50.05598658820353,
-    lng: 21.61245102578422,
-};
+const initial = COMPANY_INITIAL_GEO_COORDS;
+
 type Library = 'places' | 'marker' | 'geometry' | 'drawing' | 'visualization';
 const libraries: Library[] = ['places', 'marker'];
 
@@ -16,13 +15,10 @@ const useDeliveryLocation = ({ addres }: { addres: string }) => {
     const GOOGLE_MAPS_API_KEY =
         process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
-    const [distance, setDistance] = useState<number>(0);
+    const [distance, setDistance] = useState(0);
     const deliveryPrice = calculateDeliveryPrice(distance, 3);
     const [qrCode, setQrCode] = useState('');
-    const [destination, setDestination] = useState<{
-        lat: number;
-        lng: number;
-    } | null>(null);
+    const [destination, setDestination] = useState<typeof initial | null>(null);
     const [directions, setDirections] =
         useState<google.maps.DirectionsResult | null>(null);
 
