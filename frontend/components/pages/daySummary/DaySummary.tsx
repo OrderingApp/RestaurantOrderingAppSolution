@@ -1,13 +1,48 @@
+'use client';
+
+import { useLanguage } from '@/providers/LanguageProvider';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import languagePacks from '@/helpers/constants/languagePacks';
+import OrdersTable from './OrdersTable';
+
 const DaySummary = () => {
+    const { language } = useLanguage();
+    const {
+        daySummaryPage: {
+            tabs: { allOrders, summary },
+            heading,
+        },
+    } = languagePacks[language];
+
+    const tabs = [allOrders, summary];
+
     return (
         <div className="py-8 px-5">
-            <Tabs defaultValue="x">
-                <TabsList>
-                    <TabsTrigger value="x">x</TabsTrigger>
-                    <TabsTrigger value="y">y</TabsTrigger>
-                </TabsList>
-                <TabsContent value="x">x val</TabsContent>
-                <TabsContent value="y">y val</TabsContent>
+            <Tabs defaultValue={allOrders}>
+                <nav>
+                    <TabsList className="gap-2.5 mb-8">
+                        {tabs.map((label) => (
+                            <TabsTrigger
+                                key={label}
+                                value={label}
+                                className="py-3 px-6 font-semibold text-black shadow-[0_4px_4px_0_#00000040] rounded-xl data-[state=active]:bg-quaternary data-[state=active]:text-white"
+                            >
+                                {label}
+                            </TabsTrigger>
+                        ))}
+                    </TabsList>
+                </nav>
+
+                <TabsContent value={allOrders}>
+                    <header>
+                        <h1 className="sr-only">{heading}</h1>
+                    </header>
+
+                    <section>
+                        <OrdersTable />
+                    </section>
+                </TabsContent>
+                <TabsContent value={summary}>WIP: {summary}</TabsContent>
             </Tabs>
         </div>
     );

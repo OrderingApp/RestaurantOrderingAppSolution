@@ -6,6 +6,7 @@ enum RESERVATIONS_KEYS {
     BY_DATE = 'by-date',
     BY_ID = 'by-id',
 }
+
 enum MENU_ITEMS {
     All = 'menu-categories',
     ITEMS = 'menu-items',
@@ -15,6 +16,7 @@ enum MENU_ITEMS {
 }
 
 enum ORDERS_KEYS {
+    ALL = 'all-orders',
     BY_TYPE = 'orderType',
     BY_ID = 'orderId',
 }

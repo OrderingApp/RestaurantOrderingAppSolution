@@ -24,7 +24,7 @@ const SearchInput = ({ placeholder, className }: SearchInputProps) => {
             type="search"
             placeholder={placeholder}
             inputClassName={`[&::placeholder]:text-black bg-white shadow-[0px_4px_4px_0px_#00000040] pl-8 ml-4 ${className}`}
-            icon={<Image src={searchSvg} alt="searchIcon" />}
+            icon={<Image src={searchSvg} alt="" />}
             iconClassName="left-7 top-[11px] w-4"
             onChange={changeInputValue}
         />

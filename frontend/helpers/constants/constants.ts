@@ -63,12 +63,22 @@ export enum MENU_CATEGORY_NAMES {
     ALL = 'all',
 }
 
-export enum FILTER_STATUS {
+// TODO: ask whats going on with getStatuses in useFilterOrders and the paid&ready to prepare status
+export enum ORDER_STATUSES {
     ONGOING = 'Ongoing',
     CLOSED = 'Closed',
-    PAIDANDREADYTOPREPARE = 'PaidAndReadyToPrepare',
+    PAID_AND_READY_TO_PREPARE = 'PaidAndReadyToPrepare',
+    CANCELLED = 'Canceled',
+    PENDING_PAYMENT = 'Pending Payment',
 }
 
+export enum ORDER_TYPES {
+    DINEIN = 'Dinein',
+    TAKEAWAY = 'Takeaway',
+    DELIVERY = 'Delivery',
+}
+
+// TODO: would be best to use lang pack + enums for these
 export const ordersTypes = {
     pl: [
         {
@@ -109,4 +119,4 @@ export const DISCOUNTS = [
         id: '50',
         name: '50%',
     },
-];
+] as const;

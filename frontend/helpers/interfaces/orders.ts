@@ -45,11 +45,11 @@ interface MenuItem {
 export interface OrderItem {
     id: string;
     price: number;
-    specialInstructions?: string | null;
     discount: number;
-    extraIngredients?: Ingredient[];
-    removedIngredients?: BaseIngredient[];
     menuItem: MenuItem;
+    removedIngredients?: BaseIngredient[];
+    specialInstructions?: string | null;
+    extraIngredients?: Ingredient[];
 }
 
 interface CustomerInformation {

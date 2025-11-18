@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { fetchWithToken } from '@/helpers/utils/utils';
-import { Areas } from '@/helpers/utils/query-keys';
+import { fetchWithParams } from '@/helpers/utils/utils';
+import { Areas } from '@/helpers/utils/queryKeys';
 
 const useQueryAreas = (id: string) =>
     useQuery({
         queryKey: [Areas.All],
-        queryFn: () => fetchWithToken('areas', id),
+        queryFn: () => fetchWithParams('areas', id),
     });
 
 export default useQueryAreas;

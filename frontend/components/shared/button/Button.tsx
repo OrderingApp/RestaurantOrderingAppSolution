@@ -5,7 +5,10 @@ import { useState, type ReactNode, type MouseEvent } from 'react';
 import clsx from 'clsx';
 import btnStyles from '@/lib/styles/button';
 
-export type ButtonProps = React.InputHTMLAttributes<HTMLButtonElement> & {
+export type ButtonProps = Omit<
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    'size'
+> & {
     children: ReactNode;
     className?: string;
     disabled?: boolean;
