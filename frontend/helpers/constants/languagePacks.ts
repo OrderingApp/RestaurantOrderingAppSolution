@@ -99,7 +99,11 @@ export interface languagePack {
                 buttons: {
                     accept: string;
                     cancel: string;
+                    discount: string;
                 };
+            };
+            timeBtns: {
+                asap: string;
             };
             form: {
                 fields: orderFormFields;
@@ -145,6 +149,15 @@ export interface languagePack {
     };
     delivertyMapModal: {
         deliveryTitle: string;
+    };
+    settingsPage: {
+        settings: {
+            printerSettings: string;
+            editMenu: string;
+            systemInfo: string;
+            archive: string;
+            users: string;
+        };
     };
     daySummaryPage: {
         tabs: {

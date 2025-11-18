@@ -7,10 +7,11 @@ import { useOrdersContext } from '@/providers/OrdersContext';
 import { useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toggleQueryParam } from '@/helpers/utils/utils';
+import CustomerInformationForm from './CustomerInformationForm';
 import { ItemProps } from '@/components/shared/lists/Items/Item';
 import { ButtonProps } from '@/components/shared/button/Button';
 import { Currency } from '@/helpers/type/types';
-import useLanguage from '@/helpers/hooks/useLanguage';
+import { useLanguage } from '@/providers/LanguageProvider';
 import languagePacks from '@/helpers/constants/languagePacks';
 
 export interface BillProps {
@@ -22,14 +23,14 @@ export interface BillProps {
 }
 
 const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
+    const { orders } = useOrdersContext();
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const menuItemId = searchParams.get(SEARCH_PARAMS_NAMES.MENU_ITEM_ID);
+    const userData = searchParams.get(SEARCH_PARAMS_NAMES.USER_DATA);
 
     const [selectedId, setSelectedId] = useState('');
-
-    const { orders } = useOrdersContext();
 
     const { language } = useLanguage();
 
@@ -103,7 +104,11 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
         );
     };
 
-    return (
+    const orderItems = orders.map((order) => ({
+        menuItemId: order.id,
+    }));
+
+    return !userData ? (
         <Menu variant="order">
             <DetailsAside
                 title={asideTitle}
@@ -112,7 +117,10 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
                 currency="pln"
                 buttons={buttons}
             />
+            {/* {menuItemId && <OrderOptionsModal onClose={toggleOptionsModal} />} */}
         </Menu>
+    ) : (
+        <CustomerInformationForm bill={bill} orderItems={orderItems} />
     );
 };
 

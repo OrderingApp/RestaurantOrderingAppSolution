@@ -98,7 +98,11 @@ const enPack: languagePack = {
                 buttons: {
                     accept: 'Accept',
                     cancel: 'Close without changes',
+                    discount: 'Add Discount',
                 },
+            },
+            timeBtns: {
+                asap: 'Right now',
             },
             form: {
                 fields: {
@@ -158,6 +162,15 @@ const enPack: languagePack = {
     },
     delivertyMapModal: {
         deliveryTitle: 'Delivery',
+    },
+    settingsPage: {
+        settings: {
+            printerSettings: 'Printer Settings',
+            editMenu: 'Edit Menu',
+            systemInfo: 'System Info',
+            archive: 'Archive',
+            users: 'Users',
+        },
     },
     daySummaryPage: {
         tabs: {
