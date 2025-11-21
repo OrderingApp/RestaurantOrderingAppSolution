@@ -150,6 +150,11 @@ const enPack: languagePack = {
         paymentByCard: 'Pay by Card/BLIK',
         paymentByCash: 'Pay by Cash',
     },
+    menuItemInformationModal: {
+        title: 'Ingredients and Allergens',
+        ingredientsTitle: 'Ingredients',
+        allergensTitle: 'Allergens',
+    },
     paymentDetails: {
         bill: 'Bill',
         product: 'Product',

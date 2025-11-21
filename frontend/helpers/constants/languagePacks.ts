@@ -135,6 +135,11 @@ export interface languagePack {
         paymentByCard: string;
         paymentByCash: string;
     };
+    menuItemInformationModal: {
+        title: string;
+        ingredientsTitle: string;
+        allergensTitle: string;
+    };
 
     paymentDetails: {
         bill: string;

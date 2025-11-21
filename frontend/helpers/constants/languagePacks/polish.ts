@@ -151,6 +151,11 @@ const plPack: languagePack = {
         paymentByCard: 'Płatność Kartą/Blikiem',
         paymentByCash: 'Płatność Gotówką',
     },
+    menuItemInformationModal: {
+        title: 'Skladniki i Alergeny',
+        ingredientsTitle: 'Składniki',
+        allergensTitle: 'Alergeny',
+    },
     paymentDetails: {
         bill: 'Rachunek',
         product: 'Produkt',

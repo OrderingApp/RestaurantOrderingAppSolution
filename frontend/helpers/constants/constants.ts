@@ -15,6 +15,10 @@ export const RESTAURANT_CLOSING_HOUR = '24:00';
 export const MIN_ITEM_SELECT = 1;
 export const MAX_ITEM_SELECT = 99;
 
+
+export const MODAL_WIDTH = 445;
+export const MODAL_HEIGHT = 445;
+
 export const MENU_BAR_ICONS: {
     [K in keyof languagePack['menuBar']]: StaticImport;
 } = {
