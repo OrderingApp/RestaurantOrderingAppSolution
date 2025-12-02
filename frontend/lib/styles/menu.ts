@@ -25,8 +25,8 @@ export const menuStyles: MenuStyles = {
         },
         order: {
             container: 'w-[776px]',
-            list: 'gap-y-4 pl-5',
-            listCols: 3,
+            list: 'gap-y-6 pl-5',
+            listCols: 4,
             menuItemVariant: 'order',
         },
     },

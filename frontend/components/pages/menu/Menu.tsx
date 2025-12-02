@@ -31,6 +31,8 @@ import MenuItemInformation from '@/components/shared/modals/MenuItemInformation'
 import IngredientsMenu from './IngredientsMenu';
 import SearchInput from '@/components/shared/Input/SearchInput';
 
+import { PaginationWithLinks } from '@/components/ui/pagination-with-links';
+
 interface MenuProps {
     variant?: 'card' | 'order';
     children?: React.ReactNode;
@@ -39,12 +41,14 @@ interface MenuProps {
 const Menu = ({ variant = 'order', children }: MenuProps) => {
     const searchParams = useSearchParams();
     const menuItemId = searchParams.get(SEARCH_PARAMS_NAMES.MENU_ITEM_ID);
+    const page = searchParams.get(SEARCH_PARAMS_NAMES.PAGE);
     const {
         displayedCategories,
         filteredMenuItems,
         totalItems,
         displayedTags,
-    } = useFilterMenu();
+        itemsPerPage,
+    } = useFilterMenu(variant);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const { language } = useLanguage();
@@ -92,7 +96,7 @@ const Menu = ({ variant = 'order', children }: MenuProps) => {
                         ))}
                     </div>
                     {displayedTags?.length ? (
-                        <ul className="flex gap-3 px-5 py-2">
+                        <ul className="flex gap-3 px-5 ">
                             {displayedTags?.map((tag) => (
                                 <MenuTag {...tag} key={tag.id} />
                             ))}
@@ -119,6 +123,16 @@ const Menu = ({ variant = 'order', children }: MenuProps) => {
                             />
                         ))}
                     </ul>
+                    <div
+                        className={`absolute bottom-3  ${variant === 'order' ? 'left-[calc(50%-112px)] ' : 'left-1/2'} -translate-x-1/2`}
+                    >
+                        <PaginationWithLinks
+                            page={page ? parseInt(page, 10) : 1}
+                            pageSize={itemsPerPage || 9}
+                            totalCount={totalItems || 0}
+                            navigationMode="router"
+                        />
+                    </div>
                 </div>
             )}
 

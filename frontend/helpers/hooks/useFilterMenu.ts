@@ -10,7 +10,7 @@ import {
 import { useSearchParams } from 'next/navigation';
 import { SEARCH_PARAMS_NAMES } from '../constants/constants';
 
-const useFilterMenu = () => {
+const useFilterMenu = (variant: 'card' | 'order') => {
     const { data: menuCategories } = useQueryMenuCategory();
     const { data: menuItems } = useQueryMenuItems();
     const { data: menuItemsTags } = useQueryMenuTags();
@@ -19,11 +19,13 @@ const useFilterMenu = () => {
     const subcategoryId = searchParams.get(SEARCH_PARAMS_NAMES.SUBCATEGORY);
     const name = searchParams.get(SEARCH_PARAMS_NAMES.NAME);
     const tag = searchParams.getAll(SEARCH_PARAMS_NAMES.TAG);
+    const page = searchParams.get(SEARCH_PARAMS_NAMES.PAGE);
     const {
         displayedCategories,
         filteredMenuItems,
         totalItems,
         displayedTags,
+        itemsPerPage,
     } = useMemo(() => {
         if (!menuCategories || !menuItems || !menuItemsTags)
             return {
@@ -99,11 +101,24 @@ const useFilterMenu = () => {
             );
         }
 
+        totalItems = filteredMenuItems.length;
+
+        const itemsPerPage = variant === 'card' ? 12 : 8;
+        if (page) {
+            const pageNumber = parseInt(page, 10);
+            const startIndex = (pageNumber - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            filteredMenuItems = filteredMenuItems.slice(startIndex, endIndex);
+        } else {
+            filteredMenuItems = filteredMenuItems.slice(0, itemsPerPage);
+        }
+
         return {
             displayedCategories,
             filteredMenuItems,
             totalItems,
             displayedTags,
+            itemsPerPage,
         };
     }, [menuCategories, categoryId, subcategoryId, name, menuItems, tag]);
 
@@ -112,6 +127,7 @@ const useFilterMenu = () => {
         filteredMenuItems,
         totalItems,
         displayedTags,
+        itemsPerPage,
     };
 };
 
