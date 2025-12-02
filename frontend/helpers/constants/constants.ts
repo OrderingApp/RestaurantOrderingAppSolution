@@ -6,7 +6,7 @@ import tablesSvg from '@/public/images/svg/tables.svg';
 import ordersSvg from '@/public/images/svg/orders.svg';
 import menuSvg from '@/public/images/svg/menu.svg';
 import calendarSvg from '@/public/images/svg/calendar-white.svg';
-import endOfDaySvg from '@/public/images/svg/end-of-day.svg';
+import daySummarySvg from '@/public/images/svg/end-of-day.svg';
 import settingsSvg from '@/public/images/svg/settings.svg';
 
 export const COMPANY_NAME = 'piccolo';
@@ -22,7 +22,7 @@ export const MENU_BAR_ICONS: {
     orders: ordersSvg,
     menu: menuSvg,
     reservations: calendarSvg,
-    endOfDay: endOfDaySvg,
+    daySummary: daySummarySvg,
     settings: settingsSvg,
 };
 
@@ -69,12 +69,22 @@ export enum MENU_CATEGORY_NAMES {
     ALL = 'all',
 }
 
-export enum FILTER_STATUS {
+// TODO: ask whats going on with getStatuses in useFilterOrders and the paid&ready to prepare status
+export enum ORDER_STATUSES {
     ONGOING = 'Ongoing',
     CLOSED = 'Closed',
-    PAIDANDREADYTOPREPARE = 'PaidAndReadyToPrepare',
+    PAID_AND_READY_TO_PREPARE = 'PaidAndReadyToPrepare',
+    CANCELLED = 'Canceled',
+    PENDING_PAYMENT = 'Pending Payment',
 }
 
+export enum ORDER_TYPES {
+    DINEIN = 'Dinein',
+    TAKEAWAY = 'Takeaway',
+    DELIVERY = 'Delivery',
+}
+
+// TODO: would be best to use lang pack + enums for these
 export const ordersTypes = {
     pl: [
         {
@@ -115,4 +125,4 @@ export const DISCOUNTS = [
         id: '50',
         name: '50%',
     },
-];
+] as const;

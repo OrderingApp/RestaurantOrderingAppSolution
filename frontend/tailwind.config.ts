@@ -32,8 +32,10 @@ export default {
                 },
                 tertiary: 'var(--tertiary)',
                 quaternary: 'var(--quaternary)',
+                success: 'var(--success)',
                 danger: 'var(--danger)',
                 'danger-dark': 'var(--danger-dark)',
+                warning: 'var(--warning)',
                 brown: 'var(--brown)',
                 white: 'var(--white)',
                 black: 'var(--black)',
@@ -96,6 +98,7 @@ export default {
         ({ addVariant }: PluginAPI) => {
             addVariant('hocus', ['&:hover', '&:focus']);
         },
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         require('tailwindcss-animate'),
     ],
 } satisfies Config;

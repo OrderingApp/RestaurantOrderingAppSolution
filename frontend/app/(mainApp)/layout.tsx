@@ -39,7 +39,7 @@ const ProtectedLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
                                 <Link
                                     href={`/${camelToKebab(key)}`}
                                     className={clsx(
-                                        'flex flex-col items-center text-sm text-white capitalize hocus:opacity-90 transition-opacity duration-300',
+                                        'flex flex-col items-center text-sm text-white text-center capitalize hocus:opacity-90 transition-opacity duration-300',
                                         opacity
                                     )}
                                 >

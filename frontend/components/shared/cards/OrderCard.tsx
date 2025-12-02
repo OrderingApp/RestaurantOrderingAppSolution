@@ -1,6 +1,6 @@
 'use client';
 
-import { CURRENCIES, FILTER_STATUS } from '@/helpers/constants/constants';
+import { CURRENCIES, ORDER_STATUSES } from '@/helpers/constants/constants';
 import ItemCard, { ItemCardProps } from './ItemCard';
 import { formatDate } from '@/helpers/utils/dates';
 import useLanguage from '@/helpers/hooks/useLanguage';
@@ -37,7 +37,7 @@ const OrderCard = ({
                 formatDate(new Date(expectedOrderCompletion), language).time
             }
             variant={
-                orderStatus === FILTER_STATUS.ONGOING
+                orderStatus === ORDER_STATUSES.ONGOING
                     ? 'orderActive'
                     : 'orderCompleted'
             }

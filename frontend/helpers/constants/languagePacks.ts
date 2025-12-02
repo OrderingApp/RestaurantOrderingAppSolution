@@ -34,7 +34,7 @@ export interface languagePack {
         orders: string;
         menu: string;
         reservations: string;
-        endOfDay: string;
+        daySummary: string;
         settings: string;
     };
     reservationsPage: {
@@ -159,12 +159,75 @@ export interface languagePack {
             users: string;
         };
     };
+    daySummaryPage: {
+        tabs: {
+            allOrders: string;
+            summary: string;
+        };
+        heading: string;
+    };
+    ordersTable: {
+        actions: {
+            label: string;
+            copyId: {
+                label: string;
+                notification: string;
+            };
+            viewOrder: string;
+            viewReceipt: string;
+        };
+        searchPlaceholder: string;
+        noResults: string;
+    };
+    entities: {
+        order: {
+            descriptive: OrderEntity;
+            type: {
+                dinein: string;
+                takeaway: string;
+                delivery: string;
+            };
+            statuses: {
+                ongoing: string;
+                pendingPayment: string;
+                cancelled: string;
+                closed: string;
+                paidAndReadyToPrepare: string;
+            };
+        };
+    };
+    generic: {
+        action: string;
+        options: {
+            yes: string;
+            no: string;
+            previousPage: {
+                descriptive: string;
+            };
+            nextPage: {
+                descriptive: string;
+            };
+        };
+        noResults: string;
+        searchPlaceholder: string;
+        errorMsg: string;
+    };
+}
+
+interface OrderEntity {
+    id: string;
+    number: string;
+    price: string;
+    status: string;
+    type: string;
+    discount: string;
 }
 
 interface loginPageFormFields {
     login: string;
     password: string;
 }
+
 interface createReservationPageFormFields {
     name: string;
     capacityNeeded: string;
