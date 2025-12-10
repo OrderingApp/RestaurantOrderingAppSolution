@@ -7,7 +7,8 @@ export const formatDate = (date: Date, language: string) => {
             year: '',
             time: '--:--',
             fullDate: '',
-            fullDateFormatted: new Date(), // fallback to now
+            fullDateFormatted: new Date(),
+            monthNumber: '',
         };
     }
 
@@ -35,6 +36,7 @@ export const formatDate = (date: Date, language: string) => {
         time: `${findDatePart('hour')}:${findDatePart('minute')}`,
         fullDate: fullDateFormatted,
         fullDateFormatted: new Date(date.getTime()),
+        monthNumber: (date.getMonth() + 1).toString(),
     };
 };
 

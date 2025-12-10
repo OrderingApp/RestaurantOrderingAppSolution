@@ -1,14 +1,15 @@
 import clsx from 'clsx';
 
-import { type ComponentStyles } from '@/helpers/types/ui-types';
 import { calendarStyles } from '@/lib/styles/calendar';
 
-interface DateItemProps extends ComponentStyles {
+interface DateItemProps {
     date: string;
     day: string;
-    month: string;
     year: string;
     fullDate: string;
+    monthNumber: string;
+    variant: keyof typeof calendarStyles.variants;
+    size: keyof typeof calendarStyles.sizes;
     isSelected: boolean;
     onClick: () => void;
     className?: string;
@@ -18,7 +19,7 @@ interface DateItemProps extends ComponentStyles {
 const DateItem = ({
     date,
     day,
-    month,
+    monthNumber,
     year,
     fullDate,
     isSelected,
@@ -34,7 +35,7 @@ const DateItem = ({
         <div
             data-testid={`date-${fullDate}`}
             className={clsx(
-                'rounded-md cursor-pointer text-center',
+                'cursor-pointer text-center',
                 container,
                 isSelected
                     ? calendarStyles.variants[variant].selected
@@ -44,10 +45,10 @@ const DateItem = ({
             onClick={onClick}
         >
             <p className={clsx(text, classNameText)}>{date}</p>
-            <p className={clsx(text, classNameText)}>{day}</p>
             <p className={clsx(text, classNameText)}>
-                {month} {year}
+                {day}.{monthNumber}
             </p>
+            <p className={clsx(text, classNameText)}>{year}</p>
         </div>
     );
 };

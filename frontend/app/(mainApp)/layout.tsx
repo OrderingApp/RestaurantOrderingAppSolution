@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import clsx from 'clsx';
-import { type ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 
 import { useLanguage } from '@/providers/LanguageProvider';
 import languagePacks from '@/helpers/constants/languagePacks';
@@ -18,6 +18,8 @@ const ProtectedLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
     const menuBarEntries = Object.entries(menuBar) as Array<
         [keyof typeof menuBar, string]
     >;
+
+    const containerRef = useRef<HTMLDivElement>(null);
 
     return (
         <div className="flex min-h-[48rem] max-h-screen">
@@ -52,7 +54,10 @@ const ProtectedLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
                 </ul>
             </aside>
 
-            <main className="relative bg-light-gray w-full rounded-r-3xl overflow-x-hidden">
+            <main
+                ref={containerRef}
+                className="relative bg-light-gray w-full rounded-r-3xl overflow-x-hidden"
+            >
                 {children}
             </main>
         </div>

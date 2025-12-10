@@ -117,7 +117,6 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
                 currency="pln"
                 buttons={buttons}
             />
-            {/* {menuItemId && <OrderOptionsModal onClose={toggleOptionsModal} />} */}
         </Menu>
     ) : (
         <CustomerInformationForm bill={bill} orderItems={orderItems} />

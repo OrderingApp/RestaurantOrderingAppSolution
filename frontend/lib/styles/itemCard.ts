@@ -6,11 +6,29 @@ export enum variantTableMap {
 
 export const itemCardStyles = {
     variants: {
-        reservation: 'bg-[#2C5364] text-white',
-        [variantTableMap.ACTIVE]: 'bg-[#008080] text-white',
-        [variantTableMap.IN_PROGGRESS]: 'bg-[#CD5700] text-black',
-        [variantTableMap.PAYMENT]: 'bg-[#C70039] text-white',
-        orderActive: 'bg-[#CD5700] text-white',
-        orderCompleted: 'bg-[#008080] text-white',
+        reservation: {
+            container: 'border-[#2C5364] border-2',
+            appearance: 'bg-[#2C5364] text-white',
+        },
+        [variantTableMap.ACTIVE]: {
+            container: 'border-[#008080] border-2',
+            appearance: 'bg-[#008080] text-white',
+        },
+        [variantTableMap.IN_PROGGRESS]: {
+            container: 'border-[#CD5700] border-2',
+            appearance: 'bg-[#CD5700] text-black',
+        },
+        [variantTableMap.PAYMENT]: {
+            container: 'border-[#C70039] border-2',
+            appearance: 'bg-[#C70039] text-white',
+        },
+        orderActive: {
+            container: 'border-[#CD5700] border-2',
+            appearance: 'bg-[#CD5700] text-white',
+        },
+        orderCompleted: {
+            container: 'border-[#008080] border-2',
+            appearance: 'bg-[#008080] text-white',
+        },
     },
 };

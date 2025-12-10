@@ -1,17 +1,17 @@
-import BasicStyles from '../types/types';
+import { BasicStyles } from '../types/types';
 
 export const calendarStyles: {
     variants: {
         [K in keyof Omit<
             BasicStyles['variants'],
-            'tertiary' | 'success' | 'danger'
+            'tertiary' | 'success' | 'danger' | 'quaternary'
         >]: {
             selected: string;
             unselected: string;
         };
     };
     sizes: {
-        [K in keyof BasicStyles['sizes']]: {
+        [K in keyof Omit<BasicStyles['sizes'], 'xxs' | 'xs' | 'xl'>]: {
             container: string;
             text: string;
         };
@@ -28,7 +28,7 @@ export const calendarStyles: {
         },
     },
     sizes: {
-        sm: { container: 'py-1', text: 'text-sm' },
+        sm: { container: 'py-2', text: 'text-xs' },
         md: { container: 'py-2', text: 'text-base' },
         lg: { container: 'py-2', text: 'text-lg' },
     },

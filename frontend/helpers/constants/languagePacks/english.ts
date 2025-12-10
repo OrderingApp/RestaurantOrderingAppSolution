@@ -29,11 +29,11 @@ const enPack: languagePack = {
     },
     reservationsPage: {
         reservationTitle: 'Check Reservations',
-        upsertReservation: 'Create/Edit Reservation',
+        createReservation: 'Create Reservation',
         reservationsList: 'List of reservations',
         reservationCard: {
-            title: 'Reservation',
-            people: ['person', 'persons'],
+            totalGuests: 'Number of people',
+            phone: 'Phone number',
         },
     },
     createReservationPage: {

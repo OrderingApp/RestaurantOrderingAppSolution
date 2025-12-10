@@ -29,11 +29,11 @@ const plPack: languagePack = {
     },
     reservationsPage: {
         reservationTitle: 'Sprawdź Rezerwacje',
-        upsertReservation: 'Utwórz/Edytuj Rezerwacje',
+        createReservation: 'Utwórz Rezerwacje',
         reservationsList: 'Lista rezerwacji',
         reservationCard: {
-            title: 'Rezerwacja',
-            people: ['osób', 'osoba', 'osoby', 'osób'],
+            totalGuests: 'Liczba osób',
+            phone: 'Nr telefonu',
         },
     },
     createReservationPage: {

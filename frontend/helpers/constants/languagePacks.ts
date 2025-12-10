@@ -39,11 +39,11 @@ export interface languagePack {
     };
     reservationsPage: {
         reservationTitle: string;
-        upsertReservation: string;
+        createReservation: string;
         reservationsList: string;
         reservationCard: {
-            title: string;
-            people: string[];
+            totalGuests: string;
+            phone: string;
         };
     };
     createReservationPage: {

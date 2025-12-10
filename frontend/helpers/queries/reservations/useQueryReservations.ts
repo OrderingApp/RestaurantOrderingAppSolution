@@ -7,7 +7,7 @@ export interface Reservation {
     id: string;
     phoneNumber: string;
     name: string;
-    dateTime: string;
+    scheduledFor: string;
     capacityNeeded: number;
     isAssigned: number;
     tableId: string;

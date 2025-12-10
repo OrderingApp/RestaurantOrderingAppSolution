@@ -19,30 +19,35 @@ const ItemCard = ({
     children,
     className,
     variantClassName,
-}: ItemCardProps) => (
-    <li>
-        <button onClick={onClick}>
-            <div
-                className={cn(
-                    'w-32 h-28 border border-black rounded-lg overflow-hidden relative',
-                    className
-                )}
-            >
+}: ItemCardProps) => {
+    const styles = itemCardStyles.variants[variant];
+
+    return (
+        <li>
+            <button onClick={onClick}>
                 <div
                     className={cn(
-                        'absolute left-[-2px] top-0 w-[130px] flex justify-between items-center px-2 h-8 border-b border-l border-r border-black text-white rounded-b-[10px]',
-                        itemCardStyles.variants[variant],
-                        variantClassName
+                        'w-44 h-28 rounded-lg overflow-hidden relative',
+                        styles.container,
+                        className
                     )}
                 >
-                    <p className="text-[10px]">{title}</p>
-                    {subtitle && <p className="text-[10px]">{subtitle}</p>}
-                </div>
+                    <div
+                        className={cn(
+                            'absolute left-[-2px] top-0 w-44 flex justify-between items-center px-2 h-8 border-b border-l border-r border-black',
+                            styles.appearance,
+                            variantClassName
+                        )}
+                    >
+                        <p className="text-[11px]">{title}</p>
+                        {subtitle && <p className="text-[11px]">{subtitle}</p>}
+                    </div>
 
-                <div className="h-full p-2 mt-8">{children}</div>
-            </div>
-        </button>
-    </li>
-);
+                    <div className="h-full p-2 mt-10">{children}</div>
+                </div>
+            </button>
+        </li>
+    );
+};
 
 export default ItemCard;

@@ -16,12 +16,16 @@ import deleteSvg from '@/public/images/svg/delete.svg';
 import dollarWhiteSvg from '@/public/images/svg/dollar-white.svg';
 import mapMarkerSvg from '@/public/images/svg/map-marker.svg';
 import mapSvg from '@/public/images/svg/Map.svg';
+import timeWhiteSvg from '@/public/images/svg/time-white.svg';
+import userWhiteSvg from '@/public/images/svg/user-white.svg';
 
 export const ICONS = {
     USER: userSvg,
+    USER_WHITE: userWhiteSvg,
     USERS: usersSvg,
     CALENDAR: calendarSvg,
     TIME: timeSvg,
+    TIME_WHITE: timeWhiteSvg,
     PHONE: phoneSvg,
     MARKER: markerSvg,
     CLOSE: closeSvg,

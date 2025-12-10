@@ -5,13 +5,14 @@ import ItemCard, { ItemCardProps } from './ItemCard';
 
 import { Reservation } from '@/helpers/queries/reservations/useQueryReservations';
 import languagePacks from '@/helpers/constants/languagePacks';
-import { getPluralForm } from '@/helpers/utils/utils';
+import { formatPhoneNumber } from '@/helpers/utils/utils';
 import { formatDate } from '@/helpers/utils/dates';
 
 export interface ReservationCardProps
     extends Omit<ItemCardProps, 'variant' | 'children' | 'title'>,
         Reservation {
     capacityNeeded: number;
+    phoneNumber: string;
     scheduledFor: string;
 }
 
@@ -19,6 +20,7 @@ const ReservationCard = ({
     scheduledFor,
     name,
     capacityNeeded,
+    phoneNumber,
     onClick,
     className,
 }: ReservationCardProps) => {
@@ -26,23 +28,26 @@ const ReservationCard = ({
 
     const {
         reservationsPage: {
-            reservationCard: { title, people },
+            reservationCard: { totalGuests, phone },
         },
     } = languagePacks[language];
 
-    const peopleName = getPluralForm(capacityNeeded, people, language);
+    const formatedPhoneNumber = formatPhoneNumber(phoneNumber);
 
     return (
         <ItemCard
-            title={title}
+            title={name}
             subtitle={formatDate(new Date(scheduledFor), language).time}
             variant="reservation"
             onClick={onClick}
             className={className}
         >
-            <p className="text-[11px] text-left font-bold">{name}</p>
-            <p className="text-[11px] text-left font-bold">
-                {capacityNeeded} {peopleName}
+            <p className="text-xs text-center mb-1">
+                {totalGuests}:
+                <span className="font-bold">{capacityNeeded}</span>
+            </p>
+            <p className="text-xs text-center">
+                {phone}:<span className="font-bold">{formatedPhoneNumber}</span>
             </p>
         </ItemCard>
     );

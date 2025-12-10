@@ -117,8 +117,8 @@ const DateCalendar = ({
 
 const sliderDefaultSettings: SliderSettings = {
     speed: 300,
-    slidesToShow: 7,
-    slidesToScroll: 7,
+    slidesToShow: 12,
+    slidesToScroll: 12,
     infinite: false,
     arrows: false,
     dots: false,
