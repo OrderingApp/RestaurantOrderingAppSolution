@@ -14,6 +14,8 @@ export default {
             backgroundImage: {
                 'page-gradient':
                     'linear-gradient(135deg, #2C5364 0%, #0F2027 100%)',
+                'reservation-gradient':
+                    'linear-gradient(135deg, #2B5162 0%, #203D4A 100%)',
                 'modal-gradient':
                     'linear-gradient(135deg, #6E8894 0%, #334046 100%)',
                 'payment-modal-gradient':

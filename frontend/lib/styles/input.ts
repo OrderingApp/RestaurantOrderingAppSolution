@@ -17,6 +17,11 @@ export const inputStyles: {
         tertiary: '',
     },
     sizes: {
+        xs: {
+            label: 'text-sm',
+            input: 'px-4 py-1 text-md',
+            error: 'text-sm',
+        },
         sm: {
             label: 'text-sm',
             input: 'px-4 py-2 text-md',

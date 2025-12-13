@@ -17,6 +17,7 @@ import useReservationMutation from '@/helpers/queries/reservations/useMutationRe
 import {
     RESTAURANT_CLOSING_HOUR,
     RESTAURANT_OPENING_HOUR,
+    SEARCH_PARAMS_NAMES,
 } from '@/helpers/constants/constants';
 import { checkMaxAndMinDate } from '@/helpers/utils/dates';
 import languagePacks from '@/helpers/constants/languagePacks';
@@ -36,7 +37,7 @@ const formDefaultValues = {
 
 const ReservationForm = () => {
     const searchParams = useSearchParams();
-    const editParam = searchParams.get('edit');
+    const editParam = searchParams.get(SEARCH_PARAMS_NAMES.RESERVATION);
 
     const { language } = useLanguage();
     const reservationSchema = getReservationSchema(language);
@@ -108,31 +109,38 @@ const ReservationForm = () => {
 
         reset({
             name: reservation.name,
-            date: reservation.dateTime.split('T')[0],
+            date: reservation.scheduledFor.split('T')[0],
             phoneNumber: reservation.phoneNumber,
-            time: reservation.dateTime.split('T')[1].split('.')[0].slice(0, -3),
+            time: reservation.scheduledFor
+                .split('T')[1]
+                .split('.')[0]
+                .slice(0, -3),
             capacityNeeded: reservation.capacityNeeded.toString(),
         });
     }, [editParam, reservation, minDateString, reset]);
 
     return (
-        <div className="w-1/2 bg-white pt-8 pb-3 min-h-full relative">
+        <div className="bg-white pb-3 min-h-full relative">
             <form
-                className="py-2 px-8 flex flex-col justify-start h-full"
+                className="flex flex-col justify-start h-full"
                 onSubmit={handleSubmit(submitFormHandler)}
             >
-                <h1 className="text-center text-black text-4xl font-bold py-5 capitalize">
+                <h1
+                    className={`text-black text-xl font-bold capitalize ${!errors && 'py-4'}`}
+                >
                     {editParam ? editReservation : createReservation}
                 </h1>
-                <div className="h-full flex flex-col justify-between">
-                    <div className="flex flex-col gap-4">
+                <div className="h-full flex flex-col justify-between mt-2 ">
+                    <div className="flex flex-col gap-1">
                         <Input
                             type="text"
                             id="name"
+                            inputSize="xs"
                             label={name}
                             icon={<Image src={ICONS.USER} alt="userIcon" />}
                             {...register('name')}
                             errors={errors.name}
+                            errorClassName="!text-[11px]"
                             inputClassName="w-full"
                             defaultValue={formDefaultValues.name}
                         />
@@ -145,6 +153,7 @@ const ReservationForm = () => {
                             {...register('capacityNeeded')}
                             min={1}
                             errors={errors.capacityNeeded}
+                            errorClassName="!text-[11px]"
                             inputClassName="w-full hide-input-number-icon"
                             defaultValue={formDefaultValues.capacityNeeded}
                         />
@@ -158,6 +167,7 @@ const ReservationForm = () => {
                             defaultValue={formDefaultValues.date}
                             {...register('date')}
                             errors={errors.date}
+                            errorClassName="!text-[11px]"
                             inputClassName="w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0"
                         />
                         <Input
@@ -169,6 +179,7 @@ const ReservationForm = () => {
                             max={RESTAURANT_CLOSING_HOUR}
                             {...register('time')}
                             errors={errors.time}
+                            errorClassName="!text-[11px]"
                             inputClassName="w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0"
                             defaultValue={formDefaultValues.time}
                         />
@@ -179,28 +190,28 @@ const ReservationForm = () => {
                             icon={<Image src={ICONS.PHONE} alt="phoneIcon" />}
                             {...register('phoneNumber')}
                             errors={errors.phoneNumber}
+                            errorClassName="!text-[11px]"
                             inputClassName="w-full"
                             defaultValue={formDefaultValues.phoneNumber}
                         />
                     </div>
-                    <div className="h-full w-full">
-                        <Button className="mt-10 w-full" size="lg">
-                            {editParam ? edit : submit}
-                        </Button>
+                    <div className="self-end flex justify-between w-full ">
                         {editParam && (
-                            <Button
+                            <button
                                 onClick={() =>
                                     deleteReservationMutation.mutate({
                                         id: editParam,
                                     })
                                 }
-                                className="w-full mt-4"
-                                variant="danger"
-                                size="lg"
+                                className="bg-danger p-2 rounded-md"
                             >
-                                Usuń Rezerwacje
-                            </Button>
+                                <Image src={ICONS.DELETE} alt="delete" />
+                            </button>
                         )}
+
+                        <Button className="mt-2" size="xxs">
+                            {editParam ? edit : submit}
+                        </Button>
                     </div>
                 </div>
             </form>

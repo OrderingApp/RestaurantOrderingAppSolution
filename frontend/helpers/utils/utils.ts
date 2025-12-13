@@ -64,6 +64,25 @@ export const toggleQueryParam = (
     router.push(`${pathname}?${params.toString()}`);
 };
 
+export const setQueryParams = (
+    newParams: Record<string, string | undefined>,
+    searchParams: ReadonlyURLSearchParams,
+    router: AppRouterInstance,
+    pathname: string
+) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    Object.entries(newParams).forEach(([key, value]) => {
+        if (value === undefined || params.get(key) === value) {
+            params.delete(key);
+        } else {
+            params.set(key, value);
+        }
+    });
+
+    router.push(`${pathname}?${params.toString()}`);
+};
+
 export const formatPhoneNumber = (phoneNumber: string) => {
     return phoneNumber.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
 };

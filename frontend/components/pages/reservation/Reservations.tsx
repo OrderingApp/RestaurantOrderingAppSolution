@@ -2,28 +2,38 @@
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
+import Image from 'next/image';
 
 import useLanguage from '@/helpers/hooks/useLanguage';
+import useFilterReservations from '@/helpers/hooks/useFilterReservations';
+
+import { PaginationWithLinks } from '@/components/ui/pagination-with-links';
 
 import Button from '@/components/shared/button/Button';
 import DateCalendar from '@/components/shared/DateCalendar/DateCalendar';
 import ReservationCard from '@/components/shared/cards/ReservationCard';
-import languagePacks from '@/helpers/constants/languagePacks';
-import Image from 'next/image';
 import SearchInput from '@/components/shared/Input/SearchInput';
+import Modal from '@/components/shared/modals/Modal';
+import UpsertReservation from '@/components/shared/modals/UpsertReservation';
+
+import languagePacks from '@/helpers/constants/languagePacks';
 import { ICONS } from '@/helpers/constants/icons/icons';
-import { toggleQueryParam } from '@/helpers/utils/utils';
+import { setQueryParams, toggleQueryParam } from '@/helpers/utils/utils';
 import { SEARCH_PARAMS_NAMES } from '@/helpers/constants/constants';
-import useFilterReservations from '@/helpers/hooks/useFilterReservations';
 
 const Reservations = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
 
-    const { language } = useLanguage();
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString());
-    const { filteredReservations } = useFilterReservations(selectedDate);
+
+    const { filteredReservations, totalItems, itemsPerPage, totalPages } =
+        useFilterReservations(selectedDate);
+    const { language } = useLanguage();
+
+    const modal = searchParams.get(SEARCH_PARAMS_NAMES.MODAL);
+    const page = searchParams.get(SEARCH_PARAMS_NAMES.PAGE);
 
     const {
         reservationsPage: { reservationsList, createReservation },
@@ -49,6 +59,40 @@ const Reservations = () => {
         if (param === value) return value;
     };
 
+    const toggleModal = () => {
+        toggleQueryParam(
+            SEARCH_PARAMS_NAMES.MODAL,
+            'true',
+            searchParams,
+            router,
+            pathname
+        );
+    };
+
+    const editReservationHandler = (id: string) => {
+        setQueryParams(
+            {
+                [SEARCH_PARAMS_NAMES.MODAL]: 'true',
+                [SEARCH_PARAMS_NAMES.RESERVATION]: id,
+            },
+            searchParams,
+            router,
+            pathname
+        );
+    };
+
+    const closeModal = () => {
+        setQueryParams(
+            {
+                [SEARCH_PARAMS_NAMES.MODAL]: undefined,
+                [SEARCH_PARAMS_NAMES.RESERVATION]: undefined,
+            },
+            searchParams,
+            router,
+            pathname
+        );
+    };
+
     return (
         <section className="p-4 px-10 relative h-full">
             <header className="flex justify-between items-center py-4">
@@ -56,7 +100,7 @@ const Reservations = () => {
                     {reservationsList}
                 </h1>
                 <Button
-                    onClick={() => router.push('/reservations/create')}
+                    onClick={toggleModal}
                     className="px-8 max-w-52"
                     size="md"
                 >
@@ -64,7 +108,7 @@ const Reservations = () => {
                 </Button>
             </header>
 
-            <div className="flex justify-around w-full mt-6 h-auto">
+            <div className="flex justify-around w-full mt-6 h-auto ">
                 <div className="flex items-start justify-between w-full">
                     <div className="flex gap-4 mb-4 w-2/5 ">
                         {buttons.map((btn) => (
@@ -102,10 +146,13 @@ const Reservations = () => {
             </div>
 
             <main className="flex flex-col">
-                <ul className="flex gap-4 justify-between px-2 py-3 flex-wrap">
+                <ul className="flex gap-x-8 gap-y-4  px-2 py-3 flex-wrap">
                     {filteredReservations?.map((reservation) => (
                         <ReservationCard
                             key={reservation.id}
+                            onClick={() =>
+                                editReservationHandler(reservation.id)
+                            }
                             {...reservation}
                         />
                     ))}
@@ -116,6 +163,24 @@ const Reservations = () => {
                     onDateSelect={(date) => setSelectedDate(date.toISOString())}
                 />
             </div>
+            {modal === 'true' && (
+                <Modal onClose={closeModal}>
+                    <UpsertReservation onClose={closeModal} />
+                </Modal>
+            )}
+
+            {totalPages > 0 && (
+                <div
+                    className={`absolute bottom-20 left-1/2  -translate-x-1/2`}
+                >
+                    <PaginationWithLinks
+                        page={page ? parseInt(page, 10) : 1}
+                        pageSize={itemsPerPage || 12}
+                        totalCount={totalItems || 0}
+                        navigationMode="router"
+                    />
+                </div>
+            )}
         </section>
     );
 };

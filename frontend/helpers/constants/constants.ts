@@ -51,6 +51,7 @@ export enum BACKEND_PATHS {
 export enum SEARCH_PARAMS_NAMES {
     CATEGORY = 'categoryId',
     SUBCATEGORY = 'subcategoryId',
+    RESERVATION = 'reservationId',
     FILTER_BY = 'filterBy',
     NAME = 'name',
     TAG = 'tag',

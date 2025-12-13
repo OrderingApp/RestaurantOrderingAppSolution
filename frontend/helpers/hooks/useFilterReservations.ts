@@ -5,19 +5,21 @@ import { formatDate } from '../utils/dates';
 import useLanguage from './useLanguage';
 
 const useFilterReservations = (date: string) => {
-    const { data } = useQueryReservations(date);
     const searchParams = useSearchParams();
     const page = searchParams.get(SEARCH_PARAMS_NAMES.PAGE);
     const name = searchParams.get(SEARCH_PARAMS_NAMES.NAME);
     const filterBy = searchParams.get(SEARCH_PARAMS_NAMES.FILTER_BY);
 
+    const { data } = useQueryReservations(date);
     const { language } = useLanguage();
 
     let filteredReservations = data || [];
-    const totalItems = filteredReservations.length;
-    const itemsPerPage = 8;
 
-    if (filterBy === 'time') {
+    const itemsPerPage = 12;
+    const totalItems = filteredReservations.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    if (filterBy === 'time' || filterBy === null) {
         filteredReservations = filteredReservations.sort((a, b) => {
             const { time: aTime } = formatDate(
                 new Date(a.scheduledFor),
@@ -61,6 +63,7 @@ const useFilterReservations = (date: string) => {
         filteredReservations,
         totalItems,
         itemsPerPage,
+        totalPages,
     };
 };
 
