@@ -11,6 +11,7 @@
     --tertiary: #334046;
     --quaternary: #284d5d;
     --danger: #b20000;
+    --warning: #cd5700;
     --danger-dark: #bb0101;
     --brown: #cd5700;
     --white: #fff;
@@ -21,6 +22,7 @@
     --light-gray: #f6f6f6;
     --served: #2b622d;
     --light-grays: #f3f6f6;
+    --success: #2b622d;
 }
 
 body {

@@ -10,6 +10,7 @@ import languagePacks from '@/helpers/constants/languagePacks';
 
 import './globals.css';
 import OrdersProvider from '@/providers/OrdersContext';
+import { Toaster } from 'sonner';
 
 const geistSans = Geist({
     variable: '--font-geist-sans',
@@ -47,6 +48,7 @@ const RootLayout = async ({
                         </LanguageProvider>
                     </QueryProvider>
                 </div>
+                <Toaster richColors />
             </body>
         </html>
     );

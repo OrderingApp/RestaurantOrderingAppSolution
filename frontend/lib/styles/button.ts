@@ -3,6 +3,7 @@ import type { BasicStyles } from '../types/types';
 const btnStyles: {
     variants: Omit<BasicStyles['variants'], 'secondary'> & {
         outline: string;
+        none: string;
     };
     sizes: BasicStyles['sizes'];
 } = {
@@ -13,6 +14,7 @@ const btnStyles: {
         success: 'bg-[#2B622F] text-white',
         danger: 'bg-danger text-white ',
         outline: 'bg-white shadow-xl text-black ',
+        none: '',
     },
     sizes: {
         xxs: 'p-3 px-5 text-sm rounded-xl',

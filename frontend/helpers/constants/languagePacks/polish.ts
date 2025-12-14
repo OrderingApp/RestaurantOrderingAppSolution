@@ -24,7 +24,7 @@ const plPack: languagePack = {
         orders: 'zamówienia',
         menu: 'karta',
         reservations: 'rezerwacje',
-        endOfDay: 'koniec dnia',
+        daySummary: 'podsumowanie dnia',
         settings: 'ustawienia',
     },
     reservationsPage: {
@@ -173,9 +173,69 @@ const plPack: languagePack = {
             users: 'Użytkownicy',
         },
     },
+<<<<<<< HEAD
     pagination: {
         previousBtn: 'Porzedni',
         nextBtn: 'Następny',
+=======
+    daySummaryPage: {
+        tabs: {
+            allOrders: 'Wszystkie Zamówienia',
+            summary: 'Podsumowanie',
+        },
+        heading: 'Zamówienia',
+    },
+    ordersTable: {
+        actions: {
+            label: 'Akcje Dodatkowe',
+            copyId: {
+                label: 'Kopiuj ID Zamówienia',
+                notification: 'Skopiowanio ID zamówienia',
+            },
+            viewOrder: 'Wyświetl Zamówienie',
+            viewReceipt: 'Wyświetl Paragon',
+        },
+        searchPlaceholder: 'Wyszukaj zamówienia...',
+        noResults: 'Nie znaleziono zamówień',
+    },
+    entities: {
+        order: {
+            descriptive: {
+                id: 'ID Zamówienia',
+                number: 'Numer Zamówienia',
+                price: 'Cena',
+                status: 'Status',
+                type: 'Typ Zamówienia',
+                discount: 'Zniżka',
+            },
+            type: {
+                dinein: 'Na miejscu',
+                takeaway: 'Odbiór',
+                delivery: 'Dowóz',
+            },
+            statuses: {
+                ongoing: 'W trakcie',
+                pendingPayment: 'Oczekuje na płatność',
+                cancelled: 'Anulowane',
+                closed: 'Zamknięte',
+                paidAndReadyToPrepare: 'Opłacone',
+            },
+        },
+    },
+
+    generic: {
+        action: 'Akcja Dodatkowa',
+        options: {
+            yes: 'Tak',
+            no: 'Nie',
+            previousPage: { descriptive: 'Poprzednia strona' },
+            nextPage: { descriptive: 'Następna strona' },
+        },
+        noResults: 'Brak wyników',
+        searchPlaceholder: 'Wyszukaj...',
+        errorMsg:
+            'Wystąpił niespodziewany błąd. Spróbuj ponownie później lub skontaktuj się z administratorem.',
+>>>>>>> 9708c6c6bb664c3bb6f7828984636a472b1480d3
     },
 };
 

@@ -1,9 +1,10 @@
+import { BACKEND_PATHS } from '@/helpers/constants/constants';
 import { NotDineInOrder } from '@/helpers/interfaces/orders';
 import { OrdersItems } from '@/helpers/utils/queryKeys';
-import { fetchWithToken } from '@/helpers/utils/utils';
+import { fetchWithParams } from '@/helpers/utils/utils';
 import { useQuery } from '@tanstack/react-query';
 
-export const useQueryOrdersByType = (type: string, statuses: string[]) => {
+const useQueryOrdersByType = (type: string, statuses: string[]) => {
     const params = new URLSearchParams({
         orderType: type,
         date: new Date().toLocaleTimeString(),
@@ -13,8 +14,8 @@ export const useQueryOrdersByType = (type: string, statuses: string[]) => {
     return useQuery({
         queryKey: [OrdersItems.BY_TYPE, type, statuses],
         queryFn: () =>
-            fetchWithToken(
-                'orders',
+            fetchWithParams(
+                BACKEND_PATHS.Orders,
                 `non-dinein-orders?${params.toString()}`
             ).then((response) => response as NotDineInOrder[]),
     });

@@ -4,13 +4,13 @@ import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 import {
-    FILTER_STATUS,
+    ORDER_STATUSES,
     ordersTypes,
     SEARCH_PARAMS_NAMES,
 } from '../constants/constants';
 
 import useLanguage from './useLanguage';
-import useQueryOrdersByType from '../queries/orders/useQueryOrders';
+import useQueryOrdersByType from '../queries/orders/useQueryOrdersByType';
 
 const useFilterOrders = () => {
     const searchParams = useSearchParams();
@@ -25,13 +25,19 @@ const useFilterOrders = () => {
 
     const getOrderStatus = () => {
         if (orderStatusParam === 'Ongoing') {
-            return [FILTER_STATUS.ONGOING, FILTER_STATUS.PAIDANDREADYTOPREPARE];
+            return [
+                ORDER_STATUSES.ONGOING,
+                ORDER_STATUSES.PAID_AND_READY_TO_PREPARE,
+            ];
         }
         if (orderStatusParam) {
             return [orderStatusParam];
-        } else {
-            return [FILTER_STATUS.ONGOING, FILTER_STATUS.PAIDANDREADYTOPREPARE];
         }
+
+        return [
+            ORDER_STATUSES.ONGOING,
+            ORDER_STATUSES.PAID_AND_READY_TO_PREPARE,
+        ];
     };
 
     const { data } = useQueryOrdersByType(orderType, getOrderStatus());

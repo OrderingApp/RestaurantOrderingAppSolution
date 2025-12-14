@@ -24,7 +24,7 @@ const enPack: languagePack = {
         orders: 'orders',
         menu: 'menu',
         reservations: 'reservations',
-        endOfDay: 'end of day',
+        daySummary: 'day summary',
         settings: 'settings',
     },
     reservationsPage: {
@@ -172,9 +172,73 @@ const enPack: languagePack = {
             users: 'Users',
         },
     },
+<<<<<<< HEAD
     pagination: {
         previousBtn: 'Previous',
         nextBtn: 'Next',
+=======
+    daySummaryPage: {
+        tabs: {
+            allOrders: 'All Orders',
+            summary: 'Summary',
+        },
+        heading: 'Orders',
+    },
+    ordersTable: {
+        actions: {
+            label: 'Actions',
+            copyId: {
+                label: 'Copy Order ID',
+                notification: 'Order ID Copied',
+            },
+            viewOrder: 'View Order',
+            viewReceipt: 'View Receipt',
+        },
+        searchPlaceholder: 'Search orders...',
+        noResults: 'No orders found',
+    },
+    entities: {
+        order: {
+            descriptive: {
+                id: 'Order ID',
+                number: 'Order Number',
+                price: 'Price',
+                status: 'Status',
+                type: 'Order Type',
+                discount: 'Discount',
+            },
+            type: {
+                dinein: 'Dine in',
+                takeaway: 'Takeaway',
+                delivery: 'Delivery',
+            },
+            statuses: {
+                ongoing: 'Ongoing',
+                pendingPayment: 'Pending Payment',
+                cancelled: 'Cancelled',
+                closed: 'Closed',
+                paidAndReadyToPrepare: 'Paid',
+            },
+        },
+    },
+
+    generic: {
+        searchPlaceholder: 'Search...',
+        action: 'Additional Actions',
+        options: {
+            yes: 'Yes',
+            no: 'No',
+            previousPage: {
+                descriptive: 'Previous page',
+            },
+            nextPage: {
+                descriptive: 'Next page',
+            },
+        },
+        noResults: 'No results',
+        errorMsg:
+            'An unexpected error occured. Try again later or contact the administrator.',
+>>>>>>> 9708c6c6bb664c3bb6f7828984636a472b1480d3
     },
 };
 

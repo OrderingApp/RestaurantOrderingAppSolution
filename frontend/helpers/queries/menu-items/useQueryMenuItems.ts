@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { fetchWithToken } from '@/helpers/utils/utils';
+import { fetchWithParams } from '@/helpers/utils/utils';
 import { MenuItems } from '@/helpers/utils/queryKeys';
 
 type NamedEntity = { id: string; name: string };
@@ -51,7 +51,7 @@ export const useQueryMenuCategory = () =>
     useQuery({
         queryKey: [MenuItems.All],
         queryFn: () =>
-            fetchWithToken(MenuItems.All, '').then(
+            fetchWithParams(MenuItems.All, '').then(
                 (response) => response as MenuCategoryType[]
             ),
         staleTime: 14400000,
@@ -61,7 +61,7 @@ export const useQueryMenuItems = () =>
     useQuery({
         queryKey: [MenuItems.ITEMS],
         queryFn: () =>
-            fetchWithToken(MenuItems.ITEMS, '').then(
+            fetchWithParams(MenuItems.ITEMS, '').then(
                 (response) => response as MenuItemType[]
             ),
         staleTime: 14400000,
@@ -71,7 +71,7 @@ export const useQueryMenuItem = (id: string) =>
     useQuery({
         queryKey: [MenuItems.BY_ID],
         queryFn: () =>
-            fetchWithToken(MenuItems.ITEMS, id).then(
+            fetchWithParams(MenuItems.ITEMS, id).then(
                 (response) => response as MenuItemType
             ),
         staleTime: 14400000,
@@ -81,7 +81,7 @@ export const useQueryMenuTags = () =>
     useQuery({
         queryKey: [MenuItems.TAGS],
         queryFn: () =>
-            fetchWithToken(MenuItems.TAGS, '').then(
+            fetchWithParams(MenuItems.TAGS, '').then(
                 (response) => response as TagType[]
             ),
         staleTime: 14400000,
@@ -91,7 +91,7 @@ export const useQueryMenuIngredients = () =>
     useQuery({
         queryKey: [MenuItems.INGREDIENTS],
         queryFn: () =>
-            fetchWithToken(MenuItems.INGREDIENTS, '').then(
+            fetchWithParams(MenuItems.INGREDIENTS, '').then(
                 (response) => response as IngredientWithTags[]
             ),
         staleTime: 14400000,
