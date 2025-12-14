@@ -28,8 +28,12 @@ const Reservations = () => {
 
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString());
 
-    const { filteredReservations, totalItems, itemsPerPage, totalPages } =
-        useFilterReservations(selectedDate);
+    const {
+        filteredReservations,
+        totalItems,
+        ITEMS_PER_PAGE: itemsPerPage,
+        totalPages,
+    } = useFilterReservations(selectedDate);
     const { language } = useLanguage();
 
     const modal = searchParams.get(SEARCH_PARAMS_NAMES.MODAL);

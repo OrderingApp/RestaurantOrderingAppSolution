@@ -2,8 +2,9 @@ import Image from 'next/image';
 import ReservationForm from '@/components/reservations/ReservationForm';
 import { ICONS } from '@/helpers/constants/icons/icons';
 
+const MODAL_WIDTH = '445px';
+
 const UpsertReservation = ({ onClose }: { onClose: () => void }) => {
-    const MODAL_WIDTH = '445px';
     return (
         <div
             className="bg-reservation-gradient rounded-2xl relative h-[500px] "

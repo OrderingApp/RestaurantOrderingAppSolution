@@ -172,6 +172,10 @@ const enPack: languagePack = {
             users: 'Users',
         },
     },
+    pagination: {
+        previousBtn: 'Previous',
+        nextBtn: 'Next',
+    },
 };
 
 export default enPack;

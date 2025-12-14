@@ -159,6 +159,11 @@ export interface languagePack {
             users: string;
         };
     };
+
+    pagination: {
+        previousBtn: string;
+        nextBtn: string;
+    };
 }
 
 interface loginPageFormFields {

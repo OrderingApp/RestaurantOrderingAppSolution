@@ -137,7 +137,7 @@ const ReservationForm = () => {
                             id="name"
                             inputSize="xs"
                             label={name}
-                            icon={<Image src={ICONS.USER} alt="userIcon" />}
+                            icon={<Image src={ICONS.USER} alt="user" />}
                             {...register('name')}
                             errors={errors.name}
                             errorClassName="!text-[11px]"
@@ -149,7 +149,7 @@ const ReservationForm = () => {
                             type="number"
                             id="capacityNeeded"
                             label={capacityNeeded}
-                            icon={<Image src={ICONS.USERS} alt="usersIcon" />}
+                            icon={<Image src={ICONS.USERS} alt="users" />}
                             {...register('capacityNeeded')}
                             min={1}
                             errors={errors.capacityNeeded}
@@ -160,7 +160,7 @@ const ReservationForm = () => {
                         <Input
                             type="date"
                             id="date"
-                            icon={<Image src={ICONS.CALENDAR} alt="dateIcon" />}
+                            icon={<Image src={ICONS.CALENDAR} alt="date" />}
                             label={date}
                             min={minDateString}
                             max={maxDateString}
@@ -173,7 +173,7 @@ const ReservationForm = () => {
                         <Input
                             type="time"
                             id="time"
-                            icon={<Image src={ICONS.TIME} alt="timeIcon" />}
+                            icon={<Image src={ICONS.TIME} alt="time" />}
                             label={time}
                             min={RESTAURANT_OPENING_HOUR}
                             max={RESTAURANT_CLOSING_HOUR}
@@ -187,7 +187,7 @@ const ReservationForm = () => {
                             type="phoneNumber"
                             id="phoneNumber"
                             label={phoneNumber}
-                            icon={<Image src={ICONS.PHONE} alt="phoneIcon" />}
+                            icon={<Image src={ICONS.PHONE} alt="phone" />}
                             {...register('phoneNumber')}
                             errors={errors.phoneNumber}
                             errorClassName="!text-[11px]"

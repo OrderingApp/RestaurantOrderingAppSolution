@@ -20,6 +20,8 @@ import {
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
+import useLanguage from '@/helpers/hooks/useLanguage';
+import languagePacks from '@/helpers/constants/languagePacks';
 
 export interface PaginationWithLinksProps {
     pageSizeSelectOptions?: {
@@ -70,6 +72,12 @@ export function PaginationWithLinks({
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const [isPending, startTransition] = useTransition();
+
+    const { language } = useLanguage();
+
+    const {
+        pagination: { previousBtn, nextBtn },
+    } = languagePacks[language];
 
     const totalPageCount = Math.ceil(totalCount / pageSize);
 
@@ -210,6 +218,7 @@ export function PaginationWithLinks({
                                 onClick={() =>
                                     navigateToPage(Math.max(page - 1, 1))
                                 }
+                                previousBtnName={previousBtn}
                                 aria-disabled={page === 1 || isPending}
                                 tabIndex={
                                     page === 1 || isPending ? -1 : undefined
@@ -242,6 +251,7 @@ export function PaginationWithLinks({
                                         Math.min(page + 1, totalPageCount)
                                     )
                                 }
+                                nextBtnName={nextBtn}
                                 aria-disabled={
                                     page === totalPageCount || isPending
                                 }

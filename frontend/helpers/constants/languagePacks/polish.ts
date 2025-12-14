@@ -173,6 +173,10 @@ const plPack: languagePack = {
             users: 'Użytkownicy',
         },
     },
+    pagination: {
+        previousBtn: 'Porzedni',
+        nextBtn: 'Następny',
+    },
 };
 
 export default plPack;
