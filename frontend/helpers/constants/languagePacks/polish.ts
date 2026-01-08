@@ -173,11 +173,10 @@ const plPack: languagePack = {
             users: 'Użytkownicy',
         },
     },
-<<<<<<< HEAD
     pagination: {
         previousBtn: 'Porzedni',
         nextBtn: 'Następny',
-=======
+    },
     daySummaryPage: {
         tabs: {
             allOrders: 'Wszystkie Zamówienia',
@@ -235,7 +234,6 @@ const plPack: languagePack = {
         searchPlaceholder: 'Wyszukaj...',
         errorMsg:
             'Wystąpił niespodziewany błąd. Spróbuj ponownie później lub skontaktuj się z administratorem.',
->>>>>>> 9708c6c6bb664c3bb6f7828984636a472b1480d3
     },
 };
 

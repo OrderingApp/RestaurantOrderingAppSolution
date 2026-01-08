@@ -159,13 +159,11 @@ export interface languagePack {
             users: string;
         };
     };
-<<<<<<< HEAD
 
     pagination: {
         previousBtn: string;
         nextBtn: string;
     };
-=======
     daySummaryPage: {
         tabs: {
             allOrders: string;
@@ -228,7 +226,6 @@ interface OrderEntity {
     status: string;
     type: string;
     discount: string;
->>>>>>> 9708c6c6bb664c3bb6f7828984636a472b1480d3
 }
 
 interface loginPageFormFields {

@@ -172,11 +172,10 @@ const enPack: languagePack = {
             users: 'Users',
         },
     },
-<<<<<<< HEAD
     pagination: {
         previousBtn: 'Previous',
         nextBtn: 'Next',
-=======
+    },
     daySummaryPage: {
         tabs: {
             allOrders: 'All Orders',
@@ -238,7 +237,6 @@ const enPack: languagePack = {
         noResults: 'No results',
         errorMsg:
             'An unexpected error occured. Try again later or contact the administrator.',
->>>>>>> 9708c6c6bb664c3bb6f7828984636a472b1480d3
     },
 };
 
