@@ -41,7 +41,8 @@ const Orders = () => {
     const { filteredOrders } = useFilterOrders();
 
     const {
-        ordersPage: { createOrder, asideTitle },
+        ordersPage: { createOrder, asideTitle, noOrdersFoundFallback },
+        generic: { searchPlaceholder },
     } = languagePacks[language];
 
     const toggleModal = () => {
@@ -154,17 +155,21 @@ const Orders = () => {
                 <div className="flex p-4 justify-between items-center h-auto">
                     <ToggleSwitch items={ordersTypes[language]} />
                     <div className="flex gap-4">
-                        <Button onClick={toggleModal} variant="primary">
+                        <Button
+                            onClick={toggleModal}
+                            variant="primary"
+                            className="hocus:scale-95"
+                        >
                             {createOrder}
                         </Button>
                     </div>
                 </div>
-                <div className="flex justify-around w-full mt-20  h-auto">
+                <div className="flex justify-around w-full h-auto">
                     <div className="flex items-start justify-between w-full">
                         <div className="flex gap-4 mb-4 w-2/5 ">
                             {buttons.map((btn) => (
                                 <button
-                                    className={`${isActive(btn.value) === btn.value ? 'bg-primary' : 'bg-[#F6F6F6]'} p-3 rounded-lg shadow-xl`}
+                                    className={`${isActive(btn.value) === btn.value ? 'bg-primary' : 'bg-[#F6F6F6] hocus:bg-primary hocus:text-white hocus:scale-90'} p-3 rounded-lg shadow-xl transition-all group`}
                                     onClick={() =>
                                         toggleQueryParam(
                                             'orderStatus',
@@ -183,23 +188,30 @@ const Orders = () => {
                                                 : btn.icon
                                         }
                                         alt="iconList"
+                                        className="group-hover:brightness-0 group-hover:invert group-focus:brightness-0 group-focus:invert transition-all"
                                     />
                                 </button>
                             ))}
                         </div>
                         <div className="w-3/5 mr-5">
                             <SearchInput
-                                placeholder="Wyszukaj"
+                                placeholder={searchPlaceholder}
                                 className="w-full"
                             />
                         </div>
                     </div>
                 </div>
-                <div className="flex-1 text-center text-5xl">
-                    <OrderList
-                        orders={filteredOrders}
-                        openModal={openOrderOptionsModal}
-                    />
+                <div className="flex-1 text-center">
+                    {filteredOrders.length > 0 ? (
+                        <OrderList
+                            orders={filteredOrders}
+                            openModal={openOrderOptionsModal}
+                        />
+                    ) : (
+                        <p className="text-2xl text-danger">
+                            {noOrdersFoundFallback}
+                        </p>
+                    )}
                 </div>
             </div>
         </>

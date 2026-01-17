@@ -85,20 +85,28 @@ const MenuCategory = ({
         <button
             onClick={toggleSelectedCategory}
             className={clsx(
-                'shadow-[0px_4px_4px_0px_#00000040] flex flex-col justify-between flex-shrink-0 rounded-lg p-3 px-2',
-                isActive ? 'bg-primary' : 'bg-white',
+                'shadow-[0px_4px_4px_0px_#00000040] flex flex-col justify-between flex-shrink-0 rounded-lg p-3 px-2 transition-all group',
+                isActive
+                    ? 'bg-primary'
+                    : 'bg-white hocus:bg-primary hocus:scale-95',
                 size === 'lg'
                     ? 'w-[7.5rem] h-[6.2rem]'
                     : 'w-[6.2rem] h-[5.3rem]'
             )}
         >
-            <Image src={isActive ? iconActive : icon} alt={name} />
+            <Image
+                src={isActive ? iconActive : icon}
+                alt={name}
+                className="group-hover:brightness-0 group-hover:invert group-focus:brightness-0 group-focus:invert transition-all"
+            />
             <div>
                 <h3
                     style={{ lineHeight: '12px' }}
                     className={clsx(
                         'text-left',
-                        isActive ? 'text-white' : 'text-black',
+                        isActive
+                            ? 'text-white transition-colors'
+                            : 'text-black group-hover:text-white group-focus:text-white',
                         size === 'lg' ? 'text-[15px]' : 'text-[13px]'
                     )}
                 >
@@ -106,8 +114,10 @@ const MenuCategory = ({
                 </h3>
                 <p
                     className={clsx(
-                        'text-[10px] text-left',
-                        isActive ? 'text-white' : 'text-black'
+                        'text-[10px] text-left transition-colors',
+                        isActive
+                            ? 'text-white'
+                            : 'text-black group-hover:text-white group-focus:text-white'
                     )}
                 >
                     {totalItems} {amountItemsName}

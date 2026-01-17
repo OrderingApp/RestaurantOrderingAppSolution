@@ -13,6 +13,8 @@ import {
 import clsx from 'clsx';
 import { menuItemStyles } from '@/lib/styles/menuItem';
 import { useOrdersContext } from '@/providers/OrdersContext';
+import { useLanguage } from '@/providers/LanguageProvider';
+import languagePacks from '@/helpers/constants/languagePacks';
 
 interface MenuItemProps {
     id: string;
@@ -23,6 +25,8 @@ interface MenuItemProps {
 }
 
 const MenuItem = ({ id, name, price, variant, handleClick }: MenuItemProps) => {
+    const { language } = useLanguage();
+    const { createOrderPage } = languagePacks[language];
     const [inputValue, setInputValue] = useState<number | string>(1);
     const { addOrder } = useOrdersContext();
 
@@ -54,14 +58,15 @@ const MenuItem = ({ id, name, price, variant, handleClick }: MenuItemProps) => {
                 menuItemStyles.variants[variant]
             )}
         >
-            <Image
-                onClick={() => handleClick(id)}
-                width={22}
-                height={22}
-                src={informationIcon}
-                alt="informationIcon"
-                className="absolute top-2 right-2"
-            />
+            <button onClick={() => handleClick(id)}>
+                <Image
+                    width={22}
+                    height={22}
+                    src={informationIcon}
+                    alt="informationIcon"
+                    className="absolute top-2 right-2 transition-transform hocus:scale-90"
+                />
+            </button>
             <div className="h-[60px] flex flex-col justify-center">
                 <h2 className="text-center font-bold text-[1.1rem] leading-tight break-words">
                     {name}
@@ -72,15 +77,16 @@ const MenuItem = ({ id, name, price, variant, handleClick }: MenuItemProps) => {
             </div>
             {variant === 'order' && (
                 <>
-                    <label className="relative my-3">
+                    <div className="relative my-3">
                         <button
                             onClick={handleDecrease}
-                            className="absolute top-1 left-1 w-4 h-4 bg-[#2B5162] rounded-full text-white flex justify-center items-center"
+                            className="absolute top-1/2 -translate-y-1/2 left-1 w-4 h-4 bg-[#2B5162] rounded-full text-white flex justify-center items-center transition-transform hocus:scale-90"
+                            onMouseLeave={(e) => e.stopPropagation()}
                         >
                             -
                         </button>
                         <input
-                            className="bg-[#ECECEC] shadow-[0px_0px_5px_0px_#6A6A6A] rounded-md w-full text-center [&&::-webkit-inner-spin-button]:appearance-none"
+                            className="px-8 bg-[#ECECEC] shadow-[0px_0px_5px_0px_#6A6A6A] rounded-md w-full text-center [&::-webkit-inner-spin-button]:appearance-none py-1"
                             type="number"
                             min={MIN_ITEM_SELECT}
                             onChange={handleChange}
@@ -89,18 +95,19 @@ const MenuItem = ({ id, name, price, variant, handleClick }: MenuItemProps) => {
                         />
                         <button
                             onClick={handleIncrease}
-                            className="absolute top-1 right-1 w-4 h-4 bg-[#2B5162] rounded-full text-white flex justify-center items-center"
+                            className="absolute top-1/2 -translate-y-1/2 right-1 w-4 h-4 bg-[#2B5162] rounded-full text-white flex justify-center items-center transition-transform hocus:scale-90"
+                            onMouseLeave={(e) => e.stopPropagation()}
                         >
                             +
                         </button>
-                    </label>
+                    </div>
                     <div className="flex flex-col gap-2">
                         <Button
-                            className="w-full rounded-lg py-1"
+                            className="w-full rounded-lg py-1 transition-transform hocus:scale-95"
                             onClick={() => addOrder(newItem)}
                             size="sm"
                         >
-                            Dodaj
+                            {createOrderPage.addOrder}
                         </Button>
                     </div>
                 </>
@@ -110,5 +117,3 @@ const MenuItem = ({ id, name, price, variant, handleClick }: MenuItemProps) => {
 };
 
 export default MenuItem;
-
-// TODO use language pack

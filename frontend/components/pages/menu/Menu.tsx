@@ -32,6 +32,7 @@ import IngredientsMenu from './IngredientsMenu';
 import SearchInput from '@/components/shared/Input/SearchInput';
 
 import { PaginationWithLinks } from '@/components/ui/pagination-with-links';
+import { AnimatePresence } from 'motion/react';
 
 interface MenuProps {
     variant?: 'card' | 'order';
@@ -54,13 +55,14 @@ const Menu = ({ variant = 'order', children }: MenuProps) => {
     const { language } = useLanguage();
 
     const {
-        menuPage: { searchInputPlaceholder, allCategories },
+        menuPage: { allCategories },
     } = languagePacks[language];
 
     const openModalHandler = () => setIsModalOpen(true);
 
     const closeModalHandler = () => setIsModalOpen(false);
 
+    // TODO: fix totalitems on 'all' category, as it shows the count of subcategory, or even sub-subcategory when selected. it shoudl always show count of all possible items rather than that
     return (
         <div className="bg-light-gray w-full rounded-3xl h-full flex flex-row ">
             {menuItemId && <IngredientsMenu />}
@@ -72,10 +74,7 @@ const Menu = ({ variant = 'order', children }: MenuProps) => {
                         menuStyles.variants[variant].container
                     )}
                 >
-                    <SearchInput
-                        placeholder={searchInputPlaceholder}
-                        className="w-[90%]"
-                    />
+                    <SearchInput className="w-[90%]" />
                     <div className="p-5 flex items-center gap-3 overflow-x-auto [&::-webkit-scrollbar]:hidden">
                         <MenuCategory
                             id={MENU_CATEGORY_NAMES.ALL}
@@ -136,11 +135,13 @@ const Menu = ({ variant = 'order', children }: MenuProps) => {
                 </div>
             )}
 
-            {isModalOpen && (
-                <Modal onClose={closeModalHandler}>
-                    <MenuItemInformation onClick={closeModalHandler} />
-                </Modal>
-            )}
+            <AnimatePresence>
+                {isModalOpen && (
+                    <Modal onClose={closeModalHandler}>
+                        <MenuItemInformation onClick={closeModalHandler} />
+                    </Modal>
+                )}
+            </AnimatePresence>
 
             {children}
         </div>

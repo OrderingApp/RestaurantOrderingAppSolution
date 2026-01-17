@@ -27,8 +27,10 @@ const ToggleSwitch = ({ items }: { items: ToggleSwitchProps[] }) => {
                 <button
                     key={item.id}
                     className={clsx(
-                        'px-8 h-full rounded-full text-sm',
-                        order === item.id ? 'text-white bg-primary' : 'bg-white'
+                        'px-8 h-full rounded-full text-sm transition-all',
+                        order === item.id
+                            ? 'text-white bg-primary'
+                            : 'bg-white hocus:bg-primary hocus:text-white hocus:scale-90'
                     )}
                     onClick={toggleSwitchParams(item.id)}
                 >

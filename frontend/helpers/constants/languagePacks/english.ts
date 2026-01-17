@@ -65,7 +65,6 @@ const enPack: languagePack = {
         },
     },
     menuPage: {
-        searchInputPlaceholder: 'Search',
         menuCategoryCard: {
             itemsTitle: ['item', 'items'],
         },
@@ -85,7 +84,6 @@ const enPack: languagePack = {
         orderDelivery: 'Delivery',
         createOrder: 'Create',
         editOrder: 'Edit',
-
         payment: 'Close Order',
         orderCard: {
             pickup: 'Pickup',
@@ -139,6 +137,7 @@ const enPack: languagePack = {
             },
         },
         asideTitle: 'Order',
+        noOrdersFoundFallback: 'No orders found',
     },
     createOrderPage: {
         asideTitle: 'Order',
@@ -147,6 +146,7 @@ const enPack: languagePack = {
             close: 'Close',
             discount: 'Add discount',
         },
+        addOrder: 'Add',
     },
     paymentModal: {
         title: 'Choose Payment Method',

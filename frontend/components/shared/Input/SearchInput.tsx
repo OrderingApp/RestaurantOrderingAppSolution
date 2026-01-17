@@ -3,6 +3,8 @@ import Image from 'next/image';
 import Input from './Input';
 import searchSvg from '@/public/images/svg/search.svg';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useLanguage } from '@/providers/LanguageProvider';
+import languagePacks from '@/helpers/constants/languagePacks';
 
 interface SearchInputProps {
     placeholder?: string;
@@ -10,6 +12,10 @@ interface SearchInputProps {
 }
 
 const SearchInput = ({ placeholder, className }: SearchInputProps) => {
+    const { language } = useLanguage();
+    const {
+        generic: { searchPlaceholder },
+    } = languagePacks[language];
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -22,7 +28,7 @@ const SearchInput = ({ placeholder, className }: SearchInputProps) => {
     return (
         <Input
             type="search"
-            placeholder={placeholder}
+            placeholder={placeholder ?? searchPlaceholder}
             inputClassName={`[&::placeholder]:text-black bg-white shadow-[0px_4px_4px_0px_#00000040] pl-8 ml-4 ${className}`}
             icon={<Image src={searchSvg} alt="" />}
             iconClassName="left-7 top-[11px] w-4"

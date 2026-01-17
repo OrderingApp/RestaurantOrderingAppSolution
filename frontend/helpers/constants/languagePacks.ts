@@ -64,7 +64,6 @@ export interface languagePack {
         };
     };
     menuPage: {
-        searchInputPlaceholder: string;
         menuCategoryCard: {
             itemsTitle: string[];
         };
@@ -90,6 +89,7 @@ export interface languagePack {
             delivery: string;
         };
         asideTitle: string;
+        noOrdersFoundFallback: string;
         orderCustomerInformationForm: {
             title: string;
             buttons: {
@@ -130,6 +130,7 @@ export interface languagePack {
             close: string;
             discount: string;
         };
+        addOrder: string;
     };
     paymentModal: {
         title: string;

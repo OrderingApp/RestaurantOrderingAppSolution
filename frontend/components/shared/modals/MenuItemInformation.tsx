@@ -1,9 +1,10 @@
+// TODO: revamp this to the new state, make it dynasmic, apply lang pack
 const MenuItemInformation = ({ onClick }: { onClick: () => void }) => {
     return (
         <div className="w-[445px] h-[445px] bg-modal-gradient rounded-2xl relative">
             <button
                 onClick={onClick}
-                className="absolute top-5 right-5 text-xl"
+                className="absolute top-5 right-5 text-xl transition-transform hocus:scale-90"
             >
                 X
             </button>

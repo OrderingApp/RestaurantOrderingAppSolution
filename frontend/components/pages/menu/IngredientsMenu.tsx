@@ -17,7 +17,7 @@ const IgredientsMenu = () => {
 
     return (
         <div className="py-10 pt-10 flex flex-col">
-            <SearchInput className="w-[70%]" placeholder="Wyszukaj" />
+            <SearchInput className="w-[70%]" />
             <ul
                 className={clsx(
                     'grid py-5 flex-wrap gap-y-8 pl-5 w-[776px] mt-8 '

@@ -65,7 +65,6 @@ const plPack: languagePack = {
         },
     },
     menuPage: {
-        searchInputPlaceholder: 'Wyszukaj',
         menuCategoryCard: {
             itemsTitle: ['pozycji', 'pozycja', 'pozycje', 'pozycji'],
         },
@@ -138,8 +137,8 @@ const plPack: languagePack = {
                 address: 'Adres',
             },
         },
-
         asideTitle: 'Zamówienie',
+        noOrdersFoundFallback: 'Nie znaleziono zamówień',
     },
     createOrderPage: {
         asideTitle: 'Zamówienie',
@@ -148,6 +147,7 @@ const plPack: languagePack = {
             close: 'Zamknij bez zmian',
             discount: 'Dodaj zniżkę',
         },
+        addOrder: 'Dodaj',
     },
     paymentModal: {
         title: 'Wybierz Formę Płatnośći',

@@ -41,7 +41,7 @@ export interface PaginationWithLinksProps {
 
 /**
  * Navigate with Nextjs links or router.push with loading states
- * 
+ *
  * @example
  * ```
  * // Using Link navigation (default)
@@ -50,7 +50,7 @@ export interface PaginationWithLinksProps {
     pageSize={20}
     totalCount={500}
   />
- * 
+ *
  * // Using router.push with loading states
  * <PaginationWithLinks
     page={1}
@@ -138,7 +138,7 @@ export function PaginationWithLinks({
                             onClick={() => navigateToPage(pageNum)}
                             isActive={page === pageNum}
                             className={cn(
-                                'cursor-pointer',
+                                `cursor-pointer transition-all ${page !== pageNum && 'hocus:scale-90 hocus:!bg-primary hocus:text-white'}`,
                                 isPending && 'pointer-events-none opacity-50'
                             )}
                             aria-disabled={isPending}
