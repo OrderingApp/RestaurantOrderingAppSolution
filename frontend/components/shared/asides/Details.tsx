@@ -14,6 +14,7 @@ import ItemsList, {
 } from '@/components/shared//lists/Items/Items';
 import Button, { type ButtonProps } from '@/components/shared/button/Button';
 import type { Currency } from '@/helpers/type/types';
+import circlePlusSvg from '@/public/images/svg/circle-plus.svg';
 
 interface ButtonHeader {
     price: number;
@@ -46,6 +47,7 @@ export type DetailsAsideProps = {
     (RegularHeader | ButtonHeader) & { className?: string } & {
         isDelivery?: boolean;
         deliveryPrice?: number;
+        handleAddNewOrder: () => void;
     };
 
 const DetailsAside = ({
@@ -59,6 +61,7 @@ const DetailsAside = ({
     className,
     isDelivery,
     deliveryPrice,
+    handleAddNewOrder,
 }: DetailsAsideProps) => {
     const { language } = useLanguage();
     const { detailsAside } = languagePacks[language];
@@ -117,15 +120,31 @@ const DetailsAside = ({
                 ))}
 
             {items && <ItemsList items={items} />}
+
+            {handleAddNewOrder && (
+                <div className="px-2">
+                    <button
+                        className="flex items-center justify-center p-2 w-full border border-dashed border-black rounded-md"
+                        onClick={handleAddNewOrder}
+                    >
+                        <Image
+                            src={circlePlusSvg}
+                            alt={detailsAside.addNewOrder}
+                        />
+                    </button>
+                </div>
+            )}
+
             {isDelivery && (
                 <div>
                     <div className="h-0.5 w-full bg-[#707070] my-2"></div>
                     <div className="flex justify-between px-4">
-                        <p className="font-medium">Dostawa</p>
+                        <p className="font-medium">{detailsAside.delivery}</p>
                         <p className="font-bold">{deliveryPrice}</p>
                     </div>
                 </div>
             )}
+
             {buttons && (
                 <menu className="mt-auto pt-[18px] flex flex-col gap-3 px-5">
                     {buttons.map(({ children, ...btn }) => (

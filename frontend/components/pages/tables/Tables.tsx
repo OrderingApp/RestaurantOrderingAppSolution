@@ -213,28 +213,13 @@ const items = [
 
 const mockReservationCards = [
     {
+        scheduledFor: '2025-08-10T20:30:00Z',
+        name: 'Bob The Builder',
         capacityNeeded: 2,
-        dateTime: '2025-08-10T20:30:00Z',
-        subtitle: 'Online Request',
+        phoneNumber: '+15559876543',
         onClick: () => console.log('Clicked reservation 2'),
         className: 'bg-blue-50',
-
-        id: 'res-002',
-        phoneNumber: '+15559876543',
-        name: 'Bob The Builder',
-        isAssigned: 1,
-        tableId: 'Tbl-A3',
-    },
-    {
-        capacityNeeded: 5,
-        dateTime: '2025-08-11T18:45:00Z',
-        subtitle: 'VIP Guest',
-        onClick: () => console.log('Clicked reservation 5'),
-        className: 'bg-purple-100 shadow-lg',
-
         id: 'res-005',
-        phoneNumber: '+15553334444',
-        name: 'Elon Musk',
         isAssigned: 1,
         tableId: 'Tbl-VIP',
     },
@@ -253,6 +238,7 @@ const detailsMock = {
     items,
     served: true,
     buttons: buttons,
+    handleAddNewOrder: () => console.log('essa'),
 };
 
 const bottomMock = {

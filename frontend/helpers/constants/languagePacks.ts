@@ -21,6 +21,8 @@ export interface languagePack {
     };
     detailsAside: {
         info: string;
+        addNewOrder: string;
+        delivery: string;
     };
     loginPage: {
         appName: string;
