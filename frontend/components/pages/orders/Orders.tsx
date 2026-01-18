@@ -23,6 +23,7 @@ import PaymentDetails from '@/components/shared/modals/PaymentDetails';
 import EditOrder from './EditOrder';
 import CreateOrder from './CreateOrder';
 import SearchInput from '@/components/shared/Input/SearchInput';
+import clsx from 'clsx';
 
 const Orders = () => {
     const { language } = useLanguage();
@@ -169,7 +170,12 @@ const Orders = () => {
                         <div className="flex gap-4 mb-4 w-2/5 ">
                             {buttons.map((btn) => (
                                 <button
-                                    className={`${isActive(btn.value) === btn.value ? 'bg-primary' : 'bg-[#F6F6F6] hocus:bg-primary hocus:text-white hocus:scale-90'} p-3 rounded-lg shadow-xl transition-all group`}
+                                    className={clsx(
+                                        'p-3 rounded-lg shadow-xl transition-all group',
+                                        isActive(btn.value) === btn.value
+                                            ? 'bg-primary'
+                                            : 'bg-[#F6F6F6] hocus:bg-primary hocus:text-white hocus:scale-90'
+                                    )}
                                     onClick={() =>
                                         toggleQueryParam(
                                             'orderStatus',
@@ -188,7 +194,11 @@ const Orders = () => {
                                                 : btn.icon
                                         }
                                         alt="iconList"
-                                        className="group-hover:brightness-0 group-hover:invert group-focus:brightness-0 group-focus:invert transition-all"
+                                        className={clsx(
+                                            'transition-all',
+                                            isActive(btn.value) !== btn.value &&
+                                                'group-hover:brightness-0 group-hover:invert group-focus:brightness-0 group-focus:invert'
+                                        )}
                                     />
                                 </button>
                             ))}

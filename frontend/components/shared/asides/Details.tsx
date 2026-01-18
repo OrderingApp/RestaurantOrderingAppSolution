@@ -47,7 +47,7 @@ export type DetailsAsideProps = {
     (RegularHeader | ButtonHeader) & { className?: string } & {
         isDelivery?: boolean;
         deliveryPrice?: number;
-        handleAddNewOrder: () => void;
+        handleAddNewOrder?: () => void;
     };
 
 const DetailsAside = ({
