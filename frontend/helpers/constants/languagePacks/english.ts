@@ -223,6 +223,10 @@ const enPack: languagePack = {
                 paidAndReadyToPrepare: 'Paid',
             },
         },
+        menuItem: {
+            ingredient: 'Ingredients',
+            allergens: 'Allergens',
+        },
     },
 
     generic: {
@@ -241,6 +245,7 @@ const enPack: languagePack = {
         noResults: 'No results',
         errorMsg:
             'An unexpected error occured. Try again later or contact the administrator.',
+        close: 'Close',
     },
 };
 

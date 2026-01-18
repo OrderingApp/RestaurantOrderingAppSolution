@@ -24,7 +24,7 @@ const initial = {
 
 const DeliveryMap = ({ onClose, addres }: DeliveryMapProps) => {
     const [inputAdress, setInputAddress] = useState<string>(addres);
-    const [qrCodeModal, setQrCodeModal] = useState<boolean>(false);
+    const [isQrCodeModalOpen, setIsQrCodeModalOpen] = useState<boolean>(false);
 
     const { Image: QrImage } = useQRCode();
 
@@ -85,7 +85,7 @@ const DeliveryMap = ({ onClose, addres }: DeliveryMapProps) => {
                     </div>
 
                     {qrCode && (
-                        <button onClick={() => setQrCodeModal(true)}>
+                        <button onClick={() => setIsQrCodeModalOpen(true)}>
                             CODE
                         </button>
                     )}
@@ -120,19 +120,21 @@ const DeliveryMap = ({ onClose, addres }: DeliveryMapProps) => {
                     </GoogleMap>
                 </div>
             </div>
-            {qrCodeModal && (
-                <Modal onClose={() => setQrCodeModal(false)}>
-                    <div className="flex flex-col items-center gap-4 bg-white p-4 rounded-lg z-40 relative">
-                        <Image
-                            className="absolute top-0 right-0 w-6 h-6"
-                            alt="closeIcon"
-                            src={ICONS.CLOSE}
-                            onClick={() => setQrCodeModal(false)}
-                        />
-                        <QrImage text={qrCode} />
-                    </div>
-                </Modal>
-            )}
+
+            <Modal
+                isOpen={isQrCodeModalOpen}
+                onClose={() => setIsQrCodeModalOpen(false)}
+            >
+                <div className="flex flex-col items-center gap-4 bg-white p-4 rounded-lg z-40 relative">
+                    <Image
+                        className="absolute top-0 right-0 w-6 h-6"
+                        alt="closeIcon"
+                        src={ICONS.CLOSE}
+                        onClick={() => setIsQrCodeModalOpen(false)}
+                    />
+                    <QrImage text={qrCode} />
+                </div>
+            </Modal>
         </Modal>
     );
 };

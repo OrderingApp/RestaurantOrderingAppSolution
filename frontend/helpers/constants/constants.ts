@@ -29,7 +29,7 @@ export const MENU_BAR_ICONS: {
 export const CURRENCIES = {
     pln: 'zł',
     eur: '€',
-};
+} as const;
 
 export const COMPANY_INITIAL_GEO_COORDS = {
     lat: 50.05598658820353,

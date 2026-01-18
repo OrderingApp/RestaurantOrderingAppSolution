@@ -41,14 +41,12 @@ const PaymentDetails = ({ children }: { children: ReactNode }) => {
 
     return (
         <>
-            {paymentMode === 'true' && (
-                <Modal onClose={closePaymentModal}>
-                    <Payment
-                        onClick={closePaymentModal}
-                        totalAmount={data?.totalAmount || 0}
-                    />
-                </Modal>
-            )}
+            <Modal isOpen={paymentMode === 'true'} onClose={closePaymentModal}>
+                <Payment
+                    onClick={closePaymentModal}
+                    totalAmount={data?.totalAmount || 0}
+                />
+            </Modal>
 
             <div className="bg-light-gray w-full rounded-3xl h-full flex flex-row ">
                 <div className="bg-gray-100 py-6 px-4 rounded-lg shadow-sm flex-1">

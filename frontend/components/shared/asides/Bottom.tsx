@@ -16,9 +16,7 @@ const BottomAside = ({ reservations, className }: BottomAsideProps) => {
             {reservations.length > 0 ? (
                 <ul className="flex gap-4 ">
                     {reservations.map((r) => (
-                        <li key={r.id}>
-                            <ReservationCard {...r} />
-                        </li>
+                        <ReservationCard key={r.id} {...r} />
                     ))}
                 </ul>
             ) : null}

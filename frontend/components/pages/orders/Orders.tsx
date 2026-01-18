@@ -46,6 +46,11 @@ const Orders = () => {
         generic: { searchPlaceholder },
     } = languagePacks[language];
 
+    // Modal state booleans
+    const isCreateOrderModalOpen = modal === 'true' && !orderId;
+    const isEditOrderModalOpen = modal === 'true' && !!orderId;
+    const isPaymentModalOpen = closeOrder === 'true';
+
     const toggleModal = () => {
         toggleQueryParam(
             SEARCH_PARAMS_NAMES.MODAL,
@@ -89,44 +94,12 @@ const Orders = () => {
         },
     ];
 
-    if (modal === 'true' && !orderId) {
-        return (
-            <OverviewModal>
-                <CreateOrder toggleModal={toggleModal} />
-            </OverviewModal>
-        );
-    }
-
-    if (modal === 'true' && orderId) {
-        return (
-            <OverviewModal>
-                <EditOrder toggleModal={toggleModal} />
-            </OverviewModal>
-        );
-    }
-
-    if (closeOrder === 'true') {
-        return (
-            <OverviewModal>
-                <PaymentDetails>
-                    <DetailsAside
-                        title={asideTitle}
-                        items={[]}
-                        served={true}
-                        buttons={buttonsPayment}
-                    />
-                </PaymentDetails>
-            </OverviewModal>
-        );
-    }
-
     const buttons = [
         {
             value: 'Ongoing',
             iconActive: ICONS.LIST_WHITE,
             icon: ICONS.LIST,
         },
-
         {
             value: 'Closed',
             iconActive: ICONS.CLOSE_WHITE,
@@ -224,10 +197,28 @@ const Orders = () => {
                     )}
                 </div>
             </div>
+
+            {/* Modals */}
+            <OverviewModal isOpen={isCreateOrderModalOpen}>
+                <CreateOrder toggleModal={toggleModal} />
+            </OverviewModal>
+
+            <OverviewModal isOpen={isEditOrderModalOpen}>
+                <EditOrder toggleModal={toggleModal} />
+            </OverviewModal>
+
+            <OverviewModal isOpen={isPaymentModalOpen}>
+                <PaymentDetails>
+                    <DetailsAside
+                        title={asideTitle}
+                        items={[]}
+                        served={true}
+                        buttons={buttonsPayment}
+                    />
+                </PaymentDetails>
+            </OverviewModal>
         </>
     );
 };
 
 export default Orders;
-
-//TODO  = add pagination

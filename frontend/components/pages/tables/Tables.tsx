@@ -8,6 +8,8 @@ import TablesHeader from './Header';
 import Table from './Table';
 import AsidesView from '@/components/shared/views/Asides';
 import { CURRENCIES } from '@/helpers/constants/constants';
+import OverviewModal from '@/components/shared/modals/OverviewModal';
+import CreateOrder from '../orders/CreateOrder';
 
 const INITIAL_TABLES_DATA = [
     { id: 'table-alpha', layout: [3] },
@@ -19,48 +21,61 @@ const INITIAL_TABLES_DATA = [
 
 const Tables = () => {
     const [isPanning, setIsPanning] = useState(false);
+    const [isCreateOrderModalOpen, setIsCreateOrderModalOpen] = useState(false);
+
+    const toggleCreateOrderModal = () =>
+        setIsCreateOrderModalOpen((prev) => !prev);
 
     return (
-        <AsidesView
-            details={detailsMock}
-            bottom={bottomMock}
-            isBottomAsideShown={true}
-        >
-            <TablesHeader onTabChange={console.log} />
+        <>
+            <AsidesView
+                details={{
+                    ...detailsMock,
+                    onAddNewOrder: toggleCreateOrderModal,
+                }}
+                bottom={bottomMock}
+                isBottomAsideShown={true}
+            >
+                <TablesHeader onTabChange={console.log} />
 
-            <section>
-                <TransformWrapper
-                    initialScale={0.55}
-                    minScale={0.25}
-                    maxScale={1.25}
-                    centerOnInit={true}
-                    limitToBounds={true}
-                    onPanningStart={() => setIsPanning(true)}
-                    onPanningStop={() => setIsPanning(false)}
-                >
-                    <TransformComponent
-                        wrapperClass={cn(
-                            '!h-full !w-full',
-                            isPanning ? 'cursor-grabbing' : 'cursor-grab'
-                        )}
+                <section>
+                    <TransformWrapper
+                        initialScale={0.55}
+                        minScale={0.25}
+                        maxScale={1.25}
+                        centerOnInit={true}
+                        limitToBounds={true}
+                        onPanningStart={() => setIsPanning(true)}
+                        onPanningStop={() => setIsPanning(false)}
                     >
-                        {/* automate grid cols depending on the tables? so e.g.
+                        <TransformComponent
+                            wrapperClass={cn(
+                                '!h-full !w-full',
+                                isPanning ? 'cursor-grabbing' : 'cursor-grab'
+                            )}
+                        >
+                            {/* automate grid cols depending on the tables? so e.g.
                         semi-smart distribution, or baed on the user input how
                         he put it in edit mode? */}
-                        <ul className="grid grid-cols-[1fr,1fr,1fr] gap-y-[52px] gap-x-24 items-center p-8 pt-20">
-                            {INITIAL_TABLES_DATA.map((table) => (
-                                <li key={table.id}>
-                                    <Table
-                                        id={table.id}
-                                        layout={table.layout}
-                                    />
-                                </li>
-                            ))}
-                        </ul>
-                    </TransformComponent>
-                </TransformWrapper>
-            </section>
-        </AsidesView>
+                            <ul className="grid grid-cols-[1fr,1fr,1fr] gap-y-[52px] gap-x-24 items-center p-8 pt-20">
+                                {INITIAL_TABLES_DATA.map((table) => (
+                                    <li key={table.id}>
+                                        <Table
+                                            id={table.id}
+                                            layout={table.layout}
+                                        />
+                                    </li>
+                                ))}
+                            </ul>
+                        </TransformComponent>
+                    </TransformWrapper>
+                </section>
+            </AsidesView>
+
+            <OverviewModal isOpen={isCreateOrderModalOpen}>
+                <CreateOrder toggleModal={toggleCreateOrderModal} />
+            </OverviewModal>
+        </>
     );
 };
 
@@ -238,7 +253,7 @@ const detailsMock = {
     items,
     served: true,
     buttons: buttons,
-    handleAddNewOrder: () => console.log('essa'),
+    onAddNewOrder: () => console.log('essa'),
 };
 
 const bottomMock = {

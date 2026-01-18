@@ -167,11 +167,10 @@ const Reservations = () => {
                     onDateSelect={(date) => setSelectedDate(date.toISOString())}
                 />
             </div>
-            {modal === 'true' && (
-                <Modal onClose={closeModal}>
-                    <UpsertReservation onClose={closeModal} />
-                </Modal>
-            )}
+
+            <Modal isOpen={modal === 'true'} onClose={closeModal}>
+                <UpsertReservation onClose={closeModal} />
+            </Modal>
 
             {totalPages > 0 && (
                 <div

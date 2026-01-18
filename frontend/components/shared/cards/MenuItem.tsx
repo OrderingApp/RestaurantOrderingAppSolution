@@ -21,13 +21,19 @@ interface MenuItemProps {
     name: string;
     price: number;
     variant: 'card' | 'order';
-    handleClick: (id: string) => void;
+    onOpenMenuItemInformation: (id: string) => void;
 }
 
-const MenuItem = ({ id, name, price, variant, handleClick }: MenuItemProps) => {
+const MenuItem = ({
+    id,
+    name,
+    price,
+    variant,
+    onOpenMenuItemInformation,
+}: MenuItemProps) => {
     const { language } = useLanguage();
     const { createOrderPage } = languagePacks[language];
-    const [inputValue, setInputValue] = useState<number | string>(1);
+    const [inputValue, setInputValue] = useState<number>(1);
     const { addOrder } = useOrdersContext();
 
     const handleDecrease = () =>
@@ -38,8 +44,7 @@ const MenuItem = ({ id, name, price, variant, handleClick }: MenuItemProps) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
 
-        if (!value) return setInputValue(value);
-        setInputValue(isNaN(+value) || +value < 1 ? 1 : value);
+        setInputValue(+value);
     };
 
     const newItem = {
@@ -49,16 +54,16 @@ const MenuItem = ({ id, name, price, variant, handleClick }: MenuItemProps) => {
         discount: 0,
         quantity: inputValue,
         currency: 'pln',
-    };
+    } as const;
 
     return (
         <li
             className={clsx(
-                'rounded-lg shadow-[0px_4px_4px_0px_#00000040] bg-white p-4 py-8 pb-4 relative flex flex-col',
+                'rounded-lg shadow-[0px_4px_4px_0px_#00000040] bg-white p-4 py-5 pb-4 relative flex flex-col',
                 menuItemStyles.variants[variant]
             )}
         >
-            <button onClick={() => handleClick(id)}>
+            <button onClick={() => onOpenMenuItemInformation(id)}>
                 <Image
                     width={22}
                     height={22}
