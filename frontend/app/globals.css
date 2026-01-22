@@ -40,13 +40,22 @@ body {
 }
 
 .scrollbar::-webkit-scrollbar {
-    height: 6px;
+    height: 8px;
+    width: 8px;
 }
 
 .scrollbar::-webkit-scrollbar-thumb {
     background: hsl(var(--primary));
     border-radius: 9999px;
     color: hsl(var(--primary)) transparent;
+}
+
+.scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.8);
+}
+
+.scrollbar::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .hide-input-number-icon {

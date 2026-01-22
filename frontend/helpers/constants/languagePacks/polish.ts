@@ -224,6 +224,10 @@ const plPack: languagePack = {
                 paidAndReadyToPrepare: 'Opłacone',
             },
         },
+        menuItem: {
+            ingredient: 'Składnik',
+            allergens: 'Alergeny',
+        },
     },
 
     generic: {
@@ -238,6 +242,7 @@ const plPack: languagePack = {
         searchPlaceholder: 'Wyszukaj...',
         errorMsg:
             'Wystąpił niespodziewany błąd. Spróbuj ponownie później lub skontaktuj się z administratorem.',
+        close: 'Zamknij',
     },
 };
 

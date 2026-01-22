@@ -19,7 +19,7 @@ import circlePlusSvg from '@/public/images/svg/circle-plus.svg';
 interface ButtonHeader {
     price: number;
     currency: Currency;
-    button: Omit<ButtonProps, 'children'> &
+    button?: Omit<ButtonProps, 'children'> &
         Partial<Pick<ButtonProps, 'children'>>;
     served?: never;
 }
@@ -47,7 +47,7 @@ export type DetailsAsideProps = {
     (RegularHeader | ButtonHeader) & { className?: string } & {
         isDelivery?: boolean;
         deliveryPrice?: number;
-        handleAddNewOrder?: () => void;
+        onAddNewOrder?: () => void;
     };
 
 const DetailsAside = ({
@@ -61,7 +61,7 @@ const DetailsAside = ({
     className,
     isDelivery,
     deliveryPrice,
-    handleAddNewOrder,
+    onAddNewOrder,
 }: DetailsAsideProps) => {
     const { language } = useLanguage();
     const { detailsAside } = languagePacks[language];
@@ -121,11 +121,11 @@ const DetailsAside = ({
 
             {items && <ItemsList items={items} />}
 
-            {handleAddNewOrder && (
+            {onAddNewOrder && (
                 <div className="px-2">
                     <button
-                        className="flex items-center justify-center p-2 w-full border border-dashed border-black rounded-md"
-                        onClick={handleAddNewOrder}
+                        className="flex items-center justify-center p-2 w-full border border-dashed border-black rounded-md transition-transform hocus:scale-95 hocus:translate-y-0.5"
+                        onClick={onAddNewOrder}
                     >
                         <Image
                             src={circlePlusSvg}

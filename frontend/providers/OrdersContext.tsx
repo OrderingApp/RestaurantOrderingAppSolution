@@ -1,7 +1,7 @@
 'use client';
-import { OrderProps } from '@/components/shared/cards/OrderCard';
+
 import { CURRENCIES } from '@/helpers/constants/constants';
-import { OrderItem } from '@/helpers/interfaces/orders';
+
 import { createContext, useState, ReactNode, useCallback, use } from 'react';
 
 interface OrderContextType {
@@ -19,6 +19,7 @@ interface OrdersContextType {
     deliveryPrice?: number;
     addOrder: (order: OrderContextType) => void;
     updateDeliveryPrice: (price: number) => void;
+    clearOrders: () => void;
 }
 
 export const OrdersContext = createContext<OrdersContextType | undefined>(
@@ -49,6 +50,11 @@ const OrdersProvider = ({ children }: { children: ReactNode }) => {
 
     const updateDeliveryPrice = (price: number) => setDeliveryPrice(price);
 
+    const clearOrders = useCallback(() => {
+        setOrders([]);
+        setDeliveryPrice(0);
+    }, []);
+
     return (
         <OrdersContext.Provider
             value={{
@@ -56,6 +62,7 @@ const OrdersProvider = ({ children }: { children: ReactNode }) => {
                 addOrder: addOrderHandler,
                 updateDeliveryPrice,
                 deliveryPrice,
+                clearOrders,
             }}
         >
             {children}

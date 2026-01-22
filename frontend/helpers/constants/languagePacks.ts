@@ -203,6 +203,10 @@ export interface languagePack {
                 paidAndReadyToPrepare: string;
             };
         };
+        menuItem: {
+            ingredient: string;
+            allergens: string;
+        };
     };
     generic: {
         action: string;
@@ -219,6 +223,7 @@ export interface languagePack {
         noResults: string;
         searchPlaceholder: string;
         errorMsg: string;
+        close: string;
     };
 }
 

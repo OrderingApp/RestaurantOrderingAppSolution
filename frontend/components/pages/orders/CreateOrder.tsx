@@ -23,7 +23,7 @@ export interface BillProps {
 }
 
 const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
-    const { orders } = useOrdersContext();
+    const { orders, clearOrders } = useOrdersContext();
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -41,6 +41,20 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
         },
     } = languagePacks[language];
 
+    const handleClose = () => {
+        const newParams = new URLSearchParams(searchParams.toString());
+
+        newParams.delete(SEARCH_PARAMS_NAMES.MENU_ITEM_ID);
+        newParams.delete(SEARCH_PARAMS_NAMES.USER_DATA);
+        newParams.delete(SEARCH_PARAMS_NAMES.CATEGORY);
+        newParams.delete(SEARCH_PARAMS_NAMES.SUBCATEGORY);
+        newParams.delete(SEARCH_PARAMS_NAMES.TAG);
+
+        toggleModal();
+        clearOrders();
+        router.push(`${pathname}?${newParams.toString()}`);
+    };
+
     const buttons: ButtonProps[] = [
         {
             children: discount,
@@ -53,7 +67,7 @@ const CreateOrder = ({ toggleModal }: { toggleModal: () => void }) => {
         },
         {
             children: close,
-            onClick: () => toggleModal(),
+            onClick: handleClose,
             variant: 'tertiary',
         },
     ];
