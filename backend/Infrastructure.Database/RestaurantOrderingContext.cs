@@ -29,6 +29,7 @@ public class RestaurantOrderingContext : DbContext
     public DbSet<Area> Areas { get; set; }
     public DbSet<Tag> Tags { get; set; }
     public DbSet<Ingredient> Ingredients { get; set; }
+    public DbSet<IngredientCategory> IngredientCategories { get; set; }
     public DbSet<MenuItemIngredientRel> MenuItemIngredientRels { get; set; }
     public DbSet<IngredientTagRel> IngredientTagRels { get; set; }
     public DbSet<OrderItemIngredient> OrderItemIngredients { get; set; }
@@ -203,6 +204,14 @@ public class RestaurantOrderingContext : DbContext
             .WithMany(t => t.IngredientTagRels)
             .HasForeignKey(it => it.TagId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // ✅ IngredientCategory and Ingredient (One-to-Many), set null on delete so existing ingredients remain
+        modelBuilder
+            .Entity<IngredientCategory>()
+            .HasMany(ic => ic.Ingredients)
+            .WithOne(i => i.Category)
+            .HasForeignKey(i => i.CategoryId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         // ✅ OrderItemIngredient as an owned type (Embedded inside OrderItem)
         modelBuilder

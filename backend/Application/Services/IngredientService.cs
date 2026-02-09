@@ -2,6 +2,7 @@
 using Application.Contracts;
 using Application.Dtos.Common;
 using Application.Dtos.Ingredients;
+using Application.Dtos.IngredientCategories;
 using AutoMapper;
 using Domain;
 using Infrastructure.Database;
@@ -25,15 +26,23 @@ public class IngredientService(
         {
             var ingredient = mapper.Map<Ingredient>(ingredientCreateDto);
 
+            // If a CategoryId was provided on DTO, it will be mapped to ingredient.CategoryId
+
             await orderingContext.Ingredients.AddAsync(ingredient);
             await orderingContext.SaveChangesAsync();
 
-            var createdIngredient = mapper.Map<IngredientReadDto>(ingredient);
+            var createdIngredient = await orderingContext.Ingredients
+                .Include(i => i.IngredientTagRels)
+                .ThenInclude(rel => rel.Tag)
+                .Include(i => i.Category)
+                .FirstOrDefaultAsync(i => i.Id == ingredient.Id);
+
+            var createdDto = mapper.Map<IngredientReadDto>(createdIngredient);
 
             var ingredientCreatedEvent = mapper.Map<IngredientCreatedEvent>(ingredient);
             await eventHandlerService.HandleEventAsync(ingredientCreatedEvent);
 
-            return ResultDto<IngredientReadDto>.Success(createdIngredient, HttpStatusCode.Created);
+            return ResultDto<IngredientReadDto>.Success(createdDto, HttpStatusCode.Created);
         }
         catch (Exception ex)
         {
@@ -52,6 +61,7 @@ public class IngredientService(
             var query = orderingContext 
                 .Ingredients.Include(i => i.IngredientTagRels)
                 .ThenInclude(rel => rel.Tag)
+                .Include(i => i.Category)
                 .Where(i => i.CanBeUsedAsExtra && !i.IsDeleted)
                 .AsQueryable();
 
@@ -110,6 +120,7 @@ public class IngredientService(
             var ingredient = await orderingContext
                 .Ingredients.Include(i => i.IngredientTagRels)
                 .ThenInclude(rel => rel.Tag)
+                .Include(i => i.Category)
                 .FirstOrDefaultAsync(i => i.Id == id);
 
             if (ingredient == null)
@@ -133,6 +144,7 @@ public class IngredientService(
             var updatedIngredient = await orderingContext
                 .Ingredients.Include(i => i.IngredientTagRels)
                 .ThenInclude(rel => rel.Tag)
+                .Include(i => i.Category)
                 .FirstOrDefaultAsync(i => i.Id == id);
 
             var updatedIngredientDto = mapper.Map<IngredientReadDto>(updatedIngredient);
