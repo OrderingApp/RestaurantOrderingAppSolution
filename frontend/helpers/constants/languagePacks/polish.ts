@@ -10,6 +10,8 @@ const plPack: languagePack = {
         info: 'Informacje',
         addNewOrder: 'Dodaj nowy rachunek',
         delivery: 'Dostawa',
+        noOrders: 'Brak zamówień',
+        noTableChosen: 'Nie wybrano stolika',
     },
     loginPage: {
         appName: 'aplikacja do zamówień',
@@ -147,6 +149,8 @@ const plPack: languagePack = {
             close: 'Zamknij bez zmian',
             discount: 'Dodaj zniżkę',
         },
+        confirmation: 'Dodano do rachunku',
+        error: 'Nie udało się dodać do rachunku',
         addOrder: 'Dodaj',
     },
     paymentModal: {

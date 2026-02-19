@@ -1,12 +1,21 @@
+'use client';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { BACKEND_URL } from '@/helpers/constants/constants';
 import { OrdersItems } from '@/helpers/utils/queryKeys';
 import { useRouter } from 'next/navigation';
 import { Order, OrderDto, OrderKind } from '@/helpers/interfaces/orders';
 
+type UseOrderMutationOptions = {
+    redirectOnSettled?: boolean; // default true
+    onSuccess?: (data: unknown) => void;
+    onError?: (err: unknown) => void;
+};
+
 const useOrderMutation = (
     type: 'create' | 'update' | 'delete',
-    orderKind: OrderKind
+    orderKind: OrderKind,
+    options?: UseOrderMutationOptions
 ) => {
     const queryClient = useQueryClient();
     const router = useRouter();
@@ -22,6 +31,55 @@ const useOrderMutation = (
             } else if (type === 'delete' && id) {
                 url += `/${id}`;
                 method = 'DELETE';
+            }
+
+            // diagnostic log
+            console.log('[useOrdersMutation] mutationFn called', {
+                type,
+                orderKind,
+                id,
+                data,
+                url,
+                method,
+            });
+
+            // detect DOM nodes or circular-prone objects in data
+            const seenPaths: string[] = [];
+            const findDom = (obj: unknown, path = '', depth = 0): boolean => {
+                if (depth > 4 || obj === null || typeof obj !== 'object')
+                    return false;
+                const ctorName =
+                    obj &&
+                    (obj as { constructor?: { name?: string } }).constructor
+                        ? (obj as { constructor?: { name?: string } })
+                              .constructor!.name || ''
+                        : '';
+                if (ctorName && /HTML|Element|Node/.test(ctorName)) {
+                    seenPaths.push(path || 'root');
+                    return true;
+                }
+                try {
+                    for (const key of Object.keys(obj as object)) {
+                        if (
+                            findDom(
+                                (obj as Record<string, unknown>)[key],
+                                path ? `${path}.${key}` : key,
+                                depth + 1
+                            )
+                        )
+                            return true;
+                    }
+                } catch {
+                    // ignore traversal errors
+                }
+                return false;
+            };
+
+            if (findDom(data)) {
+                console.error(
+                    '[useOrdersMutation] Found DOM-like value in payload at paths:',
+                    seenPaths
+                );
             }
 
             const response = await fetch(url, {
@@ -77,13 +135,22 @@ const useOrderMutation = (
                     context.previousOrders
                 );
             }
+
+            options?.onError?.(_ as unknown);
         },
 
-        onSettled: () => {
+        onSettled: (data, error) => {
             queryClient.invalidateQueries({
                 queryKey: [OrdersItems.BY_TYPE, orderKind],
             });
-            router.push(`/orders`);
+
+            if (options?.redirectOnSettled === false) {
+                // don't redirect
+            } else {
+                router.push(`/orders`);
+            }
+
+            if (!error) options?.onSuccess?.(data as unknown);
         },
     });
 };

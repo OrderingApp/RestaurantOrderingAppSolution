@@ -1,15 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import { cn } from '@/lib/utils';
 
 import TablesHeader from './Header';
 import Table from './Table';
 import AsidesView from '@/components/shared/views/Asides';
 import { CURRENCIES } from '@/helpers/constants/constants';
 import OverviewModal from '@/components/shared/modals/OverviewModal';
-import CreateOrder from '../orders/CreateOrder';
+import CreateOrder from '../../shared/modals/CreateOrder';
+import useQueryOrders from '@/helpers/queries/orders/useQueryOrders';
+import { useQuery } from '@tanstack/react-query';
+import { BACKEND_URL } from '@/helpers/constants/constants';
 
 const INITIAL_TABLES_DATA = [
     { id: 'table-alpha', layout: [3] },
@@ -22,17 +23,73 @@ const INITIAL_TABLES_DATA = [
 const Tables = () => {
     const [isPanning, setIsPanning] = useState(false);
     const [isCreateOrderModalOpen, setIsCreateOrderModalOpen] = useState(false);
-
-    const toggleCreateOrderModal = () =>
+    const [currentTableId, setCurrentTableId] = useState<string | null>(
+        INITIAL_TABLES_DATA[0].id
+    );
+    const toggleCreateOrderModal = (tableId?: string | Event) => {
+        // sometimes this is used as an onClick handler and receives the click event
+        // guard against DOM/event being passed as tableId
+        if (typeof tableId === 'string') setCurrentTableId(tableId);
         setIsCreateOrderModalOpen((prev) => !prev);
+    };
+
+    const { data: allOrders } = useQueryOrders();
+    const { data: tables } = useQuery({
+        queryKey: ['tables'],
+        queryFn: async () => {
+            const res = await fetch(`${BACKEND_URL}/tables`);
+            if (!res.ok) return [];
+            return res.json();
+        },
+    });
+
+    const dineInOrders = (allOrders || []).filter(
+        (o) => o.orderType === 'dinein'
+    );
+
+    // map currentTableId (ui id) to backend table guid if possible
+    const selectedTableGuid = (() => {
+        if (!tables) return undefined;
+        const match = tables.find((t: { id: string; name?: string }) =>
+            t.name?.toLowerCase().includes((currentTableId || '').toLowerCase())
+        );
+        return match ? match.id : undefined;
+    })();
+
+    const ordersForTable = selectedTableGuid
+        ? dineInOrders.filter((o) => o.tableId === selectedTableGuid)
+        : [];
+
+    const humanize = (id: string | null) =>
+        id ? id.replace('table-', 'Stolik ').replace(/-/g, ' ') : '';
+
+    const details = {
+        ...detailsMock,
+        title: humanize(currentTableId),
+        items: ordersForTable.map((o) => ({
+            id: o.id,
+            name: `Rachunek ${o.id.slice(0, 4)}`,
+            price: o.totalAmount || 0,
+            currency: 'pln' as keyof typeof CURRENCIES,
+            nestedItems: o.orderItems.map((it) => ({
+                name: it.menuItem.name,
+                price: it.menuItem.price,
+                currency: 'pln' as keyof typeof CURRENCIES,
+                quantity:
+                    (it as unknown as { quantity?: number }).quantity ?? 1,
+                onClick: () => {},
+            })),
+        })),
+        onAddNewOrder: toggleCreateOrderModal,
+        buttons: detailsMock.buttons?.filter(
+            (b) => b.children !== 'otwórz rachunek'
+        ),
+    };
 
     return (
         <>
             <AsidesView
-                details={{
-                    ...detailsMock,
-                    onAddNewOrder: toggleCreateOrderModal,
-                }}
+                details={details}
                 bottom={bottomMock}
                 isBottomAsideShown={true}
             >
@@ -48,32 +105,28 @@ const Tables = () => {
                         onPanningStart={() => setIsPanning(true)}
                         onPanningStop={() => setIsPanning(false)}
                     >
-                        <TransformComponent
-                            wrapperClass={cn(
-                                '!h-full !w-full',
-                                isPanning ? 'cursor-grabbing' : 'cursor-grab'
-                            )}
-                        >
-                            {/* automate grid cols depending on the tables? so e.g.
-                        semi-smart distribution, or baed on the user input how
-                        he put it in edit mode? */}
-                            <ul className="grid grid-cols-[1fr,1fr,1fr] gap-y-[52px] gap-x-24 items-center p-8 pt-20">
-                                {INITIAL_TABLES_DATA.map((table) => (
-                                    <li key={table.id}>
-                                        <Table
-                                            id={table.id}
-                                            layout={table.layout}
-                                        />
-                                    </li>
-                                ))}
-                            </ul>
-                        </TransformComponent>
+                        {/* simple grid of tables (no drag/zoom) */}
+                        <ul className="grid grid-cols-[1fr,1fr,1fr] gap-y-[52px] gap-x-24 items-center p-8 pt-20">
+                            {INITIAL_TABLES_DATA.map((table) => (
+                                <li key={table.id}>
+                                    <Table
+                                        id={table.id}
+                                        onSelect={(id) => setCurrentTableId(id)}
+                                        selected={currentTableId === table.id}
+                                    />
+                                </li>
+                            ))}
+                        </ul>
                     </TransformWrapper>
                 </section>
             </AsidesView>
 
             <OverviewModal isOpen={isCreateOrderModalOpen}>
-                <CreateOrder toggleModal={toggleCreateOrderModal} />
+                <CreateOrder
+                    toggleModal={toggleCreateOrderModal}
+                    skipCustomerForm={true}
+                    tableId={currentTableId || undefined}
+                />
             </OverviewModal>
         </>
     );

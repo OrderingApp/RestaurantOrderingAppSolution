@@ -10,6 +10,8 @@ const enPack: languagePack = {
         info: 'Information',
         addNewOrder: 'Add new order',
         delivery: 'Delivery',
+        noOrders: 'No orders',
+        noTableChosen: 'No table chosen',
     },
     loginPage: {
         appName: 'order application',
@@ -146,6 +148,8 @@ const enPack: languagePack = {
             close: 'Close',
             discount: 'Add discount',
         },
+        confirmation: 'Added to bill',
+        error: 'Failed to add to bill',
         addOrder: 'Add',
     },
     paymentModal: {

@@ -1,23 +1,23 @@
-import Seat from './Seat';
-
 interface TableProps {
     id: string;
-    layout: number[];
+    onSelect?: (id: string) => void;
+    selected?: boolean;
 }
 
-const Table = ({ id, layout }: TableProps) => {
+const Table = ({ id, onSelect, selected }: TableProps) => {
+    const label = id.replace('table-', 'Stolik ').replace(/-/g, ' ');
+
     return (
-        <ul className="p-6 border border-dashed border-dark-gray rounded-2xl bg-white shadow-md w-fit flex flex-col gap-6">
-            {layout.map((seatCountInRow, rowIndex) => (
-                <li key={rowIndex} className="flex gap-6 items-center">
-                    {Array.from({ length: seatCountInRow }).map(
-                        (_, seatIndex) => (
-                            <Seat key={`${id}-${rowIndex}-${seatIndex}`} />
-                        )
-                    )}
-                </li>
-            ))}
-        </ul>
+        <div
+            className={`p-6 border rounded-2xl bg-white shadow-md w-40 h-28 flex items-center justify-center cursor-pointer transition-shadow ${
+                selected ? 'border-black shadow-lg' : 'border-dark-gray'
+            }`}
+            onClick={() => onSelect?.(id)}
+        >
+            <span className="font-semibold capitalize text-center">
+                {label}
+            </span>
+        </div>
     );
 };
 

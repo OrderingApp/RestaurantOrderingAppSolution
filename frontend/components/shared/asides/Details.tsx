@@ -121,6 +121,16 @@ const DetailsAside = ({
 
             {items && <ItemsList items={items} />}
 
+            {(!items || items.length === 0) && (
+                <div className="flex-1 flex items-center justify-center px-4">
+                    <p className="text-center text-black">
+                        {title
+                            ? (detailsAside.noOrders ?? 'No orders')
+                            : (detailsAside.noTableChosen ?? 'No table chosen')}
+                    </p>
+                </div>
+            )}
+
             {onAddNewOrder && (
                 <div className="px-2">
                     <button

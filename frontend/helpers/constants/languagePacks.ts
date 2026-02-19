@@ -23,6 +23,8 @@ export interface languagePack {
         info: string;
         addNewOrder: string;
         delivery: string;
+        noOrders?: string;
+        noTableChosen?: string;
     };
     loginPage: {
         appName: string;
@@ -130,6 +132,8 @@ export interface languagePack {
             close: string;
             discount: string;
         };
+        confirmation?: string;
+        error?: string;
         addOrder: string;
     };
     paymentModal: {
