@@ -19,8 +19,7 @@ public class IngredientMappingProfile : Profile
                 dest => dest.Tags,
                 opt =>
                     opt.MapFrom(src => src.IngredientTagRels.Select(rel => rel.Tag.Name).ToList())
-            )
-            .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : null));
+            );
 
         // Map from IngredientUpdateDto to Ingredient (Only update non-null properties)
         CreateMap<IngredientUpdateDto, Ingredient>()
