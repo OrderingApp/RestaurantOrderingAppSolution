@@ -1,4 +1,5 @@
-﻿using Application.Contracts;
+﻿using System;
+using Application.Contracts;
 using Application.Dtos.Areas;
 using Microsoft.AspNetCore.Mvc;
 
@@ -45,8 +46,8 @@ public class AreaController(IAreaService areaService) : BaseApiController
     /// <response code="200">Returns the list of areas.</response>
     [HttpGet]
     [ProducesResponseType(typeof(List<AreaReadDto>), 200)]
-    public async Task<ActionResult<List<AreaReadDto>>> GetAreas() =>
-        HandleResult(await areaService.GetAreas());
+    public async Task<ActionResult<List<AreaReadDto>>> GetAreas([FromQuery] DateTime? date = null) =>
+        HandleResult(await areaService.GetAreas(date));
 
     /// <summary>
     /// Updates an existing area.

@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System;
 using Application.Contracts;
 using Application.Dtos.Areas;
 using Application.Dtos.Common;
@@ -66,10 +67,24 @@ public class AreaService(
         }
     }
 
-    public async Task<ResultDto<List<AreaReadDto>>> GetAreas()
+    public async Task<ResultDto<List<AreaReadDto>>> GetAreas(DateTime? date = null)
     {
         try
         {
+            if (date.HasValue)
+            {
+                var start = date.Value.Date;
+                var end = start.AddDays(1);
+
+                var filteredAreas = await orderingContext.Areas
+                    .Include(a => a.Tables)
+                        .ThenInclude(t => t.Reservations.Where(r => r.ScheduledFor >= start && r.ScheduledFor < end))
+                    .AsNoTracking()
+                    .ToListAsync();
+                var filteredAreaReadDtos = mapper.Map<List<AreaReadDto>>(filteredAreas);
+                return ResultDto<List<AreaReadDto>>.Success(filteredAreaReadDtos, HttpStatusCode.OK);
+            }
+
             var areas = await orderingContext.Areas
                 .Include(a => a.Tables)
                     .ThenInclude(t => t.Reservations)
