@@ -383,7 +383,6 @@ public class ExcelSeeder
                             Name = sheet.Cells[row, 3].Text,
                             CreatedAt = DateTime.Parse(sheet.Cells[row, 4].Text),
                             CapacityNeeded = int.Parse(sheet.Cells[row, 5].Text),
-                            IsAssigned = TryParseBool(sheet.Cells[row, 6].Text),
                             TableId = TryParseGuid(sheet.Cells[row, 7].Text),
                         }
                     );

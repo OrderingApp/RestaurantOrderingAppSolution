@@ -155,7 +155,6 @@ public class ReservationServiceTests
             Name = r.Name,
             ScheduledFor = r.ScheduledFor,
             CapacityNeeded = r.CapacityNeeded,
-            IsAssigned = r.IsAssigned
         }).ToList();
 
         _mockMapper.Setup(m => m.Map<List<ReservationReadDto>>(reservations))
@@ -224,8 +223,6 @@ public class ReservationServiceTests
             Name = reservation.Name,
             ScheduledFor = reservation.ScheduledFor,
             CapacityNeeded = reservation.CapacityNeeded,
-            IsAssigned = true,
-            TableName = table.Name
         };
 
         _mockMapper.Setup(m => m.Map<TableAssignedToReservationEvent>(
@@ -240,8 +237,7 @@ public class ReservationServiceTests
 
         // Assert
         result.ShouldBeSuccessful(HttpStatusCode.OK);
-        result.Data!.TableName.Should().Be(table.Name);
-        result.Data.IsAssigned.Should().BeTrue();
+        result.Data!.Id.Should().Be(reservation.Id);
 
         _mockEventHandler.Verify(e => e.HandleEventAsync(It.IsAny<TableAssignedToReservationEvent>()), Times.Once);
     }
@@ -269,7 +265,7 @@ public class ReservationServiceTests
     public async Task AssignTableToReservation_ShouldFail_WhenTableNotFound()
     {
         // Arrange
-        var reservation = ReservationTestData.CreateReservation(isAssigned: false);
+        var reservation = ReservationTestData.CreateReservation();
         await _dbContext.Reservations.AddAsync(reservation);
         await _dbContext.SaveChangesAsync();
 
@@ -288,7 +284,7 @@ public class ReservationServiceTests
     public async Task AssignTableToReservation_ShouldFail_WhenExceptionThrown()
     {
         // Arrange
-        var reservation = ReservationTestData.CreateReservation(isAssigned: false);
+        var reservation = ReservationTestData.CreateReservation();
         var table = TableTestData.CreateCorrectTable();
 
         await _dbContext.Reservations.AddAsync(reservation);
@@ -331,7 +327,7 @@ public class ReservationServiceTests
             Name = updateDto.Name!,
             CapacityNeeded = updateDto.CapacityNeeded!.Value,
             ScheduledFor = updateDto.ScheduledFor!.Value,
-            IsAssigned = reservation.IsAssigned,
+
         };
 
         _mockMapper.Setup(m => m.Map(updateDto, reservation));

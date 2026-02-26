@@ -7,6 +7,4 @@ public class ReservationReadDto
     public string Name { get; set; } = null!;
     public DateTime ScheduledFor { get; set; }
     public int CapacityNeeded { get; set; }
-    public bool IsAssigned { get; set; }
-    public string? TableName { get; set; }
 }

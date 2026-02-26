@@ -23,7 +23,48 @@ public class ReservationService(
     {
         try
         {
+
+            if (reservationCreate.TableId.HasValue)
+            {
+                var tableId = reservationCreate.TableId.Value;
+
+                var table = await orderingContext.Tables
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(t => t.Id == tableId);
+
+                if (table == null)
+                {
+                    return ResultDto<ReservationReadDto>.Failure(
+                        "Table not found.",
+                        HttpStatusCode.NotFound
+                    );
+                }
+
+                var scheduledFor = reservationCreate.ScheduledFor!.Value;
+
+                var hasConflict = await orderingContext.Reservations
+                    .AsNoTracking()
+                    .AnyAsync(r =>
+                        r.TableId == tableId &&
+                        r.ScheduledFor == scheduledFor
+                    );
+
+                if (hasConflict)
+                {
+                    return ResultDto<ReservationReadDto>.Failure(
+                        "This table is already reserved for the selected time.",
+                        HttpStatusCode.Conflict
+                    );
+                }
+            }
+
             var reservation = mapper.Map<Reservation>(reservationCreate);
+
+            // if a table id is provided, treat the reservation as assigned by setting TableId
+            if (reservationCreate.TableId.HasValue)
+            {
+                reservation.TableId = reservationCreate.TableId.Value;
+            }
 
             await orderingContext.Reservations.AddAsync(reservation);
             await orderingContext.SaveChangesAsync();
@@ -32,6 +73,15 @@ public class ReservationService(
 
             var reservationCreatedEvent = mapper.Map<ReservationCreatedEvent>(reservation);
             await eventHandlerService.HandleEventAsync(reservationCreatedEvent);
+
+            // Optional: fire assignment event too, for consistency with AssignReservationToTable
+            if (reservation.TableId.HasValue)
+            {
+                var tableAssignedEvent = mapper.Map<TableAssignedToReservationEvent>(
+                    (reservation, reservation.TableId.Value)
+                );
+                await eventHandlerService.HandleEventAsync(tableAssignedEvent);
+            }
 
             return ResultDto<ReservationReadDto>.Success(
                 createdReservation,
@@ -79,7 +129,7 @@ public class ReservationService(
         try
         {
             var reservations = await orderingContext
-                .Reservations.Where(r => r.ScheduledFor.Date == date.Date && !r.IsAssigned)
+                .Reservations.Where(r => r.ScheduledFor.Date == date.Date && r.TableId == null)
                 .Include(r => r.Table)
                 .ToListAsync();
 
@@ -118,7 +168,6 @@ public class ReservationService(
                     HttpStatusCode.NotFound
                 );
 
-            reservation.IsAssigned = true;
             reservation.TableId = tableId;
 
             await orderingContext.SaveChangesAsync();

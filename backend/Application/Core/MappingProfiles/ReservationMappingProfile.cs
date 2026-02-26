@@ -9,11 +9,7 @@ public class ReservationMappingProfile : Profile
     public ReservationMappingProfile()
     {
         // Mapping from Reservation to ReservationReadDto
-        CreateMap<Reservation, ReservationReadDto>()
-            .ForMember(
-                dest => dest.TableName,
-                opt => opt.MapFrom(src => src.Table != null ? src.Table.Name : null)
-            );
+        CreateMap<Reservation, ReservationReadDto>();
 
         // Mapping from ReservationCreateDto to Reservation
         CreateMap<ReservationCreateDto, Reservation>()
