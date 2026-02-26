@@ -128,9 +128,13 @@ public class ReservationService(
     {
         try
         {
-            var reservations = await orderingContext
-                .Reservations.Where(r => r.ScheduledFor.Date == date.Date && r.TableId == null)
+            var start = date.Date;
+            var end = start.AddDays(1);
+
+            var reservations = await orderingContext.Reservations
+                .Where(r => r.ScheduledFor >= start && r.ScheduledFor < end)
                 .Include(r => r.Table)
+                .AsNoTracking()
                 .ToListAsync();
 
             var reservationDtos = mapper.Map<List<ReservationReadDto>>(reservations);
