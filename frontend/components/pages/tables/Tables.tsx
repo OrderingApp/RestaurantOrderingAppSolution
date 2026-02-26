@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import { cn } from '@/lib/utils';
 
 import TablesHeader from './Header';
 import Table from './Table';
@@ -21,11 +23,9 @@ const INITIAL_TABLES_DATA = [
 ];
 
 const Tables = () => {
-    const [isPanning, setIsPanning] = useState(false);
     const [isCreateOrderModalOpen, setIsCreateOrderModalOpen] = useState(false);
-    const [currentTableId, setCurrentTableId] = useState<string | null>(
-        INITIAL_TABLES_DATA[0].id
-    );
+    const [isPanning, setIsPanning] = useState(false);
+    const [currentTableId, setCurrentTableId] = useState<string | null>(null);
     const toggleCreateOrderModal = (tableId?: string | Event) => {
         // sometimes this is used as an onClick handler and receives the click event
         // guard against DOM/event being passed as tableId
@@ -95,7 +95,8 @@ const Tables = () => {
             >
                 <TablesHeader onTabChange={console.log} />
 
-                <section>
+                <section className="relative h-full" style={{ zIndex: 25 }}>
+                    <div className="absolute inset-0 bg-[#F7F7F8] z-0" />
                     <TransformWrapper
                         initialScale={0.55}
                         minScale={0.25}
@@ -105,18 +106,28 @@ const Tables = () => {
                         onPanningStart={() => setIsPanning(true)}
                         onPanningStop={() => setIsPanning(false)}
                     >
-                        {/* simple grid of tables (no drag/zoom) */}
-                        <ul className="grid grid-cols-[1fr,1fr,1fr] gap-y-[52px] gap-x-24 items-center p-8 pt-20">
-                            {INITIAL_TABLES_DATA.map((table) => (
-                                <li key={table.id}>
-                                    <Table
-                                        id={table.id}
-                                        onSelect={(id) => setCurrentTableId(id)}
-                                        selected={currentTableId === table.id}
-                                    />
-                                </li>
-                            ))}
-                        </ul>
+                        <TransformComponent
+                            wrapperClass={cn(
+                                '!h-full !w-full relative',
+                                isPanning ? 'cursor-grabbing' : 'cursor-grab'
+                            )}
+                        >
+                            <ul className="relative z-10 grid h-full w-full grid-cols-[1fr,1fr,1fr] gap-y-[52px] gap-x-24 items-start p-8 pt-20">
+                                {INITIAL_TABLES_DATA.map((table) => (
+                                    <li key={table.id}>
+                                        <Table
+                                            id={table.id}
+                                            onSelect={(id) =>
+                                                setCurrentTableId(id)
+                                            }
+                                            selected={
+                                                currentTableId === table.id
+                                            }
+                                        />
+                                    </li>
+                                ))}
+                            </ul>
+                        </TransformComponent>
                     </TransformWrapper>
                 </section>
             </AsidesView>

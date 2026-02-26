@@ -122,16 +122,14 @@ const DetailsAside = ({
             {items && <ItemsList items={items} />}
 
             {(!items || items.length === 0) && (
-                <div className="flex-1 flex items-center justify-center px-4">
-                    <p className="text-center text-black">
-                        {title
-                            ? (detailsAside.noOrders ?? 'No orders')
-                            : (detailsAside.noTableChosen ?? 'No table chosen')}
-                    </p>
+                <div className="px-4 py-2 text-sm text-black text-center">
+                    {title
+                        ? (detailsAside.noOrders ?? 'No orders')
+                        : (detailsAside.noTableChosen ?? 'No table chosen')}
                 </div>
             )}
 
-            {onAddNewOrder && (
+            {title && onAddNewOrder && (
                 <div className="px-2">
                     <button
                         className="flex items-center justify-center p-2 w-full border border-dashed border-black rounded-md transition-transform hocus:scale-95 hocus:translate-y-0.5"
@@ -145,7 +143,7 @@ const DetailsAside = ({
                 </div>
             )}
 
-            {isDelivery && (
+            {isDelivery && title && (
                 <div>
                     <div className="h-0.5 w-full bg-[#707070] my-2"></div>
                     <div className="flex justify-between px-4">
@@ -154,8 +152,7 @@ const DetailsAside = ({
                     </div>
                 </div>
             )}
-
-            {buttons && (
+            {title && buttons && (
                 <menu className="mt-auto pt-[18px] flex flex-col gap-3 px-5">
                     {buttons.map(({ children, ...btn }) => (
                         <li key={children!.toString()}>

@@ -11,7 +11,7 @@ const enPack: languagePack = {
         addNewOrder: 'Add new order',
         delivery: 'Delivery',
         noOrders: 'No orders',
-        noTableChosen: 'No table chosen',
+        noTableChosen: 'Please choose a table',
     },
     loginPage: {
         appName: 'order application',

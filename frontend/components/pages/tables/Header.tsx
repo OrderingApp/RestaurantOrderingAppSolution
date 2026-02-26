@@ -1,11 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import Button from '@/components/shared/button/Button';
-
-import EditIcon from '@/public/images/svg/edit.svg';
 
 export type TabValue = (typeof tabsMock)[number]['value'];
 interface TablesHeaderProps {
@@ -65,8 +61,9 @@ const TablesHeader = ({ onTabChange }: TablesHeaderProps) => {
 
     return (
         <header
+            style={{ boxShadow: '0px 4px 4px 0px #00000040' }}
             className={cn(
-                'fixed flex justify-center items-center gap-9 pt-4 px-5 z-50 backdrop-blur-sm',
+                'w-full flex justify-between items-center gap-9',
                 isDesktopAndOverflowing ? 'mb-3.5' : 'mb-2'
             )}
         >
@@ -75,31 +72,25 @@ const TablesHeader = ({ onTabChange }: TablesHeaderProps) => {
                 ref={tabsRef}
                 value={activeTabValue}
                 onValueChange={handleTabChange}
-                className={cn(
-                    'max-w-[547px] pb-2 overflow-x-auto scrollbar',
-                    isDesktopAndOverflowing ? '-mb-3.5' : '-mb-2'
-                )}
+                className="w-full"
             >
-                <TabsList className="p-0 h-auto bg-white rounded-3xl text-black text-sm">
+                <TabsList
+                    className={cn(
+                        'p-0 bg-transparent text-black text-sm mx-auto',
+                        isDesktopAndOverflowing ? '-mb-3.5' : '-mb-2'
+                    )}
+                >
                     {tabsMock.map(({ label, value }) => (
                         <TabsTrigger
                             key={value}
                             value={value}
-                            className="justify-start py-4 px-8 font-semibold rounded-3xl data-[state=active]:bg-quaternary data-[state=active]:text-white"
+                            className="px-6 font-semibold rounded-none flex items-center justify-center min-w-[120px] h-full data-[state=active]:bg-quaternary data-[state=active]:text-white"
                         >
                             {label}
                         </TabsTrigger>
                     ))}
                 </TabsList>
             </Tabs>
-
-            <Button
-                variant="quaternary"
-                size="xxs"
-                className="rounded-xl aspect-square h-[46px]"
-            >
-                <Image src={EditIcon} alt="Edit tables" />
-            </Button>
         </header>
     );
 };

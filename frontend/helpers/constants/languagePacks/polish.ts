@@ -11,7 +11,7 @@ const plPack: languagePack = {
         addNewOrder: 'Dodaj nowy rachunek',
         delivery: 'Dostawa',
         noOrders: 'Brak zamówień',
-        noTableChosen: 'Nie wybrano stolika',
+        noTableChosen: 'Proszę wybrać stolik',
     },
     loginPage: {
         appName: 'aplikacja do zamówień',
