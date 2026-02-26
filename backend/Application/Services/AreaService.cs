@@ -71,28 +71,21 @@ public class AreaService(
     {
         try
         {
-            if (date.HasValue)
-            {
-                var start = date.Value.Date;
-                var end = start.AddDays(1);
+            var targetDate = (date ?? DateTime.UtcNow).Date;
 
-                var filteredAreas = await orderingContext.Areas
-                    .Include(a => a.Tables)
-                        .ThenInclude(t => t.Reservations.Where(r => r.ScheduledFor >= start && r.ScheduledFor < end))
-                    .AsNoTracking()
-                    .ToListAsync();
-                var filteredAreaReadDtos = mapper.Map<List<AreaReadDto>>(filteredAreas);
-                return ResultDto<List<AreaReadDto>>.Success(filteredAreaReadDtos, HttpStatusCode.OK);
-            }
+            var start = targetDate;
+            var end = start.AddDays(1);
 
-            var areas = await orderingContext.Areas
+            var filteredAreas = await orderingContext.Areas
                 .Include(a => a.Tables)
-                    .ThenInclude(t => t.Reservations)
+                .ThenInclude(t => t.Reservations
+                    .Where(r => r.ScheduledFor >= start && r.ScheduledFor < end))
                 .AsNoTracking()
                 .ToListAsync();
 
-            var areaReadDtos = mapper.Map<List<AreaReadDto>>(areas);
-            return ResultDto<List<AreaReadDto>>.Success(areaReadDtos, HttpStatusCode.OK);
+            var filteredAreaReadDtos = mapper.Map<List<AreaReadDto>>(filteredAreas);
+
+            return ResultDto<List<AreaReadDto>>.Success(filteredAreaReadDtos, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {
