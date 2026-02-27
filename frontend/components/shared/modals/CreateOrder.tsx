@@ -2,7 +2,11 @@
 
 import DetailsAside from '@/components/shared/asides/Details';
 import Menu from '../../pages/menu/Menu';
-import { CURRENCIES, SEARCH_PARAMS_NAMES } from '@/helpers/constants/constants';
+import {
+    CURRENCIES,
+    ORDER_TYPES,
+    SEARCH_PARAMS_NAMES,
+} from '@/helpers/constants/constants';
 import { useOrdersContext } from '@/providers/OrdersContext';
 // note: direct fetch is used for skipCustomerForm flow to avoid route navigation
 import { useQueryClient } from '@tanstack/react-query';
@@ -20,6 +24,7 @@ import { Currency } from '@/helpers/type/types';
 import { useLanguage } from '@/providers/LanguageProvider';
 import languagePacks from '@/helpers/constants/languagePacks';
 import { OrderDto } from '@/helpers/interfaces/orders';
+import { ORDERS_QUERY_KEY } from '@/helpers/queries/orders/useQueryOrders';
 
 export interface BillProps {
     id: string;
@@ -62,7 +67,11 @@ const CreateOrder = ({
         redirectOnSettled: false,
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: [OrdersItems.BY_TYPE, 'dinein'],
+                queryKey: [
+                    ...ORDERS_QUERY_KEY,
+                    OrdersItems.BY_TYPE,
+                    ORDER_TYPES.DINEIN,
+                ],
             });
 
             toast.success(

@@ -1,31 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { cn } from '@/lib/utils';
 
 import TablesHeader from './Header';
 import Table from './Table';
 import AsidesView from '@/components/shared/views/Asides';
-import { CURRENCIES } from '@/helpers/constants/constants';
+import { CURRENCIES, ORDER_TYPES } from '@/helpers/constants/constants';
 import OverviewModal from '@/components/shared/modals/OverviewModal';
 import CreateOrder from '../../shared/modals/CreateOrder';
 import useQueryOrders from '@/helpers/queries/orders/useQueryOrders';
-import { useQuery } from '@tanstack/react-query';
-import { BACKEND_URL } from '@/helpers/constants/constants';
-
-const INITIAL_TABLES_DATA = [
-    { id: 'table-alpha', layout: [3] },
-    { id: 'table-beta', layout: [2, 1] },
-    { id: 'table-gamma', layout: [1, 2] },
-    { id: 'table-delta', layout: [4, 2, 1] },
-    { id: 'table-deltaa', layout: [2, 2, 1] },
-];
+import useQueryTables from '@/helpers/queries/tables/useQueryTables';
+import { OrdersItems } from '@/helpers/utils/queryKeys';
 
 const Tables = () => {
     const [isCreateOrderModalOpen, setIsCreateOrderModalOpen] = useState(false);
     const [isPanning, setIsPanning] = useState(false);
     const [currentTableId, setCurrentTableId] = useState<string | null>(null);
+
     const toggleCreateOrderModal = (tableId?: string | Event) => {
         // sometimes this is used as an onClick handler and receives the click event
         // guard against DOM/event being passed as tableId
@@ -33,35 +26,35 @@ const Tables = () => {
         setIsCreateOrderModalOpen((prev) => !prev);
     };
 
-    const { data: allOrders } = useQueryOrders();
-    const { data: tables } = useQuery({
-        queryKey: ['tables'],
-        queryFn: async () => {
-            const res = await fetch(`${BACKEND_URL}/tables`);
-            if (!res.ok) return [];
-            return res.json();
-        },
+    const { data: allOrders } = useQueryOrders({
+        queryKeys: [OrdersItems.BY_TYPE, ORDER_TYPES.DINEIN],
     });
+    const { data: tables } = useQueryTables();
 
-    const dineInOrders = (allOrders || []).filter(
-        (o) => o.orderType === 'dinein'
+    const dineInOrders = useMemo(
+        () =>
+            (allOrders || []).filter(
+                (o) =>
+                    o.orderType.toLowerCase() ===
+                    ORDER_TYPES.DINEIN.toLowerCase()
+            ),
+        [allOrders]
     );
 
-    // map currentTableId (ui id) to backend table guid if possible
-    const selectedTableGuid = (() => {
-        if (!tables) return undefined;
-        const match = tables.find((t: { id: string; name?: string }) =>
-            t.name?.toLowerCase().includes((currentTableId || '').toLowerCase())
-        );
-        return match ? match.id : undefined;
-    })();
+    // map currentTableId to backend table guid
+    const selectedTableGuid = currentTableId
+        ? tables?.find((t) => t.id === currentTableId)?.id
+        : undefined;
 
     const ordersForTable = selectedTableGuid
         ? dineInOrders.filter((o) => o.tableId === selectedTableGuid)
         : [];
 
-    const humanize = (id: string | null) =>
-        id ? id.replace('table-', 'Stolik ').replace(/-/g, ' ') : '';
+    const humanize = (id: string | null) => {
+        if (!id || !tables) return '';
+        const table = tables.find((t) => t.id === id);
+        return table?.name || '';
+    };
 
     const details = {
         ...detailsMock,
@@ -93,43 +86,47 @@ const Tables = () => {
                 bottom={bottomMock}
                 isBottomAsideShown={true}
             >
-                <TablesHeader onTabChange={console.log} />
-
-                <section className="relative h-full" style={{ zIndex: 25 }}>
-                    <div className="absolute inset-0 bg-[#F7F7F8] z-0" />
-                    <TransformWrapper
-                        initialScale={0.55}
-                        minScale={0.25}
-                        maxScale={1.25}
-                        centerOnInit={true}
-                        limitToBounds={true}
-                        onPanningStart={() => setIsPanning(true)}
-                        onPanningStop={() => setIsPanning(false)}
-                    >
-                        <TransformComponent
-                            wrapperClass={cn(
-                                '!h-full !w-full relative',
-                                isPanning ? 'cursor-grabbing' : 'cursor-grab'
-                            )}
+                <div className="flex flex-col h-full">
+                    <TablesHeader onTabChange={console.log} />
+                    <section className="relative h-full max-h-[559px] z-30">
+                        <TransformWrapper
+                            initialScale={0.55}
+                            minScale={0.25}
+                            maxScale={1.25}
+                            centerOnInit={true}
+                            limitToBounds={true}
+                            onPanningStart={() => setIsPanning(true)}
+                            onPanningStop={() => setIsPanning(false)}
                         >
-                            <ul className="relative z-10 grid h-full w-full grid-cols-[1fr,1fr,1fr] gap-y-[52px] gap-x-24 items-start p-8 pt-20">
-                                {INITIAL_TABLES_DATA.map((table) => (
-                                    <li key={table.id}>
-                                        <Table
-                                            id={table.id}
-                                            onSelect={(id) =>
-                                                setCurrentTableId(id)
-                                            }
-                                            selected={
-                                                currentTableId === table.id
-                                            }
-                                        />
-                                    </li>
-                                ))}
-                            </ul>
-                        </TransformComponent>
-                    </TransformWrapper>
-                </section>
+                            <TransformComponent
+                                wrapperClass={cn(
+                                    '!h-full !w-full relative',
+                                    isPanning
+                                        ? 'cursor-grabbing'
+                                        : 'cursor-grab'
+                                )}
+                            >
+                                <ul className="relative z-10 grid h-full w-full grid-cols-[1fr,1fr,1fr] gap-y-[52px] gap-x-24 items-start p-8 pt-20">
+                                    {tables?.map((table) => (
+                                        <li key={table.id}>
+                                            <Table
+                                                id={table.id}
+                                                name={table.name}
+                                                capacity={table.capacity}
+                                                onSelect={(id) =>
+                                                    setCurrentTableId(id)
+                                                }
+                                                selected={
+                                                    currentTableId === table.id
+                                                }
+                                            />
+                                        </li>
+                                    ))}
+                                </ul>
+                            </TransformComponent>
+                        </TransformWrapper>
+                    </section>
+                </div>
             </AsidesView>
 
             <OverviewModal isOpen={isCreateOrderModalOpen}>
