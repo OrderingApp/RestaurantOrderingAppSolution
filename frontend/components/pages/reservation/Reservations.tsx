@@ -20,6 +20,7 @@ import languagePacks from '@/helpers/constants/languagePacks';
 import { ICONS } from '@/helpers/constants/icons/icons';
 import { setQueryParams, toggleQueryParam } from '@/helpers/utils/utils';
 import { SEARCH_PARAMS_NAMES } from '@/helpers/constants/constants';
+import { useReservationContext } from '@/providers/ReservationsContext';
 
 const Reservations = () => {
     const router = useRouter();
@@ -42,6 +43,9 @@ const Reservations = () => {
     const {
         reservationsPage: { reservationsList, createReservation },
     } = languagePacks[language];
+
+    const { hasUnsavedChanges, clearLocalReservations } =
+        useReservationContext();
 
     const buttons = [
         {
@@ -95,6 +99,18 @@ const Reservations = () => {
             router,
             pathname
         );
+    };
+
+    const handleSafeClose = () => {
+        if (hasUnsavedChanges) {
+            const confirmed = window.confirm(
+                'Masz przypisane rezerwacje, które nie zostały jeszcze wysłane do bazy. Czy na pewno chcesz zamknąć okno i utracić te dane?'
+            );
+            if (!confirmed) return;
+        }
+
+        closeModal();
+        clearLocalReservations();
     };
 
     return (
@@ -168,11 +184,11 @@ const Reservations = () => {
                 />
             </div>
 
-            <Modal isOpen={modal === 'true'} onClose={closeModal}>
-                <UpsertReservation onClose={closeModal} />
+            <Modal isOpen={modal === 'true'} onClose={handleSafeClose}>
+                <UpsertReservation onClose={handleSafeClose} />
             </Modal>
 
-            {totalPages > 0 && (
+            {totalPages > 1 && (
                 <div
                     className={`absolute bottom-20 left-1/2  -translate-x-1/2`}
                 >

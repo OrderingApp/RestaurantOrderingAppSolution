@@ -26,6 +26,7 @@ import {
     type ReservationSchema,
 } from '@/helpers/models/reservationForm';
 import { ICONS } from '@/helpers/constants/icons/icons';
+import { useReservationContext } from '@/providers/ReservationsContext';
 
 const formDefaultValues = {
     name: '',
@@ -38,6 +39,11 @@ const formDefaultValues = {
 const ReservationForm = () => {
     const searchParams = useSearchParams();
     const editParam = searchParams.get(SEARCH_PARAMS_NAMES.RESERVATION);
+    const {
+        updateForm,
+        setHasUnsavedChanges,
+        form: { date: contextDate, selectedTableId },
+    } = useReservationContext();
 
     const { language } = useLanguage();
     const reservationSchema = getReservationSchema(language);
@@ -66,7 +72,10 @@ const ReservationForm = () => {
         formState: { errors },
     } = useForm<ReservationSchema>({
         resolver: zodResolver(reservationSchema),
-        defaultValues: formDefaultValues,
+        defaultValues: {
+            ...formDefaultValues,
+            date: contextDate, // Używamy daty z contextu jako startowej
+        },
     });
 
     const { data: reservation } = useQueryReservationsById(editParam ?? '');
@@ -83,6 +92,7 @@ const ReservationForm = () => {
         const newReservation = {
             ...data,
             scheduledFor: dateTimeStr,
+            tableId: selectedTableId,
         };
         if (editParam) {
             updateReservationMutation.mutate({
@@ -92,32 +102,22 @@ const ReservationForm = () => {
         } else {
             createReservationMutation.mutate({ data: newReservation });
         }
+        setHasUnsavedChanges(false);
+
         reset();
     };
 
     useEffect(() => {
-        if (!editParam)
-            return reset({
-                name: '',
-                date: minDateString,
-                phoneNumber: '',
-                time: '',
-                capacityNeeded: '',
+        if (editParam && reservation) {
+            reset({
+                name: reservation.name,
+                capacityNeeded: reservation.capacityNeeded.toString(),
+                date: reservation.scheduledFor.split('T')[0],
+                time: reservation.scheduledFor.split('T')[1].slice(0, 5),
+                phoneNumber: reservation.phoneNumber,
             });
-
-        if (!reservation) return;
-
-        reset({
-            name: reservation.name,
-            date: reservation.scheduledFor.split('T')[0],
-            phoneNumber: reservation.phoneNumber,
-            time: reservation.scheduledFor
-                .split('T')[1]
-                .split('.')[0]
-                .slice(0, -3),
-            capacityNeeded: reservation.capacityNeeded.toString(),
-        });
-    }, [editParam, reservation, minDateString, reset]);
+        }
+    }, [editParam, reservation, reset]);
 
     return (
         <div className="bg-white pb-3 min-h-full relative">
@@ -135,7 +135,6 @@ const ReservationForm = () => {
                         <Input
                             type="text"
                             id="name"
-                            inputSize="xs"
                             label={name}
                             icon={<Image src={ICONS.USER} alt="user" />}
                             {...register('name')}
@@ -150,7 +149,14 @@ const ReservationForm = () => {
                             id="capacityNeeded"
                             label={capacityNeeded}
                             icon={<Image src={ICONS.USERS} alt="users" />}
-                            {...register('capacityNeeded')}
+                            {...register('capacityNeeded', {
+                                onChange: (e) => {
+                                    updateForm(
+                                        'capacityNeeded',
+                                        e.target.value
+                                    );
+                                },
+                            })}
                             min={1}
                             errors={errors.capacityNeeded}
                             errorClassName="!text-[11px]"
@@ -165,7 +171,11 @@ const ReservationForm = () => {
                             min={minDateString}
                             max={maxDateString}
                             defaultValue={formDefaultValues.date}
-                            {...register('date')}
+                            {...register('date', {
+                                onChange: (e) => {
+                                    updateForm('date', e.target.value);
+                                },
+                            })}
                             errors={errors.date}
                             errorClassName="!text-[11px]"
                             inputClassName="w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0"
@@ -175,9 +185,13 @@ const ReservationForm = () => {
                             id="time"
                             icon={<Image src={ICONS.TIME} alt="time" />}
                             label={time}
+                            {...register('time', {
+                                onChange: (e) => {
+                                    updateForm('time', e.target.value);
+                                },
+                            })}
                             min={RESTAURANT_OPENING_HOUR}
                             max={RESTAURANT_CLOSING_HOUR}
-                            {...register('time')}
                             errors={errors.time}
                             errorClassName="!text-[11px]"
                             inputClassName="w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0"

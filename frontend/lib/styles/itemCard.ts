@@ -10,6 +10,10 @@ export const itemCardStyles = {
             container: 'border-[#2C5364] border-2',
             appearance: 'bg-[#2C5364] text-white',
         },
+        reservationOccupied: {
+            container: 'border-[#C70039] border-2',
+            appearance: 'bg-[#C70039] text-white',
+        },
         [variantTableMap.ACTIVE]: {
             container: 'border-[#008080] border-2',
             appearance: 'bg-[#008080] text-white',

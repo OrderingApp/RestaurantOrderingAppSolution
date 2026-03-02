@@ -11,6 +11,7 @@ import languagePacks from '@/helpers/constants/languagePacks';
 import './globals.css';
 import OrdersProvider from '@/providers/OrdersContext';
 import { Toaster } from 'sonner';
+import { ReservationProvider } from '@/providers/ReservationsContext';
 
 const geistSans = Geist({
     variable: '--font-geist-sans',
@@ -44,7 +45,11 @@ const RootLayout = async ({
                 <div id="root" className="w-full max-w-[64rem] relative">
                     <QueryProvider>
                         <LanguageProvider language={lang}>
-                            <OrdersProvider>{children}</OrdersProvider>
+                            <OrdersProvider>
+                                <ReservationProvider>
+                                    {children}
+                                </ReservationProvider>
+                            </OrdersProvider>
                         </LanguageProvider>
                     </QueryProvider>
                 </div>

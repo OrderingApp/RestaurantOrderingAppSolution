@@ -18,6 +18,8 @@ import mapMarkerSvg from '@/public/images/svg/map-marker.svg';
 import mapSvg from '@/public/images/svg/Map.svg';
 import timeWhiteSvg from '@/public/images/svg/time-white.svg';
 import userWhiteSvg from '@/public/images/svg/user-white.svg';
+import addCircleSvg from '@/public/images/svg/add-circle.svg';
+import addCircleWhiteSvg from '@/public/images/svg/add-circle-white.svg';
 
 export const ICONS = {
     USER: userSvg,
@@ -40,4 +42,6 @@ export const ICONS = {
     DOLLAR_WHITE: dollarWhiteSvg,
     MAP_MARKER: mapMarkerSvg,
     MAP: mapSvg,
+    ADD_CIRCLE: addCircleSvg,
+    ADD_CIRCLE_WHITE: addCircleWhiteSvg,
 } as const;

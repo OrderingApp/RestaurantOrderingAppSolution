@@ -9,6 +9,7 @@ export interface ReservationDto {
     name: string;
     scheduledFor: string;
     capacityNeeded: string;
+    tableId: string | null;
 }
 
 const useReservationMutation = (type: 'create' | 'update' | 'delete') => {

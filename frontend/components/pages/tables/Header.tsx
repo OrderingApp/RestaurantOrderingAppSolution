@@ -104,7 +104,7 @@ const TablesHeader = ({ onTabChange }: TablesHeaderProps) => {
     );
 };
 
-const tabsMock = [
+export const tabsMock = [
     { label: 'Bar', value: 'bar' },
     { label: 'Kominek', value: 'kominek' },
     { label: 'Bilardownia', value: 'bilardownia' },

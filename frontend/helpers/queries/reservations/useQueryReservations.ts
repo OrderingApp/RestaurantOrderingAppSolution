@@ -10,14 +10,14 @@ export interface Reservation {
     scheduledFor: string;
     capacityNeeded: number;
     isAssigned: number;
-    tableId: string;
+    tableId: string | null;
 }
 
 const useQueryReservations = (id: string) =>
     useQuery({
         queryKey: [Reservations.BY_DATE, id],
         queryFn: () =>
-            fetchWithParams('reservations', `by-date/${id}`).then(
+            fetchWithParams('reservations', `?date=${id}`).then(
                 (response) => response as Reservation[]
             ),
     });

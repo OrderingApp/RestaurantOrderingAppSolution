@@ -14,6 +14,7 @@ export interface ReservationCardProps
     capacityNeeded: number;
     phoneNumber: string;
     scheduledFor: string;
+    tableName?: string;
 }
 
 const ReservationCard = ({
@@ -21,6 +22,7 @@ const ReservationCard = ({
     name,
     capacityNeeded,
     phoneNumber,
+    tableName,
     onClick,
     className,
 }: ReservationCardProps) => {
@@ -38,7 +40,8 @@ const ReservationCard = ({
         <ItemCard
             title={name}
             subtitle={formatDate(new Date(scheduledFor), language).time}
-            variant="reservation"
+            label={tableName}
+            variant={tableName ? 'reservationOccupied' : 'reservation'}
             onClick={onClick}
             className={className}
         >
@@ -46,6 +49,7 @@ const ReservationCard = ({
                 {totalGuests}:
                 <span className="font-bold">{capacityNeeded}</span>
             </p>
+
             <p className="text-xs text-center">
                 {phone}:<span className="font-bold">{formatedPhoneNumber}</span>
             </p>
