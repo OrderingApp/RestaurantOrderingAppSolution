@@ -13,8 +13,11 @@ import CreateOrder from '../../shared/modals/CreateOrder';
 import useQueryOrders from '@/helpers/queries/orders/useQueryOrders';
 import useQueryTables from '@/helpers/queries/tables/useQueryTables';
 import { OrdersItems } from '@/helpers/utils/queryKeys';
+import { useLanguage } from '@/providers/LanguageProvider';
+import languagePacks from '@/helpers/constants/languagePacks';
 
 const Tables = () => {
+    const { language } = useLanguage();
     const [isCreateOrderModalOpen, setIsCreateOrderModalOpen] = useState(false);
     const [isPanning, setIsPanning] = useState(false);
     const [currentTableId, setCurrentTableId] = useState<string | null>(null);
@@ -50,27 +53,27 @@ const Tables = () => {
         ? dineInOrders.filter((o) => o.tableId === selectedTableGuid)
         : [];
 
-    const humanize = (id: string | null) => {
-        if (!id || !tables) return '';
-        const table = tables.find((t) => t.id === id);
-        return table?.name || '';
-    };
+    const { detailsAside } = languagePacks[language];
+    const receiptLabel = detailsAside.receipt;
+    const tableName =
+        currentTableId && tables
+            ? tables.find((t) => t.id === currentTableId)?.name || ''
+            : '';
 
     const details = {
         ...detailsMock,
-        title: humanize(currentTableId),
-        items: ordersForTable.map((o) => ({
+        title: tableName ? `${detailsAside.table} ${tableName}` : '',
+        items: ordersForTable.map((o, index) => ({
             id: o.id,
-            name: `Rachunek ${o.id.slice(0, 4)}`,
+            name: `${receiptLabel} ${index + 1}`,
             price: o.totalAmount || 0,
             currency: 'pln' as keyof typeof CURRENCIES,
             nestedItems: o.orderItems.map((it) => ({
                 name: it.menuItem.name,
                 price: it.menuItem.price,
                 currency: 'pln' as keyof typeof CURRENCIES,
-                quantity:
-                    (it as unknown as { quantity?: number }).quantity ?? 1,
-                onClick: () => {},
+                quantity: 1,
+                onClick: () => console.log(`item ${it.menuItem.name} clicked`),
             })),
         })),
         onAddNewOrder: toggleCreateOrderModal,
@@ -111,7 +114,7 @@ const Tables = () => {
                                         <li key={table.id}>
                                             <Table
                                                 id={table.id}
-                                                name={table.name}
+                                                name={`${detailsAside.table} ${table.name}`}
                                                 capacity={table.capacity}
                                                 onSelect={(id) =>
                                                     setCurrentTableId(id)

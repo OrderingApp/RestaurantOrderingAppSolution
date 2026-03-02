@@ -10,6 +10,8 @@ const enPack: languagePack = {
         info: 'Information',
         addNewOrder: 'Add new order',
         delivery: 'Delivery',
+        receipt: 'receipt no',
+        table: 'Table',
         noOrders: 'No orders',
         noTableChosen: 'Please choose a table',
     },

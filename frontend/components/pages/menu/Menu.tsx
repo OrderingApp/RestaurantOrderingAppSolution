@@ -32,13 +32,15 @@ import IngredientsMenu from './IngredientsMenu';
 import SearchInput from '@/components/shared/Input/SearchInput';
 
 import { PaginationWithLinks } from '@/components/ui/pagination-with-links';
+import type { AddItemHandler } from '@/components/shared/cards/MenuItem';
 
 interface MenuProps {
     variant?: 'card' | 'order';
     children?: React.ReactNode;
+    onAddItem?: AddItemHandler;
 }
 
-const Menu = ({ variant = 'order', children }: MenuProps) => {
+const Menu = ({ variant = 'order', children, onAddItem }: MenuProps) => {
     const searchParams = useSearchParams();
     const menuItemId = searchParams.get(SEARCH_PARAMS_NAMES.MENU_ITEM_ID);
     const page = searchParams.get(SEARCH_PARAMS_NAMES.PAGE);
@@ -115,6 +117,7 @@ const Menu = ({ variant = 'order', children }: MenuProps) => {
                                     menuStyles.variants[variant].menuItemVariant
                                 }
                                 key={item.id}
+                                onAddItem={onAddItem}
                                 {...item}
                             />
                         ))}

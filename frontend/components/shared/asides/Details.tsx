@@ -43,6 +43,8 @@ interface FilledAside {
 
 export type DetailsAsideProps = {
     buttons?: Omit<ButtonProps, 'className'>[];
+    onSelectItem?: (id: string) => void;
+    selectedItemId?: string | null;
 } & (FilledAside | EmptyAside) &
     (RegularHeader | ButtonHeader) & { className?: string } & {
         isDelivery?: boolean;
@@ -62,6 +64,8 @@ const DetailsAside = ({
     isDelivery,
     deliveryPrice,
     onAddNewOrder,
+    onSelectItem,
+    selectedItemId,
 }: DetailsAsideProps) => {
     const { language } = useLanguage();
     const { detailsAside } = languagePacks[language];
@@ -119,7 +123,13 @@ const DetailsAside = ({
                     </>
                 ))}
 
-            {items && <ItemsList items={items} />}
+            {items && (
+                <ItemsList
+                    items={items}
+                    onSelectItem={onSelectItem}
+                    selectedItemId={selectedItemId}
+                />
+            )}
 
             {(!items || items.length === 0) && (
                 <div className="px-4 py-2 text-sm text-black text-center">

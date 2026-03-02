@@ -10,6 +10,8 @@ const plPack: languagePack = {
         info: 'Informacje',
         addNewOrder: 'Dodaj nowy rachunek',
         delivery: 'Dostawa',
+        receipt: 'rachunek nr',
+        table: 'Stolik',
         noOrders: 'Brak zamówień',
         noTableChosen: 'Proszę wybrać stolik',
     },

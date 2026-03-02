@@ -23,6 +23,8 @@ export interface languagePack {
         info: string;
         addNewOrder: string;
         delivery: string;
+        receipt: string;
+        table: string;
         noOrders?: string;
         noTableChosen?: string;
     };
