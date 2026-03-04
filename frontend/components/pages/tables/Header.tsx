@@ -1,28 +1,23 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Area } from '@/helpers/queries/areas/useAreasQuery';
 
-const tabsMock = [
-    { label: 'Bar', value: 'bar' },
-    { label: 'Kominek', value: 'kominek' },
-    { label: 'Bilardownia', value: 'bilardownia' },
-    { label: 'Góra', value: 'góra' },
-    { label: 'Ogródek', value: 'ogródek' },
-    { label: 'Przód', value: 'przód' },
-] as const;
-
-export type TabValue = (typeof tabsMock)[number]['value'];
+export type TabValue = string;
 
 interface TablesHeaderProps {
+    tabs: Area[];
+    activeTabValue: TabValue;
     onTabChange: (newTabValue: TabValue) => void;
 }
 
 const SCROLLBAR_GAP = 6;
 
-const TablesHeader = ({ onTabChange }: TablesHeaderProps) => {
-    const [activeTabValue, setActiveTabValue] = useState<TabValue>(
-        tabsMock[0].value
-    );
+const TablesHeader = ({
+    tabs,
+    activeTabValue,
+    onTabChange,
+}: TablesHeaderProps) => {
     const [isOverflowing, setIsOverflowing] = useState(false);
     const [scrollWidth, setScrollWidth] = useState(0);
 
@@ -122,26 +117,23 @@ const TablesHeader = ({ onTabChange }: TablesHeaderProps) => {
 
         container.scrollTo({ left: targetScrollLeft, behavior: 'smooth' });
 
+        const fallbackResetTimeout = window.setTimeout(() => {
+            scrollSource.current = null;
+        }, 350);
+
         const onScrollEnd = () => {
+            window.clearTimeout(fallbackResetTimeout);
             scrollSource.current = null;
             container.removeEventListener('scrollend', onScrollEnd);
         };
         container.addEventListener('scrollend', onScrollEnd, { once: true });
 
         return () => {
+            window.clearTimeout(fallbackResetTimeout);
             scrollSource.current = null;
             container.removeEventListener('scrollend', onScrollEnd);
         };
     }, [activeTabValue]);
-
-    const handleTabChange = useCallback(
-        (newTabValue: string) => {
-            const typed = newTabValue as TabValue;
-            setActiveTabValue(typed);
-            onTabChange(typed);
-        },
-        [onTabChange]
-    );
 
     return (
         <>
@@ -151,7 +143,7 @@ const TablesHeader = ({ onTabChange }: TablesHeaderProps) => {
             >
                 <Tabs
                     value={activeTabValue}
-                    onValueChange={handleTabChange}
+                    onValueChange={onTabChange}
                     className="w-full"
                 >
                     <div
@@ -159,13 +151,13 @@ const TablesHeader = ({ onTabChange }: TablesHeaderProps) => {
                         className="w-full overflow-x-auto scrollbar-none"
                     >
                         <TabsList className="h-auto w-full rounded-none bg-transparent p-0 text-sm text-black">
-                            {tabsMock.map(({ label, value }) => (
+                            {tabs.map((tab) => (
                                 <TabsTrigger
-                                    key={value}
-                                    value={value}
+                                    key={tab.id}
+                                    value={tab.id}
                                     className="min-w-[120px] rounded-none px-6 py-3 font-semibold data-[state=active]:bg-quaternary data-[state=active]:text-white"
                                 >
-                                    {label}
+                                    {tab.name}
                                 </TabsTrigger>
                             ))}
                         </TabsList>

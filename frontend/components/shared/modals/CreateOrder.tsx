@@ -8,13 +8,11 @@ import {
     SEARCH_PARAMS_NAMES,
 } from '@/helpers/constants/constants';
 import { useOrdersContext } from '@/providers/OrdersContext';
-// note: direct fetch is used for skipCustomerForm flow to avoid route navigation
 import { useQueryClient } from '@tanstack/react-query';
-import { BACKEND_URL } from '@/helpers/constants/constants';
 import { OrdersItems } from '@/helpers/utils/queryKeys';
 import useOrderMutation from '@/helpers/queries/orders/useOrdersMutation';
 import { toast } from 'sonner';
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toggleQueryParam } from '@/helpers/utils/utils';
 import CustomerInformationForm from '../../pages/orders/CustomerInformationForm';
@@ -28,6 +26,10 @@ import { ORDERS_QUERY_KEY } from '@/helpers/queries/orders/useQueryOrders';
 import useQueryOrders from '@/helpers/queries/orders/useQueryOrders';
 import useQueryTables from '@/helpers/queries/tables/useQueryTables';
 import useAddOrderItemsMutation from '@/helpers/queries/orders/useAddOrderItemsMutation';
+import {
+    aggregateOrderItems,
+    sortOrdersByCreatedAt,
+} from '@/helpers/utils/orderTransforms';
 
 export interface BillProps {
     id: string;
@@ -80,41 +82,55 @@ const CreateOrder = ({
 
     const { language } = useLanguage();
 
-    const { data: allOrders } = useQueryOrders({
+    const { data: allOrders, isLoading: isOrdersLoading } = useQueryOrders({
         queryKeys: [OrdersItems.BY_TYPE, ORDER_TYPES.DINEIN],
     });
     const { data: tables } = useQueryTables();
 
-    const dineInOrders = useMemo(
-        () =>
-            (allOrders || []).filter(
-                (o) =>
-                    o.orderType.toLowerCase() ===
-                    ORDER_TYPES.DINEIN.toLowerCase()
-            ),
-        [allOrders]
-    );
-
-    const tableName = useMemo(() => {
-        if (!tableId || !tables) return '';
-        const table = tables.find((t) => t.id === tableId);
-        return table?.name || '';
-    }, [tableId, tables]);
+    const tableName =
+        tableId && tables
+            ? tables.find((t) => t.id === tableId)?.name || ''
+            : '';
 
     const existingOrdersForTable = useMemo(() => {
-        return tableId ? dineInOrders.filter((o) => o.tableId === tableId) : [];
-    }, [dineInOrders, tableId]);
+        if (!tableId) return [];
+
+        return aggregateOrderItems(
+            sortOrdersByCreatedAt(
+                (allOrders || [])
+                    .filter(
+                        (o) =>
+                            o.orderType.toLowerCase() ===
+                            ORDER_TYPES.DINEIN.toLowerCase()
+                    )
+                    .filter((o) => o.tableId === tableId)
+            )
+        );
+    }, [allOrders, tableId]);
+
+    const isAsideOrdersLoading =
+        !!tableId && isOrdersLoading && localBills.length === 0;
 
     // Auto-select first existing bill or 'new' if none exist
     useEffect(() => {
         if (selectedBill === null) {
-            if (existingOrdersForTable.length > 0) {
+            if (localBills.length > 0) {
+                setSelectedBill(localBills[0].id);
+            } else if (
+                !isAsideOrdersLoading &&
+                existingOrdersForTable.length > 0
+            ) {
                 setSelectedBill(existingOrdersForTable[0].id);
-            } else {
+            } else if (!isAsideOrdersLoading) {
                 setSelectedBill('new');
             }
         }
-    }, [existingOrdersForTable, selectedBill]);
+    }, [
+        existingOrdersForTable,
+        selectedBill,
+        localBills,
+        isAsideOrdersLoading,
+    ]);
 
     // Initialize localBills from existingOrdersForTable, or create a default new bill
     useEffect(() => {
@@ -130,7 +146,7 @@ const CreateOrder = ({
                             name: item.menuItem.name,
                             price: item.price,
                             currency: 'pln' as keyof typeof CURRENCIES,
-                            quantity: 1,
+                            quantity: item.quantity || 1,
                             discount: item.discount,
                         })),
                         pendingItems: [],
@@ -138,7 +154,7 @@ const CreateOrder = ({
                     })
                 );
                 setLocalBills(initialized);
-            } else {
+            } else if (!isAsideOrdersLoading) {
                 // No existing orders - create a default new bill
                 const defaultBill: LocalBill = {
                     id: 'new',
@@ -150,65 +166,65 @@ const CreateOrder = ({
                 setLocalBills([defaultBill]);
             }
         }
-    }, [existingOrdersForTable, localBills.length]);
+    }, [existingOrdersForTable, localBills.length, isAsideOrdersLoading]);
 
-    // Direct callback to add items to the selected bill - no useEffect needed
-    const addItemToSelectedBill = useCallback(
-        (item: LocalBillItem) => {
-            setLocalBills((prev) => {
-                const billIndex = prev.findIndex((b) => b.id === selectedBill);
+    const addItemToSelectedBill = (item: LocalBillItem) => {
+        setLocalBills((prev) => {
+            // Nothing selected yet: ignore safely.
+            if (!selectedBill) return prev;
 
-                if (billIndex !== -1) {
-                    // Add to existing bill
-                    const updatedBills = [...prev];
-                    const existingItemIndex = updatedBills[
-                        billIndex
-                    ].pendingItems.findIndex((i) => i.id === item.id);
+            const targetBillId = selectedBill === 'new' ? 'new' : selectedBill;
+            const billIndex = prev.findIndex((b) => b.id === targetBillId);
 
-                    if (existingItemIndex !== -1) {
-                        // Item already exists, update quantity
-                        updatedBills[billIndex] = {
-                            ...updatedBills[billIndex],
-                            pendingItems: updatedBills[
-                                billIndex
-                            ].pendingItems.map((i, idx) =>
-                                idx === existingItemIndex
-                                    ? {
-                                          ...i,
-                                          quantity: i.quantity + item.quantity,
-                                      }
-                                    : i
-                            ),
-                        };
-                    } else {
-                        // New item, add to pending
-                        updatedBills[billIndex] = {
-                            ...updatedBills[billIndex],
-                            pendingItems: [
-                                ...updatedBills[billIndex].pendingItems,
-                                item,
-                            ],
-                        };
-                    }
-                    return updatedBills;
-                } else if (selectedBill === 'new') {
-                    // Create new bill with this item
-                    return [
-                        ...prev,
-                        {
-                            id: 'new',
-                            isNew: true,
-                            orderItems: [],
-                            pendingItems: [item],
-                            totalAmount: 0,
-                        },
-                    ];
-                }
-                return prev;
-            });
-        },
-        [selectedBill]
-    );
+            // Placeholder bill selected but not present yet: create it on first add.
+            if (selectedBill === 'new' && billIndex === -1) {
+                return [
+                    ...prev,
+                    {
+                        id: 'new',
+                        isNew: true,
+                        orderItems: [],
+                        pendingItems: [item],
+                        totalAmount: 0,
+                    },
+                ];
+            }
+
+            // Selected bill vanished (e.g. race/state reset): ignore safely.
+            if (billIndex === -1) return prev;
+
+            const updatedBills = [...prev];
+            const existingItemIndex = updatedBills[
+                billIndex
+            ].pendingItems.findIndex((i) => i.id === item.id);
+
+            // Existing pending item: increment quantity.
+            if (existingItemIndex !== -1) {
+                updatedBills[billIndex] = {
+                    ...updatedBills[billIndex],
+                    pendingItems: updatedBills[billIndex].pendingItems.map(
+                        (i, idx) =>
+                            idx === existingItemIndex
+                                ? {
+                                      ...i,
+                                      quantity: i.quantity + item.quantity,
+                                  }
+                                : i
+                    ),
+                };
+
+                return updatedBills;
+            }
+
+            // New pending item for selected bill.
+            updatedBills[billIndex] = {
+                ...updatedBills[billIndex],
+                pendingItems: [...updatedBills[billIndex].pendingItems, item],
+            };
+
+            return updatedBills;
+        });
+    };
 
     const { detailsAside } = languagePacks[language];
     const {
@@ -288,40 +304,7 @@ const CreateOrder = ({
                             .join(':');
                         const dateTimeStr = `${dateStr}T${timeStr}:00`;
 
-                        const isGuid = (s?: string) =>
-                            !!s &&
-                            /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
-                                s
-                            );
-
-                        let resolvedTableId = tableId || '';
-
-                        if (tableId && !isGuid(tableId)) {
-                            try {
-                                const tablesRes = await fetch(
-                                    `${BACKEND_URL}/tables`
-                                );
-                                if (tablesRes.ok) {
-                                    const tables = await tablesRes.json();
-                                    const match = tables.find(
-                                        (t: { id: string; name?: string }) =>
-                                            t.name
-                                                ?.toLowerCase()
-                                                .includes(tableId.toLowerCase())
-                                    );
-                                    resolvedTableId = match
-                                        ? match.id
-                                        : tables[0]?.id;
-                                }
-                            } catch (err) {
-                                console.error(
-                                    'Failed to resolve table GUID',
-                                    err
-                                );
-                            }
-                        } else if (tableId && isGuid(tableId)) {
-                            resolvedTableId = tableId;
-                        }
+                        const resolvedTableId = tableId || '';
 
                         // Use current localBills state to sync to backend
                         for (const localBill of localBills) {
@@ -535,11 +518,12 @@ const CreateOrder = ({
                         ? `${detailsAside.table} ${tableName}`
                         : detailsAside.receipt
                 }
-                items={bill}
+                items={isAsideOrdersLoading ? [] : bill}
                 buttons={buttons}
                 onSelectItem={setSelectedBill}
                 selectedItemId={selectedBill}
                 onAddNewOrder={handleAddNewBill}
+                isItemsLoading={isAsideOrdersLoading}
             />
         </Menu>
     ) : (
