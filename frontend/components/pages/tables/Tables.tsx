@@ -16,8 +16,7 @@ import { OrdersItems } from '@/helpers/utils/queryKeys';
 import { useLanguage } from '@/providers/LanguageProvider';
 import languagePacks from '@/helpers/constants/languagePacks';
 import {
-    aggregateOrderItems,
-    sortOrdersByCreatedAt,
+    getAggregatedDineInOrdersForTable,
 } from '@/helpers/utils/orderTransforms';
 
 const Tables = () => {
@@ -46,18 +45,14 @@ const Tables = () => {
 
     const selectedArea = areas.find((area) => area.id === activeAreaId) ?? null;
     const tables = selectedArea?.tables ?? [];
-    const dineInOrders = (allOrders || []).filter(
-        (o) => o.orderType.toLowerCase() === ORDER_TYPES.DINEIN.toLowerCase()
-    );
 
     const selectedTableGuid = currentTableId
         ? tables?.find((t) => t.id === currentTableId)?.id
         : undefined;
 
-    const ordersForTable = aggregateOrderItems(
-        sortOrdersByCreatedAt(
-            dineInOrders.filter((o) => o.tableId === selectedTableGuid)
-        )
+    const ordersForTable = getAggregatedDineInOrdersForTable(
+        allOrders || [],
+        selectedTableGuid
     );
 
     const { detailsAside } = languagePacks[language];
@@ -84,9 +79,7 @@ const Tables = () => {
             })),
         })),
         onAddNewOrder: toggleCreateOrderModal,
-        buttons: detailsMock.buttons?.filter(
-            (b) => b.children !== 'otwórz rachunek'
-        ),
+        buttons: detailsMock.buttons,
     };
 
     return (
@@ -157,13 +150,7 @@ const Tables = () => {
     );
 };
 
-const buttons = [
-    {
-        children: 'otwórz rachunek',
-        onClick: () => console.log('otworz clicked'),
-    },
-    { children: 'zamknij rachunek' },
-];
+const buttons = [{ children: 'zamknij rachunek' }];
 
 const detailsMock = {
     served: true,

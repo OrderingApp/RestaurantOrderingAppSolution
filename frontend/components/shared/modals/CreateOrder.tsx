@@ -3,15 +3,12 @@
 import DetailsAside from '@/components/shared/asides/Details';
 import Menu from '../../pages/menu/Menu';
 import {
-    CURRENCIES,
+    COMPANYS_CURRENCY,
     ORDER_TYPES,
     SEARCH_PARAMS_NAMES,
 } from '@/helpers/constants/constants';
 import { useOrdersContext } from '@/providers/OrdersContext';
-import { useQueryClient } from '@tanstack/react-query';
 import { OrdersItems } from '@/helpers/utils/queryKeys';
-import useOrderMutation from '@/helpers/queries/orders/useOrdersMutation';
-import { toast } from 'sonner';
 import { useState, useEffect, useMemo } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toggleQueryParam } from '@/helpers/utils/utils';
@@ -21,15 +18,10 @@ import { ButtonProps } from '@/components/shared/button/Button';
 import { Currency } from '@/helpers/type/types';
 import { useLanguage } from '@/providers/LanguageProvider';
 import languagePacks from '@/helpers/constants/languagePacks';
-import { OrderDto } from '@/helpers/interfaces/orders';
-import { ORDERS_QUERY_KEY } from '@/helpers/queries/orders/useQueryOrders';
 import useQueryOrders from '@/helpers/queries/orders/useQueryOrders';
 import useQueryTables from '@/helpers/queries/tables/useQueryTables';
-import useAddOrderItemsMutation from '@/helpers/queries/orders/useAddOrderItemsMutation';
-import {
-    aggregateOrderItems,
-    sortOrdersByCreatedAt,
-} from '@/helpers/utils/orderTransforms';
+import { getAggregatedDineInOrdersForTable } from '@/helpers/utils/orderTransforms';
+import useConfirmDineinBillsMutation from '@/helpers/queries/orders/useConfirmDineinBillsMutation';
 
 export interface BillProps {
     id: string;
@@ -68,7 +60,6 @@ const CreateOrder = ({
 }) => {
     const { clearOrders, deliveryPrice } = useOrdersContext();
 
-    const queryClient = useQueryClient();
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -93,19 +84,7 @@ const CreateOrder = ({
             : '';
 
     const existingOrdersForTable = useMemo(() => {
-        if (!tableId) return [];
-
-        return aggregateOrderItems(
-            sortOrdersByCreatedAt(
-                (allOrders || [])
-                    .filter(
-                        (o) =>
-                            o.orderType.toLowerCase() ===
-                            ORDER_TYPES.DINEIN.toLowerCase()
-                    )
-                    .filter((o) => o.tableId === tableId)
-            )
-        );
+        return getAggregatedDineInOrdersForTable(allOrders || [], tableId);
     }, [allOrders, tableId]);
 
     const isAsideOrdersLoading =
@@ -145,7 +124,7 @@ const CreateOrder = ({
                             id: item.menuItem.id,
                             name: item.menuItem.name,
                             price: item.price,
-                            currency: 'pln' as keyof typeof CURRENCIES,
+                            currency: COMPANYS_CURRENCY,
                             quantity: item.quantity || 1,
                             discount: item.discount,
                         })),
@@ -233,28 +212,6 @@ const CreateOrder = ({
         },
     } = languagePacks[language];
 
-    const createDineinMutation = useOrderMutation('create', 'dinein', {
-        redirectOnSettled: false,
-        onSuccess: () => {
-            // Manual invalidation is handled in the accept button logic
-            // This ensures we only invalidate after all mutations are complete
-        },
-        onError: (err) => {
-            console.error(err);
-            toast.error(
-                languagePacks[language].createOrderPage.error ||
-                    'Failed to add to bill'
-            );
-        },
-    });
-
-    const addOrderItemsMutation = useAddOrderItemsMutation({
-        onSuccess: () => {
-            // Don't close modal here - let the accept button handler manage it
-            // Mutation already invalidates queries
-        },
-    });
-
     const handleClose = () => {
         clearOrders();
         setLocalBills([]);
@@ -266,10 +223,15 @@ const CreateOrder = ({
         newParams.delete(SEARCH_PARAMS_NAMES.CATEGORY);
         newParams.delete(SEARCH_PARAMS_NAMES.SUBCATEGORY);
         newParams.delete(SEARCH_PARAMS_NAMES.TAG);
+        newParams.delete(SEARCH_PARAMS_NAMES.ORDER_MENU_PAGE);
 
         router.push(`${pathname}?${newParams.toString()}`);
         toggleModal();
     };
+
+    const confirmDineinBillsMutation = useConfirmDineinBillsMutation({
+        onSuccess: handleClose,
+    });
 
     // Compute if accept button should be enabled:
     // only enable when there are unsynced changes (pending items) in any bill.
@@ -288,125 +250,19 @@ const CreateOrder = ({
         {
             children: accept,
             variant: 'primary',
-            disabled: !canAcceptBill,
+            disabled: !canAcceptBill || confirmDineinBillsMutation.isPending,
             onClick: async () => {
                 // Guard: must have a selected bill
                 if (!selectedBill) return;
 
                 if (skipCustomerForm || tableId) {
-                    // For dine-in orders (tableId present), sync directly to backend
-                    // For orders with skipCustomerForm, also skip the form
-                    try {
-                        const today = new Date();
-                        const dateStr = today.toISOString().split('T')[0];
-                        const timeStr = today
-                            .toTimeString()
-                            .split(':')
-                            .slice(0, 2)
-                            .join(':');
-                        const dateTimeStr = `${dateStr}T${timeStr}:00`;
-
-                        const resolvedTableId = tableId || '';
-
-                        // Use current localBills state to sync to backend
-                        for (const localBill of localBills) {
-                            if (
-                                localBill.isNew &&
-                                localBill.pendingItems.length > 0
-                            ) {
-                                // Create new bill with pending items
-                                // Expand items by quantity since backend expects separate entries
-                                const payloadOrderItems =
-                                    localBill.pendingItems.flatMap(
-                                        (item: LocalBillItem) =>
-                                            Array.from(
-                                                { length: item.quantity },
-                                                () => ({
-                                                    specialInstructions: '',
-                                                    discount:
-                                                        item.discount || 0,
-                                                    menuItemId: item.id,
-                                                    extraIngredients: [],
-                                                    removedIngredientIds: [],
-                                                })
-                                            )
-                                    );
-
-                                await createDineinMutation.mutateAsync({
-                                    data: {
-                                        createdAt: dateTimeStr,
-                                        discount: 0,
-                                        deliveryPrice: deliveryPrice || 0,
-                                        customerInformation: {
-                                            phoneNumber: '',
-                                            orderCompletionType: 'Immediate',
-                                            preferredPaymentMethod: 'Card',
-                                            additionalInstructions: '',
-                                            expectedOrderCompletion:
-                                                dateTimeStr,
-                                        },
-                                        orderItems: payloadOrderItems,
-                                        tableId: resolvedTableId,
-                                    } as OrderDto & { tableId: string },
-                                });
-                            } else if (
-                                !localBill.isNew &&
-                                localBill.pendingItems.length > 0
-                            ) {
-                                // Add pending items to existing bill
-                                // Expand items by quantity since backend expects separate entries
-                                const payloadOrderItems =
-                                    localBill.pendingItems.flatMap(
-                                        (item: LocalBillItem) =>
-                                            Array.from(
-                                                { length: item.quantity },
-                                                () => ({
-                                                    specialInstructions: '',
-                                                    discount:
-                                                        item.discount || 0,
-                                                    menuItemId: item.id,
-                                                    extraIngredients: [],
-                                                    removedIngredientIds: [],
-                                                })
-                                            )
-                                    );
-
-                                await addOrderItemsMutation.mutateAsync({
-                                    orderId: localBill.id,
-                                    orderItems: payloadOrderItems,
-                                });
-                            }
-                        }
-
-                        // All mutations succeeded, show success and close modal
-                        toast.success(
-                            languagePacks[language].createOrderPage
-                                .confirmation || 'Bill confirmed successfully'
-                        );
-
-                        // Force refresh of queries to ensure immediate UI update
-                        await queryClient.invalidateQueries({
-                            queryKey: [
-                                ...ORDERS_QUERY_KEY,
-                                OrdersItems.BY_TYPE,
-                                ORDER_TYPES.DINEIN,
-                            ],
-                        });
-
-                        // Also invalidate the tables query in case table status changed
-                        await queryClient.invalidateQueries({
-                            queryKey: ['tables'],
-                        });
-
-                        handleClose();
-                    } catch (err) {
-                        console.error('Failed to sync bills', err);
-                        toast.error(
-                            languagePacks[language].createOrderPage.error ||
-                                'Failed to confirm bill'
-                        );
-                    }
-                    return;
+                    // For dine-in orders (tableId present), submit directly to backend.
+                    // When skipCustomerForm is true, also submit directly without opening the customer form.
+                    return await confirmDineinBillsMutation.mutateAsync({
+                        bills: localBills,
+                        tableId,
+                        deliveryPrice: deliveryPrice || 0,
+                    });
                 }
 
                 // For non-dine-in or when skipCustomerForm is false, show customer form
@@ -419,8 +275,6 @@ const CreateOrder = ({
             variant: 'tertiary',
         },
     ];
-
-    const BILL_CURRENCY = 'pln' as keyof typeof CURRENCIES;
 
     const getBillStyles = (isSelected: boolean) => ({
         className: isSelected ? 'bg-primary text-white' : '',
@@ -455,19 +309,19 @@ const CreateOrder = ({
                 ? `${detailsAside.receipt} ${localBills.filter((b) => b.isNew).indexOf(localBill) + 1 + existingOrdersForTable.length} (nowy)`
                 : `${detailsAside.receipt} ${index + 1}`,
             price: localBill.totalAmount + pendingPrice,
-            currency: BILL_CURRENCY,
+            currency: COMPANYS_CURRENCY,
             nestedItems: [
                 ...localBill.orderItems.map((it) => ({
                     name: it.name,
                     price: it.price,
-                    currency: BILL_CURRENCY,
+                    currency: COMPANYS_CURRENCY,
                     quantity: it.quantity || 1,
                     onClick: () => {},
                 })),
                 ...localBill.pendingItems.map((item) => ({
                     name: item.name,
                     price: item.price,
-                    currency: BILL_CURRENCY,
+                    currency: COMPANYS_CURRENCY,
                     quantity: item.quantity,
                     onClick: () => toggleSelect(item.id),
                     className: menuItemId === item.id ? 'bg-red-200' : '',

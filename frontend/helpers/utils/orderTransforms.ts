@@ -1,4 +1,5 @@
 import { Order, OrderItem } from '@/helpers/interfaces/orders';
+import { ORDER_TYPES } from '@/helpers/constants/constants';
 
 export type AggregatedOrderItem = OrderItem & {
     quantity: number;
@@ -26,6 +27,25 @@ export const sortOrdersByCreatedAt = (orders: Order[]): Order[] =>
 
         return a.id.localeCompare(b.id);
     });
+
+export const getDineInOrders = (orders: Order[]): Order[] =>
+    orders.filter(
+        (order) =>
+            order.orderType.toLowerCase() === ORDER_TYPES.DINEIN.toLowerCase()
+    );
+
+export const getAggregatedDineInOrdersForTable = (
+    orders: Order[],
+    tableId?: string | null
+): AggregatedOrder[] => {
+    if (!tableId) return [];
+
+    return aggregateOrderItems(
+        sortOrdersByCreatedAt(
+            getDineInOrders(orders).filter((order) => order.tableId === tableId)
+        )
+    );
+};
 
 export const serializeIngredients = (ingredients?: IngredientLike[]): string =>
     JSON.stringify(
