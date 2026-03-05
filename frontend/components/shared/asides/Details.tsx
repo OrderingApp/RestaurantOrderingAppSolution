@@ -13,6 +13,7 @@ import ItemsList, {
     type ItemsListProps,
 } from '@/components/shared//lists/Items/Items';
 import Button, { type ButtonProps } from '@/components/shared/button/Button';
+import LoadingSpinner from '@/components/shared/states/LoadingSpinner';
 import type { Currency } from '@/helpers/type/types';
 import circlePlusSvg from '@/public/images/svg/circle-plus.svg';
 
@@ -43,11 +44,14 @@ interface FilledAside {
 
 export type DetailsAsideProps = {
     buttons?: Omit<ButtonProps, 'className'>[];
+    onSelectItem?: (id: string) => void;
+    selectedItemId?: string | null;
 } & (FilledAside | EmptyAside) &
     (RegularHeader | ButtonHeader) & { className?: string } & {
         isDelivery?: boolean;
         deliveryPrice?: number;
         onAddNewOrder?: () => void;
+        isItemsLoading?: boolean;
     };
 
 const DetailsAside = ({
@@ -62,6 +66,9 @@ const DetailsAside = ({
     isDelivery,
     deliveryPrice,
     onAddNewOrder,
+    onSelectItem,
+    selectedItemId,
+    isItemsLoading,
 }: DetailsAsideProps) => {
     const { language } = useLanguage();
     const { detailsAside } = languagePacks[language];
@@ -119,13 +126,39 @@ const DetailsAside = ({
                     </>
                 ))}
 
-            {items && <ItemsList items={items} />}
+            {isItemsLoading && (
+                <div className="py-6 flex justify-center">
+                    <LoadingSpinner />
+                </div>
+            )}
 
-            {onAddNewOrder && (
+            {!isItemsLoading && items && (
+                <ItemsList
+                    items={items}
+                    onSelectItem={onSelectItem}
+                    selectedItemId={selectedItemId}
+                />
+            )}
+
+            {!isItemsLoading && (!items || items.length === 0) && (
+                <div className="px-4 py-2 text-sm text-black text-center">
+                    {title
+                        ? (detailsAside.noOrders ?? 'No orders')
+                        : (detailsAside.noTableChosen ?? 'No table chosen')}
+                </div>
+            )}
+
+            {title && onAddNewOrder && (
                 <div className="px-2">
                     <button
-                        className="flex items-center justify-center p-2 w-full border border-dashed border-black rounded-md transition-transform hocus:scale-95 hocus:translate-y-0.5"
-                        onClick={onAddNewOrder}
+                        className={clsx(
+                            'flex items-center justify-center p-2 w-full border border-dashed border-black rounded-md transition-transform',
+                            isItemsLoading
+                                ? 'opacity-50 cursor-not-allowed'
+                                : 'hocus:scale-95 hocus:translate-y-0.5'
+                        )}
+                        onClick={isItemsLoading ? undefined : onAddNewOrder}
+                        disabled={isItemsLoading}
                     >
                         <Image
                             src={circlePlusSvg}
@@ -135,7 +168,7 @@ const DetailsAside = ({
                 </div>
             )}
 
-            {isDelivery && (
+            {isDelivery && title && (
                 <div>
                     <div className="h-0.5 w-full bg-[#707070] my-2"></div>
                     <div className="flex justify-between px-4">
@@ -144,8 +177,7 @@ const DetailsAside = ({
                     </div>
                 </div>
             )}
-
-            {buttons && (
+            {title && buttons && (
                 <menu className="mt-auto pt-[18px] flex flex-col gap-3 px-5">
                     {buttons.map(({ children, ...btn }) => (
                         <li key={children!.toString()}>

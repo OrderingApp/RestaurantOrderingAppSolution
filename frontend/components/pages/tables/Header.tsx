@@ -1,116 +1,181 @@
 import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
-import { cn } from '@/lib/utils';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import Button from '@/components/shared/button/Button';
+import { Area } from '@/helpers/queries/areas/useAreasQuery';
 
-import EditIcon from '@/public/images/svg/edit.svg';
+export type TabValue = string;
 
-export type TabValue = (typeof tabsMock)[number]['value'];
 interface TablesHeaderProps {
+    tabs: Area[];
+    activeTabValue: TabValue;
     onTabChange: (newTabValue: TabValue) => void;
 }
 
-const TablesHeader = ({ onTabChange }: TablesHeaderProps) => {
-    const [isDesktopAndOverflowing, setIsDesktopAndOverflowing] =
-        useState(false);
-    const [activeTabValue, setActiveTabValue] = useState(tabsMock[0].value);
-    const tabsRef = useRef<HTMLDivElement>(null);
+const SCROLLBAR_GAP = 6;
 
-    // Check overflow
+const TablesHeader = ({
+    tabs,
+    activeTabValue,
+    onTabChange,
+}: TablesHeaderProps) => {
+    const [isOverflowing, setIsOverflowing] = useState(false);
+    const [scrollWidth, setScrollWidth] = useState(0);
+
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const trackRef = useRef<HTMLDivElement>(null);
+    const scrollSource = useRef<'tabs' | 'track' | 'programmatic' | null>(null);
+
+    // Check overflow & measure scroll width
     useEffect(() => {
-        const checkOverflow = () => {
-            if (!tabsRef.current) return;
+        const el = scrollRef.current;
+        if (!el) return;
 
-            const isTouchDevice =
-                'ontouchstart' in window || navigator.maxTouchPoints > 0;
-
-            if (isTouchDevice) return setIsDesktopAndOverflowing(false);
-
-            const isOverflowing =
-                tabsRef.current.scrollWidth > tabsRef.current.clientWidth;
-
-            setIsDesktopAndOverflowing(isOverflowing);
+        const check = () => {
+            setIsOverflowing(el.scrollWidth > el.clientWidth);
+            setScrollWidth(el.scrollWidth);
         };
 
-        checkOverflow();
-        window.addEventListener('resize', checkOverflow);
+        check();
+        const observer = new ResizeObserver(check);
+        observer.observe(el);
 
-        return () => {
-            window.removeEventListener('resize', checkOverflow);
-        };
+        return () => observer.disconnect();
     }, []);
 
-    // Scroll to active tab
+    // Sync: tabs → track
     useEffect(() => {
-        if (!tabsRef.current || !activeTabValue) return;
+        const el = scrollRef.current;
+        const track = trackRef.current;
+        if (!el || !track) return;
 
-        const activeTabTrigger = tabsRef.current.querySelector(
+        const onScroll = () => {
+            if (scrollSource.current === 'track') return;
+            scrollSource.current = 'tabs';
+            track.scrollLeft = el.scrollLeft;
+            requestAnimationFrame(() => {
+                if (scrollSource.current === 'tabs')
+                    scrollSource.current = null;
+            });
+        };
+
+        el.addEventListener('scroll', onScroll, { passive: true });
+        return () => el.removeEventListener('scroll', onScroll);
+    }, [isOverflowing]);
+
+    // Sync: track → tabs
+    useEffect(() => {
+        const el = trackRef.current;
+        const container = scrollRef.current;
+        if (!el || !container) return;
+
+        const onScroll = () => {
+            if (
+                scrollSource.current === 'tabs' ||
+                scrollSource.current === 'programmatic'
+            )
+                return;
+            scrollSource.current = 'track';
+            container.scrollLeft = el.scrollLeft;
+            requestAnimationFrame(() => {
+                if (scrollSource.current === 'track')
+                    scrollSource.current = null;
+            });
+        };
+
+        el.addEventListener('scroll', onScroll, { passive: true });
+        return () => el.removeEventListener('scroll', onScroll);
+    }, [isOverflowing]);
+
+    // Scroll active tab into view
+    useEffect(() => {
+        const container = scrollRef.current;
+        if (!container) return;
+
+        const activeTrigger = container.querySelector<HTMLElement>(
             `[data-state="active"]`
         );
+        if (!activeTrigger) return;
 
-        if (!activeTabTrigger) return;
+        const containerRect = container.getBoundingClientRect();
+        const triggerRect = activeTrigger.getBoundingClientRect();
 
-        activeTabTrigger.scrollIntoView({
-            behavior: 'smooth',
-            inline: 'nearest',
-        });
+        const targetScrollLeft = Math.max(
+            0,
+            Math.min(
+                triggerRect.left -
+                    containerRect.left +
+                    container.scrollLeft -
+                    containerRect.width / 2 +
+                    triggerRect.width / 2,
+                container.scrollWidth - container.clientWidth
+            )
+        );
+
+        if (Math.abs(container.scrollLeft - targetScrollLeft) < 1) return;
+
+        scrollSource.current = 'programmatic';
+
+        container.scrollTo({ left: targetScrollLeft, behavior: 'smooth' });
+
+        const fallbackResetTimeout = window.setTimeout(() => {
+            scrollSource.current = null;
+        }, 350);
+
+        const onScrollEnd = () => {
+            window.clearTimeout(fallbackResetTimeout);
+            scrollSource.current = null;
+            container.removeEventListener('scrollend', onScrollEnd);
+        };
+        container.addEventListener('scrollend', onScrollEnd, { once: true });
+
+        return () => {
+            window.clearTimeout(fallbackResetTimeout);
+            scrollSource.current = null;
+            container.removeEventListener('scrollend', onScrollEnd);
+        };
     }, [activeTabValue]);
 
-    const handleTabChange = (newTabValue: TabValue) => {
-        setActiveTabValue(newTabValue);
-        onTabChange(newTabValue);
-    };
-
     return (
-        <header
-            className={cn(
-                'fixed flex justify-center items-center gap-9 pt-4 px-5 z-50 backdrop-blur-sm',
-                isDesktopAndOverflowing ? 'mb-3.5' : 'mb-2'
-            )}
-        >
-            {/* [PRIO-1] TODO: add skeleton for tabs -- blocked by lack of API endpoint */}
-            <Tabs
-                ref={tabsRef}
-                value={activeTabValue}
-                onValueChange={handleTabChange}
-                className={cn(
-                    'max-w-[547px] pb-2 overflow-x-auto scrollbar',
-                    isDesktopAndOverflowing ? '-mb-3.5' : '-mb-2'
-                )}
+        <>
+            <header
+                style={{ boxShadow: '0px 4px 4px 0px #00000040' }}
+                className="flex w-full items-center"
             >
-                <TabsList className="p-0 h-auto bg-white rounded-3xl text-black text-sm">
-                    {tabsMock.map(({ label, value }) => (
-                        <TabsTrigger
-                            key={value}
-                            value={value}
-                            className="justify-start py-4 px-8 font-semibold rounded-3xl data-[state=active]:bg-quaternary data-[state=active]:text-white"
-                        >
-                            {label}
-                        </TabsTrigger>
-                    ))}
-                </TabsList>
-            </Tabs>
+                <Tabs
+                    value={activeTabValue}
+                    onValueChange={onTabChange}
+                    className="w-full"
+                >
+                    <div
+                        ref={scrollRef}
+                        className="w-full overflow-x-auto scrollbar-none"
+                    >
+                        <TabsList className="h-auto w-full rounded-none bg-transparent p-0 text-sm text-black">
+                            {tabs.map((tab) => (
+                                <TabsTrigger
+                                    key={tab.id}
+                                    value={tab.id}
+                                    className="min-w-[120px] rounded-none px-6 py-3 font-semibold data-[state=active]:bg-quaternary data-[state=active]:text-white"
+                                >
+                                    {tab.name}
+                                </TabsTrigger>
+                            ))}
+                        </TabsList>
+                    </div>
+                </Tabs>
+            </header>
 
-            <Button
-                variant="quaternary"
-                size="xxs"
-                className="rounded-xl aspect-square h-[46px]"
-            >
-                <Image src={EditIcon} alt="Edit tables" />
-            </Button>
-        </header>
+            {isOverflowing && (
+                <div
+                    ref={trackRef}
+                    className="pointer-fine-scrollbar w-full overflow-x-auto"
+                    style={{ marginTop: SCROLLBAR_GAP }}
+                >
+                    <div style={{ width: scrollWidth, height: 1 }} />
+                </div>
+            )}
+        </>
     );
 };
-
-const tabsMock = [
-    { label: 'Bar', value: 'bar' },
-    { label: 'Kominek', value: 'kominek' },
-    { label: 'Bilardownia', value: 'bilardownia' },
-    { label: 'Góra', value: 'góra' },
-    { label: 'Ogródek', value: 'ogródek' },
-    { label: 'Przód', value: 'przód' },
-];
 
 export default TablesHeader;
