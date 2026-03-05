@@ -79,7 +79,16 @@ export interface languagePack {
                 payment: string;
                 normal: string;
             };
+            descriptions: {
+                available: string;
+                closed: string;
+            };
             balanceName: string;
+            receiptsCountName: string;
+            reservationName: string;
+            personsCountName: string;
+            hourName: string;
+            reservationInName: string;
         };
     };
     ordersPage: {
@@ -232,6 +241,11 @@ export interface languagePack {
         close: string;
     };
 }
+
+export type TableCardDescriptions =
+    languagePack['tablePage']['tableCard']['descriptions'];
+
+export type TableDescriptionKey = keyof TableCardDescriptions;
 
 interface OrderEntity {
     id: string;

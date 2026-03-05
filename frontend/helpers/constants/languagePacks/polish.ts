@@ -80,7 +80,16 @@ const plPack: languagePack = {
                 payment: 'Stolik w trakcie płatności',
                 normal: 'Stolik aktywny',
             },
+            descriptions: {
+                available: 'Dostępny',
+                closed: 'Nieczynny',
+            },
             balanceName: 'Saldo',
+            receiptsCountName: 'Liczba rachunków',
+            reservationName: 'Rezerwacja',
+            personsCountName: 'Liczba osób',
+            hourName: 'Godzina',
+            reservationInName: 'Rezerwacja za',
         },
     },
     ordersPage: {

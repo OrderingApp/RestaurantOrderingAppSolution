@@ -80,7 +80,16 @@ const enPack: languagePack = {
                 payment: 'Table in payment process',
                 normal: 'Active table',
             },
+            descriptions: {
+                available: 'Available',
+                closed: 'Unavailable',
+            },
             balanceName: 'Balance',
+            receiptsCountName: 'Number of bills',
+            reservationName: 'Reservation',
+            personsCountName: 'Number of people',
+            hourName: 'Time',
+            reservationInName: 'Reservation in',
         },
     },
     ordersPage: {

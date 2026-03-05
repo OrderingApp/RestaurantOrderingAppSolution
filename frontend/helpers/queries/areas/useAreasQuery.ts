@@ -4,6 +4,17 @@ import { BACKEND_PATHS } from '@/helpers/constants/constants';
 import { Areas } from '@/helpers/utils/queryKeys';
 import { fetchWithParams } from '@/helpers/utils/utils';
 
+export enum TABLE_STATUSES {
+    Available = 'Available',
+    Reserved = 'Reserved',
+    Ongoing = 'Ongoing',
+    PendingServingOrderItems = 'PendingServingOrderItems',
+    PendingPayment = 'PendingPayment',
+    Closed = 'Closed',
+}
+
+export type TableStatus = TABLE_STATUSES;
+
 export interface AreaReservation {
     id: string;
     phoneNumber: string;
@@ -18,7 +29,7 @@ export interface AreaTable {
     capacity: number;
     isPrepared: boolean;
     reservations: AreaReservation[];
-    status: string;
+    status: TableStatus;
 }
 
 export interface Area {

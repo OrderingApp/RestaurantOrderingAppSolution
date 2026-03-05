@@ -15,9 +15,7 @@ import useQueryAreas from '@/helpers/queries/areas/useAreasQuery';
 import { OrdersItems } from '@/helpers/utils/queryKeys';
 import { useLanguage } from '@/providers/LanguageProvider';
 import languagePacks from '@/helpers/constants/languagePacks';
-import {
-    getAggregatedDineInOrdersForTable,
-} from '@/helpers/utils/orderTransforms';
+import { getAggregatedDineInOrdersForTable } from '@/helpers/utils/orderTransforms';
 
 const Tables = () => {
     const { language } = useLanguage();
@@ -56,6 +54,7 @@ const Tables = () => {
     );
 
     const { detailsAside } = languagePacks[language];
+
     const receiptLabel = detailsAside.receipt;
     const tableName =
         currentTableId && tables
@@ -100,7 +99,7 @@ const Tables = () => {
                     />
                     <section className="relative h-full max-h-[559px] z-30">
                         <TransformWrapper
-                            initialScale={0.55}
+                            initialScale={0.65}
                             minScale={0.25}
                             maxScale={1.25}
                             centerOnInit={true}
@@ -120,9 +119,8 @@ const Tables = () => {
                                     {tables?.map((table) => (
                                         <li key={table.id}>
                                             <Table
-                                                id={table.id}
-                                                name={`${detailsAside.table} ${table.name}`}
-                                                capacity={table.capacity}
+                                                table={table}
+                                                orders={allOrders || []}
                                                 onSelect={(id) =>
                                                     setCurrentTableId(id)
                                                 }
