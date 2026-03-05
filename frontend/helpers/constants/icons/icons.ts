@@ -20,6 +20,10 @@ import timeWhiteSvg from '@/public/images/svg/time-white.svg';
 import userWhiteSvg from '@/public/images/svg/user-white.svg';
 import addCircleSvg from '@/public/images/svg/add-circle.svg';
 import addCircleWhiteSvg from '@/public/images/svg/add-circle-white.svg';
+import tableOccupaiedSvg from '@/public/images/svg/table.svg';
+import tableWhiteOccupaiedSvg from '@/public/images/svg/table-white.svg';
+import freeTableSvg from '@/public/images/svg/empty-table.svg';
+import freeTableWhiteSvg from '@/public/images/svg/empty-table-white.svg';
 
 export const ICONS = {
     USER: userSvg,
@@ -44,4 +48,8 @@ export const ICONS = {
     MAP: mapSvg,
     ADD_CIRCLE: addCircleSvg,
     ADD_CIRCLE_WHITE: addCircleWhiteSvg,
+    TABLE_OCCUPIED: tableOccupaiedSvg,
+    TABLE_WHITE_OCCUPIED: tableWhiteOccupaiedSvg,
+    FREE_TABLE: freeTableSvg,
+    FREE_TABLE_WHITE: freeTableWhiteSvg,
 } as const;

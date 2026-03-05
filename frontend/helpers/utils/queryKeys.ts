@@ -1,5 +1,6 @@
 enum AREA_KEYS {
     All = 'all-areas',
+    BY_ID = 'by-id',
 }
 
 enum RESERVATIONS_KEYS {

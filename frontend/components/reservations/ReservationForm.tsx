@@ -19,7 +19,7 @@ import {
     RESTAURANT_OPENING_HOUR,
     SEARCH_PARAMS_NAMES,
 } from '@/helpers/constants/constants';
-import { checkMaxAndMinDate } from '@/helpers/utils/dates';
+import { checkMaxAndMinDate, parseIsoDateAndTime } from '@/helpers/utils/dates';
 import languagePacks from '@/helpers/constants/languagePacks';
 import {
     getReservationSchema,
@@ -28,7 +28,7 @@ import {
 import { ICONS } from '@/helpers/constants/icons/icons';
 import { useReservationContext } from '@/providers/ReservationsContext';
 
-const formDefaultValues = {
+const FORM_DEFAULT_VALUES = {
     name: '',
     capacityNeeded: '',
     date: '',
@@ -42,6 +42,7 @@ const ReservationForm = () => {
     const {
         updateForm,
         setHasUnsavedChanges,
+        updateReservationFromDb,
         form: { date: contextDate, selectedTableId },
     } = useReservationContext();
 
@@ -73,8 +74,8 @@ const ReservationForm = () => {
     } = useForm<ReservationSchema>({
         resolver: zodResolver(reservationSchema),
         defaultValues: {
-            ...formDefaultValues,
-            date: contextDate, // Używamy daty z contextu jako startowej
+            ...FORM_DEFAULT_VALUES,
+            date: contextDate,
         },
     });
 
@@ -109,13 +110,21 @@ const ReservationForm = () => {
 
     useEffect(() => {
         if (editParam && reservation) {
+            updateReservationFromDb(reservation);
+
+            const { date, time } = parseIsoDateAndTime(
+                reservation.scheduledFor
+            );
+
             reset({
                 name: reservation.name,
                 capacityNeeded: reservation.capacityNeeded.toString(),
-                date: reservation.scheduledFor.split('T')[0],
-                time: reservation.scheduledFor.split('T')[1].slice(0, 5),
+                date,
+                time,
                 phoneNumber: reservation.phoneNumber,
             });
+        } else {
+            updateReservationFromDb(null);
         }
     }, [editParam, reservation, reset]);
 
@@ -141,7 +150,7 @@ const ReservationForm = () => {
                             errors={errors.name}
                             errorClassName="!text-[11px]"
                             inputClassName="w-full"
-                            defaultValue={formDefaultValues.name}
+                            defaultValue={FORM_DEFAULT_VALUES.name}
                         />
 
                         <Input
@@ -151,17 +160,14 @@ const ReservationForm = () => {
                             icon={<Image src={ICONS.USERS} alt="users" />}
                             {...register('capacityNeeded', {
                                 onChange: (e) => {
-                                    updateForm(
-                                        'capacityNeeded',
-                                        e.target.value
-                                    );
+                                    updateForm('peopleCount', e.target.value);
                                 },
                             })}
                             min={1}
                             errors={errors.capacityNeeded}
                             errorClassName="!text-[11px]"
                             inputClassName="w-full hide-input-number-icon"
-                            defaultValue={formDefaultValues.capacityNeeded}
+                            defaultValue={FORM_DEFAULT_VALUES.capacityNeeded}
                         />
                         <Input
                             type="date"
@@ -170,7 +176,7 @@ const ReservationForm = () => {
                             label={date}
                             min={minDateString}
                             max={maxDateString}
-                            defaultValue={formDefaultValues.date}
+                            defaultValue={FORM_DEFAULT_VALUES.date}
                             {...register('date', {
                                 onChange: (e) => {
                                     updateForm('date', e.target.value);
@@ -195,7 +201,7 @@ const ReservationForm = () => {
                             errors={errors.time}
                             errorClassName="!text-[11px]"
                             inputClassName="w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0"
-                            defaultValue={formDefaultValues.time}
+                            defaultValue={FORM_DEFAULT_VALUES.time}
                         />
                         <Input
                             type="phoneNumber"
@@ -206,7 +212,7 @@ const ReservationForm = () => {
                             errors={errors.phoneNumber}
                             errorClassName="!text-[11px]"
                             inputClassName="w-full"
-                            defaultValue={formDefaultValues.phoneNumber}
+                            defaultValue={FORM_DEFAULT_VALUES.phoneNumber}
                         />
                     </div>
                     <div className="self-end flex justify-between w-full ">

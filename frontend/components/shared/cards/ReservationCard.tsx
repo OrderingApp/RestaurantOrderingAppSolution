@@ -14,7 +14,7 @@ export interface ReservationCardProps
     capacityNeeded: number;
     phoneNumber: string;
     scheduledFor: string;
-    tableName?: string;
+    tableName: string | null;
 }
 
 const ReservationCard = ({
@@ -30,7 +30,7 @@ const ReservationCard = ({
 
     const {
         reservationsPage: {
-            reservationCard: { totalGuests, phone },
+            reservationCard: { totalGuests, phone, table },
         },
     } = languagePacks[language];
 
@@ -40,12 +40,11 @@ const ReservationCard = ({
         <ItemCard
             title={name}
             subtitle={formatDate(new Date(scheduledFor), language).time}
-            label={tableName}
             variant={tableName ? 'reservationOccupied' : 'reservation'}
             onClick={onClick}
             className={className}
         >
-            <p className="text-xs text-center mb-1">
+            <p className="text-xs text-center">
                 {totalGuests}:
                 <span className="font-bold">{capacityNeeded}</span>
             </p>
@@ -53,6 +52,11 @@ const ReservationCard = ({
             <p className="text-xs text-center">
                 {phone}:<span className="font-bold">{formatedPhoneNumber}</span>
             </p>
+            {tableName && (
+                <p className="text-xs text-center">
+                    {table}: <span className="font-bold">{tableName}</span>
+                </p>
+            )}
         </ItemCard>
     );
 };

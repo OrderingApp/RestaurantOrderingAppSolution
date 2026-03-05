@@ -75,3 +75,22 @@ export const getFutureTime = (minutes: number): string => {
         hour12: false,
     });
 };
+
+export const parseIsoDateAndTime = (isoDateString?: string | null) => {
+    if (!isoDateString || !isoDateString.includes('T')) {
+        return { date: '', time: '' };
+    }
+
+    try {
+        const [datePart, timePartWithSeconds] = isoDateString.split('T');
+        const timePart = timePartWithSeconds.slice(0, 5);
+
+        return {
+            date: datePart,
+            time: timePart,
+        };
+    } catch (error) {
+        console.error('Błąd podczas parsowania daty:', isoDateString);
+        return { date: '', time: '' };
+    }
+};

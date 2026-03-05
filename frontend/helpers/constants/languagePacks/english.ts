@@ -38,6 +38,7 @@ const enPack: languagePack = {
         reservationCard: {
             totalGuests: 'Number of people',
             phone: 'Phone number',
+            table: 'Table',
         },
     },
     createReservationPage: {
@@ -61,6 +62,15 @@ const enPack: languagePack = {
                 date: 'Please enter a correct date',
                 time: 'Plese enter a correct time',
                 phoneNumber: 'Please enter a valid 9-digit phone number',
+            },
+        },
+        reservationsList: {
+            table: 'Table',
+            time: 'Time',
+            guests: 'Guests',
+            tableExpanded: {
+                deleteBtn: 'Delete',
+                messageNoReservations: 'No reservations for this table',
             },
         },
     },

@@ -2,69 +2,89 @@ import Image from 'next/image';
 import ReservationForm from '@/components/reservations/ReservationForm';
 import { ICONS } from '@/helpers/constants/icons/icons';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-// Jeśli używasz ikon od Shadcn, polecam dodać strzałkę
 import { formatDate } from '@/helpers/utils/dates';
 import useLanguage from '@/helpers/hooks/useLanguage';
 import { useReservationContext } from '@/providers/ReservationsContext';
 import { Skeleton } from '@/components/ui/skeleton';
+import languagePacks from '@/helpers/constants/languagePacks';
+import { AreaReservation } from '@/helpers/queries/areas/useAreasQuery';
+
+interface ExpandableTableRowProps {
+    tableId: string;
+    tableName: string;
+    reservations?: AreaReservation[];
+    forceOpen?: boolean;
+}
 
 const ExpandableTableRow = ({
     tableId,
     tableName,
     reservations,
-}: {
-    tableId: string;
-    tableName: string;
-    reservations?: { peopleCount: number; time: string }[];
-}) => {
-    const [isOpen, setIsOpen] = useState(false);
+}: ExpandableTableRowProps) => {
+    const [isOpenTable, setIsOpenTable] = useState(false);
+
     const { language } = useLanguage();
 
-    // Pobieramy akcję z Contextu
+    const {
+        createReservationPage: {
+            reservationsList: {
+                tableExpanded: { messageNoReservations },
+            },
+        },
+    } = languagePacks[language];
+
     const {
         addLocalReservation,
         updateForm,
         form: { date, time, peopleCount, selectedTableId },
-        setHasUnsavedChanges,
+        removeLocalReservation,
     } = useReservationContext();
 
-    // Sprawdzamy czy ten stolik jest aktualnie kliknięty do dodawania
-    // const isSelectedForAdding = selectedTableId === tableId;
+    // Change table name to table id to check if is selected
 
-    const addTableReservation = () => {
+    const isSelected = selectedTableId === tableName;
+
+    // Add reservation alert if date, time or peopleCount is missing
+
+    const addTableReservation = (e: React.MouseEvent) => {
+        e.stopPropagation();
         if (!date || !time || !peopleCount) {
             alert('Proszę uzupełnić datę, godzinę i liczbę osób');
             return;
         }
+
         updateForm('selectedTableId', tableId);
         addLocalReservation(tableId, tableName);
 
-        setIsOpen(true);
+        setIsOpenTable(true);
     };
+
+    useEffect(() => {
+        if (isSelected) {
+            setIsOpenTable(true);
+        }
+    }, [isSelected]);
 
     return (
         <div className="border-b border-gray-100 last:border-0">
             <div
-                onClick={() => setIsOpen(!isOpen)}
-                className={`grid grid-cols-3 px-6 py-3 cursor-pointer transition-colors text-sm items-center ${isOpen ? 'bg-primary text-white' : 'bg-white text-black'}`}
+                onClick={() => setIsOpenTable(!isOpenTable)}
+                className={`grid grid-cols-3 px-6 py-3 cursor-pointer transition-colors text-sm items-center ${isOpenTable ? 'bg-primary text-white' : 'bg-white text-black'}`}
             >
                 <div className="flex items-center gap-2 font-medium col-start-1">
                     {tableName}
                 </div>
                 <div className="col-start-3 flex justify-end">
                     <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            addTableReservation();
-                        }}
-                        className={`${isOpen ? 'bg-white' : 'bg-primary'} w-6 h-6 flex items-center justify-center rounded-md transition-all z-10`}
+                        onClick={addTableReservation}
+                        className={`${isOpenTable ? 'bg-white' : 'bg-primary'} w-6 h-6 flex items-center justify-center rounded-md transition-all z-10`}
                     >
                         <Image
                             className="w-4"
                             src={
-                                isOpen
+                                isOpenTable
                                     ? ICONS.ADD_CIRCLE
                                     : ICONS.ADD_CIRCLE_WHITE
                             }
@@ -74,9 +94,12 @@ const ExpandableTableRow = ({
                 </div>
             </div>
 
-            {isOpen &&
-                reservations?.map((res, index) => (
-                    <div className="bg-[#E6E6E6] px-8 py-2 text-sm text-gray-600 border-t border-gray-100 shadow-inner grid grid-cols-3 ">
+            {isOpenTable &&
+                reservations?.map((res) => (
+                    <div
+                        className="bg-[#E6E6E6] px-8 py-2 text-sm text-gray-600 border-t border-gray-100 shadow-inner grid grid-cols-4"
+                        key={res.id}
+                    >
                         <div className="text-left">
                             <p className="text-xs">{tableName}</p>
                         </div>
@@ -93,11 +116,26 @@ const ExpandableTableRow = ({
                                 }
                             </p>
                         </div>
+                        <div className="flex justify-end">
+                            <button
+                                onClick={() => {
+                                    removeLocalReservation(tableId, res.id);
+                                }}
+                                className="text-red-500 hover:text-red-700"
+                            >
+                                <Image
+                                    src={ICONS.DELETE}
+                                    alt="delete"
+                                    className="w-3"
+                                />
+                            </button>
+                        </div>
                     </div>
                 ))}
-            {isOpen && reservations?.length === 0 && (
+
+            {isOpenTable && reservations?.length === 0 && (
                 <div className="bg-[#E6E6E6] px-8 py-2 text-sm text-gray-600 border-t border-gray-100 shadow-inner">
-                    <p className="text-xs italic">Brak rezerwacji</p>
+                    <p className="text-xs italic">{messageNoReservations}</p>
                 </div>
             )}
         </div>
@@ -106,21 +144,39 @@ const ExpandableTableRow = ({
 
 const MODAL_WIDTH = '830px';
 
-const UpsertReservation = ({ onClose }: { onClose: () => void }) => {
-    const [activeTabValue, setActiveTabValue] = useState(
-        '0209c7a5-4f60-4b33-894a-4a7002eadfbb'
-    );
+const UpsertReservation = () => {
+    const [activeTabValue, setActiveTabValue] = useState('');
+    const { language } = useLanguage();
 
-    // Zaciągamy z Contextu to co potrzebne
-    const { localAreas, isLoading, isFetching } = useReservationContext();
+    const {
+        createReservationPage: {
+            reservationsList: { guests, time, table },
+        },
+    } = languagePacks[language];
 
-    // if (isLoading) {
-    //     return (
-    //         <div className="p-8 text-center w-full">
-    //             Ładowanie stref i stolików...
-    //         </div>
-    //     );
-    // }
+    const {
+        localAreas,
+        isFetching,
+        form: { selectedTableId },
+    } = useReservationContext();
+
+    useEffect(() => {
+        if (!activeTabValue && localAreas?.length > 0) {
+            setActiveTabValue(localAreas[0].id);
+        }
+    }, [localAreas, activeTabValue]);
+
+    useEffect(() => {
+        if (!selectedTableId || !localAreas?.length) return;
+
+        const foundArea = localAreas.find((area) =>
+            area.tables.some((table) => table.id === selectedTableId)
+        );
+
+        if (foundArea && foundArea.id !== activeTabValue) {
+            setActiveTabValue(foundArea.id);
+        }
+    }, [selectedTableId, localAreas, activeTabValue]);
 
     return (
         <div
@@ -135,7 +191,11 @@ const UpsertReservation = ({ onClose }: { onClose: () => void }) => {
 
             <div className="w-1/2 bg-white mt-[0.4rem] h-full rounded-tr-2xl rounded-br-2xl border-l border-gray-100 overflow-scroll">
                 {isFetching && <Skeleton></Skeleton>}
-                <Tabs defaultValue={activeTabValue} className="">
+                <Tabs
+                    value={activeTabValue}
+                    onValueChange={setActiveTabValue}
+                    className=""
+                >
                     <TabsList className="flex w-full p-0 justify-start flex-wrap bg-gray-100/50 rounded-lg h-full">
                         {localAreas?.map(({ name, id }) => (
                             <TabsTrigger
@@ -152,28 +212,11 @@ const UpsertReservation = ({ onClose }: { onClose: () => void }) => {
                                 {name}
                             </TabsTrigger>
                         ))}
-                        {/* {tabsMock.map(({ label, value }) => (
-                            <TabsTrigger
-                                key={value}
-                                onClick={() => setActiveTabValue(value)}
-                                value={value}
-                                className="
-                                    flex-1 px-6 py-2 rounded-none text-xs
-                                    text-black transition-all duration-200
-                                    hover:bg-gray-200/50 hover:text-gray-900
-                                    data-[state=active]:bg-primary
-                                    data-[state=active]:text-white 
-                                    data-[state=active]:shadow-sm
-                                "
-                            >
-                                {label}
-                            </TabsTrigger>
-                        ))} */}
                     </TabsList>
                     <div className="grid grid-cols-3 bg-primary text-white px-6 py-2  text-xs font-medium">
-                        <div>Stolik</div>
-                        <div className="text-center">Ilość osób</div>
-                        <div className="text-right">Godzina</div>
+                        <div>{table}</div>
+                        <div className="text-center">{guests}</div>
+                        <div className="text-right">{time}</div>
                     </div>
 
                     {localAreas?.map((area) => (
@@ -187,6 +230,7 @@ const UpsertReservation = ({ onClose }: { onClose: () => void }) => {
                                     tableId={table.id}
                                     key={table.id}
                                     tableName={table.name}
+                                    forceOpen={selectedTableId === table.id}
                                     reservations={table.reservations}
                                 />
                             ))}

@@ -55,9 +55,14 @@ const Reservations = () => {
         },
 
         {
-            value: 'guests',
-            iconActive: ICONS.USER_WHITE,
-            icon: ICONS.USER,
+            value: 'occupatied',
+            iconActive: ICONS.TABLE_WHITE_OCCUPIED,
+            icon: ICONS.TABLE_OCCUPIED,
+        },
+        {
+            value: 'free',
+            iconActive: ICONS.FREE_TABLE_WHITE,
+            icon: ICONS.FREE_TABLE,
         },
     ];
 

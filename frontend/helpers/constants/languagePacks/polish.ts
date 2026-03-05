@@ -38,6 +38,7 @@ const plPack: languagePack = {
         reservationCard: {
             totalGuests: 'Liczba osób',
             phone: 'Nr telefonu',
+            table: 'Stolik',
         },
     },
     createReservationPage: {
@@ -61,6 +62,15 @@ const plPack: languagePack = {
                 date: 'Proszę podać poprawną datę',
                 time: 'Proszę podać poprawną godzinę',
                 phoneNumber: 'Proszę podać poprawny 9-cyfrowy numer telefonu',
+            },
+        },
+        reservationsList: {
+            table: 'Stolik',
+            time: 'Godziina',
+            guests: 'Goście',
+            tableExpanded: {
+                deleteBtn: 'Usuń',
+                messageNoReservations: 'Brak rezerwacji',
             },
         },
     },

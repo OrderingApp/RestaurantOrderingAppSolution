@@ -1,4 +1,5 @@
 'use client';
+
 import React, {
     createContext,
     useContext,
@@ -6,25 +7,40 @@ import React, {
     useEffect,
     ReactNode,
 } from 'react';
-import useQueryAreas from '@/helpers/queries/areas/useAreasQuery';
+import useQueryAreas, {
+    Area,
+    AreaReservation,
+} from '@/helpers/queries/areas/useAreasQuery';
+import { Reservation } from '@/helpers/queries/reservations/useQueryReservations';
+import { parseIsoDateAndTime } from '@/helpers/utils/dates';
+
+export interface Table {
+    id: string;
+    name: string;
+    reservations?: Reservation[];
+}
+export interface ReservationForm {
+    date: string;
+    time: string | null;
+    peopleCount: number | null;
+    selectedTableId: string | null;
+    reservationId: string | null;
+}
 
 interface ReservationContextType {
-    // Dane i ładowanie
-    localAreas: any[];
+    localAreas: Area[];
     isLoading: boolean;
     isFetching: boolean;
-    // Stan formularza
-    form: {
-        date: string;
-        time: string;
-        peopleCount: number;
-        selectedTableId: string | null;
-    };
     hasUnsavedChanges: boolean;
-    // Funkcje
-    updateForm: (field: string, value: any) => void;
+    form: ReservationForm;
+    updateForm: <K extends keyof ReservationForm>(
+        field: K,
+        value: ReservationForm[K]
+    ) => void;
     addLocalReservation: (tableId: string, tableName: string) => void;
+    removeLocalReservation: (tableId: string, reservationId: string) => void;
     clearLocalReservations: () => void;
+    updateReservationFromDb: (reservation: AreaReservation) => void;
     setHasUnsavedChanges: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -32,66 +48,119 @@ const ReservationContext = createContext<ReservationContextType | undefined>(
     undefined
 );
 
-export const ReservationProvider = ({ children }: { children: ReactNode }) => {
-    // 1. Grupujemy dane formularza w jeden obiekt state
-    const [form, setForm] = useState({
-        date: new Date().toISOString().split('T')[0],
-        time: null,
-        peopleCount: null,
-        selectedTableId: null as string | null,
-    });
+const INITIAL_FORM_STATE: ReservationForm = {
+    date: new Date().toISOString().split('T')[0],
+    time: null,
+    peopleCount: null,
+    selectedTableId: null,
+    reservationId: null,
+};
 
-    const [localAreas, setLocalAreas] = useState<any[]>([]);
+export const ReservationProvider = ({ children }: { children: ReactNode }) => {
+    const [form, setForm] = useState<ReservationForm>(INITIAL_FORM_STATE);
+    const [localAreas, setLocalAreas] = useState<Area[]>([]);
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-    // Zapytanie reaguje na form.date
-    const { data: dbAreas, isLoading, isFetching } = useQueryAreas(form.date);
+    const {
+        data: dbAreas,
+        isLoading,
+        isFetching,
+    } = useQueryAreas({ date: form.date });
 
     useEffect(() => {
         if (dbAreas) setLocalAreas(dbAreas);
     }, [dbAreas]);
 
-    // 2. Jedna funkcja do aktualizacji dowolnego pola w formularzu
-    const updateForm = (field: string, value: any) => {
-        setForm((prev) => ({ ...prev, [field]: value }));
-        // Jeśli zmieniamy datę, warto zresetować zaznaczony stolik
-        if (field === 'date')
-            setForm((prev) => ({
-                ...prev,
-                date: value,
-                selectedTableId: null,
-            }));
+    const updateForm = <K extends keyof ReservationForm>(
+        field: K,
+        value: ReservationForm[K]
+    ) => {
+        setForm((prev) => {
+            const newState = { ...prev, [field]: value };
+            if (field === 'date') {
+                newState.selectedTableId = null;
+            }
+            return newState;
+        });
     };
 
-    // 3. Logika dodawania rezerwacji korzysta z aktualnego stanu 'form'
     const addLocalReservation = (tableId: string, tableName: string) => {
-        const newRes = {
-            id: `temp-${Date.now()}`,
+        const currentReservationId =
+            form.reservationId || 'temp-draft-reservation';
+
+        const newReservation: Reservation = {
+            id: currentReservationId,
             name: tableName,
+            phoneNumber: '',
             scheduledFor: `${form.date}T${form.time}:00`,
-            capacityNeeded: form.peopleCount,
-            tableId,
+            capacityNeeded: form.peopleCount!,
+            tableName: tableName,
         };
 
-        setLocalAreas((prev) =>
-            prev.map((area) => ({
+        setLocalAreas((prevAreas) =>
+            prevAreas.map((area) => ({
                 ...area,
-                tables: area.tables.map((table: any) =>
+                tables: area.tables.map((table) => {
+                    const cleanedReservations = (
+                        table.reservations || []
+                    ).filter((res) => res.id !== currentReservationId);
+
+                    if (table.id === tableId) {
+                        return {
+                            ...table,
+                            reservations: [
+                                ...cleanedReservations,
+                                newReservation,
+                            ],
+                        };
+                    }
+
+                    return { ...table, reservations: cleanedReservations };
+                }),
+            }))
+        );
+
+        updateForm('selectedTableId', tableId);
+        setHasUnsavedChanges(true);
+    };
+
+    const removeLocalReservation = (tableId: string, reservationId: string) => {
+        setLocalAreas((prevAreas) =>
+            prevAreas.map((area) => ({
+                ...area,
+                tables: area.tables.map((table) =>
                     table.id === tableId
                         ? {
                               ...table,
-                              reservations: [
-                                  ...(table.reservations || []),
-                                  newRes,
-                              ],
+                              reservations: (table.reservations || []).filter(
+                                  (res) => res.id !== reservationId
+                              ),
                           }
                         : table
                 ),
             }))
         );
-
-        setForm((prev) => ({ ...prev, selectedTableId: tableId }));
         setHasUnsavedChanges(true);
+    };
+
+    const updateReservationFromDb = (reservation: AreaReservation) => {
+        if (!reservation) {
+            setForm({
+                ...INITIAL_FORM_STATE,
+                date: new Date().toISOString().split('T')[0],
+            });
+            return;
+        }
+
+        const { date, time } = parseIsoDateAndTime(reservation.scheduledFor);
+
+        setForm({
+            date,
+            time,
+            peopleCount: reservation.capacityNeeded,
+            selectedTableId: reservation.tableName,
+            reservationId: reservation.id,
+        });
     };
 
     const clearLocalReservations = () => {
@@ -113,6 +182,8 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
                 addLocalReservation,
                 setHasUnsavedChanges,
                 clearLocalReservations,
+                removeLocalReservation,
+                updateReservationFromDb,
             }}
         >
             {children}

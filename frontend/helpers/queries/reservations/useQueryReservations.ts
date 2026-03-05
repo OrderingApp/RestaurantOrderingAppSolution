@@ -3,14 +3,15 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchWithParams } from '@/helpers/utils/utils';
 import { Reservations } from '@/helpers/utils/queryKeys';
 
+// Change tableName to tableId
 export interface Reservation {
     id: string;
     phoneNumber: string;
     name: string;
     scheduledFor: string;
     capacityNeeded: number;
-    isAssigned: number;
-    tableId: string | null;
+    isAssigned?: number;
+    tableName: string | null;
 }
 
 const useQueryReservations = (id: string) =>

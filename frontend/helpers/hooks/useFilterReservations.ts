@@ -39,9 +39,15 @@ const useFilterReservations = (date: string) => {
         });
     }
 
-    if (filterBy === 'guests') {
-        filteredReservations = filteredReservations.sort(
-            (a, b) => b.capacityNeeded - a.capacityNeeded
+    if (filterBy === 'occupatied') {
+        filteredReservations = filteredReservations.filter(
+            (item) => item.tableName !== null
+        );
+    }
+
+    if (filterBy === 'free') {
+        filteredReservations = filteredReservations.filter(
+            (item) => item.tableName === null
         );
     }
 

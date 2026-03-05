@@ -4,7 +4,6 @@ import { cn } from '@/lib/utils';
 export interface ItemCardProps {
     title: string;
     subtitle?: string;
-    label?: string;
     variant: keyof typeof itemCardStyles.variants;
     onClick?: () => void;
     children: React.ReactNode;
@@ -15,7 +14,6 @@ export interface ItemCardProps {
 const ItemCard = ({
     title,
     subtitle,
-    label,
     variant,
     onClick,
     children,
@@ -23,8 +21,6 @@ const ItemCard = ({
     variantClassName,
 }: ItemCardProps) => {
     const styles = itemCardStyles.variants[variant];
-
-    
 
     return (
         <li>
@@ -44,9 +40,7 @@ const ItemCard = ({
                         )}
                     >
                         <p className="text-[11px]">{title}</p>
-                        {label && (
-                            <p className="text-xs text-center ">{label}</p>
-                        )}
+
                         {subtitle && <p className="text-[11px]">{subtitle}</p>}
                     </div>
 

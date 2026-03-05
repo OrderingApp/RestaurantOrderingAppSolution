@@ -7,12 +7,12 @@ export enum variantTableMap {
 export const itemCardStyles = {
     variants: {
         reservation: {
-            container: 'border-[#2C5364] border-2',
-            appearance: 'bg-[#2C5364] text-white',
+            container: 'border-[#CD5700] border-2',
+            appearance: 'bg-[#CD5700] text-white',
         },
         reservationOccupied: {
-            container: 'border-[#C70039] border-2',
-            appearance: 'bg-[#C70039] text-white',
+            container: 'border-[#2C5364] border-2',
+            appearance: 'bg-[#2C5364] text-white',
         },
         [variantTableMap.ACTIVE]: {
             container: 'border-[#008080] border-2',

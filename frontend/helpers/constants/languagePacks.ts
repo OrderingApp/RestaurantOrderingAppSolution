@@ -46,6 +46,7 @@ export interface languagePack {
         reservationCard: {
             totalGuests: string;
             phone: string;
+            table: string;
         };
     };
     createReservationPage: {
@@ -60,6 +61,15 @@ export interface languagePack {
                     min: string;
                     max: string;
                 };
+            };
+        };
+        reservationsList: {
+            table: string;
+            time: string;
+            guests: string;
+            tableExpanded: {
+                deleteBtn: string;
+                messageNoReservations: string;
             };
         };
     };
