@@ -35,6 +35,7 @@ const ExpandableTableRow = ({
         },
     } = languagePacks[language];
 
+
     const {
         addLocalReservation,
         updateForm,
