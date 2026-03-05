@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { cn } from '@/lib/utils';
 
@@ -11,16 +11,18 @@ import { CURRENCIES, ORDER_TYPES } from '@/helpers/constants/constants';
 import OverviewModal from '@/components/shared/modals/OverviewModal';
 import CreateOrder from '../../shared/modals/CreateOrder';
 import useQueryOrders from '@/helpers/queries/orders/useQueryOrders';
-import useQueryTables from '@/helpers/queries/tables/useQueryTables';
+import useQueryAreas from '@/helpers/queries/areas/useAreasQuery';
 import { OrdersItems } from '@/helpers/utils/queryKeys';
 import { useLanguage } from '@/providers/LanguageProvider';
 import languagePacks from '@/helpers/constants/languagePacks';
+import { getAggregatedDineInOrdersForTable } from '@/helpers/utils/orderTransforms';
 
 const Tables = () => {
     const { language } = useLanguage();
     const [isCreateOrderModalOpen, setIsCreateOrderModalOpen] = useState(false);
     const [isPanning, setIsPanning] = useState(false);
     const [currentTableId, setCurrentTableId] = useState<string | null>(null);
+    const [currentAreaId, setCurrentAreaId] = useState<string | null>(null);
 
     const toggleCreateOrderModal = (tableId?: string | Event) => {
         // sometimes this is used as an onClick handler and receives the click event
@@ -32,28 +34,27 @@ const Tables = () => {
     const { data: allOrders } = useQueryOrders({
         queryKeys: [OrdersItems.BY_TYPE, ORDER_TYPES.DINEIN],
     });
-    const { data: tables } = useQueryTables();
+    const { data: areas = [] } = useQueryAreas();
 
-    const dineInOrders = useMemo(
-        () =>
-            (allOrders || []).filter(
-                (o) =>
-                    o.orderType.toLowerCase() ===
-                    ORDER_TYPES.DINEIN.toLowerCase()
-            ),
-        [allOrders]
-    );
+    const activeAreaId =
+        currentAreaId && areas.some((area) => area.id === currentAreaId)
+            ? currentAreaId
+            : (areas[0]?.id ?? '');
 
-    // map currentTableId to backend table guid
+    const selectedArea = areas.find((area) => area.id === activeAreaId) ?? null;
+    const tables = selectedArea?.tables ?? [];
+
     const selectedTableGuid = currentTableId
         ? tables?.find((t) => t.id === currentTableId)?.id
         : undefined;
 
-    const ordersForTable = selectedTableGuid
-        ? dineInOrders.filter((o) => o.tableId === selectedTableGuid)
-        : [];
+    const ordersForTable = getAggregatedDineInOrdersForTable(
+        allOrders || [],
+        selectedTableGuid
+    );
 
     const { detailsAside } = languagePacks[language];
+
     const receiptLabel = detailsAside.receipt;
     const tableName =
         currentTableId && tables
@@ -72,14 +73,12 @@ const Tables = () => {
                 name: it.menuItem.name,
                 price: it.menuItem.price,
                 currency: 'pln' as keyof typeof CURRENCIES,
-                quantity: 1,
+                quantity: it.quantity,
                 onClick: () => console.log(`item ${it.menuItem.name} clicked`),
             })),
         })),
         onAddNewOrder: toggleCreateOrderModal,
-        buttons: detailsMock.buttons?.filter(
-            (b) => b.children !== 'otwórz rachunek'
-        ),
+        buttons: detailsMock.buttons,
     };
 
     return (
@@ -90,10 +89,17 @@ const Tables = () => {
                 isBottomAsideShown={true}
             >
                 <div className="flex flex-col h-full">
-                    <TablesHeader onTabChange={console.log} />
+                    <TablesHeader
+                        tabs={areas}
+                        activeTabValue={activeAreaId}
+                        onTabChange={(newAreaId) => {
+                            setCurrentAreaId(newAreaId);
+                            setCurrentTableId(null);
+                        }}
+                    />
                     <section className="relative h-full max-h-[559px] z-30">
                         <TransformWrapper
-                            initialScale={0.55}
+                            initialScale={0.65}
                             minScale={0.25}
                             maxScale={1.25}
                             centerOnInit={true}
@@ -113,9 +119,8 @@ const Tables = () => {
                                     {tables?.map((table) => (
                                         <li key={table.id}>
                                             <Table
-                                                id={table.id}
-                                                name={`${detailsAside.table} ${table.name}`}
-                                                capacity={table.capacity}
+                                                table={table}
+                                                orders={allOrders || []}
                                                 onSelect={(id) =>
                                                     setCurrentTableId(id)
                                                 }
@@ -143,185 +148,15 @@ const Tables = () => {
     );
 };
 
-const items = [
-    {
-        id: '1st',
-        name: 'Rachunek 1',
-        price: 33,
-        currency: 'pln' as keyof typeof CURRENCIES,
-        nestedItems: [
-            {
-                name: 'rosa 1',
-                price: 33,
-                currency: 'pln' as keyof typeof CURRENCIES,
-                quantity: 1,
-                onClick: () => {
-                    console.log(`item 1 clicked`);
-                },
-                isServed: true,
-            },
-            {
-                name: 'rosa 2',
-                price: 33,
-                currency: 'pln' as keyof typeof CURRENCIES,
-                quantity: 2,
-                annotation: ['+mozarella', '-mozzarella', '+mozarella'],
-                onClick: () => {
-                    console.log(`item 2 clicked`);
-                },
-            },
-            {
-                name: 'pizza Margheritta',
-                price: 33,
-                currency: 'pln' as keyof typeof CURRENCIES,
-                quantity: 1,
-                onClick: () => {
-                    console.log(`item 3 clicked`);
-                },
-                isServed: true,
-            },
-            {
-                name: 'rosa 3',
-                price: 33,
-                currency: 'pln' as keyof typeof CURRENCIES,
-                quantity: 2,
-                annotation: ['+mozarella', '-mozzarella'],
-                onClick: () => {
-                    console.log(`item 4 clicked`);
-                },
-            },
-        ],
-    },
-    {
-        id: '2nd',
-        name: 'Rachunek 2',
-        price: 33,
-        currency: 'pln' as keyof typeof CURRENCIES,
-        nestedItems: [
-            {
-                name: 'rosa 1',
-                price: 33,
-                currency: 'pln' as keyof typeof CURRENCIES,
-                quantity: 1,
-                onClick: () => {
-                    console.log(`item 1 clicked`);
-                },
-                isServed: true,
-            },
-            {
-                name: 'rosa 2',
-                price: 33,
-                currency: 'pln' as keyof typeof CURRENCIES,
-                quantity: 2,
-                annotation: ['+mozarella', '-mozzarella', '+mozarella'],
-                onClick: () => {
-                    console.log(`item 2 clicked`);
-                },
-            },
-            {
-                name: 'pizza Margheritta',
-                price: 33,
-                currency: 'pln' as keyof typeof CURRENCIES,
-                quantity: 1,
-                onClick: () => {
-                    console.log(`item 3 clicked`);
-                },
-                isServed: true,
-            },
-            {
-                name: 'rosa 3',
-                price: 33,
-                currency: 'pln' as keyof typeof CURRENCIES,
-                quantity: 2,
-                annotation: ['+mozarella', '-mozzarella'],
-                onClick: () => {
-                    console.log(`item 4 clicked`);
-                },
-            },
-        ],
-    },
-    {
-        id: '3rd',
-        name: 'Rachunek 3',
-        price: 33,
-        currency: 'pln' as keyof typeof CURRENCIES,
-        nestedItems: [
-            {
-                name: 'rosa 1',
-                price: 33,
-                currency: 'pln' as keyof typeof CURRENCIES,
-                quantity: 1,
-                onClick: () => {
-                    console.log(`item 1 clicked`);
-                },
-                isServed: true,
-            },
-            {
-                name: 'rosa 2',
-                price: 33,
-                currency: 'pln' as keyof typeof CURRENCIES,
-                quantity: 2,
-                annotation: ['+mozarella', '-mozzarella', '+mozarella'],
-                onClick: () => {
-                    console.log(`item 2 clicked`);
-                },
-            },
-            {
-                name: 'pizza Margheritta',
-                price: 33,
-                currency: 'pln' as keyof typeof CURRENCIES,
-                quantity: 1,
-                onClick: () => {
-                    console.log(`item 3 clicked`);
-                },
-                isServed: true,
-            },
-            {
-                name: 'rosa 3',
-                price: 33,
-                currency: 'pln' as keyof typeof CURRENCIES,
-                quantity: 2,
-                annotation: ['+mozarella', '-mozzarella'],
-                onClick: () => {
-                    console.log(`item 4 clicked`);
-                },
-            },
-        ],
-    },
-];
-
-const mockReservationCards = [
-    {
-        scheduledFor: '2025-08-10T20:30:00Z',
-        name: 'Bob The Builder',
-        capacityNeeded: 2,
-        phoneNumber: '+15559876543',
-        onClick: () => console.log('Clicked reservation 2'),
-        className: 'bg-blue-50',
-        id: 'res-005',
-        isAssigned: 1,
-        tableId: 'Tbl-VIP',
-    },
-];
-
-const buttons = [
-    {
-        children: 'otwórz rachunek',
-        onClick: () => console.log('otworz clicked'),
-    },
-    { children: 'zamknij rachunek' },
-];
+const buttons = [{ children: 'zamknij rachunek' }];
 
 const detailsMock = {
-    title: 'stolik b2',
-    items,
     served: true,
     buttons: buttons,
-    onAddNewOrder: () => console.log('essa'),
 };
 
 const bottomMock = {
-    reservations: mockReservationCards,
+    reservations: [],
 };
 
 export default Tables;

@@ -1,12 +1,54 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { fetchWithParams } from '@/helpers/utils/utils';
+import { BACKEND_PATHS } from '@/helpers/constants/constants';
 import { Areas } from '@/helpers/utils/queryKeys';
+import { fetchWithParams } from '@/helpers/utils/utils';
 
-const useQueryAreas = (id: string) =>
+export enum TABLE_STATUSES {
+    Available = 'Available',
+    Reserved = 'Reserved',
+    Ongoing = 'Ongoing',
+    PendingServingOrderItems = 'PendingServingOrderItems',
+    PendingPayment = 'PendingPayment',
+    Closed = 'Closed',
+}
+
+export type TableStatus = TABLE_STATUSES;
+
+export interface AreaReservation {
+    id: string;
+    phoneNumber: string;
+    name: string;
+    scheduledFor: string;
+    capacityNeeded: number;
+}
+
+export interface AreaTable {
+    id: string;
+    name: string;
+    capacity: number;
+    isPrepared: boolean;
+    reservations: AreaReservation[];
+    status: TableStatus;
+}
+
+export interface Area {
+    id: string;
+    name: string;
+    isUsed: boolean;
+    isDeleted: boolean;
+    tables: AreaTable[];
+}
+
+const useQueryAreas = (id?: string) =>
     useQuery({
-        queryKey: [Areas.All],
-        queryFn: () => fetchWithParams('areas', id),
+        queryKey: id ? [Areas.All, Areas.BY_ID, id] : [Areas.All],
+        queryFn: () =>
+            fetchWithParams(BACKEND_PATHS.Areas, id).then((response) =>
+                Array.isArray(response)
+                    ? (response as Area[])
+                    : [response as Area]
+            ),
     });
 
 export default useQueryAreas;

@@ -39,10 +39,22 @@ function PaginationItem({ ...props }: React.ComponentProps<'li'>) {
 
 type PaginationLinkProps = {
     isActive?: boolean;
-    previousBtnName?: string;
-    nextBtnName?: string;
 } & Pick<React.ComponentProps<typeof Button>, 'size'> &
     React.ComponentProps<'a'>;
+
+type PaginationPreviousProps = Omit<
+    React.ComponentProps<typeof PaginationLink>,
+    'children' | 'aria-label'
+> & {
+    previousBtnName?: string;
+};
+
+type PaginationNextProps = Omit<
+    React.ComponentProps<typeof PaginationLink>,
+    'children' | 'aria-label'
+> & {
+    nextBtnName?: string;
+};
 
 function PaginationLink({
     className,
@@ -71,17 +83,18 @@ function PaginationPrevious({
     className,
     previousBtnName,
     ...props
-}: React.ComponentProps<typeof PaginationLink>) {
+}: PaginationPreviousProps) {
+    const label = previousBtnName ?? 'Previous';
+
     return (
         <PaginationLink
-            aria-label={previousBtnName}
+            aria-label={label}
             size="default"
             className={cn('gap-1 px-2.5 sm:pl-2.5', className)}
-            previousBtnName={previousBtnName}
             {...props}
         >
             <ChevronLeftIcon />
-            <span className="hidden sm:block">{previousBtnName}</span>
+            <span className="hidden sm:block">{label}</span>
         </PaginationLink>
     );
 }
@@ -90,16 +103,17 @@ function PaginationNext({
     className,
     nextBtnName,
     ...props
-}: React.ComponentProps<typeof PaginationLink>) {
+}: PaginationNextProps) {
+    const label = nextBtnName ?? 'Next';
+
     return (
         <PaginationLink
-            aria-label={nextBtnName}
+            aria-label={label}
             size="default"
             className={cn('gap-1 px-2.5 sm:pr-2.5', className)}
-            nextBtnName={nextBtnName}
             {...props}
         >
-            <span className="hidden sm:block">{nextBtnName}</span>
+            <span className="hidden sm:block">{label}</span>
             <ChevronRightIcon />
         </PaginationLink>
     );
