@@ -37,7 +37,7 @@ const OverviewModal = ({
             {isOpen && (
                 <motion.div
                     key="overview-modal"
-                    className="absolute top-0 left-0 pl-4 h-[768px] bg-light-gray w-full rounded-3xl overflow-x-hidden z-50"
+                    className="absolute top-0 left-0 pl-4 h-full bg-light-gray w-full rounded-3xl overflow-x-hidden z-50"
                     {...motionConfig}
                 >
                     {children}

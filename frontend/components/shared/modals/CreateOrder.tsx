@@ -271,12 +271,14 @@ const CreateOrder = ({
         toggleModal();
     };
 
-    // Compute if accept button should be enabled
+    // Compute if accept button should be enabled:
+    // only enable when there are unsynced changes (pending items) in any bill.
+    // This keeps it disabled when nothing changed, or when a new bill is empty.
     const selectedBillData = localBills.find((b) => b.id === selectedBill);
-    const itemsInSelectedBill = selectedBillData?.orderItems.length ?? 0;
-    const pendingInSelectedBill = selectedBillData?.pendingItems.length ?? 0;
-    const canAcceptBill =
-        selectedBill && (itemsInSelectedBill > 0 || pendingInSelectedBill > 0);
+    const hasPendingChanges = localBills.some(
+        (bill) => bill.pendingItems.length > 0
+    );
+    const canAcceptBill = !!selectedBill && hasPendingChanges;
 
     const buttons: ButtonProps[] = [
         {
