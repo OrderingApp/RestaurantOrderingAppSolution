@@ -33,55 +33,6 @@ const useOrderMutation = (
                 method = 'DELETE';
             }
 
-            // diagnostic log
-            console.log('[useOrdersMutation] mutationFn called', {
-                type,
-                orderKind,
-                id,
-                data,
-                url,
-                method,
-            });
-
-            // detect DOM nodes or circular-prone objects in data
-            const seenPaths: string[] = [];
-            const findDom = (obj: unknown, path = '', depth = 0): boolean => {
-                if (depth > 4 || obj === null || typeof obj !== 'object')
-                    return false;
-                const ctorName =
-                    obj &&
-                    (obj as { constructor?: { name?: string } }).constructor
-                        ? (obj as { constructor?: { name?: string } })
-                              .constructor!.name || ''
-                        : '';
-                if (ctorName && /HTML|Element|Node/.test(ctorName)) {
-                    seenPaths.push(path || 'root');
-                    return true;
-                }
-                try {
-                    for (const key of Object.keys(obj as object)) {
-                        if (
-                            findDom(
-                                (obj as Record<string, unknown>)[key],
-                                path ? `${path}.${key}` : key,
-                                depth + 1
-                            )
-                        )
-                            return true;
-                    }
-                } catch {
-                    // ignore traversal errors
-                }
-                return false;
-            };
-
-            if (findDom(data)) {
-                console.error(
-                    '[useOrdersMutation] Found DOM-like value in payload at paths:',
-                    seenPaths
-                );
-            }
-
             const response = await fetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
