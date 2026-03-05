@@ -1,12 +1,21 @@
+'use client';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { BACKEND_URL } from '@/helpers/constants/constants';
 import { OrdersItems } from '@/helpers/utils/queryKeys';
 import { useRouter } from 'next/navigation';
 import { Order, OrderDto, OrderKind } from '@/helpers/interfaces/orders';
 
+type UseOrderMutationOptions = {
+    redirectOnSettled?: boolean; // default true
+    onSuccess?: (data: unknown) => void;
+    onError?: (err: unknown) => void;
+};
+
 const useOrderMutation = (
     type: 'create' | 'update' | 'delete',
-    orderKind: OrderKind
+    orderKind: OrderKind,
+    options?: UseOrderMutationOptions
 ) => {
     const queryClient = useQueryClient();
     const router = useRouter();
@@ -77,13 +86,22 @@ const useOrderMutation = (
                     context.previousOrders
                 );
             }
+
+            options?.onError?.(_ as unknown);
         },
 
-        onSettled: () => {
+        onSettled: (data, error) => {
             queryClient.invalidateQueries({
                 queryKey: [OrdersItems.BY_TYPE, orderKind],
             });
-            router.push(`/orders`);
+
+            if (options?.redirectOnSettled === false) {
+                // don't redirect
+            } else {
+                router.push(`/orders`);
+            }
+
+            if (!error) options?.onSuccess?.(data as unknown);
         },
     });
 };

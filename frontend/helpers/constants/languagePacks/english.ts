@@ -10,6 +10,10 @@ const enPack: languagePack = {
         info: 'Information',
         addNewOrder: 'Add new order',
         delivery: 'Delivery',
+        receipt: 'receipt no',
+        table: 'Table',
+        noOrders: 'No orders',
+        noTableChosen: 'Please choose a table',
     },
     loginPage: {
         appName: 'order application',
@@ -76,7 +80,16 @@ const enPack: languagePack = {
                 payment: 'Table in payment process',
                 normal: 'Active table',
             },
+            descriptions: {
+                available: 'Available',
+                closed: 'Unavailable',
+            },
             balanceName: 'Balance',
+            receiptsCountName: 'Number of bills',
+            reservationName: 'Reservation',
+            personsCountName: 'Number of people',
+            hourName: 'Time',
+            reservationInName: 'Reservation in',
         },
     },
     ordersPage: {
@@ -146,6 +159,8 @@ const enPack: languagePack = {
             close: 'Close',
             discount: 'Add discount',
         },
+        confirmation: 'Added to bill',
+        error: 'Failed to add to bill',
         addOrder: 'Add',
     },
     paymentModal: {

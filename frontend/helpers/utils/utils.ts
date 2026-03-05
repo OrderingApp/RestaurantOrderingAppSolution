@@ -27,7 +27,7 @@ export const capitalizeFirstLetter = (str: string): string => {
     return str.slice(0, index) + match[0].toUpperCase() + str.slice(index + 1);
 };
 
-export const fetchWithParams = (path: `${BACKEND_PATHS}`, params: string) =>
+export const fetchWithParams = (path: `${BACKEND_PATHS}`, params = '') =>
     fetch(`${BACKEND_URL}/${path}/${params}`).then((res) => res.json());
 
 export const getPluralForm = (
