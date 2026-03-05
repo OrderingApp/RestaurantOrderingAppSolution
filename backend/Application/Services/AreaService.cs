@@ -49,7 +49,7 @@ public class AreaService(
         try
         {
             var area = await orderingContext
-                .Areas.Include(a => a.Tables)
+                .Areas.Include(a => a.Tables.OrderBy(t => t.SequenceNumber))
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (area == null)
@@ -80,6 +80,7 @@ public class AreaService(
                 .Include(a => a.Tables)
                 .ThenInclude(t => t.Reservations
                     .Where(r => r.ScheduledFor >= start && r.ScheduledFor < end))
+                .OrderBy(a => a.SequenceNumber)
                 .AsNoTracking()
                 .ToListAsync();
 

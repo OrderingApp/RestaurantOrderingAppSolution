@@ -89,6 +89,7 @@ public class TableService(
         {
             var tables = await orderingContext.Tables
                 .Include(t => t.Reservations)
+                .OrderBy(t => t.SequenceNumber)
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -155,6 +156,17 @@ public class TableService(
             var previousStatus = table.Status;
 
             table.Status = tableStatus;
+
+            // Set ActiveSince when status changes to Ongoing
+            if (tableStatus == TableStatus.Ongoing && previousStatus != TableStatus.Ongoing)
+            {
+                table.ActiveSince = DateTime.UtcNow;
+            }
+            // Clear ActiveSince when status changes away from Ongoing
+            else if (tableStatus != TableStatus.Ongoing && previousStatus == TableStatus.Ongoing)
+            {
+                table.ActiveSince = null;
+            }
 
             await orderingContext.SaveChangesAsync();
 
