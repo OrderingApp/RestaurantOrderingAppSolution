@@ -19,6 +19,13 @@ public class IngredientMappingProfile : Profile
                 dest => dest.Tags,
                 opt =>
                     opt.MapFrom(src => src.IngredientTagRels.Select(rel => rel.Tag.Name).ToList())
+            )
+            .ForMember(
+                dest => dest.Allergens,
+                opt =>
+                    opt.MapFrom(src =>
+                        src.IngredientAllergenRels.Select(rel => rel.Allergen.Name).ToList()
+                    )
             );
 
         // Map from IngredientUpdateDto to Ingredient (Only update non-null properties)

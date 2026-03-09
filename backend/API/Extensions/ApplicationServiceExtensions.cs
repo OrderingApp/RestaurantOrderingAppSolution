@@ -24,6 +24,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<ITableService, TableService>();
         services.AddScoped<IIngredientService, IngredientService>();
         services.AddScoped<IIngredientCategoryService, IngredientCategoryService>();
+        services.AddScoped<IAllergenService, AllergenService>();
         services.AddScoped<ITagService, TagService>();
         services.AddScoped<ICustomerInformationService, CustomerInformationService>();
         services.AddScoped<IReservationService, ReservationService>();

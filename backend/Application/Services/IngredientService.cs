@@ -34,6 +34,8 @@ public class IngredientService(
             var createdIngredient = await orderingContext.Ingredients
                 .Include(i => i.IngredientTagRels)
                 .ThenInclude(rel => rel.Tag)
+                .Include(i => i.IngredientAllergenRels)
+                .ThenInclude(rel => rel.Allergen)
                 .Include(i => i.Category)
                 .FirstOrDefaultAsync(i => i.Id == ingredient.Id);
 
@@ -61,6 +63,8 @@ public class IngredientService(
             var query = orderingContext 
                 .Ingredients.Include(i => i.IngredientTagRels)
                 .ThenInclude(rel => rel.Tag)
+                .Include(i => i.IngredientAllergenRels)
+                .ThenInclude(rel => rel.Allergen)
                 .Include(i => i.Category)
                 .Where(i => i.CanBeUsedAsExtra && !i.IsDeleted)
                 .AsQueryable();
@@ -120,6 +124,8 @@ public class IngredientService(
             var ingredient = await orderingContext
                 .Ingredients.Include(i => i.IngredientTagRels)
                 .ThenInclude(rel => rel.Tag)
+                .Include(i => i.IngredientAllergenRels)
+                .ThenInclude(rel => rel.Allergen)
                 .Include(i => i.Category)
                 .FirstOrDefaultAsync(i => i.Id == id);
 
@@ -144,6 +150,63 @@ public class IngredientService(
             var updatedIngredient = await orderingContext
                 .Ingredients.Include(i => i.IngredientTagRels)
                 .ThenInclude(rel => rel.Tag)
+                .Include(i => i.IngredientAllergenRels)
+                .ThenInclude(rel => rel.Allergen)
+                .Include(i => i.Category)
+                .FirstOrDefaultAsync(i => i.Id == id);
+
+            var updatedIngredientDto = mapper.Map<IngredientReadDto>(updatedIngredient);
+            return ResultDto<IngredientReadDto>.Success(updatedIngredientDto, HttpStatusCode.OK);
+        }
+        catch (Exception ex)
+        {
+            return ResultDto<IngredientReadDto>.Failure(
+                $"An error occurred: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
+        }
+    }
+
+    public async Task<ResultDto<IngredientReadDto>> AddAllergensToIngredient(
+        Guid id,
+        List<Guid> allergenIds
+    )
+    {
+        try
+        {
+            var ingredient = await orderingContext
+                .Ingredients.Include(i => i.IngredientTagRels)
+                .ThenInclude(rel => rel.Tag)
+                .Include(i => i.IngredientAllergenRels)
+                .ThenInclude(rel => rel.Allergen)
+                .Include(i => i.Category)
+                .FirstOrDefaultAsync(i => i.Id == id);
+
+            if (ingredient == null)
+                return ResultDto<IngredientReadDto>.Failure(
+                    "Ingredient not found.",
+                    HttpStatusCode.NotFound
+                );
+
+            var existingAllergens = ingredient
+                .IngredientAllergenRels.Select(rel => rel.AllergenId)
+                .ToList();
+            var newAllergens = allergenIds.Except(existingAllergens).ToList();
+
+            foreach (var allergenId in newAllergens)
+            {
+                orderingContext.IngredientAllergenRels.Add(
+                    new IngredientAllergenRel { IngredientId = id, AllergenId = allergenId }
+                );
+            }
+
+            await orderingContext.SaveChangesAsync();
+
+            var updatedIngredient = await orderingContext
+                .Ingredients.Include(i => i.IngredientTagRels)
+                .ThenInclude(rel => rel.Tag)
+                .Include(i => i.IngredientAllergenRels)
+                .ThenInclude(rel => rel.Allergen)
                 .Include(i => i.Category)
                 .FirstOrDefaultAsync(i => i.Id == id);
 
@@ -200,6 +263,7 @@ public class IngredientService(
             var ingredient = await orderingContext
                 .Ingredients.Include(i => i.MenuItemIngredientRels)
                 .Include(i => i.IngredientTagRels)
+                .Include(i => i.IngredientAllergenRels)
                 .FirstOrDefaultAsync(i => i.Id == id);
 
             if (ingredient == null)
@@ -210,6 +274,7 @@ public class IngredientService(
 
             orderingContext.MenuItemIngredientRels.RemoveRange(ingredient.MenuItemIngredientRels);
             orderingContext.IngredientTagRels.RemoveRange(ingredient.IngredientTagRels);
+            orderingContext.IngredientAllergenRels.RemoveRange(ingredient.IngredientAllergenRels);
 
             await orderingContext.SaveChangesAsync();
 

@@ -28,10 +28,12 @@ public class RestaurantOrderingContext : DbContext
     public DbSet<Table> Tables { get; set; }
     public DbSet<Area> Areas { get; set; }
     public DbSet<Tag> Tags { get; set; }
+    public DbSet<Allergen> Allergens { get; set; }
     public DbSet<Ingredient> Ingredients { get; set; }
     public DbSet<IngredientCategory> IngredientCategories { get; set; }
     public DbSet<MenuItemIngredientRel> MenuItemIngredientRels { get; set; }
     public DbSet<IngredientTagRel> IngredientTagRels { get; set; }
+    public DbSet<IngredientAllergenRel> IngredientAllergenRels { get; set; }
     public DbSet<OrderItemIngredient> OrderItemIngredients { get; set; }
     public DbSet<CustomerInformation> CustomerInformation { get; set; }
     public DbSet<Reservation> Reservations { get; set; }
@@ -203,6 +205,25 @@ public class RestaurantOrderingContext : DbContext
             .HasOne(it => it.Tag)
             .WithMany(t => t.IngredientTagRels)
             .HasForeignKey(it => it.TagId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // ✅ Many-to-Many: Ingredient and Allergen
+        modelBuilder
+            .Entity<IngredientAllergenRel>()
+            .HasKey(ia => new { ia.IngredientId, ia.AllergenId });
+
+        modelBuilder
+            .Entity<IngredientAllergenRel>()
+            .HasOne(ia => ia.Ingredient)
+            .WithMany(i => i.IngredientAllergenRels)
+            .HasForeignKey(ia => ia.IngredientId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder
+            .Entity<IngredientAllergenRel>()
+            .HasOne(ia => ia.Allergen)
+            .WithMany(a => a.IngredientAllergenRels)
+            .HasForeignKey(ia => ia.AllergenId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // ✅ IngredientCategory and Ingredient (One-to-Many), set null on delete so existing ingredients remain
