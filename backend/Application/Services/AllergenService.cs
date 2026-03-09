@@ -24,6 +24,19 @@ public class AllergenService(
     {
         try
         {
+            if (allergenCreateDto.EuNumber.HasValue)
+            {
+                var euNumberTaken = await orderingContext.Allergens.AnyAsync(a =>
+                    a.EuNumber == allergenCreateDto.EuNumber && !a.IsDeleted
+                );
+
+                if (euNumberTaken)
+                    return ResultDto<AllergenReadDto>.Failure(
+                        $"EU allergen number {allergenCreateDto.EuNumber} is already assigned to another allergen.",
+                        HttpStatusCode.Conflict
+                    );
+            }
+
             var allergen = mapper.Map<Allergen>(allergenCreateDto);
 
             await orderingContext.Allergens.AddAsync(allergen);
@@ -112,6 +125,19 @@ public class AllergenService(
                     "Allergen not found.",
                     HttpStatusCode.NotFound
                 );
+
+            if (allergenUpdateDto.EuNumber.HasValue)
+            {
+                var euNumberTaken = await orderingContext.Allergens.AnyAsync(a =>
+                    a.EuNumber == allergenUpdateDto.EuNumber && a.Id != id && !a.IsDeleted
+                );
+
+                if (euNumberTaken)
+                    return ResultDto<AllergenReadDto>.Failure(
+                        $"EU allergen number {allergenUpdateDto.EuNumber} is already assigned to another allergen.",
+                        HttpStatusCode.Conflict
+                    );
+            }
 
             mapper.Map(allergenUpdateDto, allergen);
             await orderingContext.SaveChangesAsync();

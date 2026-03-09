@@ -431,10 +431,10 @@ public class IngredientServiceTests
             {
                 Id = ingredient.Id,
                 Name = ingredient.Name,
-                Allergens = new List<string>
+                Allergens = new List<IngredientAllergenDto>
                 {
-                    AllergenTestData.GlutenName,
-                    AllergenTestData.NutsName,
+                    new() { Id = allergen1.Id, Name = AllergenTestData.GlutenName },
+                    new() { Id = allergen2.Id, Name = AllergenTestData.NutsName },
                 },
             });
 
@@ -443,7 +443,7 @@ public class IngredientServiceTests
 
         // Assert
         result.ShouldBeSuccessful(HttpStatusCode.OK);
-        result.Data!.Allergens.Should()
+        result.Data!.Allergens.Select(a => a.Name).Should()
             .Contain(new[] { AllergenTestData.GlutenName, AllergenTestData.NutsName });
 
         var updatedIngredient = await _dbContext
@@ -472,7 +472,10 @@ public class IngredientServiceTests
             {
                 Id = ingredient.Id,
                 Name = ingredient.Name,
-                Allergens = new List<string> { AllergenTestData.GlutenName },
+                Allergens = new List<IngredientAllergenDto>
+                {
+                    new() { Id = allergen.Id, Name = AllergenTestData.GlutenName },
+                },
             });
 
         // Act - try to add the same allergen again

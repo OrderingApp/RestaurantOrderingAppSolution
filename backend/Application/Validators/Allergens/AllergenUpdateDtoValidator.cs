@@ -12,5 +12,10 @@ public class AllergenUpdateDtoValidator : AbstractValidator<AllergenUpdateDto>
             .WithMessage("Allergen name must not exceed 100 characters.");
 
         RuleFor(x => x.IsUsed).NotNull().WithMessage("IsUsed flag must be specified.");
+
+        RuleFor(x => x.EuNumber)
+            .InclusiveBetween(1, 14)
+            .WithMessage("EU allergen number must be between 1 and 14.")
+            .When(x => x.EuNumber.HasValue);
     }
 }

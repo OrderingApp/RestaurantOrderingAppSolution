@@ -1,6 +1,6 @@
-namespace Application.Dtos.Allergens;
+namespace Application.Dtos.Ingredients;
 
-public class AllergenReadDto
+public class IngredientAllergenDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;

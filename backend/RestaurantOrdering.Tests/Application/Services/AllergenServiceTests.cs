@@ -42,9 +42,9 @@ public class AllergenServiceTests
     public async Task CreateAllergen_ShouldSucceed_WhenValidAllergen()
     {
         // Arrange
-        var allergen = AllergenTestData.CreateValidAllergen();
-        var dto = new AllergenCreateDto { Name = allergen.Name };
-        var readDto = new AllergenReadDto { Id = allergen.Id, Name = allergen.Name };
+        var allergen = AllergenTestData.CreateValidAllergen(euNumber: AllergenTestData.DefaultEuNumber);
+        var dto = new AllergenCreateDto { Name = allergen.Name, EuNumber = allergen.EuNumber };
+        var readDto = new AllergenReadDto { Id = allergen.Id, Name = allergen.Name, EuNumber = allergen.EuNumber };
 
         _mockMapper.Setup(m => m.Map<Allergen>(dto)).Returns(allergen);
         _mockMapper.Setup(m => m.Map<AllergenReadDto>(allergen)).Returns(readDto);
@@ -58,6 +58,7 @@ public class AllergenServiceTests
         // Assert
         result.ShouldBeSuccessful(HttpStatusCode.Created);
         result.Data!.Name.Should().Be(allergen.Name);
+        result.Data.EuNumber.Should().Be(AllergenTestData.DefaultEuNumber);
         _dbContext.Allergens.Should().ContainSingle(a => a.Name == allergen.Name);
         _mockEventHandler.Verify(
             e => e.HandleEventAsync(It.IsAny<AllergenCreatedEvent>()),
@@ -234,5 +235,77 @@ public class AllergenServiceTests
             HttpStatusCode.InternalServerError,
             "An error occurred: Database error"
         );
+    }
+
+    [Fact]
+    public async Task CreateAllergen_ShouldFail_WhenEuNumberAlreadyTaken()
+    {
+        // Arrange — persist an allergen with EU number 1 directly in the DB
+        var existing = AllergenTestData.CreateValidAllergen(euNumber: 1);
+        await _dbContext.Allergens.AddAsync(existing);
+        await _dbContext.SaveChangesAsync();
+
+        var dto = new AllergenCreateDto { Name = "Another Gluten", EuNumber = 1 };
+
+        // Act
+        var result = await _service.CreateAllergen(dto);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.HttpStatusCode.Should().Be(HttpStatusCode.Conflict);
+        result.ErrorMessage.Should().Contain("EU allergen number 1 is already assigned");
+    }
+
+    [Fact]
+    public async Task UpdateAllergen_ShouldFail_WhenEuNumberAlreadyTakenByAnotherAllergen()
+    {
+        // Arrange — two allergens, try to assign the first one's EU number to the second
+        var allergen1 = AllergenTestData.CreateValidAllergen(euNumber: 1);
+        var allergen2 = AllergenTestData.CreateValidAllergen(euNumber: null);
+        await _dbContext.Allergens.AddRangeAsync(allergen1, allergen2);
+        await _dbContext.SaveChangesAsync();
+
+        var updateDto = new AllergenUpdateDto
+        {
+            Name = allergen2.Name,
+            EuNumber = 1,   // same as allergen1
+            IsUsed = true,
+        };
+
+        // Act
+        var result = await _service.UpdateAllergen(updateDto, allergen2.Id);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.HttpStatusCode.Should().Be(HttpStatusCode.Conflict);
+        result.ErrorMessage.Should().Contain("EU allergen number 1 is already assigned");
+    }
+
+    [Fact]
+    public async Task UpdateAllergen_ShouldSucceed_WhenKeepingOwnEuNumber()
+    {
+        // Arrange — updating an allergen while keeping its own EU number must not conflict
+        var allergen = AllergenTestData.CreateValidAllergen(euNumber: 1);
+        await _dbContext.Allergens.AddAsync(allergen);
+        await _dbContext.SaveChangesAsync();
+
+        var updateDto = new AllergenUpdateDto
+        {
+            Name = "Updated Gluten",
+            EuNumber = 1,   // same number, same allergen — no conflict
+            IsUsed = true,
+        };
+
+        var updatedDto = new AllergenReadDto { Id = allergen.Id, Name = "Updated Gluten", EuNumber = 1 };
+        _mockMapper.Setup(m => m.Map(updateDto, allergen)).Callback(() => allergen.Name = updateDto.Name);
+        _mockMapper.Setup(m => m.Map<AllergenReadDto>(allergen)).Returns(updatedDto);
+        _mockMapper.Setup(m => m.Map<AllergenUpdatedEvent>(allergen)).Returns(new AllergenUpdatedEvent());
+
+        // Act
+        var result = await _service.UpdateAllergen(updateDto, allergen.Id);
+
+        // Assert
+        result.ShouldBeSuccessful(HttpStatusCode.OK);
+        result.Data!.EuNumber.Should().Be(1);
     }
 }

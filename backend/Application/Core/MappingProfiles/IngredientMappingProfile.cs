@@ -24,7 +24,14 @@ public class IngredientMappingProfile : Profile
                 dest => dest.Allergens,
                 opt =>
                     opt.MapFrom(src =>
-                        src.IngredientAllergenRels.Select(rel => rel.Allergen.Name).ToList()
+                        src.IngredientAllergenRels
+                            .Select(rel => new IngredientAllergenDto
+                            {
+                                Id = rel.Allergen.Id,
+                                Name = rel.Allergen.Name,
+                                EuNumber = rel.Allergen.EuNumber,
+                            })
+                            .ToList()
                     )
             );
 
