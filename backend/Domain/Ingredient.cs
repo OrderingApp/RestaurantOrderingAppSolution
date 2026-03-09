@@ -14,4 +14,5 @@ public class Ingredient
 
     public List<MenuItemIngredientRel> MenuItemIngredientRels { get; set; } = new(); // check if this is needed
     public List<IngredientTagRel> IngredientTagRels { get; set; } = new();
+    public List<IngredientAllergenRel> IngredientAllergenRels { get; set; } = new();
 }
