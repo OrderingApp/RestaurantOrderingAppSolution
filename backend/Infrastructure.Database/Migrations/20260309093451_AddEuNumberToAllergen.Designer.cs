@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Database.Migrations
 {
     [DbContext(typeof(RestaurantOrderingContext))]
-    [Migration("20260309085342_AddEuNumberToAllergen")]
+    [Migration("20260309093451_AddEuNumberToAllergen")]
     partial class AddEuNumberToAllergen
     {
         /// <inheritdoc />

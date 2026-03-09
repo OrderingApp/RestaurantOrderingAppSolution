@@ -10,7 +10,7 @@ public class RestaurantOrderingContextFactory
     public RestaurantOrderingContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<RestaurantOrderingContext>();
-        optionsBuilder.UseSqlite("YourConnectionStringHere"); // Replace with dynamic configuration
+        optionsBuilder.UseSqlite("Data Source=orderingapp.db");
 
         return new RestaurantOrderingContext(optionsBuilder.Options);
     }
