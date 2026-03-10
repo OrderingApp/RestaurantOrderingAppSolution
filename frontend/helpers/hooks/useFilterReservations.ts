@@ -12,7 +12,7 @@ const useFilterReservations = (date: string) => {
     const name = searchParams.get(SEARCH_PARAMS_NAMES.NAME);
     const filterBy = searchParams.get(SEARCH_PARAMS_NAMES.FILTER_BY);
 
-    const { data } = useQueryReservations(date);
+    const { data, isLoading, isError } = useQueryReservations(date);
     const { language } = useLanguage();
 
     let filteredReservations = data || [];
@@ -71,6 +71,8 @@ const useFilterReservations = (date: string) => {
         totalItems,
         ITEMS_PER_PAGE,
         totalPages,
+        isLoading,
+        isError,
     };
 };
 

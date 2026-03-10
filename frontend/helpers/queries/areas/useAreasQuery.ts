@@ -4,15 +4,13 @@ import { fetchWithParams } from '@/helpers/utils/utils';
 import { BACKEND_PATHS } from '@/helpers/constants/constants';
 import { Areas } from '@/helpers/utils/queryKeys';
 
-// Change tableName to tableId or remove it
-
 export interface AreaReservation {
     id: string;
     phoneNumber: string;
     name: string;
     scheduledFor: string;
     capacityNeeded: number;
-    tableName: string | null;
+    tableId: string;
 }
 
 export interface AreaTable {

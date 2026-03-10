@@ -64,7 +64,7 @@ const Input = ({
             className={clsx(
                 'px-4  w-40 py-2 text-black rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500',
                 inputStyles.variants[variant],
-                errors && 'bg-red-200',
+                errors && '!bg-red-200',
                 inputStyles.sizes[inputSize].input,
                 inputClassName
             )}

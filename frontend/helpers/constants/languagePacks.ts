@@ -43,19 +43,44 @@ export interface languagePack {
         reservationTitle: string;
         createReservation: string;
         reservationsList: string;
+        searchPlaceholder: string;
         reservationCard: {
             totalGuests: string;
             phone: string;
             table: string;
         };
+        errorMsg: string;
+        messageNoReservations: string;
     };
     createReservationPage: {
         createReservation: string;
         editReservation: string;
         chooseReservation: string;
+        toasts: {
+            loading: {
+                create: string;
+                update: string;
+                delete: string;
+            };
+            success: {
+                create: string;
+                update: string;
+                delete: string;
+            };
+            error: {
+                prefix: string;
+                actionFailed: string;
+                unexpected: string;
+                missingDateTimeAndGuests: string;
+            };
+        };
         form: createReservationPageFormFields & {
             submit: string;
             edit: string;
+            events: {
+                saving: string;
+                deleting: string;
+            };
             errors: Omit<createReservationPageFormFields, 'name'> & {
                 name: {
                     min: string;
@@ -159,6 +184,12 @@ export interface languagePack {
 
     discountModal: {
         disscountTitle: string;
+    };
+    alertDialog: {
+        attentionTitle: string;
+        attentionContent: string;
+        closeBtn: string;
+        confirmBtn: string;
     };
     delivertyMapModal: {
         deliveryTitle: string;

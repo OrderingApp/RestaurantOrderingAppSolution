@@ -7,10 +7,12 @@ import React, {
     useEffect,
     ReactNode,
 } from 'react';
+
 import useQueryAreas, {
     Area,
     AreaReservation,
 } from '@/helpers/queries/areas/useAreasQuery';
+
 import { Reservation } from '@/helpers/queries/reservations/useQueryReservations';
 import { parseIsoDateAndTime } from '@/helpers/utils/dates';
 
@@ -40,7 +42,7 @@ interface ReservationContextType {
     addLocalReservation: (tableId: string, tableName: string) => void;
     removeLocalReservation: (tableId: string, reservationId: string) => void;
     clearLocalReservations: () => void;
-    updateReservationFromDb: (reservation: AreaReservation) => void;
+    updateReservationFromDb: (reservation: AreaReservation | null) => void;
     setHasUnsavedChanges: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -88,13 +90,13 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
         const currentReservationId =
             form.reservationId || 'temp-draft-reservation';
 
-        const newReservation: Reservation = {
+        const newReservation: AreaReservation = {
             id: currentReservationId,
             name: tableName,
             phoneNumber: '',
             scheduledFor: `${form.date}T${form.time}:00`,
             capacityNeeded: form.peopleCount!,
-            tableName: tableName,
+            tableId: tableId,
         };
 
         setLocalAreas((prevAreas) =>
@@ -143,7 +145,7 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
         setHasUnsavedChanges(true);
     };
 
-    const updateReservationFromDb = (reservation: AreaReservation) => {
+    const updateReservationFromDb = (reservation: AreaReservation | null) => {
         if (!reservation) {
             setForm({
                 ...INITIAL_FORM_STATE,
@@ -158,7 +160,7 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
             date,
             time,
             peopleCount: reservation.capacityNeeded,
-            selectedTableId: reservation.tableName,
+            selectedTableId: reservation.tableId,
             reservationId: reservation.id,
         });
     };

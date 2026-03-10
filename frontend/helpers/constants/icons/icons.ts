@@ -24,6 +24,7 @@ import tableOccupaiedSvg from '@/public/images/svg/table.svg';
 import tableWhiteOccupaiedSvg from '@/public/images/svg/table-white.svg';
 import freeTableSvg from '@/public/images/svg/empty-table.svg';
 import freeTableWhiteSvg from '@/public/images/svg/empty-table-white.svg';
+import alertSvg from '@/public/images/svg/Alert.svg';
 
 export const ICONS = {
     USER: userSvg,
@@ -52,4 +53,5 @@ export const ICONS = {
     TABLE_WHITE_OCCUPIED: tableWhiteOccupaiedSvg,
     FREE_TABLE: freeTableSvg,
     FREE_TABLE_WHITE: freeTableWhiteSvg,
+    ALERT: alertSvg,
 } as const;

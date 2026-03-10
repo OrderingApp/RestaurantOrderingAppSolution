@@ -35,16 +35,39 @@ const plPack: languagePack = {
         reservationTitle: 'Sprawdź Rezerwacje',
         createReservation: 'Utwórz Rezerwacje',
         reservationsList: 'Lista rezerwacji',
+        searchPlaceholder: 'Wyszukaj',
         reservationCard: {
             totalGuests: 'Liczba osób',
             phone: 'Nr telefonu',
             table: 'Stolik',
         },
+        errorMsg:
+            'Wystąpił błąd podczas pobierania rezerwacji. Proszę spróbować ponownie później.',
+        messageNoReservations: 'Brak rezerwacji na ten dzień',
     },
     createReservationPage: {
         createReservation: 'Stwórz rezerwację',
         editReservation: 'Edytuj rezerwację',
         chooseReservation: 'Wybierz rezerwację',
+        toasts: {
+            loading: {
+                create: 'Tworzenie rezerwacji...',
+                update: 'Aktualizacja rezerwacji...',
+                delete: 'Usuwanie rezerwacji...',
+            },
+            success: {
+                create: 'Rezerwacja utworzona!',
+                update: 'Rezerwacja zaktualizowana!',
+                delete: 'Rezerwacja usunięta!',
+            },
+            error: {
+                prefix: 'Błąd',
+                actionFailed: 'Nie udało się wykonać akcji.',
+                unexpected: 'Wystąpił nieoczekiwany błąd.',
+                missingDateTimeAndGuests:
+                    'Proszę uzupełnić datę, godzinę i liczbę osób',
+            },
+        },
         form: {
             name: 'Dane osobowe',
             capacityNeeded: 'Liczba osób',
@@ -53,6 +76,10 @@ const plPack: languagePack = {
             phoneNumber: 'Numer telefonu',
             submit: 'Zarezerwuj stolik',
             edit: 'Zatwierdź zmiany',
+            events: {
+                saving: 'Zapisywanie...',
+                deleting: 'Usuwanie...',
+            },
             errors: {
                 name: {
                     min: 'Proszę podać co najmniej 3 znaki',
@@ -174,6 +201,12 @@ const plPack: languagePack = {
     },
     discountModal: {
         disscountTitle: 'Dodaj zniżkę',
+    },
+    alertDialog: {
+        attentionTitle: 'Uwaga',
+        attentionContent: 'Czy na pewno chcesz wykonać tę akcję?',
+        closeBtn: 'Nie',
+        confirmBtn: 'Tak',
     },
     delivertyMapModal: {
         deliveryTitle: 'Dostawa',

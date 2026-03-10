@@ -8,6 +8,7 @@ interface ModalProps {
     isOpen?: boolean;
     onClose?: () => void;
     onAnimationComplete?: () => void;
+    zIndex?: number;
     motionConfig?: {
         backdrop?: Pick<
             HTMLMotionProps<'div'>,
@@ -40,6 +41,7 @@ const Modal = ({
     isOpen = true,
     onClose,
     onAnimationComplete,
+    zIndex = 50,
     motionConfig = MODAL_DEFAULT_MOTION_CONFIG,
 }: ModalProps) =>
     createPortal(
@@ -47,17 +49,19 @@ const Modal = ({
             {isOpen && (
                 <motion.div
                     key="modal-backdrop"
-                    className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-50"
+                    className="fixed top-0 left-0 w-full h-full flex items-center justify-center"
+                    style={{ zIndex }}
                     {...motionConfig.backdrop}
                 >
                     <div
                         onClick={onClose}
                         className="absolute top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.8)]"
                     />
+
                     <motion.div
                         key="modal-content"
                         {...motionConfig.content}
-                        onClick={(e) => e.stopPropagation()} // Prevent backdrop click when clicking content
+                        onClick={(e) => e.stopPropagation()}
                     >
                         {children}
                     </motion.div>

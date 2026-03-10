@@ -1,27 +1,37 @@
 import Image from 'next/image';
-import ReservationForm from '@/components/reservations/ReservationForm';
-import { ICONS } from '@/helpers/constants/icons/icons';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
+import ReservationForm from '@/components/reservations/ReservationForm';
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from 'sonner';
+
+import { useReservationContext } from '@/providers/ReservationsContext';
+
+import { ICONS } from '@/helpers/constants/icons/icons';
+import { SEARCH_PARAMS_NAMES } from '@/helpers/constants/constants';
 import { formatDate } from '@/helpers/utils/dates';
 import useLanguage from '@/helpers/hooks/useLanguage';
-import { useReservationContext } from '@/providers/ReservationsContext';
-import { Skeleton } from '@/components/ui/skeleton';
 import languagePacks from '@/helpers/constants/languagePacks';
 import { AreaReservation } from '@/helpers/queries/areas/useAreasQuery';
+
+const MODAL_WIDTH = '830px';
+const MODAL_HEIGHT = '510px';
 
 interface ExpandableTableRowProps {
     tableId: string;
     tableName: string;
     reservations?: AreaReservation[];
-    forceOpen?: boolean;
+    editedReservationId?: string | null;
 }
 
 const ExpandableTableRow = ({
     tableId,
     tableName,
     reservations,
+    editedReservationId,
 }: ExpandableTableRowProps) => {
     const [isOpenTable, setIsOpenTable] = useState(false);
 
@@ -32,9 +42,11 @@ const ExpandableTableRow = ({
             reservationsList: {
                 tableExpanded: { messageNoReservations },
             },
+            toasts: {
+                error: { missingDateTimeAndGuests },
+            },
         },
     } = languagePacks[language];
-
 
     const {
         addLocalReservation,
@@ -43,16 +55,12 @@ const ExpandableTableRow = ({
         removeLocalReservation,
     } = useReservationContext();
 
-    // Change table name to table id to check if is selected
-
-    const isSelected = selectedTableId === tableName;
-
-    // Add reservation alert if date, time or peopleCount is missing
+    const isSelected = selectedTableId === tableId;
 
     const addTableReservation = (e: React.MouseEvent) => {
         e.stopPropagation();
         if (!date || !time || !peopleCount) {
-            alert('Proszę uzupełnić datę, godzinę i liczbę osób');
+            toast.error(missingDateTimeAndGuests);
             return;
         }
 
@@ -98,16 +106,16 @@ const ExpandableTableRow = ({
             {isOpenTable &&
                 reservations?.map((res) => (
                     <div
-                        className="bg-[#E6E6E6] px-8 py-2 text-sm text-gray-600 border-t border-gray-100 shadow-inner grid grid-cols-4"
+                        className="bg-[#E6E6E6] px-8 pr-2 py-2 text-sm text-gray-600 border-t border-gray-100 shadow-inner grid grid-cols-3"
                         key={res.id}
                     >
-                        <div className="text-left">
+                        <div className="text-left flex items-center">
                             <p className="text-xs">{tableName}</p>
                         </div>
-                        <div className="text-center">
+                        <div className="text-center flex items-center justify-center">
                             <p className="text-xs">{res.capacityNeeded}</p>
                         </div>
-                        <div className="text-right">
+                        <div className="text-right flex justify-end gap-2 items-center">
                             <p className="text-xs">
                                 {
                                     formatDate(
@@ -116,18 +124,27 @@ const ExpandableTableRow = ({
                                     ).time
                                 }
                             </p>
-                        </div>
-                        <div className="flex justify-end">
                             <button
                                 onClick={() => {
+                                    if (
+                                        editedReservationId &&
+                                        res.id !== editedReservationId
+                                    ) {
+                                        return;
+                                    }
+
                                     removeLocalReservation(tableId, res.id);
                                 }}
-                                className="text-red-500 hover:text-red-700"
+                                disabled={
+                                    !!editedReservationId &&
+                                    res.id !== editedReservationId
+                                }
+                                className="bg-danger w-6 h-6 flex items-center justify-center rounded-md transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                                 <Image
                                     src={ICONS.DELETE}
                                     alt="delete"
-                                    className="w-3"
+                                    className="w-4 h-4"
                                 />
                             </button>
                         </div>
@@ -143,11 +160,13 @@ const ExpandableTableRow = ({
     );
 };
 
-const MODAL_WIDTH = '830px';
-
 const UpsertReservation = () => {
     const [activeTabValue, setActiveTabValue] = useState('');
+    const searchParams = useSearchParams();
     const { language } = useLanguage();
+    const editedReservationId = searchParams.get(
+        SEARCH_PARAMS_NAMES.RESERVATION
+    );
 
     const {
         createReservationPage: {
@@ -181,8 +200,8 @@ const UpsertReservation = () => {
 
     return (
         <div
-            className="bg-reservation-gradient rounded-2xl relative h-[500px] flex"
-            style={{ width: MODAL_WIDTH }}
+            className="bg-reservation-gradient rounded-2xl relative flex"
+            style={{ width: MODAL_WIDTH, height: MODAL_HEIGHT }}
         >
             <div className="w-1/2">
                 <div className="bg-white mt-[0.4rem] h-full rounded-tl-2xl rounded-bl-2xl px-6 py-4 flex flex-col">
@@ -231,8 +250,8 @@ const UpsertReservation = () => {
                                     tableId={table.id}
                                     key={table.id}
                                     tableName={table.name}
-                                    forceOpen={selectedTableId === table.id}
                                     reservations={table.reservations}
+                                    editedReservationId={editedReservationId}
                                 />
                             ))}
                         </TabsContent>

@@ -36,6 +36,8 @@ const FORM_DEFAULT_VALUES = {
     phoneNumber: '',
 };
 
+//TO THINK: should we use custom date picker for better time
+
 const ReservationForm = () => {
     const searchParams = useSearchParams();
     const editParam = searchParams.get(SEARCH_PARAMS_NAMES.RESERVATION);
@@ -62,6 +64,7 @@ const ReservationForm = () => {
                 date,
                 time,
                 phoneNumber,
+                events: { saving, deleting },
             },
         },
     } = languagePacks[language];
@@ -70,7 +73,7 @@ const ReservationForm = () => {
         handleSubmit,
         register,
         reset,
-        formState: { errors },
+        formState: { errors, isSubmitting, isDirty },
     } = useForm<ReservationSchema>({
         resolver: zodResolver(reservationSchema),
         defaultValues: {
@@ -80,9 +83,14 @@ const ReservationForm = () => {
     });
 
     const { data: reservation } = useQueryReservationsById(editParam ?? '');
-    const createReservationMutation = useReservationMutation('create');
-    const updateReservationMutation = useReservationMutation('update');
-    const deleteReservationMutation = useReservationMutation('delete');
+    const { mutate: createMutate, isPending: isCreating } =
+        useReservationMutation('create');
+    const { mutate: updateMutate, isPending: isUpdating } =
+        useReservationMutation('update');
+    const { mutate: deleteMutate, isPending: isDeleting } =
+        useReservationMutation('delete');
+
+    const isWorking = isCreating || isUpdating || isDeleting || isSubmitting;
 
     const submitFormHandler = async ({
         date,
@@ -95,17 +103,37 @@ const ReservationForm = () => {
             scheduledFor: dateTimeStr,
             tableId: selectedTableId,
         };
-        if (editParam) {
-            updateReservationMutation.mutate({
-                data: newReservation,
-                id: editParam,
-            });
-        } else {
-            createReservationMutation.mutate({ data: newReservation });
-        }
-        setHasUnsavedChanges(false);
 
-        reset();
+        const onSuccessAction = () => {
+            setHasUnsavedChanges(false);
+            reset();
+        };
+
+        if (editParam) {
+            updateMutate(
+                { data: newReservation, id: editParam },
+                { onSuccess: onSuccessAction }
+            );
+        } else {
+            createMutate(
+                { data: newReservation },
+                { onSuccess: onSuccessAction }
+            );
+        }
+    };
+
+    const handleDelete = (e: React.MouseEvent) => {
+        e.preventDefault();
+
+        deleteMutate(
+            { id: editParam! },
+            {
+                onSuccess: () => {
+                    setHasUnsavedChanges(false);
+                    reset();
+                },
+            }
+        );
     };
 
     useEffect(() => {
@@ -127,6 +155,10 @@ const ReservationForm = () => {
             updateReservationFromDb(null);
         }
     }, [editParam, reservation, reset]);
+
+    useEffect(() => {
+        setHasUnsavedChanges(isDirty);
+    }, [isDirty, setHasUnsavedChanges]);
 
     return (
         <div className="bg-white pb-3 min-h-full relative">
@@ -151,6 +183,7 @@ const ReservationForm = () => {
                             errorClassName="!text-[11px]"
                             inputClassName="w-full"
                             defaultValue={FORM_DEFAULT_VALUES.name}
+                            disabled={isWorking}
                         />
 
                         <Input
@@ -168,6 +201,7 @@ const ReservationForm = () => {
                             errorClassName="!text-[11px]"
                             inputClassName="w-full hide-input-number-icon"
                             defaultValue={FORM_DEFAULT_VALUES.capacityNeeded}
+                            disabled={isWorking}
                         />
                         <Input
                             type="date"
@@ -185,6 +219,7 @@ const ReservationForm = () => {
                             errors={errors.date}
                             errorClassName="!text-[11px]"
                             inputClassName="w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0"
+                            disabled={isWorking}
                         />
                         <Input
                             type="time"
@@ -202,6 +237,7 @@ const ReservationForm = () => {
                             errorClassName="!text-[11px]"
                             inputClassName="w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0"
                             defaultValue={FORM_DEFAULT_VALUES.time}
+                            disabled={isWorking}
                         />
                         <Input
                             type="phoneNumber"
@@ -213,24 +249,31 @@ const ReservationForm = () => {
                             errorClassName="!text-[11px]"
                             inputClassName="w-full"
                             defaultValue={FORM_DEFAULT_VALUES.phoneNumber}
+                            disabled={isWorking}
                         />
                     </div>
                     <div className="self-end flex justify-between w-full ">
                         {editParam && (
                             <button
-                                onClick={() =>
-                                    deleteReservationMutation.mutate({
-                                        id: editParam,
-                                    })
-                                }
+                                onClick={handleDelete}
                                 className="bg-danger p-2 rounded-md"
                             >
-                                <Image src={ICONS.DELETE} alt="delete" />
+                                {isDeleting ? (
+                                    <span className="text-white text-xs px-2">
+                                        {deleting}
+                                    </span>
+                                ) : (
+                                    <Image src={ICONS.DELETE} alt="delete" />
+                                )}
                             </button>
                         )}
 
                         <Button className="mt-2" size="xxs">
-                            {editParam ? edit : submit}
+                            {isCreating || isUpdating
+                                ? saving
+                                : editParam
+                                  ? edit
+                                  : submit}
                         </Button>
                     </div>
                 </div>
@@ -240,5 +283,3 @@ const ReservationForm = () => {
 };
 
 export default ReservationForm;
-
-//TODO loading states errors and push notification

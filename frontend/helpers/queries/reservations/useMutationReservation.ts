@@ -3,6 +3,9 @@ import { Reservation } from './useQueryReservations';
 import { BACKEND_URL } from '@/helpers/constants/constants';
 import { Reservations } from '@/helpers/utils/queryKeys';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import useLanguage from '@/helpers/hooks/useLanguage';
+import languagePacks from '@/helpers/constants/languagePacks';
 
 export interface ReservationDto {
     phoneNumber: string;
@@ -15,6 +18,22 @@ export interface ReservationDto {
 const useReservationMutation = (type: 'create' | 'update' | 'delete') => {
     const queryClient = useQueryClient();
     const router = useRouter();
+    const { language } = useLanguage();
+
+    const { createReservationPage } = languagePacks[language];
+    const toastMessages = createReservationPage.toasts;
+
+    const loadingMessages = {
+        create: toastMessages.loading.create,
+        update: toastMessages.loading.update,
+        delete: toastMessages.loading.delete,
+    };
+
+    const successMessages = {
+        create: toastMessages.success.create,
+        update: toastMessages.success.update,
+        delete: toastMessages.success.delete,
+    };
 
     return useMutation({
         mutationFn: async ({
@@ -42,8 +61,8 @@ const useReservationMutation = (type: 'create' | 'update' | 'delete') => {
             });
 
             if (!response.ok) throw new Error(`Failed to ${type} reservation`);
-
-            return response.json();
+            const text = await response.text();
+            return text ? JSON.parse(text) : null;
         },
 
         onMutate: async ({
@@ -53,6 +72,8 @@ const useReservationMutation = (type: 'create' | 'update' | 'delete') => {
             id?: string;
             data?: ReservationDto;
         }) => {
+            const toastId = toast.loading(loadingMessages[type]);
+
             await queryClient.cancelQueries({
                 queryKey: [Reservations.BY_DATE],
             });
@@ -81,7 +102,13 @@ const useReservationMutation = (type: 'create' | 'update' | 'delete') => {
                 }
             );
 
-            return { previousReservations };
+            return { previousReservations, toastId };
+        },
+
+        onSuccess: (_, __, context) => {
+            if (context?.toastId) {
+                toast.success(successMessages[type], { id: context.toastId });
+            }
         },
 
         onError: (err, _, context) => {
@@ -90,6 +117,15 @@ const useReservationMutation = (type: 'create' | 'update' | 'delete') => {
                     [Reservations.BY_DATE],
                     context.previousReservations
                 );
+            }
+
+            if (context?.toastId) {
+                toast.error(
+                    `${toastMessages.error.prefix}: ${err.message || toastMessages.error.actionFailed}`,
+                    { id: context.toastId }
+                );
+            } else {
+                toast.error(toastMessages.error.unexpected);
             }
         },
 

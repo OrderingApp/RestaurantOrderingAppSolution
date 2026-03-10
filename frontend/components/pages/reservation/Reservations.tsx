@@ -15,12 +15,14 @@ import ReservationCard from '@/components/shared/cards/ReservationCard';
 import SearchInput from '@/components/shared/Input/SearchInput';
 import Modal from '@/components/shared/modals/Modal';
 import UpsertReservation from '@/components/shared/modals/UpsertReservation';
+import ItemCardSkeleton from '@/components/shared/cards/ItemCardSkeleton';
 
 import languagePacks from '@/helpers/constants/languagePacks';
 import { ICONS } from '@/helpers/constants/icons/icons';
 import { setQueryParams, toggleQueryParam } from '@/helpers/utils/utils';
 import { SEARCH_PARAMS_NAMES } from '@/helpers/constants/constants';
 import { useReservationContext } from '@/providers/ReservationsContext';
+import AlertDialog from '@/components/shared/modals/AlertDialog';
 
 const Reservations = () => {
     const router = useRouter();
@@ -28,12 +30,15 @@ const Reservations = () => {
     const pathname = usePathname();
 
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString());
+    const [showConfirmClose, setShowConfirmClose] = useState(false);
 
     const {
         filteredReservations,
         totalItems,
         ITEMS_PER_PAGE: itemsPerPage,
         totalPages,
+        isLoading,
+        isError,
     } = useFilterReservations(selectedDate);
     const { language } = useLanguage();
 
@@ -41,7 +46,13 @@ const Reservations = () => {
     const page = searchParams.get(SEARCH_PARAMS_NAMES.PAGE);
 
     const {
-        reservationsPage: { reservationsList, createReservation },
+        reservationsPage: {
+            reservationsList,
+            createReservation,
+            searchPlaceholder,
+            errorMsg,
+            messageNoReservations,
+        },
     } = languagePacks[language];
 
     const { hasUnsavedChanges, clearLocalReservations } =
@@ -108,18 +119,20 @@ const Reservations = () => {
 
     const handleSafeClose = () => {
         if (hasUnsavedChanges) {
-            const confirmed = window.confirm(
-                'Masz przypisane rezerwacje, które nie zostały jeszcze wysłane do bazy. Czy na pewno chcesz zamknąć okno i utracić te dane?'
-            );
-            if (!confirmed) return;
+            setShowConfirmClose(true);
+        } else {
+            executeClose();
         }
+    };
 
+    const executeClose = () => {
         closeModal();
         clearLocalReservations();
+        setShowConfirmClose(false);
     };
 
     return (
-        <section className="p-4 px-10 relative h-full">
+        <section className="p-4 px-8 relative h-full">
             <header className="flex justify-between items-center py-4">
                 <h1 className="text-black text-4xl font-bold py-5 capitalize">
                     {reservationsList}
@@ -163,25 +176,51 @@ const Reservations = () => {
                     </div>
                     <div className="w-3/5 mr-5">
                         <SearchInput
-                            placeholder="Wyszukaj"
+                            placeholder={searchPlaceholder}
                             className="w-full"
                         />
                     </div>
                 </div>
             </div>
+            <main className="flex flex-col min-h-[300px]">
+                {isLoading && (
+                    <ul className="flex gap-x-8 gap-y-4 px-2 py-3 flex-wrap">
+                        {Array.from({ length: 8 }).map((_, index) => (
+                            <ItemCardSkeleton key={index} index={index} />
+                        ))}
+                    </ul>
+                )}
 
-            <main className="flex flex-col">
-                <ul className="flex gap-x-8 gap-y-4  px-2 py-3 flex-wrap">
-                    {filteredReservations?.map((reservation) => (
-                        <ReservationCard
-                            key={reservation.id}
-                            onClick={() =>
-                                editReservationHandler(reservation.id)
-                            }
-                            {...reservation}
-                        />
-                    ))}
-                </ul>
+                {isError && !isLoading && (
+                    <div className="flex flex-col items-center justify-center w-full mt-20 text-danger">
+                        <p>{errorMsg}</p>
+                    </div>
+                )}
+
+                {!isLoading &&
+                    !isError &&
+                    filteredReservations?.length === 0 && (
+                        <div className="flex flex-col items-center justify-center w-full mt-20 text-gray-500">
+                            <p className="text-lg">{messageNoReservations}</p>
+                        </div>
+                    )}
+
+                {!isLoading &&
+                    !isError &&
+                    filteredReservations &&
+                    filteredReservations.length > 0 && (
+                        <ul className="flex gap-x-8 gap-y-4 px-2 py-3 flex-wrap">
+                            {filteredReservations.map((reservation) => (
+                                <ReservationCard
+                                    key={reservation.id}
+                                    onClick={() =>
+                                        editReservationHandler(reservation.id)
+                                    }
+                                    {...reservation}
+                                />
+                            ))}
+                        </ul>
+                    )}
             </main>
             <div className="absolute bottom-0 left-0 w-full">
                 <DateCalendar
@@ -190,8 +229,14 @@ const Reservations = () => {
             </div>
 
             <Modal isOpen={modal === 'true'} onClose={handleSafeClose}>
-                <UpsertReservation onClose={handleSafeClose} />
+                <UpsertReservation />
             </Modal>
+
+            <AlertDialog
+                isOpen={showConfirmClose}
+                onClose={() => setShowConfirmClose(false)}
+                onConfirm={executeClose}
+            />
 
             {totalPages > 1 && (
                 <div

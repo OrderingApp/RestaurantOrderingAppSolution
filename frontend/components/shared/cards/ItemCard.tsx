@@ -11,6 +11,9 @@ export interface ItemCardProps {
     variantClassName?: string;
 }
 
+export const ITEM_CARD_WIDTH = 176;
+export const ITEM_CARD_HEIGHT = 112;
+
 const ItemCard = ({
     title,
     subtitle,
@@ -26,8 +29,10 @@ const ItemCard = ({
         <li>
             <button onClick={onClick}>
                 <div
+                    style={{ width: ITEM_CARD_WIDTH, height: ITEM_CARD_HEIGHT }}
                     className={cn(
-                        'w-44 h-28 rounded-lg overflow-hidden relative',
+                        'rounded-lg overflow-hidden relative',
+
                         styles.container,
                         className
                     )}

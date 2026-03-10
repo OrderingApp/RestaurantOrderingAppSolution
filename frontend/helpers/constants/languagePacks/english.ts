@@ -35,16 +35,39 @@ const enPack: languagePack = {
         reservationTitle: 'Check Reservations',
         createReservation: 'Create Reservation',
         reservationsList: 'List of reservations',
+        searchPlaceholder: 'Search',
         reservationCard: {
             totalGuests: 'Number of people',
             phone: 'Phone number',
             table: 'Table',
         },
+        errorMsg:
+            'An error occurred while fetching reservations. Please try again later.',
+        messageNoReservations: 'No reservations for this date',
     },
     createReservationPage: {
         createReservation: 'Create reservation',
         editReservation: 'Edit reservation',
         chooseReservation: 'Choose reservation',
+        toasts: {
+            loading: {
+                create: 'Creating reservation...',
+                update: 'Updating reservation...',
+                delete: 'Deleting reservation...',
+            },
+            success: {
+                create: 'Reservation created!',
+                update: 'Reservation updated!',
+                delete: 'Reservation deleted!',
+            },
+            error: {
+                prefix: 'Error',
+                actionFailed: 'Failed to complete the action.',
+                unexpected: 'An unexpected error occurred.',
+                missingDateTimeAndGuests:
+                    'Please provide date, time and number of guests.',
+            },
+        },
         form: {
             name: 'Personal data',
             capacityNeeded: 'Number of people',
@@ -53,6 +76,10 @@ const enPack: languagePack = {
             phoneNumber: 'Phone number',
             submit: 'Book a table',
             edit: 'Confirm changes',
+            events: {
+                saving: 'Saving...',
+                deleting: 'Deleting...',
+            },
             errors: {
                 name: {
                     min: 'Please enter at least 3 characters',
@@ -173,6 +200,12 @@ const enPack: languagePack = {
     },
     discountModal: {
         disscountTitle: 'Add discount',
+    },
+    alertDialog: {
+        attentionTitle: 'Attention',
+        attentionContent: 'Are you sure you want to perform this action?',
+        closeBtn: 'No',
+        confirmBtn: 'Yes',
     },
     delivertyMapModal: {
         deliveryTitle: 'Delivery',
