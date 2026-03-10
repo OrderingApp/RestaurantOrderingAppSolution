@@ -50,6 +50,7 @@ public class AreaService(
         {
             var area = await orderingContext
                 .Areas.Include(a => a.Tables.OrderBy(t => t.SequenceNumber))
+                    .ThenInclude(r => r.Reservations)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (area == null)

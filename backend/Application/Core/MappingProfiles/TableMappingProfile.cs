@@ -16,10 +16,7 @@ public class TableMappingProfile : Profile
             .ForMember(dest => dest.AreaId, opt => opt.MapFrom(src => src.AreaId));
 
         CreateMap<Table, TableReadDto>()
-            .ForMember(
-                dest => dest.Reservations,
-                opt => opt.MapFrom(src => src.Reservations.Where(r => r.TableId == src.Id))
-            );
+            .ForMember(dest => dest.Reservations, opt => opt.MapFrom(src => src.Reservations));
 
         CreateMap<Table, TableSummaryDto>()
             .ForMember(dest => dest.Orders, opt => opt.MapFrom(src => src.Orders));

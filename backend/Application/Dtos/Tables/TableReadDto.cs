@@ -12,6 +12,6 @@ public class TableReadDto
     public bool IsPrepared { get; set; }
     public DateTime? ActiveSince { get; set; }
 
-    public List<ReservationSummaryDto> Reservations { get; set; } = new();
+    public List<ReservationReadDto> Reservations { get; set; } = new();
     public TableStatus Status { get; set; }
 }
