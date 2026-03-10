@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System;
 using Application.Contracts;
 using Application.Dtos.Areas;
 using Application.Dtos.Common;
@@ -48,7 +49,8 @@ public class AreaService(
         try
         {
             var area = await orderingContext
-                .Areas.Include(a => a.Tables)
+                .Areas.Include(a => a.Tables.OrderBy(t => t.SequenceNumber))
+                    .ThenInclude(r => r.Reservations)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (area == null)
@@ -66,18 +68,26 @@ public class AreaService(
         }
     }
 
-    public async Task<ResultDto<List<AreaReadDto>>> GetAreas()
+    public async Task<ResultDto<List<AreaReadDto>>> GetAreas(DateTime? date = null)
     {
         try
         {
-            var areas = await orderingContext.Areas
+            var targetDate = (date ?? DateTime.UtcNow).Date;
+
+            var start = targetDate;
+            var end = start.AddDays(1);
+
+            var filteredAreas = await orderingContext.Areas
                 .Include(a => a.Tables)
-                    .ThenInclude(t => t.Reservations)
+                .ThenInclude(t => t.Reservations
+                    .Where(r => r.ScheduledFor >= start && r.ScheduledFor < end))
+                .OrderBy(a => a.SequenceNumber)
                 .AsNoTracking()
                 .ToListAsync();
 
-            var areaReadDtos = mapper.Map<List<AreaReadDto>>(areas);
-            return ResultDto<List<AreaReadDto>>.Success(areaReadDtos, HttpStatusCode.OK);
+            var filteredAreaReadDtos = mapper.Map<List<AreaReadDto>>(filteredAreas);
+
+            return ResultDto<List<AreaReadDto>>.Success(filteredAreaReadDtos, HttpStatusCode.OK);
         }
         catch (Exception ex)
         {

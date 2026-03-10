@@ -1,4 +1,5 @@
-﻿using Application.Dtos.Areas;
+﻿using System;
+using Application.Dtos.Areas;
 using Application.Dtos.Common;
 
 namespace Application.Contracts;
@@ -7,7 +8,7 @@ public interface IAreaService
 {
     Task<ResultDto<AreaReadDto>> CreateArea(AreaCreateDto areaCreateDto, Guid userId);
     Task<ResultDto<AreaReadDto>> GetArea(Guid id);
-    Task<ResultDto<List<AreaReadDto>>> GetAreas();
+    Task<ResultDto<List<AreaReadDto>>> GetAreas(DateTime? date = null);
     Task<ResultDto<AreaReadDto>> UpdateArea(Guid id, AreaUpdateDto areaUpdateDto);
     Task<ResultDto<bool>> DeleteArea(Guid id);
 }

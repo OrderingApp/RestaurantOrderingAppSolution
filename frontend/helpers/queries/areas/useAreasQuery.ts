@@ -3,6 +3,43 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchWithParams } from '@/helpers/utils/utils';
 import { BACKEND_PATHS } from '@/helpers/constants/constants';
 import { Areas } from '@/helpers/utils/queryKeys';
+import { fetchWithParams } from '@/helpers/utils/utils';
+
+export enum TABLE_STATUSES {
+    Available = 'Available',
+    Reserved = 'Reserved',
+    Ongoing = 'Ongoing',
+    PendingServingOrderItems = 'PendingServingOrderItems',
+    PendingPayment = 'PendingPayment',
+    Closed = 'Closed',
+}
+
+export type TableStatus = TABLE_STATUSES;
+
+export interface AreaReservation {
+    id: string;
+    phoneNumber: string;
+    name: string;
+    scheduledFor: string;
+    capacityNeeded: number;
+}
+
+export interface AreaTable {
+    id: string;
+    name: string;
+    capacity: number;
+    isPrepared: boolean;
+    reservations: AreaReservation[];
+    status: TableStatus;
+}
+
+export interface Area {
+    id: string;
+    name: string;
+    isUsed: boolean;
+    isDeleted: boolean;
+    tables: AreaTable[];
+}
 
 export interface AreaReservation {
     id: string;

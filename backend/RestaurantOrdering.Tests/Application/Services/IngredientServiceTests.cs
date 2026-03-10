@@ -410,4 +410,100 @@ public class IngredientServiceTests
         // Assert
         result.ShouldFailWith(HttpStatusCode.NotFound, "Ingredient not found.");
     }
+
+    [Fact]
+    public async Task AddAllergensToIngredient_ShouldSucceed_WhenNewAllergensAreAdded()
+    {
+        // Arrange
+        var ingredient = IngredientTestData.CreateValidIngredient(name: IngredientTestData.TomatoName);
+        var allergen1 = AllergenTestData.CreateAllergen(AllergenTestData.GlutenName);
+        var allergen2 = AllergenTestData.CreateAllergen(AllergenTestData.NutsName);
+
+        await _dbContext.Ingredients.AddAsync(ingredient);
+        await _dbContext.Allergens.AddRangeAsync(allergen1, allergen2);
+        await _dbContext.SaveChangesAsync();
+
+        var allergenIds = new List<Guid> { allergen1.Id, allergen2.Id };
+
+        _mockMapper
+            .Setup(m => m.Map<IngredientReadDto>(It.IsAny<Ingredient>()))
+            .Returns(new IngredientReadDto
+            {
+                Id = ingredient.Id,
+                Name = ingredient.Name,
+                Allergens = new List<IngredientAllergenDto>
+                {
+                    new() { Id = allergen1.Id, Name = AllergenTestData.GlutenName },
+                    new() { Id = allergen2.Id, Name = AllergenTestData.NutsName },
+                },
+            });
+
+        // Act
+        var result = await _service.AddAllergensToIngredient(ingredient.Id, allergenIds);
+
+        // Assert
+        result.ShouldBeSuccessful(HttpStatusCode.OK);
+        result.Data!.Allergens.Select(a => a.Name).Should()
+            .Contain(new[] { AllergenTestData.GlutenName, AllergenTestData.NutsName });
+
+        var updatedIngredient = await _dbContext
+            .Ingredients.Include(i => i.IngredientAllergenRels)
+            .FirstOrDefaultAsync(i => i.Id == ingredient.Id);
+        updatedIngredient!.IngredientAllergenRels.Should().HaveCount(2);
+    }
+
+    [Fact]
+    public async Task AddAllergensToIngredient_ShouldNotAddDuplicateAllergens()
+    {
+        // Arrange
+        var allergen = AllergenTestData.CreateAllergen(AllergenTestData.GlutenName);
+        var ingredient = IngredientTestData.CreateValidIngredient();
+        ingredient.IngredientAllergenRels.Add(
+            new IngredientAllergenRel { IngredientId = ingredient.Id, AllergenId = allergen.Id, Allergen = allergen }
+        );
+
+        await _dbContext.Allergens.AddAsync(allergen);
+        await _dbContext.Ingredients.AddAsync(ingredient);
+        await _dbContext.SaveChangesAsync();
+
+        _mockMapper
+            .Setup(m => m.Map<IngredientReadDto>(It.IsAny<Ingredient>()))
+            .Returns(new IngredientReadDto
+            {
+                Id = ingredient.Id,
+                Name = ingredient.Name,
+                Allergens = new List<IngredientAllergenDto>
+                {
+                    new() { Id = allergen.Id, Name = AllergenTestData.GlutenName },
+                },
+            });
+
+        // Act - try to add the same allergen again
+        var result = await _service.AddAllergensToIngredient(
+            ingredient.Id,
+            new List<Guid> { allergen.Id }
+        );
+
+        // Assert
+        result.ShouldBeSuccessful(HttpStatusCode.OK);
+
+        var updatedIngredient = await _dbContext
+            .Ingredients.Include(i => i.IngredientAllergenRels)
+            .FirstOrDefaultAsync(i => i.Id == ingredient.Id);
+        updatedIngredient!.IngredientAllergenRels.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public async Task AddAllergensToIngredient_ShouldReturnNotFound_WhenIngredientDoesNotExist()
+    {
+        // Arrange
+        var nonExistentId = Guid.NewGuid();
+        var allergenIds = new List<Guid> { Guid.NewGuid() };
+
+        // Act
+        var result = await _service.AddAllergensToIngredient(nonExistentId, allergenIds);
+
+        // Assert
+        result.ShouldFailWith<IngredientReadDto>(HttpStatusCode.NotFound, "Ingredient not found.");
+    }
 }

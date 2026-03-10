@@ -16,12 +16,22 @@ import { useOrdersContext } from '@/providers/OrdersContext';
 import { useLanguage } from '@/providers/LanguageProvider';
 import languagePacks from '@/helpers/constants/languagePacks';
 
+export type AddItemHandler = (item: {
+    id: string;
+    name: string;
+    price: number;
+    discount: number;
+    quantity: number;
+    currency: 'pln';
+}) => void;
+
 interface MenuItemProps {
     id: string;
     name: string;
     price: number;
     variant: 'card' | 'order';
     onOpenMenuItemInformation: (id: string) => void;
+    onAddItem?: AddItemHandler;
 }
 
 const MenuItem = ({
@@ -30,6 +40,7 @@ const MenuItem = ({
     price,
     variant,
     onOpenMenuItemInformation,
+    onAddItem,
 }: MenuItemProps) => {
     const { language } = useLanguage();
     const { createOrderPage } = languagePacks[language];
@@ -55,6 +66,16 @@ const MenuItem = ({
         quantity: inputValue,
         currency: 'pln',
     } as const;
+
+    const handleAddItem = () => {
+        // If onAddItem prop is provided, use it (for CreateOrder modal)
+        // Otherwise fall back to global orders context
+        if (onAddItem) {
+            onAddItem(newItem);
+        } else {
+            addOrder(newItem);
+        }
+    };
 
     return (
         <li
@@ -109,7 +130,7 @@ const MenuItem = ({
                     <div className="flex flex-col gap-2">
                         <Button
                             className="w-full rounded-lg py-1 transition-transform hocus:scale-95"
-                            onClick={() => addOrder(newItem)}
+                            onClick={handleAddItem}
                             size="sm"
                         >
                             {createOrderPage.addOrder}

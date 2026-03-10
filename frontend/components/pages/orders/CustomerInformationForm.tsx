@@ -10,7 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import DetailsAside from '@/components/shared/asides/Details';
 import Button, { ButtonProps } from '@/components/shared/button/Button';
 import Input from '@/components/shared/Input/Input';
-import { BillProps } from './CreateOrder';
+import { BillProps } from '../../shared/modals/CreateOrder';
 import DeliveryInput from './DeliveryInput';
 
 import { getFutureTime } from '@/helpers/utils/dates';

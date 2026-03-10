@@ -8,8 +8,6 @@ public class Reservation
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime ScheduledFor { get; set; }
     public int CapacityNeeded { get; set; }
-    public bool IsAssigned { get; set; } = false;
-
     public Guid? TableId { get; set; }
     public Table? Table { get; set; }
 }

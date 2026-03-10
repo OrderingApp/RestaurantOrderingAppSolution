@@ -6,4 +6,6 @@ public class ReservationCreateDto
     public string Name { get; set; } = null!;
     public DateTime? ScheduledFor { get; set; }
     public int CapacityNeeded { get; set; }
+
+    public Guid? TableId { get; set; }
 }

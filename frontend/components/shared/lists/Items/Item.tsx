@@ -26,6 +26,7 @@ export type ItemProps = {
     isSingleItem?: boolean;
     isServed?: boolean;
     className?: string;
+    priceStrClassName?: string;
     quantity?: number;
     annotation?: string[];
     button?: Omit<ButtonProps, 'className' | 'children'> & { name?: string };
@@ -39,6 +40,7 @@ const Item = ({
     annotation,
     isSingleItem,
     className = '',
+    priceStrClassName = '',
     ...props
 }: ItemProps) => {
     const priceStr = formatPriceStr({ currency, price, quantity });
@@ -62,7 +64,8 @@ const Item = ({
                 className={clsx(
                     'text-primary',
                     quantity && 'text-xs font-semibold',
-                    !quantity && 'col-span-2 font-bold'
+                    !quantity && 'col-span-2 font-bold',
+                    priceStrClassName
                 )}
             >
                 {priceStr}

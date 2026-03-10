@@ -64,6 +64,22 @@ public class IngredientsController(IIngredientService ingredientService) : BaseA
     ) => HandleResult(await ingredientService.AddTagsToIngredient(id, tagIds));
 
     /// <summary>
+    /// Adds allergens to an ingredient.
+    /// </summary>
+    /// <param name="id">The unique ingredient ID.</param>
+    /// <param name="allergenIds">List of allergen IDs to associate with the ingredient.</param>
+    /// <returns>The updated ingredient with assigned allergens.</returns>
+    /// <response code="200">If allergens were successfully added.</response>
+    /// <response code="404">If the ingredient is not found.</response>
+    [HttpPut("{id}/allergens")]
+    [ProducesResponseType(typeof(IngredientReadDto), 200)]
+    [ProducesResponseType(404)]
+    public async Task<ActionResult<IngredientReadDto>> AddAllergensToIngredient(
+        [FromRoute] Guid id,
+        [FromBody] List<Guid> allergenIds
+    ) => HandleResult(await ingredientService.AddAllergensToIngredient(id, allergenIds));
+
+    /// <summary>
     /// Updates an ingredient.
     /// </summary>
     /// <param name="id">The ID of the ingredient to update.</param>
