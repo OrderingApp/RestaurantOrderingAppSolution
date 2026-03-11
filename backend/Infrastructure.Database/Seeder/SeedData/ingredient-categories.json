@@ -1,0 +1,38 @@
+[
+  {
+    "id": "d3a7b9e4-6f8a-4c1e-9f6e-2a1f9b3c4d5e",
+    "name": "Sery",
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "e5b8c9f1-7a2b-4d3e-8f7a-3b2c1d4e5f6a",
+    "name": "Mięso",
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "a1b2c3d4-1111-4a4a-8a8a-1234567890ab",
+    "name": "Warzywa i zielenina",
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "11111111-2222-4aaa-bbbb-0000000000aa",
+    "name": "Oliwy i oleje",
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "d4e5f6a7-4444-4d4d-bcbc-4234567890de",
+    "name": "Dodatki",
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "c3d4e5f6-3333-4c4c-abab-3234567890cd",
+    "name": "Ryby i owoce morza",
+    "isUsed": true,
+    "isDeleted": false
+  }
+]

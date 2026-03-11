@@ -1,22 +1,18 @@
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain;
 using Infrastructure.Database.Seeder.SeedModels;
-using Microsoft.AspNetCore.Hosting;
 
 namespace Infrastructure.Database.Seeder.Seeders;
 
 public class TagSeeder : ISeeder
 {
     private readonly RestaurantOrderingContext _context;
-    private readonly IWebHostEnvironment _env;
     private readonly SeedDataReader _reader;
 
-    public TagSeeder(RestaurantOrderingContext context, IWebHostEnvironment env, SeedDataReader reader)
+    public TagSeeder(RestaurantOrderingContext context, SeedDataReader reader)
     {
         _context = context;
-        _env = env;
         _reader = reader;
     }
 
@@ -25,8 +21,7 @@ public class TagSeeder : ISeeder
         if (_context.Tags.Any())
             return;
 
-        var path = Path.Combine(_env.ContentRootPath, "Seeder", "SeedData", "tags.json");
-        var models = await _reader.ReadAsync<TagSeedModel>(path);
+        var models = await _reader.ReadByFileNameAsync<TagSeedModel>("tags.json");
         if (models == null || models.Count == 0)
             return;
 

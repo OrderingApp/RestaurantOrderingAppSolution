@@ -1,23 +1,19 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain;
 using Infrastructure.Database.Seeder.SeedModels;
-using Microsoft.AspNetCore.Hosting;
 
 namespace Infrastructure.Database.Seeder.Seeders;
 
 public class MenuCategorySeeder : ISeeder
 {
     private readonly RestaurantOrderingContext _context;
-    private readonly IWebHostEnvironment _env;
     private readonly SeedDataReader _reader;
 
-    public MenuCategorySeeder(RestaurantOrderingContext context, IWebHostEnvironment env, SeedDataReader reader)
+    public MenuCategorySeeder(RestaurantOrderingContext context, SeedDataReader reader)
     {
         _context = context;
-        _env = env;
         _reader = reader;
     }
 
@@ -26,8 +22,7 @@ public class MenuCategorySeeder : ISeeder
         if (_context.MenuCategories.Any())
             return;
 
-        var path = Path.Combine(_env.ContentRootPath, "Seeder", "SeedData", "menu-categories.json");
-        var models = await _reader.ReadAsync<MenuCategorySeedModel>(path);
+        var models = await _reader.ReadByFileNameAsync<MenuCategorySeedModel>("menu-categories.json");
         if (models == null || !models.Any())
             return;
 

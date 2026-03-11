@@ -1,22 +1,18 @@
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain;
 using Infrastructure.Database.Seeder.SeedModels;
-using Microsoft.AspNetCore.Hosting;
 
 namespace Infrastructure.Database.Seeder.Seeders;
 
 public class TableSeeder : ISeeder
 {
     private readonly RestaurantOrderingContext _context;
-    private readonly IWebHostEnvironment _env;
     private readonly SeedDataReader _reader;
 
-    public TableSeeder(RestaurantOrderingContext context, IWebHostEnvironment env, SeedDataReader reader)
+    public TableSeeder(RestaurantOrderingContext context, SeedDataReader reader)
     {
         _context = context;
-        _env = env;
         _reader = reader;
     }
 
@@ -25,8 +21,7 @@ public class TableSeeder : ISeeder
         if (_context.Tables.Any())
             return;
 
-        var path = Path.Combine(_env.ContentRootPath, "Seeder", "SeedData", "tables.json");
-        var models = await _reader.ReadAsync<TableSeedModel>(path);
+        var models = await _reader.ReadByFileNameAsync<TableSeedModel>("tables.json");
         if (models == null || models.Count == 0)
             return;
 

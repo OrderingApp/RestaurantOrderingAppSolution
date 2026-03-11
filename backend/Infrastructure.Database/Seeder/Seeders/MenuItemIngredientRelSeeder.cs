@@ -1,24 +1,20 @@
-using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Domain;
 using Infrastructure.Database.Seeder.SeedModels;
-using Microsoft.AspNetCore.Hosting;
 
 namespace Infrastructure.Database.Seeder.Seeders;
 
 public class MenuItemIngredientRelSeeder : ISeeder
 {
     private readonly RestaurantOrderingContext _context;
-    private readonly IWebHostEnvironment _env;
     private readonly SeedDataReader _reader;
 
-    public MenuItemIngredientRelSeeder(RestaurantOrderingContext context, IWebHostEnvironment env, SeedDataReader reader)
+    public MenuItemIngredientRelSeeder(RestaurantOrderingContext context, SeedDataReader reader)
     {
         _context = context;
-        _env = env;
         _reader = reader;
     }
 
@@ -27,8 +23,7 @@ public class MenuItemIngredientRelSeeder : ISeeder
         if (_context.MenuItemIngredientRels.Any())
             return;
 
-        var path = Path.Combine(_env.ContentRootPath, "Seeder", "SeedData", "menu-item-ingredient-rels.json");
-        var models = await _reader.ReadAsync<MenuItemIngredientRelSeedModel>(path);
+        var models = await _reader.ReadByFileNameAsync<MenuItemIngredientRelSeedModel>("menu-item-ingredient-rels.json");
         if (models == null || models.Count == 0)
             return;
 
@@ -78,8 +73,7 @@ public class MenuItemIngredientRelSeeder : ISeeder
     public async Task<RelationalSeedReport> SeedRelationsAsync()
     {
         var report = new RelationalSeedReport();
-        var path = Path.Combine(_env.ContentRootPath, "Seeder", "SeedData", "menu-item-ingredient-rels.json");
-        var models = await _reader.ReadAsync<MenuItemIngredientRelSeedModel>(path);
+        var models = await _reader.ReadByFileNameAsync<MenuItemIngredientRelSeedModel>("menu-item-ingredient-rels.json");
         if (models == null || models.Count == 0)
             return report;
 

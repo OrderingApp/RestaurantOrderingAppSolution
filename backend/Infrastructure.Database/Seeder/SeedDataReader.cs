@@ -37,4 +37,15 @@ public class SeedDataReader
             return new List<T>();
         }
     }
+
+    /// <summary>
+    /// Reads a seed data file by name from the Seeder/SeedData/ folder
+    /// located next to the running assembly (AppContext.BaseDirectory).
+    /// This is the preferred method for production and dev-runner use.
+    /// </summary>
+    public Task<List<T>> ReadByFileNameAsync<T>(string fileName)
+    {
+        var path = Path.Combine(AppContext.BaseDirectory, "Seeder", "SeedData", fileName);
+        return ReadAsync<T>(path);
+    }
 }
