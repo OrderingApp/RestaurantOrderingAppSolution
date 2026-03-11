@@ -1,0 +1,66 @@
+[
+  {
+    "id": "5cdd50f7-7337-4211-99ae-e0bc4616819f",
+    "name": "Rossa",
+    "isUsed": true,
+    "isDeleted": false,
+    "menuCategoryId": "b67ec25b-f644-48c8-9039-fa94f9f6d78e",
+    "sequenceNumber": 1
+  },
+  {
+    "id": "ac218a03-3db7-4279-a08e-642a46fe6c5f",
+    "name": "Bianca",
+    "isUsed": true,
+    "isDeleted": false,
+    "menuCategoryId": "b67ec25b-f644-48c8-9039-fa94f9f6d78e",
+    "sequenceNumber": 2
+  },
+  {
+    "id": "68618c20-f33b-4e89-b746-f75fa820a4b9",
+    "name": "Special",
+    "isUsed": true,
+    "isDeleted": false,
+    "menuCategoryId": "b67ec25b-f644-48c8-9039-fa94f9f6d78e",
+    "sequenceNumber": 3
+  },
+  {
+    "id": "c525791d-adf2-4a70-b7bb-fd7674bff2f3",
+    "name": "Ciep\u0142e",
+    "isUsed": true,
+    "isDeleted": false,
+    "menuCategoryId": "a723c65b-a4ab-48c0-a9e6-f8481bcf5c16",
+    "sequenceNumber": 4
+  },
+  {
+    "id": "d1c06fda-c632-490c-b686-dba1658e76db",
+    "name": "Zimne",
+    "isUsed": true,
+    "isDeleted": false,
+    "menuCategoryId": "a723c65b-a4ab-48c0-a9e6-f8481bcf5c16",
+    "sequenceNumber": 5
+  },
+  {
+    "id": "3f517330-05f6-40ec-a581-502152199eae",
+    "name": "Piwo",
+    "isUsed": true,
+    "isDeleted": false,
+    "menuCategoryId": "cc9993a8-0fda-4135-a4fc-dde9e8f7cc65",
+    "sequenceNumber": 6
+  },
+  {
+    "id": "5d121ce7-923f-42cd-b529-fb841d5b0479",
+    "name": "Bezalkoholowe",
+    "isUsed": true,
+    "isDeleted": false,
+    "menuCategoryId": "cc9993a8-0fda-4135-a4fc-dde9e8f7cc65",
+    "sequenceNumber": 7
+  },
+  {
+    "id": "0b1c65a0-97af-410e-b29a-7e4295d3630b",
+    "name": "Drinki",
+    "isUsed": true,
+    "isDeleted": false,
+    "menuCategoryId": "cc9993a8-0fda-4135-a4fc-dde9e8f7cc65",
+    "sequenceNumber": 8
+  }
+]

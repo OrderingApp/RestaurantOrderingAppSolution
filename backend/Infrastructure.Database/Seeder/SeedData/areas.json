@@ -1,0 +1,37 @@
+[
+  {
+    "id": "5ecdc81b-929e-4ee9-b82d-8a7d4f3218a6",
+    "name": "Bar",
+    "isUsed": true,
+    "isDeleted": false,
+    "sequenceNumber": 1
+  },
+  {
+    "id": "bb3bfebb-11cb-4a21-96ed-7f1d44f5c7e3",
+    "name": "Kominek",
+    "isUsed": true,
+    "isDeleted": false,
+    "sequenceNumber": 2
+  },
+  {
+    "id": "9525d09b-41fa-448f-ac8a-b6ed7f67ca7f",
+    "name": "Bilardownia",
+    "isUsed": true,
+    "isDeleted": false,
+    "sequenceNumber": 3
+  },
+  {
+    "id": "d9bd7201-196b-4a0a-a291-a092d9406b2d",
+    "name": "G\u00F3ra",
+    "isUsed": true,
+    "isDeleted": false,
+    "sequenceNumber": 4
+  },
+  {
+    "id": "0209c7a5-4f60-4b33-894a-4a7002eadfbb",
+    "name": "Ogr\u00F3dek",
+    "isUsed": true,
+    "isDeleted": false,
+    "sequenceNumber": 5
+  }
+]
