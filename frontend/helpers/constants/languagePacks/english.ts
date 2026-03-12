@@ -138,6 +138,9 @@ const enPack: languagePack = {
         orderCard: {
             pickup: 'Pickup',
             delivery: 'Delivery',
+            price: 'Price',
+            phone: 'Phone number',
+                address: 'Address',
         },
         orderCustomerInformationForm: {
             title: 'Data',
@@ -179,7 +182,7 @@ const enPack: languagePack = {
         orderOptionsModal: {
             titleDelivery: 'Delivery',
             titleTakeway: 'Pickup',
-            paymentDue: 'Payment Due',
+            paymentDue: 'Price',
             customerInformation: {
                 time: 'Time',
                 phoneNumber: 'Phone Number',

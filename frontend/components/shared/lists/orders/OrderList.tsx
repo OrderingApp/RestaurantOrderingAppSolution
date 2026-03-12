@@ -7,7 +7,7 @@ interface OrderListPops {
 
 const OrderList = ({ orders, openModal }: OrderListPops) => {
     return (
-        <ul className="grid grid-cols-6 mt-5 gap-2  text-5xl">
+        <ul className="grid grid-cols-4 mt-5 gap-2 text-5xl">
             {orders?.map((order) => (
                 <OrderCard
                     onClick={() => openModal(order.id)}

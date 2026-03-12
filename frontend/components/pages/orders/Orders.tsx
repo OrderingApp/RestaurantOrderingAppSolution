@@ -24,6 +24,8 @@ import EditOrder from './EditOrder';
 import CreateOrder from '../../shared/modals/CreateOrder';
 import SearchInput from '@/components/shared/Input/SearchInput';
 import clsx from 'clsx';
+import Modal from '@/components/shared/modals/Modal';
+import OrderOptionsModal from '@/components/shared/modals/OrderOptionsModal';
 
 const Orders = () => {
     const { language } = useLanguage();
@@ -50,6 +52,7 @@ const Orders = () => {
     const isCreateOrderModalOpen = modal === 'true' && !orderId;
     const isEditOrderModalOpen = modal === 'true' && !!orderId;
     const isPaymentModalOpen = closeOrder === 'true';
+    const isOrderOptionsModalOpen = !!orderId;
 
     const toggleModal = () => {
         toggleQueryParam(
@@ -96,20 +99,30 @@ const Orders = () => {
 
     const buttons = [
         {
-            value: 'Ongoing',
+            value: 'All',
             iconActive: ICONS.LIST_WHITE,
             icon: ICONS.LIST,
         },
         {
-            value: 'Closed',
+            value: 'Ongoing',
+            iconActive: ICONS.MENU_OPEN_WHITE,
+            icon: ICONS.MENU_OPEN,
+        },
+        {
+            value: 'PaidAndReadyToPrepare',
             iconActive: ICONS.CLOSE_WHITE,
             icon: ICONS.CLOSE,
+        },
+        {
+            value: 'Closed',
+            iconActive: ICONS.TIME_WHITE,
+            icon: ICONS.TIME,
         },
     ];
 
     const isActive = (value: string) => {
         const param = searchParams.get('orderStatus');
-        if (!param || undefined) return 'Ongoing';
+        if (!param || undefined) return 'All';
         if (param === value) return value;
     };
 
@@ -117,6 +130,16 @@ const Orders = () => {
         toggleQueryParam(
             SEARCH_PARAMS_NAMES.ORDER_ID,
             id,
+            searchParams,
+            router,
+            pathname
+        );
+    };
+
+    const closeOrderOptionsModal = () => {
+        toggleQueryParam(
+            SEARCH_PARAMS_NAMES.ORDER_ID,
+            undefined,
             searchParams,
             router,
             pathname
@@ -138,16 +161,16 @@ const Orders = () => {
                         </Button>
                     </div>
                 </div>
-                <div className="flex justify-around w-full h-auto">
+                <div className="flex justify-around w-full h-auto mt-4">
                     <div className="flex items-start justify-between w-full">
                         <div className="flex gap-4 mb-4 w-2/5 ">
                             {buttons.map((btn) => (
                                 <button
                                     className={clsx(
-                                        'p-3 rounded-lg shadow-xl transition-all group',
+                                        'p-3 rounded-lg shadow-xl transition-all',
                                         isActive(btn.value) === btn.value
                                             ? 'bg-primary'
-                                            : 'bg-[#F6F6F6] hocus:bg-primary hocus:text-white hocus:scale-90'
+                                            : 'bg-[#F6F6F6] '
                                     )}
                                     onClick={() =>
                                         toggleQueryParam(
@@ -170,7 +193,7 @@ const Orders = () => {
                                         className={clsx(
                                             'transition-all',
                                             isActive(btn.value) !== btn.value &&
-                                                'group-hover:brightness-0 group-hover:invert group-focus:brightness-0 group-focus:invert'
+                                                'group-hover:brightness-0 group-hover:invert'
                                         )}
                                     />
                                 </button>
@@ -217,6 +240,13 @@ const Orders = () => {
                     />
                 </PaymentDetails>
             </OverviewModal>
+
+            <Modal
+                isOpen={isOrderOptionsModalOpen}
+                onClose={closeOrderOptionsModal}
+            >
+                <OrderOptionsModal onClose={closeOrderOptionsModal} />
+            </Modal>
         </>
     );
 };

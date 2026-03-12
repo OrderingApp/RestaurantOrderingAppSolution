@@ -5,6 +5,7 @@ import Menu from '../../pages/menu/Menu';
 import {
     COMPANYS_CURRENCY,
     ORDER_TYPES,
+    ordersTypes,
     SEARCH_PARAMS_NAMES,
 } from '@/helpers/constants/constants';
 import { useOrdersContext } from '@/providers/OrdersContext';
@@ -53,10 +54,14 @@ const CreateOrder = ({
     toggleModal,
     skipCustomerForm = false,
     tableId,
+    orderType,
+    allowMultipleBills,
 }: {
     toggleModal: () => void;
     skipCustomerForm?: boolean;
     tableId?: string | undefined;
+    orderType?: ORDER_TYPES;
+    allowMultipleBills?: boolean;
 }) => {
     const { clearOrders, deliveryPrice } = useOrdersContext();
 
@@ -212,6 +217,16 @@ const CreateOrder = ({
         },
     } = languagePacks[language];
 
+    const effectiveOrderType =
+        orderType ?? (tableId ? ORDER_TYPES.DINEIN : ORDER_TYPES.TAKEAWAY);
+    const canAddMultipleBills = allowMultipleBills ?? !!tableId;
+
+    const selectedOrderTypeLabel =
+        ordersTypes[language].find((type) => type.id === effectiveOrderType)
+            ?.name ??
+        ordersTypes[language][0]?.name ??
+        detailsAside.receipt;
+
     const handleClose = () => {
         clearOrders();
         setLocalBills([]);
@@ -282,6 +297,8 @@ const CreateOrder = ({
     });
 
     const handleAddNewBill = () => {
+        if (!canAddMultipleBills) return;
+
         const newId = `new-${newBillCounter}`;
         setNewBillCounter((prev) => prev + 1);
 
@@ -372,13 +389,15 @@ const CreateOrder = ({
                 title={
                     tableName
                         ? `${detailsAside.table} ${tableName}`
-                        : detailsAside.receipt
+                        : selectedOrderTypeLabel
                 }
                 items={isAsideOrdersLoading ? [] : bill}
                 buttons={buttons}
                 onSelectItem={setSelectedBill}
                 selectedItemId={selectedBill}
-                onAddNewOrder={handleAddNewBill}
+                onAddNewOrder={
+                    canAddMultipleBills ? handleAddNewBill : undefined
+                }
                 isItemsLoading={isAsideOrdersLoading}
             />
         </Menu>

@@ -135,6 +135,9 @@ export interface languagePack {
         orderCard: {
             pickup: string;
             delivery: string;
+            price: string;
+            phone: string;
+            address: string;
         };
         asideTitle: string;
         noOrdersFoundFallback: string;

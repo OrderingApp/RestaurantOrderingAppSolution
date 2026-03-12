@@ -24,12 +24,21 @@ const useFilterOrders = () => {
     const orderType = orderTypeParam || ordersTypes[language][0]?.id;
 
     const getOrderStatus = () => {
-        if (orderStatusParam === 'Ongoing') {
+        if (orderStatusParam === 'All') {
             return [
                 ORDER_STATUSES.ONGOING,
                 ORDER_STATUSES.PAID_AND_READY_TO_PREPARE,
             ];
         }
+
+        if (orderStatusParam === 'Ongoing') {
+            return [ORDER_STATUSES.ONGOING];
+        }
+
+        if (orderStatusParam === 'PaidAndReadyToPrepare') {
+            return [ORDER_STATUSES.PAID_AND_READY_TO_PREPARE];
+        }
+
         if (orderStatusParam) {
             return [orderStatusParam];
         }

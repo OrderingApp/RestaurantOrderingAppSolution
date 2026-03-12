@@ -138,6 +138,9 @@ const plPack: languagePack = {
         orderCard: {
             pickup: 'Odbiór',
             delivery: 'Dostawa',
+            price: 'Cena',
+            phone: 'Nr telefonu',
+            address: 'Adres',
         },
         orderCustomerInformationForm: {
             title: 'Dane',
@@ -180,7 +183,7 @@ const plPack: languagePack = {
         orderOptionsModal: {
             titleDelivery: 'Dowóz',
             titleTakeway: 'Odbiór',
-            paymentDue: 'Do Zapłaty',
+            paymentDue: 'Cena',
             customerInformation: {
                 time: 'Godzina',
                 phoneNumber: 'Numer telefonu',

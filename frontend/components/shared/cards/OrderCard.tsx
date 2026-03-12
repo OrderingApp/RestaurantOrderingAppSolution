@@ -26,7 +26,13 @@ const OrderCard = ({
     const { language } = useLanguage();
     const {
         ordersPage: {
-            orderCard: { pickup, delivery },
+            orderCard: {
+                pickup,
+                delivery,
+                price,
+                phone,
+                address: addressLabel,
+            },
         },
     } = languagePacks[language];
 
@@ -45,16 +51,25 @@ const OrderCard = ({
             variantClassName={variantClassName}
             onClick={onClick}
         >
-            <div>
-                <p className="text-left text-[11px] font-bold pb-0.5">
-                    {totalAmount}
-                    {CURRENCIES.pln}
+            <div className="flex flex-col gap-1 items-center justify-center py-2">
+                <p className="text-left text-xs">
+                    <span>{price}:</span>
+                    <span className="font-bold">
+                        {totalAmount}
+                        {CURRENCIES.pln}
+                    </span>
                 </p>
-                <p className="text-left text-[11px] font-bold">
-                    {formatPhoneNumber(phoneNumber)}
+                <p className="text-left text-xs ">
+                    <span>{phone}:</span>
+                    <span className="font-bold">
+                        {formatPhoneNumber(phoneNumber)}
+                    </span>
                 </p>
                 {address && (
-                    <p className="text-left text-[11px] font-bold">{address}</p>
+                    <p className="text-left text-xs flex flex-row justify-center">
+                        <span>{addressLabel}:</span>
+                        <span className="font-bold capitalize">{address}</span>
+                    </p>
                 )}
             </div>
         </ItemCard>
