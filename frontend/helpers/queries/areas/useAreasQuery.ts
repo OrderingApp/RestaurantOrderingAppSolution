@@ -10,7 +10,7 @@ export interface AreaReservation {
     name: string;
     scheduledFor: string;
     capacityNeeded: number;
-    tableId: string;
+    tableId: string | null;
 }
 
 export interface AreaTable {

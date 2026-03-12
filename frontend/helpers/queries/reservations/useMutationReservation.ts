@@ -60,9 +60,7 @@ const useReservationMutation = (type: 'create' | 'update' | 'delete') => {
                 body: type !== 'delete' ? JSON.stringify(data) : undefined,
             });
 
-            if (!response.ok) throw new Error(`Failed to ${type} reservation`);
-            const text = await response.text();
-            return text ? JSON.parse(text) : null;
+            return response.json();
         },
 
         onMutate: async ({

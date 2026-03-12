@@ -62,9 +62,9 @@ const Input = ({
                 ...props,
             }}
             className={clsx(
-                'px-4  w-40 py-2 text-black rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500',
+                'px-4  w-40 py-2 text-black rounded-full focus:outline-none focus:ring-2 focus:ring-primary',
                 inputStyles.variants[variant],
-                errors && '!bg-red-200',
+                errors && '!bg-danger-light',
                 inputStyles.sizes[inputSize].input,
                 inputClassName
             )}
@@ -73,7 +73,7 @@ const Input = ({
         {errors && (
             <p
                 className={clsx(
-                    'text-red-500 text-[10px] md:text-[12px] px-2 ',
+                    'text-danger text-[10px] md:text-[12px] px-2 ',
                     inputStyles.sizes[inputSize].error,
                     errorClassName
                 )}

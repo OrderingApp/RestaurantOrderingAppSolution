@@ -16,7 +16,7 @@ import useQueryAreas, {
 import { Reservation } from '@/helpers/queries/reservations/useQueryReservations';
 import { parseIsoDateAndTime } from '@/helpers/utils/dates';
 
-export interface Table {
+export interface ReservationTable {
     id: string;
     name: string;
     reservations?: Reservation[];
@@ -58,6 +58,8 @@ const INITIAL_FORM_STATE: ReservationForm = {
     reservationId: null,
 };
 
+const TEMP_DRAFT_RESERVATION_ID = 'temp-draft-reservation';
+
 export const ReservationProvider = ({ children }: { children: ReactNode }) => {
     const [form, setForm] = useState<ReservationForm>(INITIAL_FORM_STATE);
     const [localAreas, setLocalAreas] = useState<Area[]>([]);
@@ -88,7 +90,7 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
 
     const addLocalReservation = (tableId: string, tableName: string) => {
         const currentReservationId =
-            form.reservationId || 'temp-draft-reservation';
+            form.reservationId || TEMP_DRAFT_RESERVATION_ID;
 
         const newReservation: AreaReservation = {
             id: currentReservationId,
@@ -127,6 +129,14 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const removeLocalReservation = (tableId: string, reservationId: string) => {
+        const canDeleteReservation = form.reservationId
+            ? reservationId === form.reservationId
+            : reservationId === TEMP_DRAFT_RESERVATION_ID;
+
+        if (!canDeleteReservation) {
+            return;
+        }
+
         setLocalAreas((prevAreas) =>
             prevAreas.map((area) => ({
                 ...area,

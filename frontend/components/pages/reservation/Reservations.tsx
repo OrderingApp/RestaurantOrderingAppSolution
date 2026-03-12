@@ -186,22 +186,26 @@ const Reservations = () => {
                 {isLoading && (
                     <ul className="flex gap-x-8 gap-y-4 px-2 py-3 flex-wrap">
                         {Array.from({ length: 8 }).map((_, index) => (
-                            <ItemCardSkeleton key={index} index={index} />
+                            <li key={index}>
+                                <ItemCardSkeleton />
+                            </li>
                         ))}
                     </ul>
                 )}
 
                 {isError && !isLoading && (
-                    <div className="flex flex-col items-center justify-center w-full mt-20 text-danger">
-                        <p>{errorMsg}</p>
+                    <div>
+                        <p className="text-danger">{errorMsg}</p>
                     </div>
                 )}
 
                 {!isLoading &&
                     !isError &&
                     filteredReservations?.length === 0 && (
-                        <div className="flex flex-col items-center justify-center w-full mt-20 text-gray-500">
-                            <p className="text-lg">{messageNoReservations}</p>
+                        <div>
+                            <p className="text-lg text-center mt-2">
+                                {messageNoReservations}
+                            </p>
                         </div>
                     )}
 

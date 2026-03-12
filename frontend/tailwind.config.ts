@@ -39,6 +39,7 @@ export default {
                 success: 'var(--success)',
                 danger: 'var(--danger)',
                 'danger-dark': 'var(--danger-dark)',
+                'danger-light': 'var(--danger-light)',
                 warning: 'var(--warning)',
                 brown: 'var(--brown)',
                 white: 'var(--white)',

@@ -28,29 +28,31 @@ const ItemCard = ({
     return (
         <li>
             <button onClick={onClick}>
-                <div
+                <span
                     style={{ width: ITEM_CARD_WIDTH, height: ITEM_CARD_HEIGHT }}
                     className={cn(
-                        'rounded-lg overflow-hidden relative',
+                        'block rounded-lg overflow-hidden relative',
 
                         styles.container,
                         className
                     )}
                 >
-                    <div
+                    <span
                         className={cn(
                             'absolute left-[-2px] top-0 w-44 flex justify-between items-center px-2 h-8 border-b border-l border-r border-black',
                             styles.appearance,
                             variantClassName
                         )}
                     >
-                        <p className="text-[11px]">{title}</p>
+                        <span className="text-[11px]">{title}</span>
 
-                        {subtitle && <p className="text-[11px]">{subtitle}</p>}
-                    </div>
+                        {subtitle && (
+                            <span className="text-[11px]">{subtitle}</span>
+                        )}
+                    </span>
 
-                    <div className="h-full p-2 mt-10">{children}</div>
-                </div>
+                    <span className="block h-full p-2 pt-10">{children}</span>
+                </span>
             </button>
         </li>
     );

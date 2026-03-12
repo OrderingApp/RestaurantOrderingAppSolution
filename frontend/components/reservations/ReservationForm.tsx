@@ -40,7 +40,7 @@ const FORM_DEFAULT_VALUES = {
 
 const ReservationForm = () => {
     const searchParams = useSearchParams();
-    const editParam = searchParams.get(SEARCH_PARAMS_NAMES.RESERVATION);
+    const reservationId = searchParams.get(SEARCH_PARAMS_NAMES.RESERVATION);
     const {
         updateForm,
         setHasUnsavedChanges,
@@ -82,7 +82,7 @@ const ReservationForm = () => {
         },
     });
 
-    const { data: reservation } = useQueryReservationsById(editParam ?? '');
+    const { data: reservation } = useQueryReservationsById(reservationId ?? '');
     const { mutate: createMutate, isPending: isCreating } =
         useReservationMutation('create');
     const { mutate: updateMutate, isPending: isUpdating } =
@@ -90,7 +90,7 @@ const ReservationForm = () => {
     const { mutate: deleteMutate, isPending: isDeleting } =
         useReservationMutation('delete');
 
-    const isWorking = isCreating || isUpdating || isDeleting || isSubmitting;
+    const inFlight = isCreating || isUpdating || isDeleting || isSubmitting;
 
     const submitFormHandler = async ({
         date,
@@ -109,9 +109,9 @@ const ReservationForm = () => {
             reset();
         };
 
-        if (editParam) {
+        if (reservationId) {
             updateMutate(
-                { data: newReservation, id: editParam },
+                { data: newReservation, id: reservationId },
                 { onSuccess: onSuccessAction }
             );
         } else {
@@ -126,7 +126,7 @@ const ReservationForm = () => {
         e.preventDefault();
 
         deleteMutate(
-            { id: editParam! },
+            { id: reservationId! },
             {
                 onSuccess: () => {
                     setHasUnsavedChanges(false);
@@ -137,7 +137,7 @@ const ReservationForm = () => {
     };
 
     useEffect(() => {
-        if (editParam && reservation) {
+        if (reservationId && reservation) {
             updateReservationFromDb(reservation);
 
             const { date, time } = parseIsoDateAndTime(
@@ -154,7 +154,7 @@ const ReservationForm = () => {
         } else {
             updateReservationFromDb(null);
         }
-    }, [editParam, reservation, reset]);
+    }, [reservationId, reservation, reset]);
 
     useEffect(() => {
         setHasUnsavedChanges(isDirty);
@@ -169,7 +169,7 @@ const ReservationForm = () => {
                 <h1
                     className={`text-black text-xl font-bold capitalize ${!errors && 'py-4'}`}
                 >
-                    {editParam ? editReservation : createReservation}
+                    {reservationId ? editReservation : createReservation}
                 </h1>
                 <div className="h-full flex flex-col justify-between mt-2 ">
                     <div className="flex flex-col gap-1">
@@ -183,7 +183,7 @@ const ReservationForm = () => {
                             errorClassName="!text-[11px]"
                             inputClassName="w-full"
                             defaultValue={FORM_DEFAULT_VALUES.name}
-                            disabled={isWorking}
+                            disabled={inFlight}
                         />
 
                         <Input
@@ -201,7 +201,7 @@ const ReservationForm = () => {
                             errorClassName="!text-[11px]"
                             inputClassName="w-full hide-input-number-icon"
                             defaultValue={FORM_DEFAULT_VALUES.capacityNeeded}
-                            disabled={isWorking}
+                            disabled={inFlight}
                         />
                         <Input
                             type="date"
@@ -219,7 +219,7 @@ const ReservationForm = () => {
                             errors={errors.date}
                             errorClassName="!text-[11px]"
                             inputClassName="w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0"
-                            disabled={isWorking}
+                            disabled={inFlight}
                         />
                         <Input
                             type="time"
@@ -237,7 +237,7 @@ const ReservationForm = () => {
                             errorClassName="!text-[11px]"
                             inputClassName="w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0"
                             defaultValue={FORM_DEFAULT_VALUES.time}
-                            disabled={isWorking}
+                            disabled={inFlight}
                         />
                         <Input
                             type="phoneNumber"
@@ -249,11 +249,11 @@ const ReservationForm = () => {
                             errorClassName="!text-[11px]"
                             inputClassName="w-full"
                             defaultValue={FORM_DEFAULT_VALUES.phoneNumber}
-                            disabled={isWorking}
+                            disabled={inFlight}
                         />
                     </div>
                     <div className="self-end flex justify-between w-full ">
-                        {editParam && (
+                        {reservationId && (
                             <button
                                 onClick={handleDelete}
                                 className="bg-danger p-2 rounded-md"
@@ -271,7 +271,7 @@ const ReservationForm = () => {
                         <Button className="mt-2" size="xxs">
                             {isCreating || isUpdating
                                 ? saving
-                                : editParam
+                                : reservationId
                                   ? edit
                                   : submit}
                         </Button>

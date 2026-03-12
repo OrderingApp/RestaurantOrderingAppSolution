@@ -24,7 +24,7 @@ const AlertDialog = ({ isOpen, onClose, onConfirm }: AlertDialogProps) => {
     } = languagePacks[language];
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} zIndex={60}>
+        <Modal isOpen={isOpen} onClose={onClose}>
             <div className="w-[445px] h-[445px] bg-attention-gradient rounded-2xl relative shadow-2xl pt-[0.4rem]">
                 <button
                     onClick={onClose}

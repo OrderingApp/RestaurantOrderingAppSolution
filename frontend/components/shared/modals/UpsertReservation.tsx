@@ -19,6 +19,7 @@ import { AreaReservation } from '@/helpers/queries/areas/useAreasQuery';
 
 const MODAL_WIDTH = '830px';
 const MODAL_HEIGHT = '510px';
+const TEMP_DRAFT_RESERVATION_ID = 'temp-draft-reservation';
 
 interface ExpandableTableRowProps {
     tableId: string;
@@ -102,55 +103,57 @@ const ExpandableTableRow = ({
                     </button>
                 </div>
             </div>
+            <ul>
+                {isOpenTable &&
+                    reservations?.map((res) => {
+                        const canDeleteReservation = editedReservationId
+                            ? res.id === editedReservationId
+                            : res.id === TEMP_DRAFT_RESERVATION_ID;
 
-            {isOpenTable &&
-                reservations?.map((res) => (
-                    <div
-                        className="bg-[#E6E6E6] px-8 pr-2 py-2 text-sm text-gray-600 border-t border-gray-100 shadow-inner grid grid-cols-3"
-                        key={res.id}
-                    >
-                        <div className="text-left flex items-center">
-                            <p className="text-xs">{tableName}</p>
-                        </div>
-                        <div className="text-center flex items-center justify-center">
-                            <p className="text-xs">{res.capacityNeeded}</p>
-                        </div>
-                        <div className="text-right flex justify-end gap-2 items-center">
-                            <p className="text-xs">
-                                {
-                                    formatDate(
-                                        new Date(res.scheduledFor),
-                                        language
-                                    ).time
-                                }
-                            </p>
-                            <button
-                                onClick={() => {
-                                    if (
-                                        editedReservationId &&
-                                        res.id !== editedReservationId
-                                    ) {
-                                        return;
-                                    }
-
-                                    removeLocalReservation(tableId, res.id);
-                                }}
-                                disabled={
-                                    !!editedReservationId &&
-                                    res.id !== editedReservationId
-                                }
-                                className="bg-danger w-6 h-6 flex items-center justify-center rounded-md transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                        return (
+                            <li
+                                className="bg-[#E6E6E6] px-8 pr-2 py-2 text-sm text-gray-600 border-t border-gray-100 shadow-inner grid grid-cols-3 items-center"
+                                key={res.id}
                             >
-                                <Image
-                                    src={ICONS.DELETE}
-                                    alt="delete"
-                                    className="w-4 h-4"
-                                />
-                            </button>
-                        </div>
-                    </div>
-                ))}
+                                <p className="text-xs ">{tableName}</p>
+                                <p className="text-xs text-center">
+                                    {res.capacityNeeded}
+                                </p>
 
+                                <div className="text-right flex justify-end gap-2 items-center">
+                                    <p className="text-xs">
+                                        {
+                                            formatDate(
+                                                new Date(res.scheduledFor),
+                                                language
+                                            ).time
+                                        }
+                                    </p>
+                                    <button
+                                        onClick={() => {
+                                            if (!canDeleteReservation) {
+                                                return;
+                                            }
+
+                                            removeLocalReservation(
+                                                tableId,
+                                                res.id
+                                            );
+                                        }}
+                                        disabled={!canDeleteReservation}
+                                        className="bg-danger w-6 h-6 flex items-center justify-center rounded-md transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                                    >
+                                        <Image
+                                            src={ICONS.DELETE}
+                                            alt="delete"
+                                            className="w-4 h-4"
+                                        />
+                                    </button>
+                                </div>
+                            </li>
+                        );
+                    })}
+            </ul>
             {isOpenTable && reservations?.length === 0 && (
                 <div className="bg-[#E6E6E6] px-8 py-2 text-sm text-gray-600 border-t border-gray-100 shadow-inner">
                     <p className="text-xs italic">{messageNoReservations}</p>
@@ -214,26 +217,23 @@ const UpsertReservation = () => {
                 <Tabs
                     value={activeTabValue}
                     onValueChange={setActiveTabValue}
-                    className=""
+                    className="w-full"
                 >
-                    <TabsList className="flex w-full p-0 justify-start flex-wrap bg-gray-100/50 rounded-lg h-full">
-                        {localAreas?.map(({ name, id }) => (
-                            <TabsTrigger
-                                key={id}
-                                onClick={() => setActiveTabValue(id)}
-                                value={id}
-                                className="flex-1 px-6 py-2 rounded-none text-xs
-                                    text-black transition-all duration-200
-                                    hover:bg-gray-200/50 hover:text-gray-900
-                                    data-[state=active]:bg-primary
-                                    data-[state=active]:text-white 
-                                    data-[state=active]:shadow-sm"
-                            >
-                                {name}
-                            </TabsTrigger>
-                        ))}
-                    </TabsList>
-                    <div className="grid grid-cols-3 bg-primary text-white px-6 py-2  text-xs font-medium">
+                    <div className="w-full overflow-x-auto scrollbar pb-2">
+                        <TabsList className="flex w-max p-0 h-auto bg-white rounded-3xl text-black text-sm justify-start">
+                            {localAreas?.map(({ name, id }) => (
+                                <TabsTrigger
+                                    key={id}
+                                    onClick={() => setActiveTabValue(id)}
+                                    value={id}
+                                    className="justify-start py-3 px-6 font-semibold rounded-3xl transition-all duration-200 whitespace-nowrap data-[state=active]:bg-quaternary data-[state=active]:text-white"
+                                >
+                                    {name}
+                                </TabsTrigger>
+                            ))}
+                        </TabsList>
+                    </div>
+                    <div className="grid grid-cols-3 bg-primary text-white px-6 py-2 text-xs font-medium mt-2 rounded-t-lg">
                         <div>{table}</div>
                         <div className="text-center">{guests}</div>
                         <div className="text-right">{time}</div>

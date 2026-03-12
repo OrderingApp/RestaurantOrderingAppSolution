@@ -41,7 +41,6 @@ const Modal = ({
     isOpen = true,
     onClose,
     onAnimationComplete,
-    zIndex = 50,
     motionConfig = MODAL_DEFAULT_MOTION_CONFIG,
 }: ModalProps) =>
     createPortal(
@@ -49,8 +48,7 @@ const Modal = ({
             {isOpen && (
                 <motion.div
                     key="modal-backdrop"
-                    className="fixed top-0 left-0 w-full h-full flex items-center justify-center"
-                    style={{ zIndex }}
+                    className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50"
                     {...motionConfig.backdrop}
                 >
                     <div
