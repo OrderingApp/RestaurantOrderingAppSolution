@@ -154,7 +154,7 @@ const ReservationForm = () => {
         } else {
             updateReservationFromDb(null);
         }
-    }, [reservationId, reservation, reset]);
+    }, [reservationId, reservation, reset, updateReservationFromDb]);
 
     useEffect(() => {
         setHasUnsavedChanges(isDirty);
