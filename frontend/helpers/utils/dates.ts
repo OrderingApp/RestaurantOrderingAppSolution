@@ -93,6 +93,7 @@ export const parseIsoDateAndTime = (isoDateString?: string | null) => {
         console.error('Błąd podczas parsowania daty:', isoDateString);
         return { date: '', time: '' };
     }
+};
 export const getElapsedSecondsFromTimestamp = (timestamp?: string) => {
     if (!timestamp) return 0;
 
