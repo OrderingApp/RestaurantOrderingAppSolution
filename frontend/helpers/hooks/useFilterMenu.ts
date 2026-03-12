@@ -19,7 +19,11 @@ const useFilterMenu = (variant: 'card' | 'order') => {
     const subcategoryId = searchParams.get(SEARCH_PARAMS_NAMES.SUBCATEGORY);
     const name = searchParams.get(SEARCH_PARAMS_NAMES.NAME);
     const tag = searchParams.getAll(SEARCH_PARAMS_NAMES.TAG);
-    const page = searchParams.get(SEARCH_PARAMS_NAMES.PAGE);
+    const pageSearchParam =
+        variant === 'order'
+            ? SEARCH_PARAMS_NAMES.ORDER_MENU_PAGE
+            : SEARCH_PARAMS_NAMES.PAGE;
+    const page = searchParams.get(pageSearchParam);
     const {
         displayedCategories,
         filteredMenuItems,
@@ -77,7 +81,7 @@ const useFilterMenu = (variant: 'card' | 'order') => {
             displayedTags = menuItemsTags.filter((tag) =>
                 filteredMenuItems.some((item) =>
                     item.ingredients.some((ingredient) =>
-                        ingredient.tagIds.some((id) => id === tag.id)
+                        ingredient.tags.some((id) => id === tag.id)
                     )
                 )
             );
@@ -85,7 +89,7 @@ const useFilterMenu = (variant: 'card' | 'order') => {
             if (tag.length > 0) {
                 filteredMenuItems = filteredMenuItems.filter((item) =>
                     item.ingredients.some((ingredient) =>
-                        ingredient.tagIds.some((id) => tag.includes(id))
+                        ingredient.tags.some((id) => tag.includes(id))
                     )
                 );
             }
@@ -120,7 +124,17 @@ const useFilterMenu = (variant: 'card' | 'order') => {
             displayedTags,
             itemsPerPage,
         };
-    }, [menuCategories, categoryId, subcategoryId, name, menuItems, tag]);
+    }, [
+        menuCategories,
+        categoryId,
+        subcategoryId,
+        name,
+        menuItems,
+        menuItemsTags,
+        page,
+        tag,
+        variant,
+    ]);
 
     return {
         displayedCategories,

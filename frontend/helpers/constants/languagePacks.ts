@@ -23,6 +23,10 @@ export interface languagePack {
         info: string;
         addNewOrder: string;
         delivery: string;
+        receipt: string;
+        table: string;
+        noOrders?: string;
+        noTableChosen?: string;
     };
     loginPage: {
         appName: string;
@@ -110,7 +114,16 @@ export interface languagePack {
                 payment: string;
                 normal: string;
             };
+            descriptions: {
+                available: string;
+                closed: string;
+            };
             balanceName: string;
+            receiptsCountName: string;
+            reservationName: string;
+            personsCountName: string;
+            hourName: string;
+            reservationInName: string;
         };
     };
     ordersPage: {
@@ -165,6 +178,8 @@ export interface languagePack {
             close: string;
             discount: string;
         };
+        confirmation?: string;
+        error?: string;
         addOrder: string;
     };
     paymentModal: {
@@ -267,6 +282,11 @@ export interface languagePack {
         close: string;
     };
 }
+
+export type TableCardDescriptions =
+    languagePack['tablePage']['tableCard']['descriptions'];
+
+export type TableDescriptionKey = keyof TableCardDescriptions;
 
 interface OrderEntity {
     id: string;

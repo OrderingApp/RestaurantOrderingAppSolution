@@ -93,4 +93,48 @@ export const parseIsoDateAndTime = (isoDateString?: string | null) => {
         console.error('Błąd podczas parsowania daty:', isoDateString);
         return { date: '', time: '' };
     }
+export const getElapsedSecondsFromTimestamp = (timestamp?: string) => {
+    if (!timestamp) return 0;
+
+    const startedAt = new Date(timestamp);
+    if (Number.isNaN(startedAt.getTime())) return 0;
+
+    const elapsed = Math.floor((Date.now() - startedAt.getTime()) / 1000);
+    return Math.max(0, elapsed);
+};
+
+export const getRemainingSecondsUntilTimestamp = (timestamp?: string) => {
+    if (!timestamp) return 0;
+
+    const targetDate = new Date(timestamp);
+    if (Number.isNaN(targetDate.getTime())) return 0;
+
+    const remaining = Math.floor((targetDate.getTime() - Date.now()) / 1000);
+    return Math.max(0, remaining);
+};
+
+export const formatElapsedTime = (elapsedInSeconds: number) => {
+    const hours = Math.floor(elapsedInSeconds / 3600)
+        .toString()
+        .padStart(2, '0');
+    const minutes = Math.floor((elapsedInSeconds % 3600) / 60)
+        .toString()
+        .padStart(2, '0');
+    const seconds = Math.floor(elapsedInSeconds % 60)
+        .toString()
+        .padStart(2, '0');
+
+    return `${hours}:${minutes}:${seconds}`;
+};
+
+export const formatReservationHour = (dateValue?: string) => {
+    if (!dateValue) return '--:--';
+
+    const date = new Date(dateValue);
+    if (Number.isNaN(date.getTime())) return '--:--';
+
+    return new Intl.DateTimeFormat(undefined, {
+        hour: '2-digit',
+        minute: '2-digit',
+    }).format(date);
 };

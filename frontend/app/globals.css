@@ -40,23 +40,39 @@ body {
     }
 }
 
-.scrollbar::-webkit-scrollbar {
-    height: 8px;
-    width: 8px;
+/* Hide native scrollbar on the tabs container */
+.scrollbar-none {
+    scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
 }
 
-.scrollbar::-webkit-scrollbar-thumb {
-    background: hsl(var(--primary));
-    border-radius: 9999px;
-    color: hsl(var(--primary)) transparent;
+/* Standalone scrollbar — only on pointer devices */
+@media (pointer: fine) {
+    .pointer-fine-scrollbar::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .pointer-fine-scrollbar::-webkit-scrollbar-thumb {
+        background: hsl(var(--primary));
+        border-radius: 9999px;
+    }
+
+    .pointer-fine-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: hsl(var(--primary) / 0.8);
+    }
+
+    .pointer-fine-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
 }
 
-.scrollbar::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--primary) / 0.8);
-}
-
-.scrollbar::-webkit-scrollbar-track {
-    background: transparent;
+/* Touch — swipe on tabs works, no visible scrollbar anywhere */
+@media (pointer: coarse) {
+    .pointer-fine-scrollbar {
+        display: none;
+    }
 }
 
 .hide-input-number-icon {

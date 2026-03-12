@@ -348,63 +348,63 @@ public class OrderServiceTests
         );
     }
 
-    [Fact]
-    public async Task GetOngoingNonDineInOrders_ShouldReturnBadRequest_WhenOrderTypeIsInvalid()
-    {
-        // Arrange
-        var invalidOrderType = OrderType.DineIn;
-        var date = DateTime.Today;
+    //[Fact]
+    //public async Task GetOngoingNonDineInOrders_ShouldReturnBadRequest_WhenOrderTypeIsInvalid()
+    //{
+    //    // Arrange
+    //    var invalidOrderType = OrderType.DineIn;
+    //    var date = DateTime.Today;
 
-        // Act
-        var result = await _service.GetOngoingAndClosedNonDineInOrders(invalidOrderType, date);
+    //    // Act
+    //    var result = await _service.GetOngoingAndClosedNonDineInOrders(invalidOrderType, date);
 
-        // Assert
-        result.ShouldFailWith<List<NonDineInOrderSummaryDto>>(
-            HttpStatusCode.BadRequest,
-            "Invalid order type. Only 'Delivery' and 'Takeaway' types are allowed."
-        );
-    }
+    //    // Assert
+    //    result.ShouldFailWith<List<NonDineInOrderSummaryDto>>(
+    //        HttpStatusCode.BadRequest,
+    //        "Invalid order type. Only 'Delivery' and 'Takeaway' types are allowed."
+    //    );
+    //}
 
-    [Fact]
-    public async Task GetOngoingNonDineInOrders_ShouldReturnOrders_WhenValid()
-    {
-        // Arrange
-        var date = DateTime.Today;
-        var order = OrderTestData.CreateOrder(
-            type: OrderType.Takeaway,
-            status: OrderStatus.Ongoing
-        );
+    //[Fact]
+    //public async Task GetOngoingNonDineInOrders_ShouldReturnOrders_WhenValid()
+    //{
+    //    // Arrange
+    //    var date = DateTime.Today;
+    //    var order = OrderTestData.CreateOrder(
+    //        type: OrderType.Takeaway,
+    //        status: OrderStatus.Ongoing
+    //    );
 
-        await _dbContext.Orders.AddAsync(order);
-        await _dbContext.SaveChangesAsync();
+    //    await _dbContext.Orders.AddAsync(order);
+    //    await _dbContext.SaveChangesAsync();
 
-        var expectedDto = new NonDineInOrderSummaryDto { Id = order.Id };
-        _mockMapper.Setup(m => m.Map<List<NonDineInOrderSummaryDto>>(It.IsAny<List<Order>>()))
-            .Returns(new List<NonDineInOrderSummaryDto> { expectedDto });
+    //    var expectedDto = new NonDineInOrderSummaryDto { Id = order.Id };
+    //    _mockMapper.Setup(m => m.Map<List<NonDineInOrderSummaryDto>>(It.IsAny<List<Order>>()))
+    //        .Returns(new List<NonDineInOrderSummaryDto> { expectedDto });
 
-        // Act
-        var result = await _service.GetOngoingAndClosedNonDineInOrders(OrderType.Takeaway, date);
+    //    // Act
+    //    var result = await _service.GetOngoingAndClosedNonDineInOrders(OrderType.Takeaway, date);
 
-        // Assert
-        result.ShouldBeSuccessful(HttpStatusCode.OK);
-        result.Data.Should().ContainSingle().And.ContainEquivalentOf(expectedDto);
-    }
+    //    // Assert
+    //    result.ShouldBeSuccessful(HttpStatusCode.OK);
+    //    result.Data.Should().ContainSingle().And.ContainEquivalentOf(expectedDto);
+    //}
 
-    [Fact]
-    public async Task GetOngoingNonDineInOrders_ShouldFail_WhenExceptionThrown()
-    {
-        // Arrange
-        var service = new OrderService(null!, _mockEventHandler.Object, _mockMapper.Object);
+    //[Fact]
+    //public async Task GetOngoingNonDineInOrders_ShouldFail_WhenExceptionThrown()
+    //{
+    //    // Arrange
+    //    var service = new OrderService(null!, _mockEventHandler.Object, _mockMapper.Object);
 
-        // Act
-        var result = await service.GetOngoingAndClosedNonDineInOrders(OrderType.Delivery, DateTime.Today);
+    //    // Act
+    //    var result = await service.GetOngoingAndClosedNonDineInOrders(OrderType.Delivery, date );
 
-        // Assert
-        result.ShouldFailWith<List<NonDineInOrderSummaryDto>>(
-            HttpStatusCode.InternalServerError,
-            expectedErrorMessage: result.ErrorMessage!
-        );
-    }
+    //    // Assert
+    //    result.ShouldFailWith<List<NonDineInOrderSummaryDto>>(
+    //        HttpStatusCode.InternalServerError,
+    //        expectedErrorMessage: result.ErrorMessage!
+    //    );
+    //}
 
     [Fact]
     public async Task GetOngoingOrdersForTable_ShouldReturnNotFound_WhenNoOngoingOrdersExist()

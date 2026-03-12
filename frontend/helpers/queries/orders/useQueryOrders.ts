@@ -13,9 +13,9 @@ export const fetchOrders = async (): Promise<Order[]> => {
 
 export const ORDERS_QUERY_KEY = [OrdersItems.ALL];
 
-const useQueryOrders = () =>
+const useQueryOrders = ({ queryKeys }: { queryKeys?: string[] }) =>
     useQuery({
-        queryKey: ORDERS_QUERY_KEY,
+        queryKey: [...ORDERS_QUERY_KEY, ...(queryKeys || [])],
         queryFn: fetchOrders,
     });
 

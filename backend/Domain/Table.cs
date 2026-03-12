@@ -5,7 +5,9 @@ public class Table
     public Guid Id { get; set; }
     public required string Name { get; set; }
     public int Capacity { get; set; }
+    public int SequenceNumber { get; set; }
     public bool IsPrepared { get; set; } = false;
+    public DateTime? ActiveSince { get; set; }
 
     public bool IsUsed { get; set; } = true;
     public bool IsDeleted { get; set; } = false;

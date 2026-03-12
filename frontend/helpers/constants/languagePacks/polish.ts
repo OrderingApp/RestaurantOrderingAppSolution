@@ -10,6 +10,10 @@ const plPack: languagePack = {
         info: 'Informacje',
         addNewOrder: 'Dodaj nowy rachunek',
         delivery: 'Dostawa',
+        receipt: 'rachunek nr',
+        table: 'Stolik',
+        noOrders: 'Brak zamówień',
+        noTableChosen: 'Proszę wybrać stolik',
     },
     loginPage: {
         appName: 'aplikacja do zamówień',
@@ -113,7 +117,16 @@ const plPack: languagePack = {
                 payment: 'Stolik w trakcie płatności',
                 normal: 'Stolik aktywny',
             },
+            descriptions: {
+                available: 'Dostępny',
+                closed: 'Nieczynny',
+            },
             balanceName: 'Saldo',
+            receiptsCountName: 'Liczba rachunków',
+            reservationName: 'Rezerwacja',
+            personsCountName: 'Liczba osób',
+            hourName: 'Godzina',
+            reservationInName: 'Rezerwacja za',
         },
     },
     ordersPage: {
@@ -184,6 +197,8 @@ const plPack: languagePack = {
             close: 'Zamknij bez zmian',
             discount: 'Dodaj zniżkę',
         },
+        confirmation: 'Dodano do rachunku',
+        error: 'Nie udało się dodać do rachunku',
         addOrder: 'Dodaj',
     },
     paymentModal: {

@@ -31,6 +31,8 @@ export const CURRENCIES = {
     eur: '€',
 } as const;
 
+export const COMPANYS_CURRENCY: keyof typeof CURRENCIES = 'pln';
+
 export const COMPANY_INITIAL_GEO_COORDS = {
     lat: 50.05598658820353,
     lng: 21.61245102578422,
@@ -56,6 +58,7 @@ export enum SEARCH_PARAMS_NAMES {
     NAME = 'name',
     TAG = 'tag',
     PAGE = 'page',
+    ORDER_MENU_PAGE = 'orderMenuPage',
     ORDER_TYPE = 'orderType',
     ORDER_STATUS = 'orderStatus',
     ORDER_ID = 'orderId',

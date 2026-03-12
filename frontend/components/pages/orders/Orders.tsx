@@ -21,7 +21,7 @@ import DetailsAside from '@/components/shared/asides/Details';
 import OrderList from '@/components/shared/lists/orders/OrderList';
 import PaymentDetails from '@/components/shared/modals/PaymentDetails';
 import EditOrder from './EditOrder';
-import CreateOrder from './CreateOrder';
+import CreateOrder from '../../shared/modals/CreateOrder';
 import SearchInput from '@/components/shared/Input/SearchInput';
 import clsx from 'clsx';
 

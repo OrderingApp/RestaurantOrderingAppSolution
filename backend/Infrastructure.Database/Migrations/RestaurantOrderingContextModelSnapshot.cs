@@ -17,6 +17,30 @@ namespace Infrastructure.Database.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
 
+            modelBuilder.Entity("Domain.Allergen", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("EuNumber")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Allergens");
+                });
+
             modelBuilder.Entity("Domain.Area", b =>
                 {
                     b.Property<Guid>("Id")
@@ -32,6 +56,9 @@ namespace Infrastructure.Database.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("SequenceNumber")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -81,6 +108,9 @@ namespace Infrastructure.Database.Migrations
                     b.Property<bool>("CanBeUsedAsExtra")
                         .HasColumnType("INTEGER");
 
+                    b.Property<Guid?>("CategoryId")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
 
@@ -93,7 +123,45 @@ namespace Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
                     b.ToTable("Ingredients");
+                });
+
+            modelBuilder.Entity("Domain.IngredientAllergenRel", b =>
+                {
+                    b.Property<Guid>("IngredientId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("AllergenId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("IngredientId", "AllergenId");
+
+                    b.HasIndex("AllergenId");
+
+                    b.ToTable("IngredientAllergenRels");
+                });
+
+            modelBuilder.Entity("Domain.IngredientCategory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("IngredientCategories");
                 });
 
             modelBuilder.Entity("Domain.MenuCategory", b =>
@@ -313,9 +381,6 @@ namespace Infrastructure.Database.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("IsAssigned")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -389,6 +454,9 @@ namespace Infrastructure.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("ActiveSince")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("AreaId")
                         .HasColumnType("TEXT");
 
@@ -407,6 +475,9 @@ namespace Infrastructure.Database.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("SequenceNumber")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -464,6 +535,35 @@ namespace Infrastructure.Database.Migrations
                         .IsRequired();
 
                     b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("Domain.Ingredient", b =>
+                {
+                    b.HasOne("Domain.IngredientCategory", "Category")
+                        .WithMany("Ingredients")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Domain.IngredientAllergenRel", b =>
+                {
+                    b.HasOne("Domain.Allergen", "Allergen")
+                        .WithMany("IngredientAllergenRels")
+                        .HasForeignKey("AllergenId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Ingredient", "Ingredient")
+                        .WithMany("IngredientAllergenRels")
+                        .HasForeignKey("IngredientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Allergen");
+
+                    b.Navigation("Ingredient");
                 });
 
             modelBuilder.Entity("Domain.MenuItem", b =>
@@ -664,6 +764,11 @@ namespace Infrastructure.Database.Migrations
                     b.Navigation("Tag");
                 });
 
+            modelBuilder.Entity("Domain.Allergen", b =>
+                {
+                    b.Navigation("IngredientAllergenRels");
+                });
+
             modelBuilder.Entity("Domain.Area", b =>
                 {
                     b.Navigation("Tables");
@@ -671,9 +776,16 @@ namespace Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Domain.Ingredient", b =>
                 {
+                    b.Navigation("IngredientAllergenRels");
+
                     b.Navigation("IngredientTagRels");
 
                     b.Navigation("MenuItemIngredientRels");
+                });
+
+            modelBuilder.Entity("Domain.IngredientCategory", b =>
+                {
+                    b.Navigation("Ingredients");
                 });
 
             modelBuilder.Entity("Domain.MenuCategory", b =>

@@ -27,7 +27,7 @@ public static class ReservationTestData
         string? phoneNumber = null,
         string? name = null,
         DateTime? scheduledFor = null,
-        bool? isAssigned = null,
+        Guid? tableId = null,
         int capacityNeeded = 4
     ) =>
         new Reservation
@@ -37,7 +37,7 @@ public static class ReservationTestData
             Name = name ?? DefaultName,
             ScheduledFor = scheduledFor ?? DateTime.UtcNow.AddHours(3),
             CapacityNeeded = capacityNeeded,
-            IsAssigned = isAssigned ?? false
+            TableId = tableId
         };
 
     public static ReservationReadDto CreateReservationReadDto(Reservation reservation) =>
@@ -48,6 +48,6 @@ public static class ReservationTestData
             Name = reservation.Name,
             ScheduledFor = reservation.ScheduledFor,
             CapacityNeeded = reservation.CapacityNeeded,
-            IsAssigned = reservation.IsAssigned
+            // TableName / TableId can be set by tests when needed
         };
 }
