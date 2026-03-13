@@ -171,6 +171,13 @@ export interface languagePack {
                 time: string;
                 phoneNumber: string;
                 address: string;
+                comment: string;
+            };
+            summary: {
+                title: string;
+                status: string;
+                paid: string;
+                unpaid: string;
             };
         };
     };

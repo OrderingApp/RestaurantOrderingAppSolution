@@ -12,7 +12,7 @@ export interface ItemCardProps {
 }
 
 export const ITEM_CARD_WIDTH = 176;
-export const ITEM_CARD_HEIGHT = 112;
+export const ITEM_CARD_HEIGHT = 110;
 
 const ItemCard = ({
     title,
@@ -32,7 +32,6 @@ const ItemCard = ({
                     style={{ width: ITEM_CARD_WIDTH, height: ITEM_CARD_HEIGHT }}
                     className={cn(
                         'block rounded-lg overflow-hidden relative',
-
                         styles.container,
                         className
                     )}

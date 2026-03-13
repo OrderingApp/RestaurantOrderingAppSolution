@@ -5,6 +5,7 @@ import React, {
     useContext,
     useState,
     useEffect,
+    useCallback,
     ReactNode,
 } from 'react';
 
@@ -72,7 +73,17 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
     } = useQueryAreas({ date: form.date });
 
     useEffect(() => {
-        if (dbAreas) setLocalAreas(dbAreas);
+        if (!dbAreas) {
+            return;
+        }
+
+        setLocalAreas((prevAreas) => {
+            if (JSON.stringify(prevAreas) === JSON.stringify(dbAreas)) {
+                return prevAreas;
+            }
+
+            return dbAreas;
+        });
     }, [dbAreas]);
 
     const updateForm = <K extends keyof ReservationForm>(
@@ -155,25 +166,48 @@ export const ReservationProvider = ({ children }: { children: ReactNode }) => {
         setHasUnsavedChanges(true);
     };
 
-    const updateReservationFromDb = (reservation: AreaReservation | null) => {
-        if (!reservation) {
-            setForm({
-                ...INITIAL_FORM_STATE,
-                date: new Date().toISOString().split('T')[0],
+    const updateReservationFromDb = useCallback(
+        (reservation: AreaReservation | null) => {
+            if (!reservation) {
+                const resetDate = new Date().toISOString().split('T')[0];
+
+                setForm((prev) => {
+                    const next = {
+                        ...INITIAL_FORM_STATE,
+                        date: resetDate,
+                    };
+
+                    if (JSON.stringify(prev) === JSON.stringify(next)) {
+                        return prev;
+                    }
+
+                    return next;
+                });
+                return;
+            }
+
+            const { date, time } = parseIsoDateAndTime(
+                reservation.scheduledFor
+            );
+
+            setForm((prev) => {
+                const next = {
+                    date,
+                    time,
+                    peopleCount: reservation.capacityNeeded,
+                    selectedTableId: reservation.tableId,
+                    reservationId: reservation.id,
+                };
+
+                if (JSON.stringify(prev) === JSON.stringify(next)) {
+                    return prev;
+                }
+
+                return next;
             });
-            return;
-        }
-
-        const { date, time } = parseIsoDateAndTime(reservation.scheduledFor);
-
-        setForm({
-            date,
-            time,
-            peopleCount: reservation.capacityNeeded,
-            selectedTableId: reservation.tableId,
-            reservationId: reservation.id,
-        });
-    };
+        },
+        []
+    );
 
     const clearLocalReservations = () => {
         if (dbAreas) {

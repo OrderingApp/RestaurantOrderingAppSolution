@@ -75,23 +75,51 @@ export const createOrderItemAggregationKey = (item: OrderItem): string => {
     return `${menuItemId}|${extraKey}|${removedKey}|${specialInstructions}`;
 };
 
+const compareAggregatedOrderItems = (
+    a: AggregatedOrderItem,
+    b: AggregatedOrderItem
+): number => {
+    // Show most frequent items first.
+    if (a.quantity !== b.quantity) return b.quantity - a.quantity;
+
+    const extrasDiff = serializeIngredients(a.extraIngredients).localeCompare(
+        serializeIngredients(b.extraIngredients)
+    );
+    if (extrasDiff !== 0) return extrasDiff;
+
+    const menuNameDiff = a.menuItem.name.localeCompare(b.menuItem.name);
+    if (menuNameDiff !== 0) return menuNameDiff;
+
+    return createOrderItemAggregationKey(a).localeCompare(
+        createOrderItemAggregationKey(b)
+    );
+};
+
+export const aggregateAndSortOrderItems = (
+    orderItems: OrderItem[]
+): AggregatedOrderItem[] => {
+    const aggregated = new Map<string, AggregatedOrderItem>();
+
+    orderItems.forEach((item) => {
+        const key = createOrderItemAggregationKey(item);
+
+        if (aggregated.has(key)) {
+            const existing = aggregated.get(key)!;
+            existing.quantity += 1;
+        } else {
+            aggregated.set(key, { ...item, quantity: 1 });
+        }
+    });
+
+    return Array.from(aggregated.values()).toSorted(
+        compareAggregatedOrderItems
+    );
+};
+
 export const aggregateOrderItems = (orders: Order[]): AggregatedOrder[] =>
     orders.map((order) => {
-        const aggregated = new Map<string, AggregatedOrderItem>();
-
-        order.orderItems.forEach((item) => {
-            const key = createOrderItemAggregationKey(item);
-
-            if (aggregated.has(key)) {
-                const existing = aggregated.get(key)!;
-                existing.quantity += 1;
-            } else {
-                aggregated.set(key, { ...item, quantity: 1 });
-            }
-        });
-
         return {
             ...order,
-            orderItems: Array.from(aggregated.values()),
+            orderItems: aggregateAndSortOrderItems(order.orderItems),
         };
     });

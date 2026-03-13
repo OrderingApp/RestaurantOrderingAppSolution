@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { Order, OrderItem } from '@/helpers/interfaces/orders';
 import {
+    aggregateAndSortOrderItems,
     aggregateOrderItems,
     createOrderItemAggregationKey,
 } from '@/helpers/utils/orderTransforms';
@@ -212,5 +213,79 @@ describe('createOrderItemAggregationKey', () => {
         expect(createOrderItemAggregationKey(first)).not.toBe(
             createOrderItemAggregationKey(second)
         );
+    });
+});
+
+describe('aggregateAndSortOrderItems', () => {
+    it('aggregates identical items and computes quantity on frontend', () => {
+        const first = createOrderItem({
+            extraIngredients: [
+                extra('ing-2', 'Olives', 1, 2),
+                extra('ing-1', 'Cheese', 1, 3),
+            ],
+        });
+        const second = createOrderItem({
+            extraIngredients: [
+                extra('ing-1', 'Cheese', 1, 3),
+                extra('ing-2', 'Olives', 1, 2),
+            ],
+        });
+
+        const result = aggregateAndSortOrderItems([first, second]);
+
+        expect(result).toHaveLength(1);
+        expect(result[0].quantity).toBe(2);
+    });
+
+    it('sorts by quantity descending', () => {
+        const repeatedA = createOrderItem(
+            { menuItem: { ...createOrderItem().menuItem, id: 'a', name: 'A' } },
+            'a'
+        );
+        const repeatedB = createOrderItem(
+            { menuItem: { ...createOrderItem().menuItem, id: 'b', name: 'B' } },
+            'b'
+        );
+
+        const result = aggregateAndSortOrderItems([
+            repeatedA,
+            createOrderItem({ ...repeatedA, id: crypto.randomUUID() }, 'a'),
+            repeatedB,
+        ]);
+
+        expect(result).toHaveLength(2);
+        expect(result[0].quantity).toBe(2);
+        expect(result[1].quantity).toBe(1);
+    });
+
+    it('when quantity is equal, sorts by extra ingredients key', () => {
+        const cheese = createOrderItem(
+            {
+                menuItem: {
+                    ...createOrderItem().menuItem,
+                    id: 'x',
+                    name: 'Pizza',
+                },
+                extraIngredients: [extra('ing-1', 'Cheese', 1, 3)],
+            },
+            'x'
+        );
+        const olives = createOrderItem(
+            {
+                menuItem: {
+                    ...createOrderItem().menuItem,
+                    id: 'x',
+                    name: 'Pizza',
+                },
+                extraIngredients: [extra('ing-2', 'Olives', 1, 2)],
+            },
+            'x'
+        );
+
+        const result = aggregateAndSortOrderItems([olives, cheese]);
+
+        expect(result).toHaveLength(2);
+        expect(result[0].extraIngredients?.[0]?.ingredientId).toBe('ing-1');
+        expect(result[1].extraIngredients?.[0]?.ingredientId).toBe('ing-2');
     });
 });

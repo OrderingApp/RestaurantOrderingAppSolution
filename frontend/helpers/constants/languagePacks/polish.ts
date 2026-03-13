@@ -188,6 +188,13 @@ const plPack: languagePack = {
                 time: 'Godzina',
                 phoneNumber: 'Numer telefonu',
                 address: 'Adres',
+                comment: 'Komentarz',
+            },
+            summary: {
+                title: 'Podsumowanie',
+                status: 'Status',
+                paid: 'Opłacone',
+                unpaid: 'Nieopłacone',
             },
         },
         asideTitle: 'Zamówienie',

@@ -1,6 +1,10 @@
 'use client';
 
-import { CURRENCIES, ORDER_STATUSES } from '@/helpers/constants/constants';
+import {
+    CURRENCIES,
+    ORDER_STATUSES,
+    ORDER_TYPES,
+} from '@/helpers/constants/constants';
 import ItemCard, { ItemCardProps } from './ItemCard';
 import { formatDate } from '@/helpers/utils/dates';
 import useLanguage from '@/helpers/hooks/useLanguage';
@@ -38,7 +42,7 @@ const OrderCard = ({
 
     return (
         <ItemCard
-            title={orderType === 'Takeaway' ? pickup : delivery}
+            title={orderType === ORDER_TYPES.TAKEAWAY ? pickup : delivery}
             subtitle={
                 formatDate(new Date(expectedOrderCompletion), language).time
             }
@@ -47,31 +51,33 @@ const OrderCard = ({
                     ? 'orderActive'
                     : 'orderCompleted'
             }
-            className={className}
+            className={`${className} ${orderType === ORDER_TYPES.DELIVERY ? '!h-[120px]' : ''}`}
             variantClassName={variantClassName}
             onClick={onClick}
         >
-            <div className="flex flex-col gap-1 items-center justify-center py-2">
-                <p className="text-left text-xs">
+            <span className="flex flex-col gap-1 items-center justify-center">
+                <span className="text-left text-xs">
                     <span>{price}:</span>
                     <span className="font-bold">
                         {totalAmount}
                         {CURRENCIES.pln}
                     </span>
-                </p>
-                <p className="text-left text-xs ">
+                </span>
+                <span className="text-left text-xs">
                     <span>{phone}:</span>
                     <span className="font-bold">
                         {formatPhoneNumber(phoneNumber)}
                     </span>
-                </p>
+                </span>
                 {address && (
-                    <p className="text-left text-xs flex flex-row justify-center">
+                    <span className="text-left text-xs flex flex-row justify-center">
                         <span>{addressLabel}:</span>
-                        <span className="font-bold capitalize">{address}</span>
-                    </p>
+                        <span className="font-bold capitalize text-center mb-2">
+                            {address}
+                        </span>
+                    </span>
                 )}
-            </div>
+            </span>
         </ItemCard>
     );
 };

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -10,12 +10,19 @@ import { ICONS } from '@/helpers/constants/icons/icons';
 import languagePacks from '@/helpers/constants/languagePacks';
 import useLanguage from '@/helpers/hooks/useLanguage';
 import useQuerySingleOrder from '@/helpers/queries/orders/useQuerySingleOrder';
-import { toggleQueryParam } from '@/helpers/utils/utils';
+import { aggregateAndSortOrderItems } from '@/helpers/utils/orderTransforms';
+import { formatPhoneNumber, toggleQueryParam } from '@/helpers/utils/utils';
+import clsx from 'clsx';
+import { inputStyles } from '@/lib/styles/input';
+import { formatDate } from '@/helpers/utils/dates';
 
 const VIEWS = {
     INFO: 'info',
     SUMMARY: 'summary',
 };
+
+const MODAL_WIDTH = '445px';
+const ORDER_TYPE = 'Takeaway';
 
 const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
     const { language } = useLanguage();
@@ -25,11 +32,19 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
     const orderId = searchParms.get(SEARCH_PARAMS_NAMES.ORDER_ID);
     const { data } = useQuerySingleOrder(orderId || '');
 
-    // --- NOWE STANY I ZMIENNE ---
     const [currentView, setCurrentView] = useState(VIEWS.INFO);
+    const [stableOrderStatus, setStableOrderStatus] = useState<
+        string | undefined
+    >(undefined);
 
-    // Zastąp to właściwym polem z Twojego API sprawdzającym czy opłacone
-    const isPaid = data?.isPaid || false;
+    useEffect(() => {
+        if (data?.orderStatus) {
+            setStableOrderStatus(data.orderStatus);
+        }
+    }, [data?.orderStatus]);
+
+    const orderStatus = data?.orderStatus ?? stableOrderStatus;
+    const isPaid = orderStatus === 'PaidAndReadyToPrepare';
 
     const {
         ordersPage: {
@@ -37,30 +52,33 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
                 titleDelivery,
                 titleTakeway,
                 paymentDue,
-                customerInformation: { time, phoneNumber, address },
+                customerInformation: { time, phoneNumber, address, comment },
+                summary: { title, status, paid, unpaid },
             },
         },
     } = languagePacks[language];
 
-    // Informacje o kliencie (Widok Info)
+    const summaryOrderItems = aggregateAndSortOrderItems(
+        data?.orderItems ?? []
+    );
+
     const informationInputs = [
         {
-            label: 'Dane', // Warto dodać do paczki językowej
-            value: data?.customerInformation?.name || 'Jan Kowalski',
-            icon: ICONS.USER, // Upewnij się, że masz taką ikonę
-            alt: 'user',
-        },
-        {
             label: time,
-            value: data?.customerInformation?.expectedOrderCompletion
-                ?.split('T')[1]
-                ?.slice(0, 5),
+            value: formatDate(
+                new Date(
+                    data?.customerInformation?.expectedOrderCompletion || ''
+                ),
+                language
+            ).time,
             icon: ICONS.TIME,
             alt: 'time',
         },
         {
             label: phoneNumber,
-            value: data?.customerInformation?.phoneNumber,
+            value: formatPhoneNumber(
+                data?.customerInformation?.phoneNumber || ''
+            ),
             icon: ICONS.PHONE,
             alt: 'phone',
         },
@@ -72,10 +90,8 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
         },
 
         {
-            label: 'Komentarz',
-            value: data?.customerInformation?.comment || 'Brak',
-            icon: ICONS.COMMENT,
-            alt: 'comment',
+            label: comment,
+            value: data?.customerInformation?.additionalInstructions,
         },
     ];
 
@@ -89,8 +105,6 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
         );
     };
 
-    // --- LOGIKA PRZYCISKÓW ---
-    // Przyciski zmieniają się w zależności od widoku i statusu opłacenia
     const getActionsButtons = () => {
         if (currentView === VIEWS.INFO) {
             return isPaid
@@ -102,7 +116,7 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
                           onClick: () => setCurrentView(VIEWS.SUMMARY),
                       },
                       {
-                          icon: ICONS.CLOSE,
+                          icon: ICONS.CLOSE_WHITE,
                           color: '#3A4A5A',
                           alt: 'close order',
                           onClick: closeOrder,
@@ -135,7 +149,6 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
                       },
                   ];
         } else {
-            // WIDOK PODSUMOWANIA
             return isPaid
                 ? [
                       {
@@ -145,13 +158,13 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
                           onClick: () => setCurrentView(VIEWS.INFO),
                       },
                       {
-                          icon: ICONS.PREVIEW_NO_EDIT,
+                          icon: ICONS.USER,
                           color: '#2B5162',
                           alt: 'preview no edit',
                           onClick: () => console.log('Preview no edit'),
                       },
                       {
-                          icon: ICONS.CLOSE,
+                          icon: ICONS.CLOSE_WHITE,
                           color: '#3A4A5A',
                           alt: 'close order',
                           onClick: closeOrder,
@@ -165,7 +178,7 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
                   ]
                 : [
                       {
-                          icon: ICONS.USER,
+                          icon: ICONS.USER_WHITE,
                           color: '#2B5162',
                           alt: 'customer data',
                           onClick: () => setCurrentView(VIEWS.INFO),
@@ -192,19 +205,18 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
         }
     };
 
-    const MODAL_WIDTH = '445px';
-    const ORDER_TYPE = 'Takeaway';
-
     return (
         <div
-            className="bg-order-card-gradient pt-[0.4rem] rounded-2xl relative"
+            className={clsx(
+                'pt-[0.4rem] rounded-2xl relative',
+                isPaid ? 'bg-order-paid-gradient' : 'bg-order-card-gradient'
+            )}
             style={{ width: MODAL_WIDTH }}
         >
             <button onClick={onClose} className="absolute top-3 right-2">
                 <Image className="w-6 h-6" src={ICONS.CLOSE} alt="close" />
             </button>
-            <div className="bg-white  rounded-2xl h-full p-4 flex flex-col min-h-[550px] justify-between">
-                {/* ZAWARTOŚĆ GŁÓWNA */}
+            <div className="bg-white  rounded-2xl h-full p-4 flex flex-col justify-center">
                 <div>
                     {currentView === VIEWS.INFO && (
                         <>
@@ -218,108 +230,108 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
                                     <span className="font-bold text-sm">
                                         {paymentDue}
                                     </span>
-                                    <span className="text-[#2B5162] font-bold">
+                                    <span
+                                        className={clsx('font-bold', {
+                                            'text-paid': isPaid,
+                                            'text-ongoing': !isPaid,
+                                        })}
+                                    >
                                         {data?.totalAmount} {CURRENCIES.pln}
                                     </span>
                                 </div>
                             </div>
-                            <div className="flex flex-col gap-2 mt-2">
+                            <ul className="flex flex-col gap-2 mt-2">
                                 {informationInputs.map((input) => (
-                                    <div key={input.label}>
+                                    <li key={input.label}>
                                         <h4 className="font-bold ml-2 text-sm">
                                             {input.label}
                                         </h4>
-                                        <div className="flex bg-[#F5F5F5] rounded-xl p-3 justify-between items-center">
-                                            <span className="opacity-70 text-sm">
+                                        <div
+                                            className={clsx(
+                                                inputStyles.variants.primary,
+                                                'flex h-11 rounded-2xl p-3 justify-between items-center'
+                                            )}
+                                        >
+                                            <span className="text-sm">
                                                 {input.value}
                                             </span>
                                             {input.icon && (
                                                 <Image
+                                                    className="aspect-square"
                                                     src={input.icon}
-                                                    alt={input.alt}
-                                                    width={18}
-                                                    height={18}
+                                                    alt={input.alt ?? ''}
+                                                    width={22}
+                                                    height={22}
                                                 />
                                             )}
                                         </div>
-                                    </div>
+                                    </li>
                                 ))}
-                            </div>
+                            </ul>
                         </>
                     )}
 
                     {currentView === VIEWS.SUMMARY && (
                         <>
-                            <h2 className="text-xl font-bold mb-4">
-                                Podsumowanie zamówienia
-                            </h2>
-                            <div className="flex flex-col gap-2 border-b-2 border-gray-200 pb-4 mb-4">
-                                {/* ZAMIEŃ NA MAPOWANIE PRAWDZIWYCH DANYCH data?.items */}
-                                <div className="flex justify-between text-sm font-bold">
-                                    <span>
-                                        Rossa 1{' '}
-                                        <span className="text-gray-400 font-normal">
-                                            x2
-                                        </span>
-                                    </span>
-                                    <span>60,00 zł</span>
-                                </div>
-                                <div className="flex justify-between text-sm font-bold">
-                                    <span>
-                                        Rossa 1{' '}
-                                        <span className="text-gray-400 font-normal">
-                                            +extra
-                                        </span>
-                                    </span>
-                                    <span>35,00 zł</span>
-                                </div>
-                            </div>
+                            <h2 className="text-xl font-bold mb-8">{title}</h2>
 
-                            <div className="flex flex-col gap-1 text-sm font-bold mb-6">
-                                <div className="flex justify-between text-orange-500">
-                                    <span>Suma:</span>
-                                    <span>129,00 zł</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Opłacono:</span>
-                                    <span>
-                                        {isPaid ? '129,00 zł' : '0,00 zł'}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Pozostało:</span>
-                                    <span>
-                                        {isPaid ? '0,00 zł' : '129,00 zł'}
-                                    </span>
-                                </div>
-                            </div>
+                            <div className="border border-gray-300 rounded-2xl p-2 py-4 shadow-xl">
+                                <ul className="flex flex-col px-2">
+                                    {summaryOrderItems.map((item, index) => (
+                                        <li
+                                            key={`${item.id}-${index}`}
+                                            className="flex justify-between items-center py-2 pb-1 border-b border-gray-300 text-md font-bold text-black"
+                                        >
+                                            <span className="font-bold">
+                                                {item.menuItem.name}{' '}
+                                                <span className="text-dark-gray font-normal text-sm ml-1">
+                                                    x{item.quantity}
+                                                </span>
+                                            </span>
+                                            <span>
+                                                {item.menuItem.price} zł
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
 
-                            <div
-                                className={`text-center py-2 rounded-lg font-bold text-sm ${isPaid ? 'bg-teal-50 text-teal-600' : 'bg-orange-50 text-orange-500'}`}
-                            >
-                                Status: {isPaid ? 'Opłacone' : 'Nie opłacone'}
+                                <div className="mt-5 bg-gray font-semibold text-center py-3 rounded-xl text-xl text-black">
+                                    <span className=""> {status}: </span>
+
+                                    <span
+                                        className={
+                                            isPaid
+                                                ? 'text-paid'
+                                                : 'text-ongoing'
+                                        }
+                                    >
+                                        {isPaid ? paid : unpaid}
+                                    </span>
+                                </div>
                             </div>
                         </>
                     )}
                 </div>
 
-                {/* PRZYCISKI AKCJI NA DOLE */}
-                <div className="flex gap-4 py-3 justify-center mt-auto border-t border-gray-100 pt-4">
+                <ul
+                    className={`flex gap-4 py-3 justify-between mt-6 ${currentView == VIEWS.INFO ? 'px-12' : 'px-6'}`}
+                >
                     {getActionsButtons().map((btn) => (
-                        <button
-                            key={btn.alt}
-                            onClick={btn.onClick}
-                            style={{ backgroundColor: btn.color }}
-                            className="w-14 h-14 rounded-lg shadow-md flex justify-center items-center hover:opacity-90 transition-opacity"
-                        >
-                            <Image
-                                className="w-6 h-6"
-                                src={btn.icon}
-                                alt={btn.alt}
-                            />
-                        </button>
+                        <li key={btn.alt}>
+                            <button
+                                onClick={btn.onClick}
+                                style={{ backgroundColor: btn.color }}
+                                className="w-16 h-16 rounded-lg shadow-md flex justify-center items-center hover:opacity-90 transition-opacity"
+                            >
+                                <Image
+                                    className="w-8 h-8"
+                                    src={btn.icon}
+                                    alt={btn.alt}
+                                />
+                            </button>
+                        </li>
                     ))}
-                </div>
+                </ul>
             </div>
         </div>
     );

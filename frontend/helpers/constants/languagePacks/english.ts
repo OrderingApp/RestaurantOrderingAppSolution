@@ -140,7 +140,7 @@ const enPack: languagePack = {
             delivery: 'Delivery',
             price: 'Price',
             phone: 'Phone number',
-                address: 'Address',
+            address: 'Address',
         },
         orderCustomerInformationForm: {
             title: 'Data',
@@ -187,6 +187,13 @@ const enPack: languagePack = {
                 time: 'Time',
                 phoneNumber: 'Phone Number',
                 address: 'Adress',
+                comment: 'Comment',
+            },
+            summary: {
+                title: 'Summary',
+                status: 'Status',
+                paid: 'Paid',
+                unpaid: 'Unpaid',
             },
         },
         asideTitle: 'Order',

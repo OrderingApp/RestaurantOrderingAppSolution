@@ -6,7 +6,12 @@ export type OrderCompletionType = 'Immediate' | 'Scheduled';
 
 export type PaymentMethod = 'Card' | 'Cash' | 'Online';
 
-export type OrderStatus = 'Ongoing' | 'PendingPayment' | 'Cancelled' | 'Closed';
+export type OrderStatus =
+    | 'Ongoing'
+    | 'PendingPayment'
+    | 'Cancelled'
+    | 'Closed'
+    | 'PaidAndReadyToPrepare';
 
 export interface ExtraIngredient {
     ingredientId: string;

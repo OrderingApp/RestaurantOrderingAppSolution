@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchWithParams } from '@/helpers/utils/utils';
 import { BACKEND_PATHS } from '@/helpers/constants/constants';
 import { Areas } from '@/helpers/utils/queryKeys';
-import { fetchWithParams } from '@/helpers/utils/utils';
 
 export enum TABLE_STATUSES {
     Available = 'Available',
@@ -56,7 +55,7 @@ export interface AreaTable {
     capacity: number;
     isPrepared: boolean;
     reservations: AreaReservation[];
-    status: string;
+    status: TableStatus;
 }
 
 export interface Area {

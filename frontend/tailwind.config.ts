@@ -24,6 +24,8 @@ export default {
                     'linear-gradient(135deg, #DD8080 0%, #BB0101 100%)',
                 'order-card-gradient':
                     'linear-gradient(135deg, #CD5700 0%, #843901 100%)',
+                'order-paid-gradient':
+                    'linear-gradient(135deg, #008080 0%, #005656 100%)',
             },
             colors: {
                 primary: {
@@ -49,6 +51,8 @@ export default {
                 gray: 'var(--gray)',
                 'dark-gray': 'var(--dark-gray)',
                 served: 'var(--served)',
+                ongoing: 'var(--ongoing)',
+                paid: 'var(--paid)',
                 background: 'hsl(var(--background))',
                 foreground: 'hsl(var(--foreground))',
                 card: {
