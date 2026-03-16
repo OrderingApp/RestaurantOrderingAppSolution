@@ -38,6 +38,7 @@ interface DataTableProps<TData, TValue> {
     data: TData[];
     pagination?: boolean;
     paginationType?: 'descriptive';
+    searchBar?: boolean;
     searchPlaceholder?: string;
     noResultsFallback?: ReactNode;
     error?: string;
@@ -51,6 +52,7 @@ export const DataTable = <TData, TValue>({
     data,
     pagination,
     paginationType = 'descriptive',
+    searchBar,
     searchPlaceholder,
     noResultsFallback,
     error,
@@ -111,15 +113,17 @@ export const DataTable = <TData, TValue>({
 
     return (
         <>
-            <Input
-                value={globalFilter ?? ''}
-                placeholder={searchPlaceholder ?? fallbackSearchPlaceholder}
-                icon={<Image src={searchSvg} alt="" />}
-                className="w-4/5 max-w-[630px] mb-5"
-                inputClassName="w-full pl-8"
-                iconClassName="left-3 !top-1/2 -translate-y-1/2 w-max"
-                onChange={(e) => table.setGlobalFilter(e.target.value)}
-            />
+            {searchBar && (
+                <Input
+                    value={globalFilter ?? ''}
+                    placeholder={searchPlaceholder ?? fallbackSearchPlaceholder}
+                    icon={<Image src={searchSvg} alt="" />}
+                    className="w-4/5 max-w-[630px] mb-5"
+                    inputClassName="w-full pl-8"
+                    iconClassName="left-3 !top-1/2 -translate-y-1/2 w-max"
+                    onChange={(e) => table.setGlobalFilter(e.target.value)}
+                />
+            )}
 
             <div className="overflow-hidden rounded-md border">
                 <Table>

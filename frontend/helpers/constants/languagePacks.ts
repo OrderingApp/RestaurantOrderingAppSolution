@@ -201,7 +201,9 @@ export interface languagePack {
 
     paymentDetails: {
         bill: string;
+        productNumber: string;
         product: string;
+        discount: string;
         quantity: string;
         productPrice: string;
         total: string;

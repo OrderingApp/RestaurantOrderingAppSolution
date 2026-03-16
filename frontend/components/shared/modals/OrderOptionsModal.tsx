@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -33,18 +33,8 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
     const { data } = useQuerySingleOrder(orderId || '');
 
     const [currentView, setCurrentView] = useState(VIEWS.INFO);
-    const [stableOrderStatus, setStableOrderStatus] = useState<
-        string | undefined
-    >(undefined);
 
-    useEffect(() => {
-        if (data?.orderStatus) {
-            setStableOrderStatus(data.orderStatus);
-        }
-    }, [data?.orderStatus]);
-
-    const orderStatus = data?.orderStatus ?? stableOrderStatus;
-    const isPaid = orderStatus === 'PaidAndReadyToPrepare';
+    const isPaid = data?.orderStatus === 'PaidAndReadyToPrepare';
 
     const {
         ordersPage: {
@@ -116,7 +106,7 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
                           onClick: () => setCurrentView(VIEWS.SUMMARY),
                       },
                       {
-                          icon: ICONS.CLOSE_WHITE,
+                          icon: ICONS.CLOSE,
                           color: '#3A4A5A',
                           alt: 'close order',
                           onClick: closeOrder,
@@ -164,7 +154,7 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
                           onClick: () => console.log('Preview no edit'),
                       },
                       {
-                          icon: ICONS.CLOSE_WHITE,
+                          icon: ICONS.CLOSE,
                           color: '#3A4A5A',
                           alt: 'close order',
                           onClick: closeOrder,
@@ -207,10 +197,7 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
 
     return (
         <div
-            className={clsx(
-                'pt-[0.4rem] rounded-2xl relative',
-                isPaid ? 'bg-order-paid-gradient' : 'bg-order-card-gradient'
-            )}
+            className="bg-order-card-gradient pt-[0.4rem] rounded-2xl relative"
             style={{ width: MODAL_WIDTH }}
         >
             <button onClick={onClose} className="absolute top-3 right-2">

@@ -220,7 +220,9 @@ const enPack: languagePack = {
         bill: 'Bill',
         product: 'Product',
         quantity: 'Quantity',
-        productPrice: 'Product Price',
+        productPrice: 'Price',
+        discount: 'Discount',
+        productNumber: 'Number',
         total: 'Total',
     },
     discountModal: {

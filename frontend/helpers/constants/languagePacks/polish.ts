@@ -221,8 +221,10 @@ const plPack: languagePack = {
         bill: 'Rachunek',
         product: 'Produkt',
         quantity: 'Ilość',
-        productPrice: 'Cena za produkt',
-        total: 'Razem',
+        productPrice: 'Cena',
+        discount: 'Zniżka',
+        productNumber: 'Numer',
+        total: 'Suma',
     },
     discountModal: {
         disscountTitle: 'Dodaj zniżkę',

@@ -52,7 +52,7 @@ const Orders = () => {
     const isCreateOrderModalOpen = modal === 'true' && !orderId;
     const isEditOrderModalOpen = modal === 'true' && !!orderId;
     const isPaymentModalOpen = closeOrder === 'true';
-    const isOrderOptionsModalOpen = !!orderId;
+    const isOrderOptionsModalOpen = !!orderId && !isPaymentModalOpen;
 
     const toggleModal = () => {
         toggleQueryParam(
@@ -229,6 +229,8 @@ const Orders = () => {
             <OverviewModal isOpen={isEditOrderModalOpen}>
                 <EditOrder toggleModal={toggleModal} />
             </OverviewModal>
+
+            {/* Change detailaside props or change aside ui */}
 
             <OverviewModal isOpen={isPaymentModalOpen}>
                 <PaymentDetails>

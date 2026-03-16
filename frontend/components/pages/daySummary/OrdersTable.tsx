@@ -12,8 +12,8 @@ import {
     DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
 import Badge from '@/components/shared/badges/Badge';
-import TableSortableHeader from './components/orders-table/TableSortableHeader';
-import TableCell from './components/orders-table/TableCell';
+import TableSortableHeader from '@/components/shared/tables/TableSortableHeader';
+import TableCell from '../../shared/tables/TableCell';
 
 import { formatPriceStr } from '@/helpers/utils/prices';
 import { ORDER_STATUSES, ORDER_TYPES } from '@/helpers/constants/constants';
@@ -33,7 +33,7 @@ const currency = 'pln';
 
 const OrdersTable = () => {
     const { language } = useLanguage();
-    const { data, isLoading, isError, error } = useQueryOrders();
+    const { data, isLoading, isError, error } = useQueryOrders({});
 
     const {
         ordersTable: {
