@@ -33,5 +33,12 @@
     "isUsed": true,
     "isDeleted": false,
     "sequenceNumber": 5
+  },
+  {
+    "id": "bbd115a6-620e-434f-9dad-4f739a32ed6b",
+    "name": "Przód",
+    "isUsed": true,
+    "isDeleted": false,
+    "sequenceNumber": 6
   }
 ]
