@@ -13,7 +13,7 @@ interface SubCategory extends NamedEntity {
 
 interface Ingredient extends NamedEntity {
     id: string;
-    tags: string[];
+    tagIds: string[];
 }
 
 export interface IngredientWithTags extends Ingredient {

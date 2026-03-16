@@ -81,7 +81,7 @@ const useFilterMenu = (variant: 'card' | 'order') => {
             displayedTags = menuItemsTags.filter((tag) =>
                 filteredMenuItems.some((item) =>
                     item.ingredients.some((ingredient) =>
-                        ingredient.tags.some((id) => id === tag.id)
+                        ingredient.tagIds.some((id) => id === tag.id)
                     )
                 )
             );
@@ -89,7 +89,7 @@ const useFilterMenu = (variant: 'card' | 'order') => {
             if (tag.length > 0) {
                 filteredMenuItems = filteredMenuItems.filter((item) =>
                     item.ingredients.some((ingredient) =>
-                        ingredient.tags.some((id) => tag.includes(id))
+                        ingredient.tagIds.some((id) => tag.includes(id))
                     )
                 );
             }
@@ -107,7 +107,7 @@ const useFilterMenu = (variant: 'card' | 'order') => {
 
         totalItems = filteredMenuItems.length;
 
-        const itemsPerPage = variant === 'card' ? 12 : 8;
+        const itemsPerPage = variant === 'card' ? 12 : 9;
         if (page) {
             const pageNumber = parseInt(page, 10);
             const startIndex = (pageNumber - 1) * itemsPerPage;
@@ -116,6 +116,7 @@ const useFilterMenu = (variant: 'card' | 'order') => {
         } else {
             filteredMenuItems = filteredMenuItems.slice(0, itemsPerPage);
         }
+        console.log(filteredMenuItems);
 
         return {
             displayedCategories,

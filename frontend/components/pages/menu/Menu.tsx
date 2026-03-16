@@ -117,9 +117,6 @@ const Menu = ({ variant = 'order', children, onAddItem }: MenuProps) => {
                                 onOpenMenuItemInformation={(id: string) =>
                                     setMenuItemInformationId(id)
                                 }
-                                variant={
-                                    menuStyles.variants[variant].menuItemVariant
-                                }
                                 key={item.id}
                                 onAddItem={onAddItem}
                                 {...item}
