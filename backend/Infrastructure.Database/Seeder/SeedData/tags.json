@@ -1,0 +1,44 @@
+[
+  {
+    "id": "83804d10-57c7-49c8-8f8a-34f6a8486c0f",
+    "name": "Szynka",
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "15febb8e-5c89-4416-ac10-7011f7f31cd8",
+    "name": "Salami",
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "4df3da64-b66b-4db9-ad1c-bcd54db2cc4f",
+    "name": "Spianata",
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "bd9dc92b-4f3f-46fa-8e4e-5b0a6602996c",
+    "name": "Kurczak",
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "3805b924-0399-4ffb-af1b-dd2533d3bf63",
+    "name": "Wege",
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "e3e07ec9-75f1-45bb-b435-7ab002a68b73",
+    "name": "N\u0027duja",
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "66109b01-6f01-49e9-ab47-249eba53f077",
+    "name": "\u0141oso\u015B",
+    "isUsed": true,
+    "isDeleted": false
+  }
+]

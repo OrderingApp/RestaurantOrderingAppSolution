@@ -1,0 +1,65 @@
+[
+  {
+    "id": "3105744d-0779-441c-a4d1-18abc2d8dfd2",
+    "name": "Przystawki",
+    "isUsed": true,
+    "isDeleted": false,
+    "sequenceNumber": 5
+  },
+  {
+    "id": "3f8b6e32-6c05-48bf-a6f7-e80d938ee926",
+    "name": "Panuozzo",
+    "isUsed": true,
+    "isDeleted": false,
+    "sequenceNumber": 4
+  },
+  {
+    "id": "296d37b9-57e0-4201-9b48-262a976cc186",
+    "name": "Piadina",
+    "isUsed": true,
+    "isDeleted": false,
+    "sequenceNumber": 3
+  },
+  {
+    "id": "b67ec25b-f644-48c8-9039-fa94f9f6d78e",
+    "name": "Pizza",
+    "isUsed": true,
+    "isDeleted": false,
+    "sequenceNumber": 1
+  },
+  {
+    "id": "0125059b-c237-4973-a363-992359741021",
+    "name": "Calzone",
+    "isUsed": true,
+    "isDeleted": false,
+    "sequenceNumber": 2
+  },
+  {
+    "id": "a723c65b-a4ab-48c0-a9e6-f8481bcf5c16",
+    "name": "Napoje",
+    "isUsed": true,
+    "isDeleted": false,
+    "sequenceNumber": 6
+  },
+  {
+    "id": "9e451bf3-3df6-49b8-9eb7-aa1ffaa4366c",
+    "name": "Sezon Letni",
+    "isUsed": true,
+    "isDeleted": false,
+    "sequenceNumber": 10
+  },
+  {
+    "id": "34f4ff47-bb0f-4a46-a73a-e7b357ff2c0c",
+    "name": "Sezon Zimowy",
+    "isUsed": true,
+    "isDeleted": false,
+    "sequenceNumber": 9
+  },
+  {
+    "id": "cc9993a8-0fda-4135-a4fc-dde9e8f7cc65",
+    "name": "Alkohol",
+    "isUsed": true,
+    "isDeleted": false,
+    "sequenceNumber": 8
+  }
+]
