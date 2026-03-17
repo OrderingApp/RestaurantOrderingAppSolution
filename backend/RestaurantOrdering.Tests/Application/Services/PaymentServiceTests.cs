@@ -34,10 +34,10 @@ public class PaymentServiceTests
     }
 
     [Fact]
-    public async Task AddPayment_ShouldSucceed_WhenOrderIsPendingPayment()
+    public async Task AddPayment_ShouldSucceed_WhenOrderIsOngoing()
     {
         // Arrange
-        var order = OrderTestData.CreateOrder(status: OrderStatus.PendingPayment, totalAmount: 100m);
+        var order = OrderTestData.CreateOrder(status: OrderStatus.Ongoing, totalAmount: 100m);
         await _dbContext.Orders.AddAsync(order);
         await _dbContext.SaveChangesAsync();
 
@@ -77,10 +77,10 @@ public class PaymentServiceTests
     }
 
     [Fact]
-    public async Task AddPayment_ShouldFail_WhenOrderIsNotPendingPayment()
+    public async Task AddPayment_ShouldFail_WhenOrderIsClosed()
     {
         // Arrange
-        var order = OrderTestData.CreateOrder(status: OrderStatus.Ongoing, totalAmount: 100m);
+        var order = OrderTestData.CreateOrder(status: OrderStatus.Closed, totalAmount: 100m);
         await _dbContext.Orders.AddAsync(order);
         await _dbContext.SaveChangesAsync();
 
@@ -92,7 +92,7 @@ public class PaymentServiceTests
         // Assert
         result.ShouldFailWith<PaymentReadDto>(
             HttpStatusCode.BadRequest,
-            "Order must be in Pending Payment status to add payment."
+            "Cannot add a payment to an order that is closed or cancelled."
         );
     }
 
@@ -100,7 +100,7 @@ public class PaymentServiceTests
     public async Task AddPayment_ShouldFail_WhenPaymentExceedsTotal()
     {
         // Arrange
-        var order = OrderTestData.CreateOrder(status: OrderStatus.PendingPayment, totalAmount: 100m);
+        var order = OrderTestData.CreateOrder(status: OrderStatus.Ongoing, totalAmount: 100m);
         var existingPayment = PaymentTestData.CreatePayment(orderId: order.Id, amount: 90m);
         order.Payments.Add(existingPayment);
 

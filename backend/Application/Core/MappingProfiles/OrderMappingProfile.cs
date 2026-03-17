@@ -32,6 +32,7 @@ public class OrderMappingProfile : Profile
                         ? s.CustomerInformation.ExpectedOrderCompletion.Value
                         : s.CreatedAt))
             .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Status.ToString()))
+            .ForMember(dest => dest.PaymentStatus, opt => opt.MapFrom(src => src.PaymentStatus.ToString()))
             .ForMember(dest => dest.OrderType, opt => opt.MapFrom(src => src.Type.ToString()))
             .ForMember(
                 dest => dest.PhoneNumber,

@@ -34,15 +34,15 @@ public class PaymentService(
                     HttpStatusCode.NotFound
                 );
 
-            if (order.Status != OrderStatus.PendingPayment)
+            if (order.Status == OrderStatus.Closed || order.Status == OrderStatus.Cancelled)
                 return ResultDto<PaymentReadDto>.Failure(
-                    "Order must be in Pending Payment status to add payment.",
+                    "Cannot add a payment to an order that is closed or cancelled.",
                     HttpStatusCode.BadRequest
                 );
 
-            var totalPaid = order.Payments.Sum(p => p.Amount);
+            var activelyPaid = order.Payments.Where(p => !p.IsRefunded).Sum(p => p.Amount);
 
-            if (totalPaid + paymentDto.Amount > order.TotalAmount)
+            if (activelyPaid + paymentDto.Amount > order.TotalAmount)
                 return ResultDto<PaymentReadDto>.Failure(
                     "Payment exceeds order total.",
                     HttpStatusCode.BadRequest
@@ -52,6 +52,10 @@ public class PaymentService(
             payment.OrderId = orderId;
 
             orderingContext.Payments.Add(payment);
+
+            order.PaidAmount = activelyPaid + paymentDto.Amount;
+            order.PaymentStatus = DerivePaymentStatus(order.PaidAmount, order.TotalAmount);
+
             await orderingContext.SaveChangesAsync();
 
             var paymentReadDto = mapper.Map<PaymentReadDto>(payment);
@@ -102,16 +106,17 @@ public class PaymentService(
     {
         try
         {
-            var orderExists = await orderingContext.Orders.AnyAsync(o => o.Id == orderId);
-            if (!orderExists)
+            var order = await orderingContext
+                .Orders.Include(o => o.Payments)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (order == null)
                 return ResultDto<PaymentReadDto>.Failure(
                     "Order not found",
                     HttpStatusCode.NotFound
                 );
 
-            var payment = await orderingContext.Payments.FirstOrDefaultAsync(p =>
-                p.Id == id && p.OrderId == orderId
-            );
+            var payment = order.Payments.FirstOrDefault(p => p.Id == id);
 
             if (payment == null)
                 return ResultDto<PaymentReadDto>.Failure(
@@ -120,6 +125,10 @@ public class PaymentService(
                 );
 
             payment.IsRefunded = true;
+
+            order.PaidAmount = order.Payments.Where(p => !p.IsRefunded).Sum(p => p.Amount);
+            order.PaymentStatus = DerivePaymentStatus(order.PaidAmount, order.TotalAmount);
+
             await orderingContext.SaveChangesAsync();
 
             var paymentReadDto = mapper.Map<PaymentReadDto>(payment);
@@ -133,5 +142,12 @@ public class PaymentService(
                 HttpStatusCode.InternalServerError
             );
         }
+    }
+
+    private static PaymentStatus DerivePaymentStatus(decimal paidAmount, decimal totalAmount)
+    {
+        if (paidAmount <= 0) return PaymentStatus.Unpaid;
+        if (paidAmount < totalAmount) return PaymentStatus.PartiallyPaid;
+        return PaymentStatus.Paid;
     }
 }

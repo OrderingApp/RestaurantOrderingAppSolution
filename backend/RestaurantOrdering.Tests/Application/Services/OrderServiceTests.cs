@@ -672,7 +672,7 @@ public class OrderServiceTests
         // Assert
         result.ShouldFailWith<OrderReadDto>(
             HttpStatusCode.BadRequest,
-            "Payments do not fully cover the order total."
+            "Order cannot be closed until it is fully paid."
         );
     }
 
@@ -682,6 +682,7 @@ public class OrderServiceTests
         // Arrange
         var table = TableTestData.CreateOngoingTable();
         var order = OrderTestData.CreateOrder(tableId: table.Id, totalAmount: 100, discount: 0);
+        order.PaymentStatus = PaymentStatus.Paid;
         var payment = PaymentTestData.CreatePayment(amount: 100);
         order.Payments.Add(payment);
 
@@ -711,6 +712,7 @@ public class OrderServiceTests
         // Arrange
         var table = TableTestData.CreateOngoingTable();
         var order1 = OrderTestData.CreateOrder(tableId: table.Id, totalAmount: 100, discount: 0);
+        order1.PaymentStatus = PaymentStatus.Paid;
         var order2 = OrderTestData.CreateOrder(tableId: table.Id, status: OrderStatus.Ongoing);
         var payment = PaymentTestData.CreatePayment(amount: 100);
         order1.Payments.Add(payment);

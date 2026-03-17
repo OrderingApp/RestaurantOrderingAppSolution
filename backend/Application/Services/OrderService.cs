@@ -488,7 +488,6 @@ public class OrderService(
         {
             var order = await orderingContext
                 .Orders.Include(o => o.OrderItems)
-                .Include(o => o.Payments)
                 .Include(o => o.Table)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
@@ -501,12 +500,9 @@ public class OrderService(
                     HttpStatusCode.BadRequest
                 );
 
-            var totalDue = Math.Max(0, order.TotalAmount * (1 - (order.Discount / 100m)));
-            var totalPaid = order.Payments.Sum(p => p.Amount);
-
-            if (totalPaid < totalDue)
+            if (order.PaymentStatus != PaymentStatus.Paid)
                 return ResultDto<OrderReadDto>.Failure(
-                    "Payments do not fully cover the order total.",
+                    "Order cannot be closed until it is fully paid.",
                     HttpStatusCode.BadRequest
                 );
 
