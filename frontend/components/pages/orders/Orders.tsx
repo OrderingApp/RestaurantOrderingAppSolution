@@ -55,13 +55,24 @@ const Orders = () => {
     const isOrderOptionsModalOpen = !!orderId && !isPaymentModalOpen;
 
     const toggleModal = () => {
-        toggleQueryParam(
-            SEARCH_PARAMS_NAMES.MODAL,
-            'true',
-            searchParams,
-            router,
-            pathname
-        );
+        const params = new URLSearchParams(searchParams.toString());
+        const isOpen = params.get(SEARCH_PARAMS_NAMES.MODAL) === 'true';
+
+        if (isOpen) {
+            params.delete(SEARCH_PARAMS_NAMES.MODAL);
+            params.delete(SEARCH_PARAMS_NAMES.ORDER_ID);
+            params.delete(SEARCH_PARAMS_NAMES.MENU_ITEM_ID);
+            params.delete(SEARCH_PARAMS_NAMES.USER_DATA);
+            params.delete(SEARCH_PARAMS_NAMES.CATEGORY);
+            params.delete(SEARCH_PARAMS_NAMES.SUBCATEGORY);
+            params.delete(SEARCH_PARAMS_NAMES.TAG);
+            params.delete(SEARCH_PARAMS_NAMES.ORDER_MENU_PAGE);
+        } else {
+            params.set(SEARCH_PARAMS_NAMES.MODAL, 'true');
+        }
+
+        const queryString = params.toString();
+        router.push(queryString ? `${pathname}?${queryString}` : pathname);
     };
 
     const closeOrderHandler = () => {

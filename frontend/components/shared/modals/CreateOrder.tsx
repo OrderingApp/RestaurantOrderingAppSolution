@@ -10,7 +10,7 @@ import {
 } from '@/helpers/constants/constants';
 import { useOrdersContext } from '@/providers/OrdersContext';
 import { OrdersItems } from '@/helpers/utils/queryKeys';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toggleQueryParam } from '@/helpers/utils/utils';
 import CustomerInformationForm from '../../pages/orders/CustomerInformationForm';
@@ -23,6 +23,14 @@ import useQueryOrders from '@/helpers/queries/orders/useQueryOrders';
 import useQueryTables from '@/helpers/queries/tables/useQueryTables';
 import { getAggregatedDineInOrdersForTable } from '@/helpers/utils/orderTransforms';
 import useConfirmDineinBillsMutation from '@/helpers/queries/orders/useConfirmDineinBillsMutation';
+import {
+    useQueryMenuIngredients,
+    useQueryMenuItem,
+} from '@/helpers/queries/menu-items/useQueryMenuItems';
+import type { AddItemHandler } from '@/components/shared/cards/MenuItem';
+import { formatPriceStr } from '@/helpers/utils/prices';
+import { useCreateOrderLocalBills } from '../../../helpers/hooks/useCreateOrderLocalBills';
+import SwipeableIngredientRow from '../animations/SwipeableIngredientRow';
 
 export interface BillProps {
     id: string;
@@ -33,25 +41,8 @@ export interface BillProps {
     className?: string;
 }
 
-type LocalBillItem = {
-    id: string; // menu item id
-    name: string;
-    price: number;
-    currency: Currency;
-    quantity: number;
-    discount?: number;
-};
-
-type LocalBill = {
-    id: string; // either existing bill id or 'new-X' for new bills
-    isNew: boolean;
-    orderItems: LocalBillItem[];
-    pendingItems: LocalBillItem[]; // items added from menu, not yet synced to backend
-    totalAmount: number;
-};
-
 const CreateOrder = ({
-    toggleModal,
+    toggleModal: _toggleModal,
     skipCustomerForm = false,
     tableId,
     orderType,
@@ -63,18 +54,31 @@ const CreateOrder = ({
     orderType?: ORDER_TYPES;
     allowMultipleBills?: boolean;
 }) => {
-    const { clearOrders, deliveryPrice } = useOrdersContext();
+    const {
+        clearOrders,
+        clearExtraIngredients,
+        clearRemovedIngredients,
+        deliveryPrice,
+        addExtraIngredient,
+        decrementExtraIngredient,
+        removeIngredientFromOrderItem,
+        restoreIngredientForOrderItem,
+        getExtraIngredients,
+        getExtraIngredientsTotalPrice,
+        getExtraIngredientsPayloadByOrderItemId,
+        getRemovedIngredientIds,
+        getRemovedIngredientIdsPayloadByOrderItemId,
+    } = useOrdersContext();
 
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const menuItemId = searchParams.get(SEARCH_PARAMS_NAMES.MENU_ITEM_ID);
+    const selectedOrderItemId = searchParams.get(
+        SEARCH_PARAMS_NAMES.MENU_ITEM_ID
+    );
     const userData = searchParams.get(SEARCH_PARAMS_NAMES.USER_DATA);
 
     const [selectedId, setSelectedId] = useState('');
-    const [selectedBill, setSelectedBill] = useState<string | null>(null);
-    const [localBills, setLocalBills] = useState<LocalBill[]>([]);
-    const [newBillCounter, setNewBillCounter] = useState(0);
 
     const { language } = useLanguage();
 
@@ -92,123 +96,76 @@ const CreateOrder = ({
         return getAggregatedDineInOrdersForTable(allOrders || [], tableId);
     }, [allOrders, tableId]);
 
+    const canAddMultipleBills = allowMultipleBills ?? !!tableId;
+    const isAsideOrdersLoadingForInit = !!tableId && isOrdersLoading;
+
+    const {
+        localBills,
+        selectedBill,
+        setSelectedBill,
+        selectedBillData,
+        addItemToSelectedBill,
+        handleAddNewBill,
+        resetBillsState,
+        mergeDuplicatePendingItemsForSelectedBill,
+    } = useCreateOrderLocalBills({
+        existingOrdersForTable,
+        isAsideOrdersLoading: isAsideOrdersLoadingForInit,
+        canAddMultipleBills,
+        getHasExtras: (orderItemId) =>
+            getExtraIngredients(orderItemId).length > 0 ||
+            getRemovedIngredientIds(orderItemId).length > 0,
+        getExtrasSignature: (orderItemId) => {
+            const extras = getExtraIngredients(orderItemId);
+            const removed = getRemovedIngredientIds(orderItemId);
+
+            const extrasSig = extras.length
+                ? [...extras]
+                      .sort((a, b) =>
+                          a.ingredientId.localeCompare(b.ingredientId)
+                      )
+                      .map((x) => `${x.ingredientId}:${x.quantity}`)
+                      .join('|')
+                : '';
+
+            const removedSig = removed.length
+                ? [...removed].sort((a, b) => a.localeCompare(b)).join('|')
+                : '';
+
+            return `${extrasSig}||removed:${removedSig}`;
+        },
+    });
+
     const isAsideOrdersLoading =
         !!tableId && isOrdersLoading && localBills.length === 0;
 
-    // Auto-select first existing bill or 'new' if none exist
-    useEffect(() => {
-        if (selectedBill === null) {
-            if (localBills.length > 0) {
-                setSelectedBill(localBills[0].id);
-            } else if (
-                !isAsideOrdersLoading &&
-                existingOrdersForTable.length > 0
-            ) {
-                setSelectedBill(existingOrdersForTable[0].id);
-            } else if (!isAsideOrdersLoading) {
-                setSelectedBill('new');
-            }
+    const selectedPendingItem = useMemo(() => {
+        if (!selectedOrderItemId) return undefined;
+
+        for (const bill of localBills) {
+            const found = bill.pendingItems.find(
+                (x) => x.id === selectedOrderItemId
+            );
+            if (found) return found;
         }
-    }, [
-        existingOrdersForTable,
-        selectedBill,
-        localBills,
-        isAsideOrdersLoading,
-    ]);
 
-    // Initialize localBills from existingOrdersForTable, or create a default new bill
-    useEffect(() => {
-        if (localBills.length === 0) {
-            if (existingOrdersForTable.length > 0) {
-                // Initialize from existing orders
-                const initialized: LocalBill[] = existingOrdersForTable.map(
-                    (order) => ({
-                        id: order.id,
-                        isNew: false,
-                        orderItems: order.orderItems.map((item) => ({
-                            id: item.menuItem.id,
-                            name: item.menuItem.name,
-                            price: item.price,
-                            currency: COMPANYS_CURRENCY,
-                            quantity: item.quantity || 1,
-                            discount: item.discount,
-                        })),
-                        pendingItems: [],
-                        totalAmount: order.totalAmount || 0,
-                    })
-                );
-                setLocalBills(initialized);
-            } else if (!isAsideOrdersLoading) {
-                // No existing orders - create a default new bill
-                const defaultBill: LocalBill = {
-                    id: 'new',
-                    isNew: true,
-                    orderItems: [],
-                    pendingItems: [],
-                    totalAmount: 0,
-                };
-                setLocalBills([defaultBill]);
-            }
+        return undefined;
+    }, [localBills, selectedOrderItemId]);
+
+    const selectedMenuItemId = selectedPendingItem?.menuItemId ?? '';
+
+    const { data: selectedMenuItem, isLoading: isSelectedMenuItemLoading } =
+        useQueryMenuItem(selectedMenuItemId);
+
+    const { data: allIngredients = [] } = useQueryMenuIngredients();
+
+    const ingredientPriceById = useMemo(() => {
+        const map = new Map<string, number>();
+        for (const ing of allIngredients) {
+            map.set(ing.id, ing.price);
         }
-    }, [existingOrdersForTable, localBills.length, isAsideOrdersLoading]);
-
-    const addItemToSelectedBill = (item: LocalBillItem) => {
-        setLocalBills((prev) => {
-            // Nothing selected yet: ignore safely.
-            if (!selectedBill) return prev;
-
-            const targetBillId = selectedBill === 'new' ? 'new' : selectedBill;
-            const billIndex = prev.findIndex((b) => b.id === targetBillId);
-
-            // Placeholder bill selected but not present yet: create it on first add.
-            if (selectedBill === 'new' && billIndex === -1) {
-                return [
-                    ...prev,
-                    {
-                        id: 'new',
-                        isNew: true,
-                        orderItems: [],
-                        pendingItems: [item],
-                        totalAmount: 0,
-                    },
-                ];
-            }
-
-            // Selected bill vanished (e.g. race/state reset): ignore safely.
-            if (billIndex === -1) return prev;
-
-            const updatedBills = [...prev];
-            const existingItemIndex = updatedBills[
-                billIndex
-            ].pendingItems.findIndex((i) => i.id === item.id);
-
-            // Existing pending item: increment quantity.
-            if (existingItemIndex !== -1) {
-                updatedBills[billIndex] = {
-                    ...updatedBills[billIndex],
-                    pendingItems: updatedBills[billIndex].pendingItems.map(
-                        (i, idx) =>
-                            idx === existingItemIndex
-                                ? {
-                                      ...i,
-                                      quantity: i.quantity + item.quantity,
-                                  }
-                                : i
-                    ),
-                };
-
-                return updatedBills;
-            }
-
-            // New pending item for selected bill.
-            updatedBills[billIndex] = {
-                ...updatedBills[billIndex],
-                pendingItems: [...updatedBills[billIndex].pendingItems, item],
-            };
-
-            return updatedBills;
-        });
-    };
+        return map;
+    }, [allIngredients]);
 
     const { detailsAside } = languagePacks[language];
     const {
@@ -219,7 +176,6 @@ const CreateOrder = ({
 
     const effectiveOrderType =
         orderType ?? (tableId ? ORDER_TYPES.DINEIN : ORDER_TYPES.TAKEAWAY);
-    const canAddMultipleBills = allowMultipleBills ?? !!tableId;
 
     const selectedOrderTypeLabel =
         ordersTypes[language].find((type) => type.id === effectiveOrderType)
@@ -229,19 +185,52 @@ const CreateOrder = ({
 
     const handleClose = () => {
         clearOrders();
-        setLocalBills([]);
-        setSelectedBill(null);
+        resetBillsState();
+
+        // This modal is used in two contexts:
+        // - Orders page: open/close is controlled by the `modal=true` URL param.
+        // - Tables page: open/close is controlled by local component state.
+        // In the latter case we must call the passed toggle handler, otherwise the modal stays open.
+        const isUrlControlledModal =
+            searchParams.get(SEARCH_PARAMS_NAMES.MODAL) === 'true';
+        if (!isUrlControlledModal) {
+            _toggleModal();
+        }
 
         const newParams = new URLSearchParams(searchParams.toString());
+        newParams.delete(SEARCH_PARAMS_NAMES.MODAL);
         newParams.delete(SEARCH_PARAMS_NAMES.MENU_ITEM_ID);
         newParams.delete(SEARCH_PARAMS_NAMES.USER_DATA);
         newParams.delete(SEARCH_PARAMS_NAMES.CATEGORY);
         newParams.delete(SEARCH_PARAMS_NAMES.SUBCATEGORY);
         newParams.delete(SEARCH_PARAMS_NAMES.TAG);
         newParams.delete(SEARCH_PARAMS_NAMES.ORDER_MENU_PAGE);
+        newParams.delete(SEARCH_PARAMS_NAMES.PAGE);
 
-        router.push(`${pathname}?${newParams.toString()}`);
-        toggleModal();
+        const queryString = newParams.toString();
+        router.push(queryString ? `${pathname}?${queryString}` : pathname);
+    };
+
+    const clearSelectedMenuItem = () => {
+        toggleQueryParam(
+            SEARCH_PARAMS_NAMES.MENU_ITEM_ID,
+            undefined,
+            searchParams,
+            router,
+            pathname
+        );
+    };
+
+    const handleAddExtraIngredient: AddItemHandler = (ingredient) => {
+        if (!selectedOrderItemId) return;
+
+        addExtraIngredient({
+            orderItemId: selectedOrderItemId,
+            ingredientId: ingredient.id,
+            ingredientName: ingredient.name,
+            price: ingredient.price,
+            quantity: ingredient.quantity,
+        });
     };
 
     const confirmDineinBillsMutation = useConfirmDineinBillsMutation({
@@ -251,11 +240,12 @@ const CreateOrder = ({
     // Compute if accept button should be enabled:
     // only enable when there are unsynced changes (pending items) in any bill.
     // This keeps it disabled when nothing changed, or when a new bill is empty.
-    const selectedBillData = localBills.find((b) => b.id === selectedBill);
     const hasPendingChanges = localBills.some(
         (bill) => bill.pendingItems.length > 0
     );
-    const canAcceptBill = !!selectedBill && hasPendingChanges;
+    const canAcceptBill = selectedOrderItemId
+        ? true
+        : !!selectedBill && hasPendingChanges;
 
     const buttons: ButtonProps[] = [
         {
@@ -267,6 +257,21 @@ const CreateOrder = ({
             variant: 'primary',
             disabled: !canAcceptBill || confirmDineinBillsMutation.isPending,
             onClick: async () => {
+                // If we're editing extras for a selected menu item, just confirm UI changes
+                // and return back to the receipt view.
+                if (selectedOrderItemId) {
+                    const removedOrderItemIds =
+                        mergeDuplicatePendingItemsForSelectedBill();
+                    removedOrderItemIds.forEach((id) =>
+                        clearExtraIngredients(id)
+                    );
+                    removedOrderItemIds.forEach((id) =>
+                        clearRemovedIngredients(id)
+                    );
+                    clearSelectedMenuItem();
+                    return;
+                }
+
                 // Guard: must have a selected bill
                 if (!selectedBill) return;
 
@@ -277,6 +282,10 @@ const CreateOrder = ({
                         bills: localBills,
                         tableId,
                         deliveryPrice: deliveryPrice || 0,
+                        extraIngredientsByOrderItemId:
+                            getExtraIngredientsPayloadByOrderItemId(),
+                        removedIngredientIdsByOrderItemId:
+                            getRemovedIngredientIdsPayloadByOrderItemId(),
                     });
                 }
 
@@ -296,30 +305,15 @@ const CreateOrder = ({
         priceStrClassName: isSelected ? 'text-white' : '',
     });
 
-    const handleAddNewBill = () => {
-        if (!canAddMultipleBills) return;
-
-        const newId = `new-${newBillCounter}`;
-        setNewBillCounter((prev) => prev + 1);
-
-        const newBill: LocalBill = {
-            id: newId,
-            isNew: true,
-            orderItems: [],
-            pendingItems: [],
-            totalAmount: 0,
-        };
-
-        setLocalBills((prev) => [...prev, newBill]);
-        setSelectedBill(newId);
-    };
-
     const bill: BillProps[] = localBills.map((localBill, index) => {
         const isSelected = selectedBill === localBill.id;
-        const pendingPrice = localBill.pendingItems.reduce(
-            (acc, item) => acc + item.price * item.quantity,
-            0
-        );
+        const pendingPrice = localBill.pendingItems.reduce((acc, item) => {
+            const extrasTotalPrice = getExtraIngredientsTotalPrice(item.id);
+            const safeExtrasTotalPrice = Number.isFinite(extrasTotalPrice)
+                ? extrasTotalPrice
+                : 0;
+            return acc + (item.price + safeExtrasTotalPrice) * item.quantity;
+        }, 0);
         return {
             id: localBill.id,
             name: localBill.isNew
@@ -335,14 +329,31 @@ const CreateOrder = ({
                     quantity: it.quantity || 1,
                     onClick: () => {},
                 })),
-                ...localBill.pendingItems.map((item) => ({
-                    name: item.name,
-                    price: item.price,
-                    currency: COMPANYS_CURRENCY,
-                    quantity: item.quantity,
-                    onClick: () => toggleSelect(item.id),
-                    className: menuItemId === item.id ? 'bg-red-200' : '',
-                })),
+                ...localBill.pendingItems.map((item) => {
+                    const extras = getExtraIngredients(item.id);
+                    const extrasTotalPrice = getExtraIngredientsTotalPrice(
+                        item.id
+                    );
+
+                    return {
+                        name: item.name,
+                        price: item.price + extrasTotalPrice,
+                        currency: COMPANYS_CURRENCY,
+                        quantity: item.quantity,
+                        annotation: extras.length
+                            ? extras.map(
+                                  (x) =>
+                                      `+ ${x.ingredientName}${x.quantity > 1 ? ` x${x.quantity}` : ''}`
+                              )
+                            : undefined,
+                        annotationClassName: extras.length
+                            ? 'text-dark-gray font-normal'
+                            : undefined,
+                        onClick: () => toggleSelect(item.id),
+                        className:
+                            selectedOrderItemId === item.id ? 'bg-red-200' : '',
+                    };
+                }),
             ],
             ...getBillStyles(isSelected),
         };
@@ -357,7 +368,7 @@ const CreateOrder = ({
             pathname
         );
 
-        if (selectedId.includes(id)) {
+        if (selectedId === id) {
             setSelectedId('');
             return;
         }
@@ -378,28 +389,194 @@ const CreateOrder = ({
     const orderItems = selectedBillData
         ? selectedBillData.pendingItems.flatMap((item) =>
               Array.from({ length: item.quantity }, () => ({
-                  menuItemId: item.id,
+                  menuItemId: item.menuItemId,
               }))
           )
         : [];
 
+    const selectedExtras = selectedOrderItemId
+        ? getExtraIngredients(selectedOrderItemId)
+        : [];
+    const selectedExtrasTotalPrice = selectedOrderItemId
+        ? getExtraIngredientsTotalPrice(selectedOrderItemId)
+        : 0;
+    const safeSelectedExtrasTotalPrice = Number.isFinite(
+        selectedExtrasTotalPrice
+    )
+        ? selectedExtrasTotalPrice
+        : 0;
+    const selectedMenuItemDisplayPrice =
+        (selectedMenuItem?.price ?? 0) + safeSelectedExtrasTotalPrice;
+
     return !userData ? (
-        <Menu variant="order" onAddItem={addItemToSelectedBill}>
-            <DetailsAside
-                title={
-                    tableName
-                        ? `${detailsAside.table} ${tableName}`
-                        : selectedOrderTypeLabel
-                }
-                items={isAsideOrdersLoading ? [] : bill}
-                buttons={buttons}
-                onSelectItem={setSelectedBill}
-                selectedItemId={selectedBill}
-                onAddNewOrder={
-                    canAddMultipleBills ? handleAddNewBill : undefined
-                }
-                isItemsLoading={isAsideOrdersLoading}
-            />
+        <Menu
+            variant="order"
+            onAddItem={addItemToSelectedBill}
+            onAddIngredient={handleAddExtraIngredient}
+        >
+            {selectedOrderItemId ? (
+                <DetailsAside
+                    title={selectedMenuItem?.name || ''}
+                    price={selectedMenuItemDisplayPrice}
+                    currency={COMPANYS_CURRENCY}
+                    button={{
+                        onClick: clearSelectedMenuItem,
+                        children: languagePacks[language].generic.close,
+                    }}
+                    buttons={buttons}
+                    isItemsLoading={isSelectedMenuItemLoading}
+                >
+                    <div className="flex-1 pb-2 overflow-y-auto">
+                        <section className="mb-4">
+                            {selectedMenuItem?.ingredients?.length ? (
+                                <ul className="">
+                                    {selectedMenuItem.ingredients.map((ing) => (
+                                        <SwipeableIngredientRow
+                                            key={ing.id}
+                                            className="flex items-center justify-center w-full p-2 odd:bg-primary even:bg-primary-light"
+                                            onSwipeLeft={() => {
+                                                if (!selectedOrderItemId)
+                                                    return;
+                                                removeIngredientFromOrderItem({
+                                                    orderItemId:
+                                                        selectedOrderItemId,
+                                                    ingredientId: ing.id,
+                                                });
+                                            }}
+                                            onSwipeRight={() => {
+                                                if (!selectedOrderItemId)
+                                                    return;
+
+                                                const isRemoved =
+                                                    getRemovedIngredientIds(
+                                                        selectedOrderItemId
+                                                    ).includes(ing.id);
+
+                                                if (isRemoved) {
+                                                    restoreIngredientForOrderItem(
+                                                        {
+                                                            orderItemId:
+                                                                selectedOrderItemId,
+                                                            ingredientId:
+                                                                ing.id,
+                                                        }
+                                                    );
+                                                    return;
+                                                }
+
+                                                // Swipe right on a base ingredient adds an extra of the same ingredient (e.g. double cheese)
+                                                addExtraIngredient({
+                                                    orderItemId:
+                                                        selectedOrderItemId,
+                                                    ingredientId: ing.id,
+                                                    ingredientName: ing.name,
+                                                    price:
+                                                        ingredientPriceById.get(
+                                                            ing.id
+                                                        ) ?? 0,
+                                                    quantity: 1,
+                                                });
+                                            }}
+                                        >
+                                            <span
+                                                className={
+                                                    getRemovedIngredientIds(
+                                                        selectedOrderItemId
+                                                    ).includes(ing.id)
+                                                        ? 'text-md text-white line-through opacity-60'
+                                                        : 'text-md text-white'
+                                                }
+                                            >
+                                                {ing.name}
+                                            </span>
+                                        </SwipeableIngredientRow>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="text-sm text-center text-black/70">
+                                    {languagePacks[language].generic.noResults}
+                                </p>
+                            )}
+                        </section>
+
+                        <section className="mt-6">
+                            <h3 className="text-md py-2 text-center border-gray border-t-2 border-b-2 font-semibold ">
+                                Dodatki
+                            </h3>
+
+                            {selectedExtras.length ? (
+                                <ul>
+                                    {selectedExtras.map((extra) => (
+                                        <SwipeableIngredientRow
+                                            key={extra.ingredientId}
+                                            className="flex items-center justify-center gap-4 w-full p-2 odd:bg-primary even:bg-primary-light"
+                                            onSwipeLeft={() => {
+                                                if (!selectedOrderItemId)
+                                                    return;
+                                                decrementExtraIngredient({
+                                                    orderItemId:
+                                                        selectedOrderItemId,
+                                                    ingredientId:
+                                                        extra.ingredientId,
+                                                    quantity: 1,
+                                                });
+                                            }}
+                                            onSwipeRight={() => {
+                                                if (!selectedOrderItemId)
+                                                    return;
+                                                addExtraIngredient({
+                                                    orderItemId:
+                                                        selectedOrderItemId,
+                                                    ingredientId:
+                                                        extra.ingredientId,
+                                                    ingredientName:
+                                                        extra.ingredientName,
+                                                    price: extra.price,
+                                                    quantity: 1,
+                                                });
+                                            }}
+                                        >
+                                            <span className="text-md text-white">
+                                                {extra.ingredientName}
+                                                {extra.quantity > 1
+                                                    ? ` x${extra.quantity}`
+                                                    : ''}
+                                            </span>
+                                            <span className="font-semibold text-slate-300">
+                                                {formatPriceStr({
+                                                    currency: COMPANYS_CURRENCY,
+                                                    price: extra.price,
+                                                    quantity: extra.quantity,
+                                                })}
+                                            </span>
+                                        </SwipeableIngredientRow>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="text-sm text-center text-black/70">
+                                    Brak dodatków
+                                </p>
+                            )}
+                        </section>
+                    </div>
+                </DetailsAside>
+            ) : (
+                <DetailsAside
+                    title={
+                        tableName
+                            ? `${detailsAside.table} ${tableName}`
+                            : selectedOrderTypeLabel
+                    }
+                    items={isAsideOrdersLoading ? [] : bill}
+                    buttons={buttons}
+                    onSelectItem={setSelectedBill}
+                    selectedItemId={selectedBill}
+                    onAddNewOrder={
+                        canAddMultipleBills ? handleAddNewBill : undefined
+                    }
+                    isItemsLoading={isAsideOrdersLoading}
+                />
+            )}
         </Menu>
     ) : (
         <CustomerInformationForm bill={bill} orderItems={orderItems} />

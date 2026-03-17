@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'motion/react';
 import clsx from 'clsx';
+import type { ReactNode } from 'react';
 
 import { useLanguage } from '@/providers/LanguageProvider';
 import { formatPriceStr } from '@/helpers/utils/prices';
@@ -46,6 +47,7 @@ export type DetailsAsideProps = {
     buttons?: Omit<ButtonProps, 'className'>[];
     onSelectItem?: (id: string) => void;
     selectedItemId?: string | null;
+    children?: ReactNode;
 } & (FilledAside | EmptyAside) &
     (RegularHeader | ButtonHeader) & { className?: string } & {
         isDelivery?: boolean;
@@ -69,9 +71,13 @@ const DetailsAside = ({
     onSelectItem,
     selectedItemId,
     isItemsLoading,
+    children,
 }: DetailsAsideProps) => {
     const { language } = useLanguage();
     const { detailsAside } = languagePacks[language];
+
+    const showPriceHeader =
+        typeof price === 'number' && !!currency && typeof title === 'string';
 
     return (
         <aside
@@ -81,18 +87,21 @@ const DetailsAside = ({
             )}
         >
             {title &&
-                (button ? (
-                    <div className="flex flex-col items-center px-4 gap-1 mb-[18px]">
-                        <h2 className="text-xl/8 capitalize font-bold">
+                (showPriceHeader ? (
+                    <div className="flex items-center justify-center gap-x-10 flex-wrap px-4 gap-1">
+                        <h2 className="text-xl/8 capitalize font-bold text-center">
                             {title}
                         </h2>
 
                         <p className="text-primary font-bold">
                             {formatPriceStr({ currency, price })}
                         </p>
-                        <Button variant="tertiary" size="xs" {...button}>
-                            {button.children ?? detailsAside.info}
-                        </Button>
+
+                        {button && (
+                            <Button variant="tertiary" size="xs" {...button}>
+                                {button.children ?? detailsAside.info}
+                            </Button>
+                        )}
                     </div>
                 ) : (
                     <>
@@ -132,7 +141,9 @@ const DetailsAside = ({
                 </div>
             )}
 
-            {!isItemsLoading && items && (
+            {!isItemsLoading && children}
+
+            {!isItemsLoading && !children && items && (
                 <ItemsList
                     items={items}
                     onSelectItem={onSelectItem}
@@ -140,7 +151,7 @@ const DetailsAside = ({
                 />
             )}
 
-            {!isItemsLoading && (!items || items.length === 0) && (
+            {!isItemsLoading && !children && (!items || items.length === 0) && (
                 <div className="px-4 py-2 text-sm text-black text-center">
                     {title
                         ? (detailsAside.noOrders ?? 'No orders')

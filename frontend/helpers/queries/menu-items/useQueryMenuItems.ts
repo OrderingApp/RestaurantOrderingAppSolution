@@ -11,19 +11,25 @@ interface SubCategory extends NamedEntity {
     totalItems: number;
 }
 
-interface Ingredient extends NamedEntity {
+export interface Allergen {
     id: string;
+    name: string;
+    euNumber: number;
+}
+
+interface Ingredient extends NamedEntity {
     tagIds: string[];
 }
 
-export interface IngredientWithTags extends Ingredient {
-    name: string;
+interface IngredientWithTags extends Ingredient {
     price: number;
+    tags: TagType[];
+    allergens: Allergen[];
 }
 
 export interface MenuItemType {
     id: string;
-    desription: string;
+    description: string;
     ingredients: Ingredient[];
     name: string;
     price: number;
@@ -45,6 +51,12 @@ export interface DisplayedCategoriesType extends SubCategory {
     size?: string;
     type?: string;
     menuItems?: MenuItemType[];
+}
+
+export interface IngredientCategoryType {
+    id: string;
+    name: string;
+    ingredients: IngredientWithTags[];
 }
 
 export const useQueryMenuCategory = () =>
@@ -69,11 +81,12 @@ export const useQueryMenuItems = () =>
 
 export const useQueryMenuItem = (id: string) =>
     useQuery({
-        queryKey: [MenuItems.BY_ID],
+        queryKey: [MenuItems.BY_ID, id],
         queryFn: () =>
             fetchWithParams(MenuItems.ITEMS, id).then(
                 (response) => response as MenuItemType
             ),
+        enabled: !!id,
         staleTime: 14400000,
     });
 
@@ -93,6 +106,16 @@ export const useQueryMenuIngredients = () =>
         queryFn: () =>
             fetchWithParams(MenuItems.INGREDIENTS, '').then(
                 (response) => response as IngredientWithTags[]
+            ),
+        staleTime: 14400000,
+    });
+
+export const useQueryMenuIngredientCategory = () =>
+    useQuery({
+        queryKey: [MenuItems.INGREDIENT_CATEGORIES],
+        queryFn: () =>
+            fetchWithParams(MenuItems.INGREDIENT_CATEGORIES, '').then(
+                (response) => response as IngredientCategoryType[]
             ),
         staleTime: 14400000,
     });

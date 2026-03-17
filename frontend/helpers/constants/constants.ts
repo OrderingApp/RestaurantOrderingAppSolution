@@ -48,6 +48,7 @@ export enum BACKEND_PATHS {
     Tags = 'tags',
     Orders = 'orders',
     Ingredients = 'ingredients',
+    IngredientCategories = 'ingredient-categories',
 }
 
 export enum SEARCH_PARAMS_NAMES {

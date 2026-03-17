@@ -14,6 +14,7 @@ const Dish = ({
     priceStr,
     quantity,
     annotation,
+    annotationClassName,
     isServed,
     isLastItem,
 }: Dish) => {
@@ -44,7 +45,13 @@ const Dish = ({
                 <span className="text-primary">{priceStr}</span>
 
                 {annotation && (
-                    <ul className="text-start text-xs text-danger-dark font-semibold col-span-full flex flex-wrap">
+                    <ul
+                        className={clsx(
+                            'text-start text-xs col-span-full flex flex-wrap',
+                            annotationClassName ??
+                                'text-danger-dark font-semibold'
+                        )}
+                    >
                         {annotation.map((str, i) => {
                             const capitalizedStr = capitalizeFirstLetter(str);
                             const divider =

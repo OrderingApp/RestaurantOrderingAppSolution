@@ -29,6 +29,7 @@ export type ItemProps = {
     priceStrClassName?: string;
     quantity?: number;
     annotation?: string[];
+    annotationClassName?: string;
     button?: Omit<ButtonProps, 'className' | 'children'> & { name?: string };
 } & (NotNestedItem | HasNestedItems);
 
@@ -38,6 +39,7 @@ const Item = ({
     currency,
     quantity,
     annotation,
+    annotationClassName,
     isSingleItem,
     className = '',
     priceStrClassName = '',
@@ -72,7 +74,12 @@ const Item = ({
             </dd>
 
             {annotation && (
-                <dd className="text-start text-xs text-danger-dark font-semibold col-span-full">
+                <dd
+                    className={clsx(
+                        'text-start text-xs col-span-full',
+                        annotationClassName ?? 'text-danger-dark font-semibold'
+                    )}
+                >
                     <ul className="flex flex-wrap">
                         {annotation.map((str, i) => {
                             const capitalizedStr = capitalizeFirstLetter(str);
@@ -91,7 +98,15 @@ const Item = ({
         </button>
     ) : (
         <Dish
-            {...{ name, quantity, annotation, priceStr, className, ...props }}
+            {...{
+                name,
+                quantity,
+                annotation,
+                annotationClassName,
+                priceStr,
+                className,
+                ...props,
+            }}
         />
     );
 };

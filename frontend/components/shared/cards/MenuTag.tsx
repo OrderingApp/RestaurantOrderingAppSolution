@@ -29,7 +29,7 @@ const MenuTag = ({ id, name }: MenuTagProps) => {
     return (
         <li
             className={clsx(
-                'w-28 h-9 rounded-lg shadow-[0px_4px_4px_0px_#00000040] transition-all hocus:bg-primary hocus:text-white hocus:scale-95',
+                'w-28 h-9 rounded-lg shadow-[0px_4px_4px_0px_#00000040] transition-all',
                 isActive ? 'bg-primary text-white' : 'bg-white text-black'
             )}
             key={id}

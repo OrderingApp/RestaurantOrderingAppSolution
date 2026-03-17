@@ -38,9 +38,15 @@ interface MenuProps {
     variant?: 'card' | 'order';
     children?: React.ReactNode;
     onAddItem?: AddItemHandler;
+    onAddIngredient?: AddItemHandler;
 }
 
-const Menu = ({ variant = 'order', children, onAddItem }: MenuProps) => {
+const Menu = ({
+    variant = 'order',
+    children,
+    onAddItem,
+    onAddIngredient,
+}: MenuProps) => {
     const searchParams = useSearchParams();
     const menuItemId = searchParams.get(SEARCH_PARAMS_NAMES.MENU_ITEM_ID);
     const pageSearchParam =
@@ -52,6 +58,7 @@ const Menu = ({ variant = 'order', children, onAddItem }: MenuProps) => {
         displayedCategories,
         filteredMenuItems,
         totalItems,
+        allItems,
         displayedTags,
         itemsPerPage,
     } = useFilterMenu(variant);
@@ -66,7 +73,9 @@ const Menu = ({ variant = 'order', children, onAddItem }: MenuProps) => {
     // TODO: fix totalitems on 'all' category, as it shows the count of subcategory, or even sub-subcategory when selected. it shoudl always show count of all possible items rather than that
     return (
         <div className="bg-light-gray w-full rounded-3xl h-full flex flex-row ">
-            {menuItemId && <IngredientsMenu />}
+            {menuItemId && (
+                <IngredientsMenu onAddIngredient={onAddIngredient} />
+            )}
 
             {!menuItemId && (
                 <div
@@ -82,7 +91,7 @@ const Menu = ({ variant = 'order', children, onAddItem }: MenuProps) => {
                             icon={menuSvg}
                             iconActive={menuSvgWhite}
                             name={allCategories}
-                            totalItems={totalItems!}
+                            totalItems={allItems!}
                         />
                         {displayedCategories?.map((item) => (
                             <MenuCategory
@@ -105,7 +114,7 @@ const Menu = ({ variant = 'order', children, onAddItem }: MenuProps) => {
 
                     <ul
                         className={clsx(
-                            'grid py-5 flex-wrap overflow-y-auto max-h-[500px] [&&::-webkit-scrollbar]:hidden',
+                            'grid py-5 flex-wrap overflow-y-auto max-h-[500px] [&&::-webkit-scrollbar]:hidden mr-4',
                             menuStyles.variants[variant].list
                         )}
                         style={{

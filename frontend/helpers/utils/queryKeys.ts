@@ -13,6 +13,7 @@ enum MENU_ITEMS {
     ITEMS = 'menu-items',
     TAGS = 'tags',
     INGREDIENTS = 'ingredients',
+    INGREDIENT_CATEGORIES = 'ingredient-categories',
     BY_ID = 'by-id',
 }
 

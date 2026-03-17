@@ -30,6 +30,7 @@ const useFilterMenu = (variant: 'card' | 'order') => {
         totalItems,
         displayedTags,
         itemsPerPage,
+        allItems,
     } = useMemo(() => {
         if (!menuCategories || !menuItems || !menuItemsTags)
             return {
@@ -37,6 +38,7 @@ const useFilterMenu = (variant: 'card' | 'order') => {
                 filteredMenuItems: [],
                 totalItems: 0,
                 displayedTags: [],
+                allItems: 0,
             };
 
         let displayedCategories: DisplayedCategoriesType[] = menuCategories;
@@ -46,6 +48,8 @@ const useFilterMenu = (variant: 'card' | 'order') => {
             (sum, category) => sum + category.totalItems,
             0
         );
+
+        let allItems = totalItems;
 
         if (categoryId) {
             const selectedCategory = menuCategories.find(
@@ -122,6 +126,7 @@ const useFilterMenu = (variant: 'card' | 'order') => {
             displayedCategories,
             filteredMenuItems,
             totalItems,
+            allItems,
             displayedTags,
             itemsPerPage,
         };
@@ -141,6 +146,7 @@ const useFilterMenu = (variant: 'card' | 'order') => {
         displayedCategories,
         filteredMenuItems,
         totalItems,
+        allItems,
         displayedTags,
         itemsPerPage,
     };

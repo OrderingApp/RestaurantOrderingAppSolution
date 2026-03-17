@@ -18,7 +18,7 @@ const btnStyles: {
     },
     sizes: {
         xxs: 'p-3 px-5 text-sm rounded-xl',
-        xs: 'py-3 px-[60px] text-sm rounded-xl shadow-[0px_0px_5px_0px_#6A6A6A]',
+        xs: 'py-2 px-6 text-sm rounded-xl shadow-[0px_0px_5px_0px_#6A6A6A]',
         sm: 'w-[10.5rem] h-[3.125rem] text-[1rem] shadow-[0px_4px_4px_0px_#00000040]',
         md: 'w-[11.25rem] h-[3.75rem] text-[1rem] rounded-lg shadow-[0px_4px_4px_0px_#00000040]',
         lg: 'w-[23.75rem] h-[3.125rem] text-xl rounded-xl shadow-[0px_4px_4px_0px_#00000040]',

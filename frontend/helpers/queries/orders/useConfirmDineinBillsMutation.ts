@@ -10,7 +10,8 @@ import { OrdersItems } from '@/helpers/utils/queryKeys';
 import { ORDERS_QUERY_KEY } from './useQueryOrders';
 
 interface BillItemForSync {
-    id: string;
+    id: string; // local line item id
+    menuItemId: string;
     quantity: number;
     discount?: number;
 }
@@ -25,6 +26,12 @@ interface ConfirmDineinBillsInput {
     bills: BillForSync[];
     tableId?: string;
     deliveryPrice: number;
+    extraIngredientsByOrderItemId?: Record<
+        string,
+        { ingredientId: string; quantity: number }[]
+    >;
+
+    removedIngredientIdsByOrderItemId?: Record<string, string[]>;
 }
 
 interface UseConfirmDineinBillsMutationOptions {
@@ -32,14 +39,26 @@ interface UseConfirmDineinBillsMutationOptions {
     onError?: (error: unknown) => void;
 }
 
-const toOrderItemsPayload = (items: BillItemForSync[]) =>
+const toOrderItemsPayload = (
+    items: BillItemForSync[],
+    extraIngredientsByOrderItemId?: Record<
+        string,
+        { ingredientId: string; quantity: number }[]
+    >,
+    removedIngredientIdsByOrderItemId?: Record<string, string[]>
+) =>
     items.flatMap((item) =>
         Array.from({ length: item.quantity }, () => ({
             specialInstructions: '',
             discount: item.discount || 0,
-            menuItemId: item.id,
-            extraIngredients: [],
-            removedIngredientIds: [],
+            menuItemId: item.menuItemId,
+            extraIngredients:
+                extraIngredientsByOrderItemId?.[item.id]?.map((x) => ({
+                    ingredientId: x.ingredientId,
+                    quantity: x.quantity,
+                })) ?? [],
+            removedIngredientIds:
+                removedIngredientIdsByOrderItemId?.[item.id] ?? [],
         }))
     );
 
@@ -62,6 +81,8 @@ const useConfirmDineinBillsMutation = (
             bills,
             tableId,
             deliveryPrice,
+            extraIngredientsByOrderItemId,
+            removedIngredientIdsByOrderItemId,
         }: ConfirmDineinBillsInput) => {
             const dateTimeStr = getCurrentOrderDateTime();
             const resolvedTableId = tableId || '';
@@ -73,7 +94,9 @@ const useConfirmDineinBillsMutation = (
             await Promise.all(
                 billsWithPendingItems.map(async (bill) => {
                     const payloadOrderItems = toOrderItemsPayload(
-                        bill.pendingItems
+                        bill.pendingItems,
+                        extraIngredientsByOrderItemId,
+                        removedIngredientIdsByOrderItemId
                     );
 
                     if (bill.isNew) {

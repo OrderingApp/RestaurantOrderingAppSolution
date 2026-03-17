@@ -57,7 +57,12 @@ const MenuItem = ({
             onClick={handleAddItem}
             className="rounded-lg shadow-[0px_4px_4px_0px_#00000040] bg-white p-4 py-5 pb-4 relative flex flex-col min-h-32 justify-center"
         >
-            <button onClick={() => onOpenMenuItemInformation(id)}>
+            <button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onOpenMenuItemInformation(id);
+                }}
+            >
                 <Image
                     width={22}
                     height={22}

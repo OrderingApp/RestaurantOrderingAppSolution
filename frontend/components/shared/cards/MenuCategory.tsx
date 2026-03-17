@@ -5,7 +5,10 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import clsx from 'clsx';
 
-import { SEARCH_PARAMS_NAMES } from '@/helpers/constants/constants';
+import {
+    MENU_CATEGORY_NAMES,
+    SEARCH_PARAMS_NAMES,
+} from '@/helpers/constants/constants';
 import languagePacks from '@/helpers/constants/languagePacks';
 import { getPluralForm } from '@/helpers/utils/utils';
 
@@ -47,7 +50,7 @@ const MenuCategory = ({
     } = languagePacks[language];
 
     const isActive =
-        (id === 'all' && !categoryId) ||
+        (id === MENU_CATEGORY_NAMES.ALL && !categoryId) ||
         (type === 'category' && categoryId === id) ||
         (type === 'subcategory' && subcategoryId === id);
 
@@ -55,28 +58,34 @@ const MenuCategory = ({
         const newParams = new URLSearchParams(searchParams.toString());
 
         if (type === 'category') {
-            if (categoryId === id) {
-                newParams.delete('categoryId');
+            if (id === MENU_CATEGORY_NAMES.ALL) {
+                newParams.delete(SEARCH_PARAMS_NAMES.CATEGORY);
+                newParams.delete(SEARCH_PARAMS_NAMES.SUBCATEGORY);
+            } else if (categoryId === id) {
+                newParams.delete(SEARCH_PARAMS_NAMES.CATEGORY);
+                newParams.delete(SEARCH_PARAMS_NAMES.SUBCATEGORY);
             } else {
-                newParams.set('categoryId', id);
+                newParams.set(SEARCH_PARAMS_NAMES.CATEGORY, id);
+                newParams.delete(SEARCH_PARAMS_NAMES.SUBCATEGORY);
             }
+
+            // Reset pagination when filter changes
+            newParams.delete(SEARCH_PARAMS_NAMES.PAGE);
+            newParams.delete(SEARCH_PARAMS_NAMES.ORDER_MENU_PAGE);
         } else if (type === 'subcategory') {
             if (subcategoryId === id) {
-                newParams.delete('subcategoryId');
+                newParams.delete(SEARCH_PARAMS_NAMES.SUBCATEGORY);
             } else {
-                newParams.set('subcategoryId', id);
+                newParams.set(SEARCH_PARAMS_NAMES.SUBCATEGORY, id);
             }
+
+            // Reset pagination when filter changes
+            newParams.delete(SEARCH_PARAMS_NAMES.PAGE);
+            newParams.delete(SEARCH_PARAMS_NAMES.ORDER_MENU_PAGE);
         }
 
-        const modalParam = newParams.get('modal')
-            ? `modal=${newParams.get('modal')}`
-            : '';
-
-        router.push(
-            id === 'all'
-                ? `${pathname}?${modalParam}`
-                : `${pathname}?${newParams.toString()}`
-        );
+        const queryString = newParams.toString();
+        router.push(queryString ? `${pathname}?${queryString}` : pathname);
     };
 
     const amountItemsName = getPluralForm(totalItems, itemsTitle, language);
@@ -85,10 +94,8 @@ const MenuCategory = ({
         <button
             onClick={toggleSelectedCategory}
             className={clsx(
-                'shadow-[0px_4px_4px_0px_#00000040] flex flex-col justify-between flex-shrink-0 rounded-lg p-3 px-2 transition-all group',
-                isActive
-                    ? 'bg-primary'
-                    : 'bg-white hocus:bg-primary hocus:scale-95',
+                'shadow-[0px_4px_4px_0px_#00000040] flex flex-col justify-between flex-shrink-0 rounded-lg p-3 px-2 transition-all ',
+                isActive ? 'bg-primary' : 'bg-white',
                 size === 'lg'
                     ? 'w-[7.5rem] h-[6.2rem]'
                     : 'w-[6.2rem] h-[5.3rem]'
@@ -106,7 +113,7 @@ const MenuCategory = ({
                         'text-left',
                         isActive
                             ? 'text-white transition-colors'
-                            : 'text-black group-hover:text-white group-focus:text-white',
+                            : 'text-black group-hover:text-white',
                         size === 'lg' ? 'text-[15px]' : 'text-[13px]'
                     )}
                 >
@@ -117,7 +124,7 @@ const MenuCategory = ({
                         'text-[10px] text-left transition-colors',
                         isActive
                             ? 'text-white'
-                            : 'text-black group-hover:text-white group-focus:text-white'
+                            : 'text-black group-hover:text-white'
                     )}
                 >
                     {totalItems} {amountItemsName}
