@@ -228,6 +228,7 @@ public class OrderService(
     public async Task<ResultDto<List<NonDineInOrderSummaryDto>>> GetOngoingAndClosedNonDineInOrders(
         OrderType orderType,
         IReadOnlyCollection<OrderStatus> statuses,
+        IReadOnlyCollection<PaymentStatus>? paymentStatuses,
         DateTime? date = null
     )
     {
@@ -260,18 +261,35 @@ public class OrderService(
             // Filter by today using the projected DueAt
             q = q.Where(x => x.DueAt >= day && x.DueAt < nextDay);
 
+            // If payment status filters were provided, apply them
+            if (paymentStatuses != null && paymentStatuses.Any())
+            {
+                var paymentStatusArr = paymentStatuses.ToArray();
+                q = q.Where(x => paymentStatusArr.Contains(x.Order.PaymentStatus));
+            }
+
             // Sort: closed -> newest; else -> by DueAt
             q = closedOnly
                 ? q.OrderByDescending(x => x.Order.CreatedAt).ThenByDescending(x => x.Order.Id)
                 : q.OrderBy(x => x.DueAt).ThenBy(x => x.Order.Id);
 
-            // Bring back the entity for mapping
-            var entities = await q
-                .Select(x => x.Order)
-                .Include(o => o.CustomerInformation)   // keep if your DTO needs it
+            // Project directly to the DTO so we explicitly include payment fields (PaidAmount, PaymentStatus)
+            var dtos = await q
+                .Select(x => new NonDineInOrderSummaryDto
+                {
+                    Id = x.Order.Id,
+                    CreatedAt = x.Order.CreatedAt,
+                    ExpectedOrderCompletion = x.DueAt,
+                    TotalAmount = x.Order.TotalAmount,
+                    PaidAmount = x.Order.PaidAmount,
+                    PaymentStatus = x.Order.PaymentStatus.ToString(),
+                    OrderStatus = x.Order.Status.ToString(),
+                    OrderType = x.Order.Type.ToString(),
+                    PhoneNumber = x.Order.CustomerInformation != null ? x.Order.CustomerInformation.PhoneNumber : null,
+                    Address = x.Order.CustomerInformation != null ? x.Order.CustomerInformation.Address : null
+                })
                 .ToListAsync();
 
-            var dtos = mapper.Map<List<NonDineInOrderSummaryDto>>(entities);
             return ResultDto<List<NonDineInOrderSummaryDto>>.Success(dtos, HttpStatusCode.OK);
         }
         catch (Exception ex)
