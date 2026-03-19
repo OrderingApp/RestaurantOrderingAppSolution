@@ -8,37 +8,47 @@ import DeliveryMap from '@/components/shared/modals/DeliveryMap';
 
 import { ICONS } from '@/helpers/constants/icons/icons';
 import useDeliveryLocation from '@/helpers/hooks/useDeliveryLocation';
-import { FieldErrors, UseFormRegister } from 'react-hook-form';
+import { FieldErrors, UseFormRegister, UseFormSetValue } from 'react-hook-form';
+
+type FormValues = {
+    date: string;
+    time: string;
+    phoneNumber: string;
+    address: string;
+    comment: string;
+};
 
 interface DeliveryInputProps {
     isDelivery: boolean;
-    register: UseFormRegister<{
-        date: string;
-        time: string;
-        phoneNumber: string;
-        address: string;
-        comment: string;
-    }>;
-    errors: FieldErrors<{
-        date: string;
-        time: string;
-        phoneNumber: string;
-        address: string;
-        comment: string;
-    }>;
+    isDisabled?: boolean;
+    register: UseFormRegister<FormValues>;
+    setValue: UseFormSetValue<FormValues>;
+    errors: FieldErrors<FormValues>;
     address: string;
 }
 
 const DeliveryInput = ({
     isDelivery,
+    isDisabled = false,
     register,
+    setValue,
     errors,
     address,
 }: DeliveryInputProps) => {
-    const [addres, setAddres] = useState('');
+    const [addressValue, setAddressValue] = useState('');
     const [isMapShown, setIsMapShown] = useState(false);
+    const { ...addressRegister } = register('address');
 
-    const { handleRoute } = useDeliveryLocation({ addres });
+    const { handleRoute } = useDeliveryLocation({ address: addressValue });
+
+    const handleAddressChange = (nextAddress: string) => {
+        setAddressValue(nextAddress);
+        setValue('address', nextAddress, {
+            shouldDirty: true,
+            shouldValidate: true,
+            shouldTouch: true,
+        });
+    };
 
     return (
         <>
@@ -56,17 +66,18 @@ const DeliveryInput = ({
                     }
                     iconClassName="w-4 h-4"
                     label={address}
-                    {...register('address')}
-                    onChange={(e) => setAddres(e.target.value)}
+                    {...addressRegister}
+                    onChange={(e) => handleAddressChange(e.target.value)}
                     errors={errors.address}
                     labelClassName={`${!isDelivery && 'text-[rgba(0,0,0,0.5)]'}`}
                     inputClassName={`w-full ${!isDelivery && 'opacity-90'}`}
-                    disabled={!isDelivery}
+                    disabled={!isDelivery || isDisabled}
                 />
 
                 <button
-                    disabled={!isDelivery}
-                    className={`${errors.address ? 'self-center' : 'self-end'} bg-white shadow-xl p-2 rounded-lg ${!isDelivery && 'opacity-50 cursor-not-allowed'}`}
+                    type="button"
+                    disabled={!isDelivery || isDisabled}
+                    className={`${errors.address ? 'self-center' : 'self-end'} bg-white shadow-xl p-2 rounded-lg ${(!isDelivery || isDisabled) && 'opacity-50 cursor-not-allowed'}`}
                     onClick={() => setIsMapShown(true)}
                 >
                     <Image src={ICONS.MAP} alt="map" className="w-6 h-6" />
@@ -75,7 +86,8 @@ const DeliveryInput = ({
             {isMapShown && (
                 <DeliveryMap
                     onClose={() => setIsMapShown(false)}
-                    addres={addres}
+                    address={addressValue}
+                    onAddressChange={handleAddressChange}
                 />
             )}
         </>

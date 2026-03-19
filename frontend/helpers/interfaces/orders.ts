@@ -4,14 +4,9 @@ export type OrderType = 'dinein' | 'Takeaway' | 'Delivery';
 
 export type OrderCompletionType = 'Immediate' | 'Scheduled';
 
-export type PaymentMethod = 'Card' | 'Cash' | 'Online';
+export type OrderStatus = 'Ongoing' | 'Cancelled' | 'Closed';
 
-export type OrderStatus =
-    | 'Ongoing'
-    | 'PendingPayment'
-    | 'Cancelled'
-    | 'Closed'
-    | 'PaidAndReadyToPrepare';
+export type PaymentStatus = 'Unpaid' | 'PartiallyPaid' | 'Paid';
 
 export interface ExtraIngredient {
     ingredientId: string;
@@ -62,7 +57,6 @@ interface CustomerInformation {
     additionalInstructions: string | null;
     address?: string | null;
     orderCompletionType: OrderCompletionType;
-    preferredPaymentMethod: PaymentMethod;
     expectedOrderCompletion: string;
 }
 
@@ -84,6 +78,7 @@ export interface NotDineInOrder {
     expectedOrderCompletion: string;
     totalAmount: number;
     orderStatus: OrderStatus;
+    paymentStatus?: PaymentStatus;
     orderType: OrderType;
     phoneNumber: string;
     address: string | null;
@@ -91,12 +86,10 @@ export interface NotDineInOrder {
 
 export interface OrderDto {
     createdAt: string;
-    discount: number;
     deliveryPrice: number;
     customerInformation: {
         phoneNumber: string;
         orderCompletionType: OrderCompletionType;
-        preferredPaymentMethod: PaymentMethod;
         additionalInstructions?: string;
         expectedOrderCompletion: string;
         address?: string;

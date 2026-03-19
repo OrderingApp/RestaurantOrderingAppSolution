@@ -234,8 +234,13 @@ const enPack: languagePack = {
         closeBtn: 'No',
         confirmBtn: 'Yes',
     },
-    delivertyMapModal: {
+    deliveryMapModal: {
         deliveryTitle: 'Delivery',
+        inputEmptyError: 'Please enter a delivery address',
+        distanceExceedError:
+            'Delivery address is out of range. Maximum distance is 10 km.',
+        mapLoadingError: 'Failed to load the map. Please try again later.',
+        noneAddressError: 'No delivery address found.',
     },
     settingsPage: {
         settings: {

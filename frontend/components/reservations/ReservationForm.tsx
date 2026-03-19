@@ -1,14 +1,16 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
+import dayjs, { type Dayjs } from 'dayjs';
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import Input from '../shared/Input/Input';
 import Button from '../shared/button/Button';
+import MobileTimePicker from '../shared/pickers/MobileTimePicker';
 
 import { useLanguage } from '@/providers/LanguageProvider';
 import { useQueryReservationsById } from '@/helpers/queries/reservations/useQueryReservations';
@@ -35,8 +37,6 @@ const FORM_DEFAULT_VALUES = {
     time: '',
     phoneNumber: '',
 };
-
-//TO THINK: should we use custom date picker for better time
 
 const ReservationForm = () => {
     const searchParams = useSearchParams();
@@ -72,6 +72,7 @@ const ReservationForm = () => {
     const {
         handleSubmit,
         register,
+        setValue,
         reset,
         formState: { errors, isSubmitting, isDirty },
     } = useForm<ReservationSchema>({
@@ -81,6 +82,7 @@ const ReservationForm = () => {
             date: contextDate,
         },
     });
+    const [timeValue, setTimeValue] = useState<Dayjs | null>(null);
 
     const { data: reservation } = useQueryReservationsById(reservationId ?? '');
     const { mutate: createMutate, isPending: isCreating } =
@@ -151,8 +153,11 @@ const ReservationForm = () => {
                 time,
                 phoneNumber: reservation.phoneNumber,
             });
+            const [hours, minutes] = time.split(':').map(Number);
+            setTimeValue(dayjs().hour(hours).minute(minutes).second(0));
         } else {
             updateReservationFromDb(null);
+            setTimeValue(null);
         }
     }, [reservationId, reservation, reset, updateReservationFromDb]);
 
@@ -221,23 +226,26 @@ const ReservationForm = () => {
                             inputClassName="w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0"
                             disabled={inFlight}
                         />
-                        <Input
-                            type="time"
-                            id="time"
-                            icon={<Image src={ICONS.TIME} alt="time" />}
+
+                        <MobileTimePicker
                             label={time}
-                            {...register('time', {
-                                onChange: (e) => {
-                                    updateForm('time', e.target.value);
-                                },
-                            })}
-                            min={RESTAURANT_OPENING_HOUR}
-                            max={RESTAURANT_CLOSING_HOUR}
-                            errors={errors.time}
-                            errorClassName="!text-[11px]"
-                            inputClassName="w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0"
-                            defaultValue={FORM_DEFAULT_VALUES.time}
+                            value={timeValue}
+                            minutesStep={5}
                             disabled={inFlight}
+                            errorText={errors.time?.message}
+                            onChange={(newValue) => {
+                                // ... (reszta Twojego kodu bez zmian)
+                                setTimeValue(newValue);
+                                const nextTime = newValue
+                                    ? newValue.format('HH:mm')
+                                    : '';
+                                setValue('time', nextTime, {
+                                    shouldDirty: true,
+                                    shouldValidate: true,
+                                    shouldTouch: true,
+                                });
+                                updateForm('time', nextTime);
+                            }}
                         />
                         <Input
                             type="phoneNumber"

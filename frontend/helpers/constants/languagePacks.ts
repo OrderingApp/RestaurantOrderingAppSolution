@@ -218,8 +218,12 @@ export interface languagePack {
         closeBtn: string;
         confirmBtn: string;
     };
-    delivertyMapModal: {
+    deliveryMapModal: {
         deliveryTitle: string;
+        inputEmptyError: string;
+        distanceExceedError: string;
+        mapLoadingError: string;
+        noneAddressError: string;
     };
     settingsPage: {
         settings: {

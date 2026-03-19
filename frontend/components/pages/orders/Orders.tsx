@@ -10,7 +10,7 @@ import {
 } from '@/helpers/constants/constants';
 import languagePacks from '@/helpers/constants/languagePacks';
 import useLanguage from '@/helpers/hooks/useLanguage';
-import { toggleQueryParam } from '@/helpers/utils/utils';
+import { setQueryParams, toggleQueryParam } from '@/helpers/utils/utils';
 import { ICONS } from '@/helpers/constants/icons/icons';
 import useFilterOrders from '@/helpers/hooks/useFilterOrders';
 
@@ -111,31 +111,55 @@ const Orders = () => {
     const buttons = [
         {
             value: 'All',
+            param: SEARCH_PARAMS_NAMES.ORDER_STATUS,
             iconActive: ICONS.LIST_WHITE,
             icon: ICONS.LIST,
         },
         {
             value: 'Ongoing',
+            param: SEARCH_PARAMS_NAMES.ORDER_STATUS,
             iconActive: ICONS.MENU_OPEN_WHITE,
             icon: ICONS.MENU_OPEN,
         },
         {
-            value: 'PaidAndReadyToPrepare',
+            value: 'Paid',
+            param: SEARCH_PARAMS_NAMES.PAYMENT_STATUS,
             iconActive: ICONS.CLOSE_WHITE,
             icon: ICONS.CLOSE,
         },
         {
             value: 'Closed',
+            param: SEARCH_PARAMS_NAMES.ORDER_STATUS,
             iconActive: ICONS.TIME_WHITE,
             icon: ICONS.TIME,
         },
     ];
 
-    const isActive = (value: string) => {
-        const param = searchParams.get('orderStatus');
-        if (!param || undefined) return 'All';
-        if (param === value) return value;
-    };
+    const orderStatus = searchParams.get(SEARCH_PARAMS_NAMES.ORDER_STATUS);
+    const paymentStatus = searchParams.get(SEARCH_PARAMS_NAMES.PAYMENT_STATUS);
+    const activeFilter = paymentStatus ?? orderStatus ?? 'All';
+
+    const onFilterClick = (paramName: string, value: string) =>
+        setQueryParams(
+            value === 'All'
+                ? {
+                      [SEARCH_PARAMS_NAMES.ORDER_STATUS]: undefined,
+                      [SEARCH_PARAMS_NAMES.PAYMENT_STATUS]: undefined,
+                  }
+                : {
+                      [SEARCH_PARAMS_NAMES.ORDER_STATUS]:
+                          paramName === SEARCH_PARAMS_NAMES.ORDER_STATUS
+                              ? value
+                              : undefined,
+                      [SEARCH_PARAMS_NAMES.PAYMENT_STATUS]:
+                          paramName === SEARCH_PARAMS_NAMES.PAYMENT_STATUS
+                              ? value
+                              : undefined,
+                  },
+            searchParams,
+            router,
+            pathname
+        );
 
     const openOrderOptionsModal = (id: string) => {
         toggleQueryParam(
@@ -175,40 +199,38 @@ const Orders = () => {
                 <div className="flex justify-around w-full h-auto mt-4">
                     <div className="flex items-start justify-between w-full">
                         <div className="flex gap-4 mb-4 w-2/5 ">
-                            {buttons.map((btn) => (
-                                <button
-                                    className={clsx(
-                                        'p-3 rounded-lg shadow-xl transition-all',
-                                        isActive(btn.value) === btn.value
-                                            ? 'bg-primary'
-                                            : 'bg-[#F6F6F6] '
-                                    )}
-                                    onClick={() =>
-                                        toggleQueryParam(
-                                            'orderStatus',
-                                            btn.value,
-                                            searchParams,
-                                            router,
-                                            pathname
-                                        )
-                                    }
-                                    key={btn.value}
-                                >
-                                    <Image
-                                        src={
-                                            isActive(btn.value) === btn.value
-                                                ? btn.iconActive
-                                                : btn.icon
-                                        }
-                                        alt="iconList"
+                            {buttons.map((btn) => {
+                                const isActive = activeFilter === btn.value;
+
+                                return (
+                                    <button
                                         className={clsx(
-                                            'transition-all',
-                                            isActive(btn.value) !== btn.value &&
-                                                'group-hover:brightness-0 group-hover:invert'
+                                            'p-3 rounded-lg shadow-xl transition-all',
+                                            isActive
+                                                ? 'bg-primary'
+                                                : 'bg-[#F6F6F6]'
                                         )}
-                                    />
-                                </button>
-                            ))}
+                                        onClick={() =>
+                                            onFilterClick(btn.param, btn.value)
+                                        }
+                                        key={btn.value}
+                                    >
+                                        <Image
+                                            src={
+                                                isActive
+                                                    ? btn.iconActive
+                                                    : btn.icon
+                                            }
+                                            alt="iconList"
+                                            className={clsx(
+                                                'transition-all',
+                                                !isActive &&
+                                                    'group-hover:brightness-0 group-hover:invert'
+                                            )}
+                                        />
+                                    </button>
+                                );
+                            })}
                         </div>
                         <div className="w-3/5 mr-5">
                             <SearchInput

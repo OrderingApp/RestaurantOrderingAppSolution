@@ -62,6 +62,7 @@ export enum SEARCH_PARAMS_NAMES {
     ORDER_MENU_PAGE = 'orderMenuPage',
     ORDER_TYPE = 'orderType',
     ORDER_STATUS = 'orderStatus',
+    PAYMENT_STATUS = 'paymentStatus',
     ORDER_ID = 'orderId',
     MENU_ITEM_ID = 'menuItemId',
     MODAL = 'modal',
@@ -79,9 +80,13 @@ export enum MENU_CATEGORY_NAMES {
 export enum ORDER_STATUSES {
     ONGOING = 'Ongoing',
     CLOSED = 'Closed',
-    PAID_AND_READY_TO_PREPARE = 'PaidAndReadyToPrepare',
-    CANCELLED = 'Canceled',
-    PENDING_PAYMENT = 'Pending Payment',
+    CANCELLED = 'Cancelled',
+}
+
+export enum PAYMENT_STATUSES {
+    UNPAID = 'Unpaid',
+    PARTIALPAID = 'PartiallyPaid',
+    PAID = 'Paid',
 }
 
 export enum ORDER_TYPES {

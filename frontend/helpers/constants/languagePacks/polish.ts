@@ -235,8 +235,13 @@ const plPack: languagePack = {
         closeBtn: 'Nie',
         confirmBtn: 'Tak',
     },
-    delivertyMapModal: {
+    deliveryMapModal: {
         deliveryTitle: 'Dostawa',
+        inputEmptyError: 'Proszę wpisać adres dostawy',
+        distanceExceedError:
+            'Adres dostawy jest poza zasięgiem. Maksymalna odległość to 10 km.',
+        mapLoadingError: 'Nie można załadować mapy. Spróbuj ponownie później.',
+        noneAddressError: 'Nie znaleziono adresu dostawy.',
     },
     settingsPage: {
         settings: {

@@ -16,12 +16,7 @@ const OrderStatusBadge = ({
 
     switch (status.toLowerCase()) {
         case ORDER_STATUSES.ONGOING.toLowerCase():
-        case ORDER_STATUSES.PAID_AND_READY_TO_PREPARE.toLowerCase():
             variant = 'success';
-            break;
-
-        case ORDER_STATUSES.PENDING_PAYMENT.toLowerCase():
-            variant = 'warning';
             break;
 
         case ORDER_STATUSES.CLOSED.toLowerCase():

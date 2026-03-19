@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import {
     ORDER_STATUSES,
     ordersTypes,
+    PAYMENT_STATUSES,
     SEARCH_PARAMS_NAMES,
 } from '../constants/constants';
 
@@ -19,6 +20,7 @@ const useFilterOrders = () => {
     const {
         [SEARCH_PARAMS_NAMES.ORDER_TYPE]: orderTypeParam,
         [SEARCH_PARAMS_NAMES.ORDER_STATUS]: orderStatusParam,
+        [SEARCH_PARAMS_NAMES.PAYMENT_STATUS]: paymentStatusParam,
     } = params;
 
     const orderType = orderTypeParam || ordersTypes[language][0]?.id;
@@ -27,25 +29,34 @@ const useFilterOrders = () => {
         if (orderStatusParam === 'All') {
             return [
                 ORDER_STATUSES.ONGOING,
-                ORDER_STATUSES.PAID_AND_READY_TO_PREPARE,
+                PAYMENT_STATUSES.UNPAID,
+                PAYMENT_STATUSES.PARTIALPAID,
+                PAYMENT_STATUSES.PAID,
             ];
         }
 
         if (orderStatusParam === 'Ongoing') {
-            return [ORDER_STATUSES.ONGOING];
+            return [
+                ORDER_STATUSES.ONGOING,
+                PAYMENT_STATUSES.UNPAID,
+                PAYMENT_STATUSES.PARTIALPAID,
+            ];
         }
 
-        if (orderStatusParam === 'PaidAndReadyToPrepare') {
-            return [ORDER_STATUSES.PAID_AND_READY_TO_PREPARE];
+        if (paymentStatusParam === 'Paid') {
+            return [PAYMENT_STATUSES.PAID];
         }
 
         if (orderStatusParam) {
             return [orderStatusParam];
         }
+        
 
         return [
             ORDER_STATUSES.ONGOING,
-            ORDER_STATUSES.PAID_AND_READY_TO_PREPARE,
+            PAYMENT_STATUSES.UNPAID,
+            PAYMENT_STATUSES.PARTIALPAID,
+            PAYMENT_STATUSES.PAID,
         ];
     };
 

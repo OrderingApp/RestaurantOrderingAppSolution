@@ -21,8 +21,10 @@ import { getOrderDeliverySchema } from '@/helpers/models/orderDeliveryForm';
 import { getOrderTakewaySchema } from '@/helpers/models/orderTakewayForm';
 import useOrderMutation from '@/helpers/queries/orders/useOrdersMutation';
 import { useLanguage } from '@/providers/LanguageProvider';
+import MobileTimePicker from '@/components/shared/pickers/MobileTimePicker';
 
 import { useOrdersContext } from '@/providers/OrdersContext';
+import dayjs, { type Dayjs } from 'dayjs';
 
 const formDefaultValues = {
     date: '',
@@ -52,12 +54,14 @@ const CustomerInformationForm = ({
     const [selectedQuickTime, setSelectedQuickTime] = useState<string | null>(
         null
     );
+    const [timeValue, setTimeValue] = useState<Dayjs | null>(null);
     const pathname = usePathname();
     const router = useRouter();
     const { language } = useLanguage();
     const { deliveryPrice } = useOrdersContext();
 
     const {
+        generic: { errorMsg },
         ordersPage: {
             orderCustomerInformationForm: {
                 title,
@@ -77,44 +81,83 @@ const CustomerInformationForm = ({
     const deliverySchema = getOrderDeliverySchema(language);
     const takewaySchema = getOrderTakewaySchema(language);
 
-    const createTakewayOrderMutation = useOrderMutation('create', 'Takeaway');
-    const createDeliveryOrderMutation = useOrderMutation('create', 'Delivery');
+    const createTakewayOrderMutation = useOrderMutation('create', 'Takeaway', {
+        redirectOnSettled: false,
+        onSuccess: () => router.push('/orders'),
+    });
+    const createDeliveryOrderMutation = useOrderMutation('create', 'Delivery', {
+        redirectOnSettled: false,
+        onSuccess: () => router.push('/orders'),
+    });
 
     const {
         handleSubmit,
         register,
         setValue,
-        formState: { errors },
+        formState: { errors, isSubmitting },
     } = useForm({
         resolver: zodResolver(isDelivery ? deliverySchema : takewaySchema),
         defaultValues: formDefaultValues,
     });
 
+    const isOrderMutationPending =
+        createTakewayOrderMutation.isPending ||
+        createDeliveryOrderMutation.isPending;
+
+    const isLoading = isSubmitting || isOrderMutationPending;
+
+    const mutationError = isDelivery
+        ? createDeliveryOrderMutation.error
+        : createTakewayOrderMutation.error;
+
+    const mutationErrorMessage = !mutationError
+        ? null
+        : mutationError instanceof Error
+          ? mutationError.message
+          : errorMsg;
+
     const setInputValueHandler = (time: string, id: string) => {
-        setValue('time', getFutureTime(parseInt(time)), {
-            shouldDirty: true,
-            shouldValidate: true,
-        });
+        const futureTime = getFutureTime(parseInt(time, 10));
+
         if (selectedQuickTime === id) {
             setSelectedQuickTime(null);
-            setValue('time', '');
+            setValue('time', '', {
+                shouldDirty: true,
+                shouldValidate: true,
+                shouldTouch: true,
+            });
+            setTimeValue(null);
         } else {
             setSelectedQuickTime(id);
+            setValue('time', futureTime, {
+                shouldDirty: true,
+                shouldValidate: true,
+                shouldTouch: true,
+            });
+
+            const [hours, minutes] = futureTime.split(':').map(Number);
+            setTimeValue(dayjs().hour(hours).minute(minutes).second(0));
         }
     };
 
-    const submitFormHandler = (data: FormData) => {
-        const today = new Date();
-        const dateStr = today.toISOString().split('T')[0];
+    // CHANGE orderCompletionType
+
+    const submitFormHandler = async (data: FormData) => {
+        const now = new Date();
+        const dateStr = [
+            now.getFullYear(),
+            String(now.getMonth() + 1).padStart(2, '0'),
+            String(now.getDate()).padStart(2, '0'),
+        ].join('-');
         const dateTimeStr = `${dateStr}T${data.time}:00`;
+        const orderCompletionType =
+            selectedQuickTime === '10' ? 'Immediate' : 'Scheduled';
 
         const order: OrderDto = {
             createdAt: dateTimeStr,
-            discount: 0,
             customerInformation: {
                 phoneNumber: data.phoneNumber,
-                orderCompletionType: 'Immediate',
-                preferredPaymentMethod: 'Card',
+                orderCompletionType,
                 additionalInstructions: data.comment,
                 address: isDelivery ? data.address : '',
                 expectedOrderCompletion: dateTimeStr,
@@ -124,9 +167,9 @@ const CustomerInformationForm = ({
         };
 
         if (!isDelivery) {
-            createTakewayOrderMutation.mutate({ data: order });
+            await createTakewayOrderMutation.mutateAsync({ data: order });
         } else {
-            createDeliveryOrderMutation.mutate({ data: order });
+            await createDeliveryOrderMutation.mutateAsync({ data: order });
         }
     };
 
@@ -138,19 +181,16 @@ const CustomerInformationForm = ({
         {
             children: accept,
             variant: 'primary',
+            disabled: isLoading,
             onClick: () => handleSubmit(submitFormHandler)(),
         },
         {
             children: cancel,
+            disabled: isLoading,
             onClick: () => router.push(pathname),
             variant: 'tertiary',
         },
     ];
-
-    const button = {
-        children: 'Info',
-        variant: 'tertiary' as const,
-    };
 
     const timeBtns = [
         {
@@ -182,11 +222,13 @@ const CustomerInformationForm = ({
                 <div className="flex gap-5 mt-5">
                     <Button
                         variant={isDelivery ? 'outline' : 'primary'}
+                        disabled={isLoading}
                         onClick={() => setIsDelivery(false)}
                     >
                         {takeway}
                     </Button>
                     <Button
+                        disabled={isLoading}
                         onClick={() => setIsDelivery(true)}
                         variant={isDelivery ? 'primary' : 'outline'}
                     >
@@ -197,16 +239,26 @@ const CustomerInformationForm = ({
                     onSubmit={handleSubmit(submitFormHandler)}
                     className="flex flex-col gap-5 mt-6"
                 >
-                    <Input
-                        type="time"
-                        id="time"
-                        icon={<Image src={ICONS.TIME} alt="time" />}
+                    <MobileTimePicker
                         label={time}
-                        {...register('time')}
-                        errors={errors.time}
-                        disabled={!!selectedQuickTime}
-                        labelClassName={`${selectedQuickTime && 'text-[rgba(0,0,0,0.5)]'}`}
-                        inputClassName={`w-full [&::-webkit-calendar-picker-indicator]:w-20 [&::-webkit-calendar-picker-indicator]:opacity-0 ${selectedQuickTime && 'opacity-90'} `}
+                        value={timeValue}
+                        minutesStep={5}
+                        disabled={!!selectedQuickTime || isLoading}
+                        dimLabel={!!selectedQuickTime}
+                        errorText={errors.time?.message}
+                        onChange={(newValue) => {
+                            setTimeValue(newValue);
+                            setSelectedQuickTime(null);
+                            setValue(
+                                'time',
+                                newValue ? newValue.format('HH:mm') : '',
+                                {
+                                    shouldDirty: true,
+                                    shouldValidate: true,
+                                    shouldTouch: true,
+                                }
+                            );
+                        }}
                     />
                     <div className="flex gap-2">
                         {timeBtns.map((btn) => (
@@ -215,6 +267,7 @@ const CustomerInformationForm = ({
                                 id={btn.id}
                                 key={btn.id}
                                 value={btn.value}
+                                disabled={isLoading}
                                 inputClassName={`${selectedQuickTime === btn.id ? 'bg-primary text-white' : 'bg-white'} focus:outline-none focus:ring-0 w-auto text-sm  shadow-xl rounded-xl`}
                                 onClick={(e) =>
                                     setInputValueHandler(
@@ -232,6 +285,7 @@ const CustomerInformationForm = ({
                         label={phoneNumber}
                         {...register('phoneNumber')}
                         errors={errors.phoneNumber}
+                        disabled={isLoading}
                         inputClassName="w-full"
                     />
 
@@ -240,7 +294,15 @@ const CustomerInformationForm = ({
                         isDelivery={isDelivery}
                         errors={errors}
                         register={register}
+                        setValue={setValue}
+                        isDisabled={isLoading}
                     />
+
+                    {mutationErrorMessage && (
+                        <p className="rounded-lg bg-red-100 px-3 py-2 text-sm text-red-700">
+                            {mutationErrorMessage}
+                        </p>
+                    )}
 
                     <div className="flex flex-col">
                         <label
@@ -252,6 +314,7 @@ const CustomerInformationForm = ({
                         <textarea
                             {...register('comment')}
                             id="comment"
+                            disabled={isLoading}
                             className={`${errors.comment && 'bg-red-200'} h-40 rounded-xl bg-[#E6E6E6] text-[#2B5162] p-2 focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         />
                         {errors && (
@@ -268,7 +331,6 @@ const CustomerInformationForm = ({
                 price={3}
                 currency="pln"
                 buttons={buttons}
-                button={button}
                 isDelivery={isDelivery}
                 deliveryPrice={deliveryPrice}
             />
@@ -277,5 +339,3 @@ const CustomerInformationForm = ({
 };
 
 export default CustomerInformationForm;
-
-//TODO - btn from aside to remove
