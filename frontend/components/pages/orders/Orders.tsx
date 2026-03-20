@@ -10,7 +10,7 @@ import {
 } from '@/helpers/constants/constants';
 import languagePacks from '@/helpers/constants/languagePacks';
 import useLanguage from '@/helpers/hooks/useLanguage';
-import { toggleQueryParam } from '@/helpers/utils/utils';
+import { getToggleModalUrl, toggleQueryParam } from '@/helpers/utils/utils';
 import { ICONS } from '@/helpers/constants/icons/icons';
 import useFilterOrders from '@/helpers/hooks/useFilterOrders';
 
@@ -26,6 +26,29 @@ import SearchInput from '@/components/shared/Input/SearchInput';
 import clsx from 'clsx';
 import Modal from '@/components/shared/modals/Modal';
 import OrderOptionsModal from '@/components/shared/modals/OrderOptionsModal';
+
+const buttons = [
+    {
+        value: 'All',
+        iconActive: ICONS.LIST_WHITE,
+        icon: ICONS.LIST,
+    },
+    {
+        value: 'Ongoing',
+        iconActive: ICONS.MENU_OPEN_WHITE,
+        icon: ICONS.MENU_OPEN,
+    },
+    {
+        value: 'PaidAndReadyToPrepare',
+        iconActive: ICONS.CLOSE_WHITE,
+        icon: ICONS.CLOSE,
+    },
+    {
+        value: 'Closed',
+        iconActive: ICONS.TIME_WHITE,
+        icon: ICONS.TIME,
+    },
+];
 
 const Orders = () => {
     const { language } = useLanguage();
@@ -55,24 +78,8 @@ const Orders = () => {
     const isOrderOptionsModalOpen = !!orderId && !isPaymentModalOpen;
 
     const toggleModal = () => {
-        const params = new URLSearchParams(searchParams.toString());
-        const isOpen = params.get(SEARCH_PARAMS_NAMES.MODAL) === 'true';
-
-        if (isOpen) {
-            params.delete(SEARCH_PARAMS_NAMES.MODAL);
-            params.delete(SEARCH_PARAMS_NAMES.ORDER_ID);
-            params.delete(SEARCH_PARAMS_NAMES.MENU_ITEM_ID);
-            params.delete(SEARCH_PARAMS_NAMES.USER_DATA);
-            params.delete(SEARCH_PARAMS_NAMES.CATEGORY);
-            params.delete(SEARCH_PARAMS_NAMES.SUBCATEGORY);
-            params.delete(SEARCH_PARAMS_NAMES.TAG);
-            params.delete(SEARCH_PARAMS_NAMES.ORDER_MENU_PAGE);
-        } else {
-            params.set(SEARCH_PARAMS_NAMES.MODAL, 'true');
-        }
-
-        const queryString = params.toString();
-        router.push(queryString ? `${pathname}?${queryString}` : pathname);
+        const newUrl = getToggleModalUrl(searchParams, pathname);
+        router.push(newUrl);
     };
 
     const closeOrderHandler = () => {
@@ -105,29 +112,6 @@ const Orders = () => {
             children: 'Płatność',
             onClick: () => finalizePayment(),
             variant: 'primary',
-        },
-    ];
-
-    const buttons = [
-        {
-            value: 'All',
-            iconActive: ICONS.LIST_WHITE,
-            icon: ICONS.LIST,
-        },
-        {
-            value: 'Ongoing',
-            iconActive: ICONS.MENU_OPEN_WHITE,
-            icon: ICONS.MENU_OPEN,
-        },
-        {
-            value: 'PaidAndReadyToPrepare',
-            iconActive: ICONS.CLOSE_WHITE,
-            icon: ICONS.CLOSE,
-        },
-        {
-            value: 'Closed',
-            iconActive: ICONS.TIME_WHITE,
-            icon: ICONS.TIME,
         },
     ];
 

@@ -53,8 +53,7 @@ const SwipeableIngredientRow = ({
             setIsSwiping(true);
 
             // react-swipeable provides deltaX; keep this defensive
-            const deltaX =
-                typeof (e as any).deltaX === 'number' ? (e as any).deltaX : 0;
+            const deltaX = typeof e.deltaX === 'number' ? e.deltaX : 0;
             const clamped = Math.max(-60, Math.min(60, deltaX));
             setSwipeXThrottled(clamped);
         },
