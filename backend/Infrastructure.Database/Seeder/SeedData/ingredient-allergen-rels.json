@@ -1,0 +1,46 @@
+[
+  {
+    "ingredientId": "eba387c7-eead-465c-b636-c1c171667f73",
+    "allergenId": "aa111111-0000-4000-8000-000000000007"
+  },
+  {
+    "ingredientId": "d6c1225a-0cd8-4cca-b146-7bfd8b0b413f",
+    "allergenId": "aa111111-0000-4000-8000-000000000007"
+  },
+  {
+    "ingredientId": "9a8095c9-f992-4a0e-8b3e-492e01da1f69",
+    "allergenId": "aa111111-0000-4000-8000-000000000007"
+  },
+  {
+    "ingredientId": "8207029e-6cf4-427f-b9d2-536ece3a79c1",
+    "allergenId": "aa111111-0000-4000-8000-000000000007"
+  },
+  {
+    "ingredientId": "b789abce-5092-4f5a-977f-1b6453651074",
+    "allergenId": "aa111111-0000-4000-8000-000000000007"
+  },
+  {
+    "ingredientId": "012bd3a0-f0a6-4a8d-9ae7-703eee731302",
+    "allergenId": "aa111111-0000-4000-8000-000000000003"
+  },
+  {
+    "ingredientId": "dd0f4e89-c04d-40a5-862b-8b016f4776f4",
+    "allergenId": "aa111111-0000-4000-8000-000000000008"
+  },
+  {
+    "ingredientId": "5820a2b2-2eb1-4647-87c8-3a77cc77047c",
+    "allergenId": "aa111111-0000-4000-8000-000000000008"
+  },
+  {
+    "ingredientId": "bfd2edaf-fa45-4859-aae5-fb0f98ac4fb2",
+    "allergenId": "aa111111-0000-4000-8000-000000000008"
+  },
+  {
+    "ingredientId": "e3dbdbb3-05f8-456a-a3f1-a2ca74004a86",
+    "allergenId": "aa111111-0000-4000-8000-000000000004"
+  },
+  {
+    "ingredientId": "a9ffe2be-8c22-499c-8e6a-7a37007df386",
+    "allergenId": "aa111111-0000-4000-8000-000000000010"
+  }
+]

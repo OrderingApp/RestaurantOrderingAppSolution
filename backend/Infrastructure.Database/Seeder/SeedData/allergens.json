@@ -1,0 +1,100 @@
+[
+  {
+    "id": "aa111111-0000-4000-8000-000000000001",
+    "name": "Zboża zawierające gluten",
+    "euNumber": 1,
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "aa111111-0000-4000-8000-000000000002",
+    "name": "Skorupiaki",
+    "euNumber": 2,
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "aa111111-0000-4000-8000-000000000003",
+    "name": "Jaja",
+    "euNumber": 3,
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "aa111111-0000-4000-8000-000000000004",
+    "name": "Ryby",
+    "euNumber": 4,
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "aa111111-0000-4000-8000-000000000005",
+    "name": "Orzechy ziemne (arachidowe)",
+    "euNumber": 5,
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "aa111111-0000-4000-8000-000000000006",
+    "name": "Soja",
+    "euNumber": 6,
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "aa111111-0000-4000-8000-000000000007",
+    "name": "Mleko (w tym laktoza)",
+    "euNumber": 7,
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "aa111111-0000-4000-8000-000000000008",
+    "name": "Orzechy (drzewne)",
+    "euNumber": 8,
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "aa111111-0000-4000-8000-000000000009",
+    "name": "Seler",
+    "euNumber": 9,
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "aa111111-0000-4000-8000-000000000010",
+    "name": "Gorczyca (musztarda)",
+    "euNumber": 10,
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "aa111111-0000-4000-8000-000000000011",
+    "name": "Nasiona sezamu",
+    "euNumber": 11,
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "aa111111-0000-4000-8000-000000000012",
+    "name": "Dwutlenek siarki i siarczyny",
+    "euNumber": 12,
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "aa111111-0000-4000-8000-000000000013",
+    "name": "Łubin",
+    "euNumber": 13,
+    "isUsed": true,
+    "isDeleted": false
+  },
+  {
+    "id": "aa111111-0000-4000-8000-000000000014",
+    "name": "Mięczaki (np. małże)",
+    "euNumber": 14,
+    "isUsed": true,
+    "isDeleted": false
+  }
+]

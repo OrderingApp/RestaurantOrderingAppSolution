@@ -20,6 +20,7 @@ public interface IOrderService
     Task<ResultDto<List<NonDineInOrderSummaryDto>>> GetOngoingAndClosedNonDineInOrders(
         OrderType orderType,
         IReadOnlyCollection<OrderStatus> statuses,
+        IReadOnlyCollection<PaymentStatus>? paymentStatuses,
         DateTime? date = null
     );
     Task<ResultDto<List<OrderSummaryDto>>> GetOngoingOrdersForTable(Guid tableId);

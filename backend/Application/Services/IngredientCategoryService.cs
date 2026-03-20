@@ -43,14 +43,20 @@ public class IngredientCategoryService(
     {
         try
         {
-            var list = await orderingContext.IngredientCategories
+            var entities = await orderingContext.IngredientCategories
                 .Where(ic => ic.IsUsed && !ic.IsDeleted)
-                .ProjectTo<IngredientCategoryReadDto>(mapper.ConfigurationProvider)
+                .Include(ic => ic.Ingredients)
+                    .ThenInclude(i => i.IngredientTagRels)
+                        .ThenInclude(rel => rel.Tag)
+                .Include(ic => ic.Ingredients)
+                    .ThenInclude(i => i.IngredientAllergenRels)
+                        .ThenInclude(rel => rel.Allergen)
                 .ToListAsync();
 
-            if (!list.Any())
+            if (!entities.Any())
                 return ResultDto<List<IngredientCategoryReadDto>>.Failure("No ingredient categories found", HttpStatusCode.NotFound);
 
+            var list = mapper.Map<List<IngredientCategoryReadDto>>(entities);
             return ResultDto<List<IngredientCategoryReadDto>>.Success(list, HttpStatusCode.OK);
         }
         catch (Exception ex)
@@ -63,7 +69,16 @@ public class IngredientCategoryService(
     {
         try
         {
-            var entity = await orderingContext.IngredientCategories.FindAsync(id);
+            var entity = await orderingContext.IngredientCategories
+                .Where(ic => ic.Id == id && ic.IsUsed && !ic.IsDeleted)
+                .Include(ic => ic.Ingredients)
+                    .ThenInclude(i => i.IngredientTagRels)
+                        .ThenInclude(rel => rel.Tag)
+                .Include(ic => ic.Ingredients)
+                    .ThenInclude(i => i.IngredientAllergenRels)
+                        .ThenInclude(rel => rel.Allergen)
+                .FirstOrDefaultAsync();
+
             if (entity == null)
                 return ResultDto<IngredientCategoryReadDto>.Failure("Ingredient category not found.", HttpStatusCode.NotFound);
 

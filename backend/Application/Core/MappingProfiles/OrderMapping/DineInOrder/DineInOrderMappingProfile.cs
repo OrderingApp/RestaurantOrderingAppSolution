@@ -12,6 +12,7 @@ public class DineInOrderMappingProfile : Profile
         CreateMap<Order, OrderReadDto>()
             .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
             .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Status.ToString()))
+            .ForMember(dest => dest.PaymentStatus, opt => opt.MapFrom(src => src.PaymentStatus.ToString()))
             .ForMember(dest => dest.OrderType, opt => opt.MapFrom(src => src.Type.ToString()))
             .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems))
             .ForMember(dest => dest.TableId, opt => opt.MapFrom(src => src.TableId))
@@ -22,6 +23,7 @@ public class DineInOrderMappingProfile : Profile
 
         CreateMap<Order, OrderSummaryDto>()
             .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.Status.ToString()))
+            .ForMember(dest => dest.PaymentStatus, opt => opt.MapFrom(src => src.PaymentStatus.ToString()))
             .ForMember(dest => dest.OrderType, opt => opt.MapFrom(src => src.Type.ToString()));
 
         CreateMap<DineInOrderCreateDto, Order>()

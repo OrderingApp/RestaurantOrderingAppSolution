@@ -42,3 +42,6 @@ yarn-error.log*
 next-env.d.ts
 *.json
 backend/API/appsettings.Development.json
+
+# Allow JSON seed data files in SeedData folders
+!backend/Infrastructure.Database/Seeder/SeedData/*.json

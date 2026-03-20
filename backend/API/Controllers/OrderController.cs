@@ -105,8 +105,9 @@ public class OrderController(IOrderService orderService) : BaseApiController
     public async Task<ActionResult<List<NonDineInOrderSummaryDto>>> GetOngoingAndClosedNonDineInOrders(
         [FromQuery] OrderType orderType,
         [FromQuery] IReadOnlyCollection<OrderStatus> statuses,
+        [FromQuery] IReadOnlyCollection<PaymentStatus>? paymentStatuses,
         [FromQuery] DateTime? date = null
-    ) => HandleResult(await orderService.GetOngoingAndClosedNonDineInOrders(orderType, statuses, date));
+    ) => HandleResult(await orderService.GetOngoingAndClosedNonDineInOrders(orderType, statuses, paymentStatuses, date));
 
     /// <summary>
     /// Applies a discount to an existing order.

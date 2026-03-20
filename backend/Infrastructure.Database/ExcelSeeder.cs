@@ -1,7 +1,23 @@
-﻿using Domain;
+﻿// ============================================================
+// LEGACY: ExcelSeeder is the OLD seeding approach.
+// It reads directly from an Excel file and writes to the DB.
+//
+// NEW approach: JSON files in Infrastructure.Database/Seeder/SeedData
+// are the source of truth. Seeders in Seeder/Seeders/ read those
+// JSON files via SeedDataReader and write to the DB.
+//
+// ExcelSeeder is kept only as a migration reference.
+// Safe to remove once JSON seed data has been verified in production.
+// Do NOT run this alongside DatabaseSeeder – they both guard
+// against re-seeding with "if empty" checks, but managing two
+// approaches creates confusion.
+// ============================================================
+using Domain;
 using Infrastructure.Database;
 using OfficeOpenXml;
 
+[Obsolete("Use Infrastructure.Database.Seeder.Seeders.DatabaseSeeder instead. " +
+          "Data is now sourced from JSON files in Seeder/SeedData.")]
 public class ExcelSeeder
 {
     private readonly RestaurantOrderingContext _context;
