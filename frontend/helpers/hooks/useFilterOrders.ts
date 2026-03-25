@@ -25,26 +25,19 @@ const useFilterOrders = () => {
     } = params;
 
     const orderType = orderTypeParam || ordersTypes[language][0]?.id;
-    const allOrderStatuses = Object.values(ORDER_STATUSES);
     const allPaymentStatuses = Object.values(PAYMENT_STATUSES);
 
     const getFilters = () => {
         if (paymentStatusParam === PAYMENT_STATUSES.PAID) {
             return {
-                statuses: [
-                    ORDER_STATUSES.ONGOING,
-                    ORDER_STATUSES.COMPLETED,
-                ],
+                statuses: [ORDER_STATUSES.ONGOING, ORDER_STATUSES.COMPLETED],
                 paymentStatuses: [PAYMENT_STATUSES.PAID],
             };
         }
 
         if (orderStatusParam === 'All') {
             return {
-                statuses: [
-                    ORDER_STATUSES.ONGOING,
-                    ORDER_STATUSES.COMPLETED,
-                ],
+                statuses: [ORDER_STATUSES.ONGOING, ORDER_STATUSES.COMPLETED],
                 paymentStatuses: allPaymentStatuses,
             };
         }
@@ -76,7 +69,7 @@ const useFilterOrders = () => {
         }
 
         return {
-        statuses: [ORDER_STATUSES.ONGOING, ORDER_STATUSES.COMPLETED],
+            statuses: [ORDER_STATUSES.ONGOING, ORDER_STATUSES.COMPLETED],
             paymentStatuses: allPaymentStatuses,
         };
     };

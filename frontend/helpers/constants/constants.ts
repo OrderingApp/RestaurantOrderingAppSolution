@@ -69,7 +69,7 @@ export enum SEARCH_PARAMS_NAMES {
     MODAL = 'modal',
     PAYMENT = 'payment',
     CLOSE_ORDER = 'closeOrder',
-    OPTIONS = 'options',    
+    OPTIONS = 'options',
     USER_DATA = 'userData',
 }
 

@@ -18,8 +18,6 @@ const Discount = ({ onClick }: { onClick: () => void }) => {
         discountModal: { disscountTitle },
     } = languagePacks[language];
 
-    console.log(discount);
-
     return (
         <div className="w-[720px] h-[377px] rounded-md bg-[#F8F8F8] p-4 py-7 relative flex flex-col justify-between items-center">
             <button
@@ -55,6 +53,7 @@ const Discount = ({ onClick }: { onClick: () => void }) => {
             {isCustomDiscount && (
                 <Input
                     type="number"
+                    value={discount}
                     inputClassName="py-2 w-full"
                     variant="secondary"
                     onChange={(e) => setDiscount(e.target.value)}

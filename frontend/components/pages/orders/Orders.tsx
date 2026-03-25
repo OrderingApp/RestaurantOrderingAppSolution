@@ -115,10 +115,17 @@ const Orders = () => {
         },
     ];
 
-    const isActive = (value: string) => {
-        const param = searchParams.get('orderStatus');
-        if (!param || undefined) return 'All';
-        if (param === value) return value;
+    const activeFilter =
+        searchParams.get(SEARCH_PARAMS_NAMES.ORDER_STATUS) || 'All';
+
+    const onFilterClick = (value: string) => {
+        toggleQueryParam(
+            SEARCH_PARAMS_NAMES.ORDER_STATUS,
+            value,
+            searchParams,
+            router,
+            pathname
+        );
     };
 
     const openOrderOptionsModal = (id: string) => {
@@ -170,9 +177,7 @@ const Orders = () => {
                                                 ? 'bg-primary'
                                                 : 'bg-[#F6F6F6]'
                                         )}
-                                        onClick={() =>
-                                            onFilterClick(btn.param, btn.value)
-                                        }
+                                        onClick={() => onFilterClick(btn.value)}
                                         key={btn.value}
                                     >
                                         <Image
