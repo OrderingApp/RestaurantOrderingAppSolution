@@ -39,6 +39,7 @@ export const COMPANY_INITIAL_GEO_COORDS = {
 };
 
 export const BACKEND_URL = 'http://localhost:5000/api';
+export const BACKEND_URL_PAYMENT = 'http://localhost:5000';
 
 export enum BACKEND_PATHS {
     Areas = 'areas',
@@ -62,12 +63,13 @@ export enum SEARCH_PARAMS_NAMES {
     ORDER_MENU_PAGE = 'orderMenuPage',
     ORDER_TYPE = 'orderType',
     ORDER_STATUS = 'orderStatus',
+    PAYMENT_STATUS = 'paymentStatus',
     ORDER_ID = 'orderId',
     MENU_ITEM_ID = 'menuItemId',
     MODAL = 'modal',
     PAYMENT = 'payment',
     CLOSE_ORDER = 'closeOrder',
-    OPTIONS = 'options',
+    OPTIONS = 'options',    
     USER_DATA = 'userData',
 }
 
@@ -81,6 +83,12 @@ export enum ORDER_STATUSES {
     COMPLETED = 'Completed',
     CANCELLED = 'Cancelled',
     PENDING_PAYMENT = 'Pending Payment',
+}
+
+export enum PAYMENT_STATUSES {
+    UNPAID = 'Unpaid',
+    PARTIALPAID = 'PartiallyPaid',
+    PAID = 'Paid',
 }
 
 export enum ORDER_TYPES {

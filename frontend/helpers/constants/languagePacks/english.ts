@@ -148,6 +148,10 @@ const enPack: languagePack = {
                 takeway: 'Pickup',
                 delivery: 'Delivery',
             },
+            toasts: {
+                updateSuccess: 'Customer information updated.',
+                updateError: 'Failed to update customer information.',
+            },
             aside: {
                 title: 'Order',
                 buttons: {
@@ -194,6 +198,14 @@ const enPack: languagePack = {
                 status: 'Status',
                 paid: 'Paid',
                 unpaid: 'Unpaid',
+                paidAmount: 'Paid amount',
+                remainingAmount: 'Remaining',
+            },
+            toasts: {
+                deleteSuccess: 'Order deleted.',
+                deleteError: 'Failed to delete order.',
+                closeSuccess: 'Order closed.',
+                closeError: 'Failed to close order.',
             },
         },
         asideTitle: 'Order',
@@ -206,6 +218,10 @@ const enPack: languagePack = {
             close: 'Close',
             discount: 'Add discount',
         },
+        extras: {
+            title: 'Extras',
+            emptyFallback: 'No extras',
+        },
         confirmation: 'Added to bill',
         error: 'Failed to add to bill',
         addOrder: 'Add',
@@ -215,6 +231,10 @@ const enPack: languagePack = {
         inputLabel: 'Enter Amount',
         paymentByCard: 'Pay by Card/BLIK',
         paymentByCash: 'Pay by Cash',
+        alreadyPaidMsg: 'Order is already fully paid.',
+        amountRangeError: 'Enter an amount between 0 and {max}.',
+        toastPaymentCreated: 'Payment successful.',
+        toastPaymentFailed: 'Failed to process payment.',
     },
     paymentDetails: {
         bill: 'Bill',
@@ -234,8 +254,13 @@ const enPack: languagePack = {
         closeBtn: 'No',
         confirmBtn: 'Yes',
     },
-    delivertyMapModal: {
+    deliveryMapModal: {
         deliveryTitle: 'Delivery',
+        inputEmptyError: 'Please enter a delivery address',
+        distanceExceedError:
+            'Delivery address is out of range. Maximum distance is 10 km.',
+        mapLoadingError: 'Failed to load the map. Please try again later.',
+        noneAddressError: 'No delivery address found.',
     },
     settingsPage: {
         settings: {

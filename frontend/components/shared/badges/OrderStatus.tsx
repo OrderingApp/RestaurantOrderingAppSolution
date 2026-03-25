@@ -20,10 +20,6 @@ const OrderStatusBadge = ({
             variant = 'success';
             break;
 
-        case ORDER_STATUSES.PENDING_PAYMENT.toLowerCase():
-            variant = 'warning';
-            break;
-
         case ORDER_STATUSES.CLOSED.toLowerCase():
             variant = 'danger';
             break;

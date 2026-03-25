@@ -20,12 +20,11 @@ import ToggleSwitch from '@/components/shared/toggleSwitch/ToggleSwitch';
 import DetailsAside from '@/components/shared/asides/Details';
 import OrderList from '@/components/shared/lists/orders/OrderList';
 import PaymentDetails from '@/components/shared/modals/PaymentDetails';
-import EditOrder from './EditOrder';
 import CreateOrder from '../../shared/modals/CreateOrder';
 import SearchInput from '@/components/shared/Input/SearchInput';
 import clsx from 'clsx';
 import Modal from '@/components/shared/modals/Modal';
-import OrderOptionsModal from '@/components/shared/modals/OrderOptionsModal';
+import OrderOptionsModal from '@/components/shared/modals/order-options-modal/OrderOptionsModal';
 
 const buttons = [
     {
@@ -75,7 +74,8 @@ const Orders = () => {
     const isCreateOrderModalOpen = modal === 'true' && !orderId;
     const isEditOrderModalOpen = modal === 'true' && !!orderId;
     const isPaymentModalOpen = closeOrder === 'true';
-    const isOrderOptionsModalOpen = !!orderId && !isPaymentModalOpen;
+    const isOrderOptionsModalOpen =
+        !!orderId && !isPaymentModalOpen && modal !== 'true';
 
     const toggleModal = () => {
         const newUrl = getToggleModalUrl(searchParams, pathname);
@@ -159,40 +159,38 @@ const Orders = () => {
                 <div className="flex justify-around w-full h-auto mt-4">
                     <div className="flex items-start justify-between w-full">
                         <div className="flex gap-4 mb-4 w-2/5 ">
-                            {buttons.map((btn) => (
-                                <button
-                                    className={clsx(
-                                        'p-3 rounded-lg shadow-xl transition-all',
-                                        isActive(btn.value) === btn.value
-                                            ? 'bg-primary'
-                                            : 'bg-[#F6F6F6] '
-                                    )}
-                                    onClick={() =>
-                                        toggleQueryParam(
-                                            'orderStatus',
-                                            btn.value,
-                                            searchParams,
-                                            router,
-                                            pathname
-                                        )
-                                    }
-                                    key={btn.value}
-                                >
-                                    <Image
-                                        src={
-                                            isActive(btn.value) === btn.value
-                                                ? btn.iconActive
-                                                : btn.icon
-                                        }
-                                        alt="iconList"
+                            {buttons.map((btn) => {
+                                const isActive = activeFilter === btn.value;
+
+                                return (
+                                    <button
                                         className={clsx(
-                                            'transition-all',
-                                            isActive(btn.value) !== btn.value &&
-                                                'group-hover:brightness-0 group-hover:invert'
+                                            'p-3 rounded-lg shadow-xl transition-all',
+                                            isActive
+                                                ? 'bg-primary'
+                                                : 'bg-[#F6F6F6]'
                                         )}
-                                    />
-                                </button>
-                            ))}
+                                        onClick={() =>
+                                            onFilterClick(btn.param, btn.value)
+                                        }
+                                        key={btn.value}
+                                    >
+                                        <Image
+                                            src={
+                                                isActive
+                                                    ? btn.iconActive
+                                                    : btn.icon
+                                            }
+                                            alt="iconList"
+                                            className={clsx(
+                                                'transition-all',
+                                                !isActive &&
+                                                    'group-hover:brightness-0 group-hover:invert'
+                                            )}
+                                        />
+                                    </button>
+                                );
+                            })}
                         </div>
                         <div className="w-3/5 mr-5">
                             <SearchInput
@@ -222,7 +220,7 @@ const Orders = () => {
             </OverviewModal>
 
             <OverviewModal isOpen={isEditOrderModalOpen}>
-                <EditOrder toggleModal={toggleModal} />
+                <CreateOrder toggleModal={toggleModal} skipCustomerForm />
             </OverviewModal>
 
             {/* Change detailaside props or change aside ui */}

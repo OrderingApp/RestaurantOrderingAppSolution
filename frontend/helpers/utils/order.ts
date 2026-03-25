@@ -28,7 +28,6 @@ export const getOrderStatus = (
 
         case ORDER_STATUSES.PENDING_PAYMENT.toLowerCase():
             return pendingPayment;
-
         case ORDER_STATUSES.CLOSED.toLowerCase():
             return closed;
 
