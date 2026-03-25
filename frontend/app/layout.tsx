@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
+import MuiLocalizationProvider from '@/providers/LocalizationProvider';
+
 import QueryProvider from '@/providers/queryProvider';
 import LanguageProvider from '@/providers/LanguageProvider';
 import readLangCookie from '@/actions/readLangCookie';
@@ -45,11 +47,13 @@ const RootLayout = async ({
                 <div id="root" className="w-full max-w-[64rem] relative">
                     <QueryProvider>
                         <LanguageProvider language={lang}>
-                            <OrdersProvider>
-                                <ReservationProvider>
-                                    {children}
-                                </ReservationProvider>
-                            </OrdersProvider>
+                            <MuiLocalizationProvider>
+                                <OrdersProvider>
+                                    <ReservationProvider>
+                                        {children}
+                                    </ReservationProvider>
+                                </OrdersProvider>
+                            </MuiLocalizationProvider>
                         </LanguageProvider>
                     </QueryProvider>
                 </div>

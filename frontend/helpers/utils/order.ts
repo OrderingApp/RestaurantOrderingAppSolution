@@ -8,13 +8,7 @@ export const getOrderStatus = (
     const {
         entities: {
             order: {
-                statuses: {
-                    ongoing,
-                    pendingPayment,
-                    cancelled,
-                    paidAndReadyToPrepare,
-                    closed,
-                },
+                statuses: { ongoing, cancelled, closed },
             },
         },
     } = languagePacks[language];
@@ -22,12 +16,6 @@ export const getOrderStatus = (
     switch (status.toLowerCase()) {
         case ORDER_STATUSES.ONGOING.toLowerCase():
             return ongoing;
-
-        case ORDER_STATUSES.PAID_AND_READY_TO_PREPARE.toLowerCase():
-            return paidAndReadyToPrepare;
-
-        case ORDER_STATUSES.PENDING_PAYMENT.toLowerCase():
-            return pendingPayment;
 
         case ORDER_STATUSES.CLOSED.toLowerCase():
             return closed;

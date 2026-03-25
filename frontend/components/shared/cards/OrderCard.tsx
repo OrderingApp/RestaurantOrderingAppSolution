@@ -4,6 +4,7 @@ import {
     CURRENCIES,
     ORDER_STATUSES,
     ORDER_TYPES,
+    PAYMENT_STATUSES,
 } from '@/helpers/constants/constants';
 import ItemCard, { ItemCardProps } from './ItemCard';
 import { formatDate } from '@/helpers/utils/dates';
@@ -19,6 +20,7 @@ export interface OrderProps
 const OrderCard = ({
     orderType,
     orderStatus,
+    paymentStatus,
     totalAmount,
     phoneNumber,
     address,
@@ -40,6 +42,11 @@ const OrderCard = ({
         },
     } = languagePacks[language];
 
+    const isActiveOrder =
+        orderStatus === ORDER_STATUSES.ONGOING &&
+        paymentStatus !== PAYMENT_STATUSES.PAID;
+    const isClosedOrder = orderStatus === ORDER_STATUSES.CLOSED;
+
     return (
         <ItemCard
             title={orderType === ORDER_TYPES.TAKEAWAY ? pickup : delivery}
@@ -47,9 +54,11 @@ const OrderCard = ({
                 formatDate(new Date(expectedOrderCompletion), language).time
             }
             variant={
-                orderStatus === ORDER_STATUSES.ONGOING
+                isActiveOrder
                     ? 'orderActive'
-                    : 'orderCompleted'
+                    : isClosedOrder
+                      ? 'orderClosed'
+                      : 'orderCompleted'
             }
             className={`${className} ${orderType === ORDER_TYPES.DELIVERY ? '!h-[120px]' : ''}`}
             variantClassName={variantClassName}

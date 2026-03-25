@@ -148,6 +148,10 @@ const plPack: languagePack = {
                 takeway: 'Odbiór',
                 delivery: 'Dostawa',
             },
+            toasts: {
+                updateSuccess: 'Dane klienta zostały zaktualizowane.',
+                updateError: 'Nie udało się zaktualizować danych klienta.',
+            },
             aside: {
                 title: 'Do zapłaty',
                 buttons: {
@@ -195,6 +199,14 @@ const plPack: languagePack = {
                 status: 'Status',
                 paid: 'Opłacone',
                 unpaid: 'Nieopłacone',
+                paidAmount: 'Opłacono',
+                remainingAmount: 'Pozostało',
+            },
+            toasts: {
+                deleteSuccess: 'Zamówienie zostało usunięte.',
+                deleteError: 'Nie udało się usunąć zamówienia.',
+                closeSuccess: 'Zamówienie zostało zamknięte.',
+                closeError: 'Nie udało się zamknąć zamówienia.',
             },
         },
         asideTitle: 'Zamówienie',
@@ -207,15 +219,23 @@ const plPack: languagePack = {
             close: 'Zamknij bez zmian',
             discount: 'Dodaj zniżkę',
         },
+        extras: {
+            title: 'Dodatki',
+            emptyFallback: 'Brak dodatków',
+        },
         confirmation: 'Dodano do rachunku',
         error: 'Nie udało się dodać do rachunku',
         addOrder: 'Dodaj',
     },
     paymentModal: {
-        title: 'Wybierz Formę Płatnośći',
+        title: 'Wybierz Formę Płatności',
         inputLabel: 'Wpisz wartość',
         paymentByCard: 'Płatność Kartą/Blikiem',
         paymentByCash: 'Płatność Gotówką',
+        alreadyPaidMsg: 'Zamówienie jest już w całości opłacone.',
+        amountRangeError: 'Wpisz kwotę pomiędzy 0 a {max}.',
+        toastPaymentCreated: 'Płatność zrealizowana',
+        toastPaymentFailed: 'Nie udało się zrealizować płatności.',
     },
     paymentDetails: {
         bill: 'Rachunek',
@@ -235,8 +255,13 @@ const plPack: languagePack = {
         closeBtn: 'Nie',
         confirmBtn: 'Tak',
     },
-    delivertyMapModal: {
+    deliveryMapModal: {
         deliveryTitle: 'Dostawa',
+        inputEmptyError: 'Proszę wpisać adres dostawy',
+        distanceExceedError:
+            'Adres dostawy jest poza zasięgiem. Maksymalna odległość to 10 km.',
+        mapLoadingError: 'Nie można załadować mapy. Spróbuj ponownie później.',
+        noneAddressError: 'Nie znaleziono adresu dostawy.',
     },
     settingsPage: {
         settings: {

@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 export const useQuerySingleOrder = (id: string) =>
     useQuery({
         queryKey: [OrdersItems.BY_ID, id],
+        enabled: !!id,
         queryFn: () =>
             fetchWithParams('orders', id).then((response) => response as Order),
     });

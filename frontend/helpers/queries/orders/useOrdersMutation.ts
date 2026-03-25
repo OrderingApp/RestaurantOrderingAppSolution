@@ -13,7 +13,7 @@ type UseOrderMutationOptions = {
 };
 
 const useOrderMutation = (
-    type: 'create' | 'update' | 'delete',
+    type: 'create' | 'update' | 'delete' | 'close',
     orderKind: OrderKind,
     options?: UseOrderMutationOptions
 ) => {
@@ -29,20 +29,33 @@ const useOrderMutation = (
                 url += `/${id}`;
                 method = 'PUT';
             } else if (type === 'delete' && id) {
-                url += `/${id}`;
+                url = `${BACKEND_URL}/orders/${id}`;
                 method = 'DELETE';
+            } else if (type === 'close' && id) {
+                url = `${BACKEND_URL}/orders/${id}/close`;
+                method = 'PATCH';
             }
 
             const response = await fetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
-                body: type !== 'delete' ? JSON.stringify(data) : undefined,
+                body:
+                    type === 'create' || type === 'update'
+                        ? JSON.stringify(data)
+                        : undefined,
             });
 
             if (!response.ok)
                 throw new Error(`Failed to ${type} ${orderKind} order`);
 
-            return response.json();
+            if (response.status === 204) {
+                return null;
+            }
+
+            const contentType = response.headers.get('content-type') || '';
+            return contentType.includes('application/json')
+                ? response.json()
+                : null;
         },
 
         onMutate: async ({ id, data }: { id?: string; data?: OrderDto }) => {
@@ -71,6 +84,12 @@ const useOrderMutation = (
                         );
                     } else if (type === 'delete' && id) {
                         return old.filter((order) => order.id !== id);
+                    } else if (type === 'close' && id) {
+                        return old.map((order) =>
+                            order.id === id
+                                ? { ...order, orderStatus: 'Closed' }
+                                : order
+                        );
                     }
                     return old;
                 }

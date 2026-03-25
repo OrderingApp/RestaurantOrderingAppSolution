@@ -14,6 +14,8 @@ export type LocalBillItem = {
     currency: Currency;
     quantity: number;
     discount?: number;
+    annotation?: string[];
+    annotationClassName?: string;
 };
 
 export type LocalBill = {
@@ -28,9 +30,12 @@ type ExistingOrderForTable = {
     id: string;
     totalAmount?: number;
     orderItems: Array<{
+        id?: string;
         price: number;
         quantity?: number;
         discount?: number;
+        annotation?: string[];
+        annotationClassName?: string;
         menuItem: {
             id: string;
             name: string;
@@ -91,13 +96,15 @@ export const useCreateOrderLocalBills = ({
                         id: order.id,
                         isNew: false,
                         orderItems: order.orderItems.map((item) => ({
-                            id: item.menuItem.id,
+                            id: item.id || item.menuItem.id,
                             menuItemId: item.menuItem.id,
                             name: item.menuItem.name,
                             price: item.price,
                             currency: COMPANYS_CURRENCY,
                             quantity: item.quantity || 1,
                             discount: item.discount,
+                            annotation: item.annotation,
+                            annotationClassName: item.annotationClassName,
                         })),
                         pendingItems: [],
                         totalAmount: order.totalAmount || 0,

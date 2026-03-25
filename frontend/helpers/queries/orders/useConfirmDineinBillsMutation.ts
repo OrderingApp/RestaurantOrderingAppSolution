@@ -150,6 +150,18 @@ const useConfirmDineinBillsMutation = (
         },
         onSuccess: async () => {
             await queryClient.invalidateQueries({
+                queryKey: ORDERS_QUERY_KEY,
+            });
+
+            await queryClient.invalidateQueries({
+                queryKey: [OrdersItems.BY_TYPE],
+            });
+
+            await queryClient.invalidateQueries({
+                queryKey: [OrdersItems.BY_ID],
+            });
+
+            await queryClient.invalidateQueries({
                 queryKey: [
                     ...ORDERS_QUERY_KEY,
                     OrdersItems.BY_TYPE,

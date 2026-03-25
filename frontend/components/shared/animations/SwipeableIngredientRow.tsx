@@ -115,8 +115,8 @@ const SwipeableIngredientRow = ({
             <div
                 className={
                     isSwiping
-                        ? 'w-full'
-                        : 'w-full transition-transform duration-150 ease-out'
+                        ? 'w-full flex items-center justify-between gap-2'
+                        : 'w-full flex items-center justify-between gap-2 transition-transform duration-150 ease-out'
                 }
                 style={{ transform: `translateX(${swipeX}px)` }}
             >

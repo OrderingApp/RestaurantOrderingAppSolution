@@ -4,14 +4,9 @@ export type OrderType = 'dinein' | 'Takeaway' | 'Delivery';
 
 export type OrderCompletionType = 'Immediate' | 'Scheduled';
 
-export type PaymentMethod = 'Card' | 'Cash' | 'Online';
+export type OrderStatus = 'Ongoing' | 'Cancelled' | 'Closed';
 
-export type OrderStatus =
-    | 'Ongoing'
-    | 'PendingPayment'
-    | 'Cancelled'
-    | 'Closed'
-    | 'PaidAndReadyToPrepare';
+export type PaymentStatus = 'Unpaid' | 'PartiallyPaid' | 'Paid';
 
 export interface ExtraIngredient {
     ingredientId: string;
@@ -58,11 +53,11 @@ export interface OrderItem {
 }
 
 interface CustomerInformation {
+    id?: string;
     phoneNumber: string;
     additionalInstructions: string | null;
     address?: string | null;
     orderCompletionType: OrderCompletionType;
-    preferredPaymentMethod: PaymentMethod;
     expectedOrderCompletion: string;
 }
 
@@ -70,8 +65,12 @@ export interface Order {
     id: string;
     createdAt: string;
     totalAmount: number;
+    paidAmount?: number;
+    unpaidAmount?: number;
+    remainingAmount?: number;
     discount: number;
     orderStatus: OrderStatus;
+    paymentStatus?: PaymentStatus;
     orderType: OrderType;
     tableId: string | null;
     customerInformation: CustomerInformation;
@@ -84,24 +83,29 @@ export interface NotDineInOrder {
     expectedOrderCompletion: string;
     totalAmount: number;
     orderStatus: OrderStatus;
+    paymentStatus?: PaymentStatus;
     orderType: OrderType;
     phoneNumber: string;
     address: string | null;
 }
 
 export interface OrderDto {
-    createdAt: string;
     discount: number;
-    deliveryPrice: number;
     customerInformation: {
         phoneNumber: string;
+        additionalInstructions: string;
+        address: string;
         orderCompletionType: OrderCompletionType;
-        preferredPaymentMethod: PaymentMethod;
-        additionalInstructions?: string;
         expectedOrderCompletion: string;
-        address?: string;
     };
     orderItems: {
+        specialInstructions: string;
+        discount: number;
         menuItemId: string;
+        extraIngredients: {
+            ingredientId: string;
+            quantity: number;
+        }[];
+        removedIngredientIds: string[];
     }[];
 }
