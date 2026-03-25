@@ -169,8 +169,6 @@ const OrdersProvider = ({ children }: { children: ReactNode }) => {
         }) => {
             if (!orderItemId || !ingredientId) return;
 
-            const safeQty = Math.max(1, quantity);
-
             setExtraIngredientsByOrderItemId((prev) => {
                 const existing = prev[orderItemId] ?? [];
 
@@ -182,7 +180,7 @@ const OrdersProvider = ({ children }: { children: ReactNode }) => {
 
                 const current = existing[index];
 
-                const nextQty = current.quantity - safeQty;
+                const nextQty = current.quantity - quantity;
 
                 if (nextQty <= 0) {
                     const next = existing.filter(

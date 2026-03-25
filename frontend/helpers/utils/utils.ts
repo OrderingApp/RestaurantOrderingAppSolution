@@ -1,5 +1,9 @@
 import { ReadonlyURLSearchParams } from 'next/navigation';
-import { BACKEND_PATHS, BACKEND_URL } from '../constants/constants';
+import {
+    BACKEND_PATHS,
+    BACKEND_URL,
+    SEARCH_PARAMS_NAMES,
+} from '../constants/constants';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { toast } from 'sonner';
 
@@ -173,4 +177,45 @@ export const getPaginationRange = (currentPage: number, totalPages: number) => {
     });
 
     return pages;
+};
+
+export const MODAL_CLEANUP_PARAMS = [
+    SEARCH_PARAMS_NAMES.MODAL,
+    SEARCH_PARAMS_NAMES.ORDER_ID,
+    SEARCH_PARAMS_NAMES.MENU_ITEM_ID,
+    SEARCH_PARAMS_NAMES.USER_DATA,
+    SEARCH_PARAMS_NAMES.CATEGORY,
+    SEARCH_PARAMS_NAMES.SUBCATEGORY,
+    SEARCH_PARAMS_NAMES.TAG,
+    SEARCH_PARAMS_NAMES.ORDER_MENU_PAGE,
+    SEARCH_PARAMS_NAMES.PAGE,
+];
+
+export const getToggleModalUrl = (
+    searchParams: URLSearchParams | string,
+    pathname: string
+): string => {
+    const params = new URLSearchParams(searchParams.toString());
+    const isOpen = params.get(SEARCH_PARAMS_NAMES.MODAL) === 'true';
+
+    if (isOpen) {
+        MODAL_CLEANUP_PARAMS.forEach((param) => params.delete(param));
+    } else {
+        params.set(SEARCH_PARAMS_NAMES.MODAL, 'true');
+    }
+
+    const queryString = params.toString();
+    return queryString ? `${pathname}?${queryString}` : pathname;
+};
+
+export const getCloseModalUrl = (
+    searchParams: URLSearchParams | string,
+    pathname: string
+): string => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    MODAL_CLEANUP_PARAMS.forEach((param) => params.delete(param));
+
+    const queryString = params.toString();
+    return queryString ? `${pathname}?${queryString}` : pathname;
 };

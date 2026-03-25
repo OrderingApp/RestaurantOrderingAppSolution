@@ -12,7 +12,7 @@ import { useOrdersContext } from '@/providers/OrdersContext';
 import { OrdersItems } from '@/helpers/utils/queryKeys';
 import { useState, useMemo } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { toggleQueryParam } from '@/helpers/utils/utils';
+import { getCloseModalUrl, toggleQueryParam } from '@/helpers/utils/utils';
 import CustomerInformationForm from '../../pages/orders/CustomerInformationForm';
 import { ItemProps } from '@/components/shared/lists/Items/Item';
 import { ButtonProps } from '@/components/shared/button/Button';
@@ -245,18 +245,8 @@ const CreateOrder = ({
             _toggleModal();
         }
 
-        const newParams = new URLSearchParams(searchParams.toString());
-        newParams.delete(SEARCH_PARAMS_NAMES.MODAL);
-        newParams.delete(SEARCH_PARAMS_NAMES.MENU_ITEM_ID);
-        newParams.delete(SEARCH_PARAMS_NAMES.USER_DATA);
-        newParams.delete(SEARCH_PARAMS_NAMES.CATEGORY);
-        newParams.delete(SEARCH_PARAMS_NAMES.SUBCATEGORY);
-        newParams.delete(SEARCH_PARAMS_NAMES.TAG);
-        newParams.delete(SEARCH_PARAMS_NAMES.ORDER_MENU_PAGE);
-        newParams.delete(SEARCH_PARAMS_NAMES.PAGE);
-
-        const queryString = newParams.toString();
-        router.push(queryString ? `${pathname}?${queryString}` : pathname);
+        const newUrl = getCloseModalUrl(searchParams, pathname);
+        router.push(newUrl);
     };
 
     const clearSelectedMenuItem = () => {

@@ -286,6 +286,12 @@ namespace Infrastructure.Database.Migrations
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal>("PaidAmount")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PaymentStatus")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("TEXT");

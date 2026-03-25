@@ -1,4 +1,6 @@
 ﻿using Infrastructure.Database;
+using Infrastructure.Database.Seeder;
+using Infrastructure.Database.Seeder.Seeders;
 using Microsoft.EntityFrameworkCore;
 using RestaurantOrdering.Events.Infrastructure.Database;
 
@@ -11,7 +13,6 @@ public static class DatabaseExtensions
         IConfiguration configuration
     )
     {
-
         services.AddSingleton<AuditTimestampsInterceptor>();
 
         services.AddDbContext<RestaurantOrderingContext>((sp, opt) =>
@@ -25,6 +26,9 @@ public static class DatabaseExtensions
             opt.UseSqlite(configuration.GetConnectionString("EventsDatabaseContext"));
         });
 
+        // Register JSON-based seeders
+        services.AddDatabaseSeeders();
+
         return services;
     }
 
@@ -35,15 +39,12 @@ public static class DatabaseExtensions
 
         try
         {
-            var restaurantOrderingContext =
-                services.GetRequiredService<RestaurantOrderingContext>();
+            var restaurantOrderingContext = services.GetRequiredService<RestaurantOrderingContext>();
             await restaurantOrderingContext.Database.MigrateAsync();
 
-            var excelSeeder = new ExcelSeeder(restaurantOrderingContext);
-
-            await excelSeeder.SeedFromExcel(
-                Path.Combine(Environment.CurrentDirectory, "SeedData.xlsx")
-            );
+            // Seed from JSON files in Seeder/SeedData/ (if-empty, safe to call on every startup)
+            var seeder = services.GetRequiredService<DatabaseSeeder>();
+            await seeder.SeedAsync();
 
             var eventsDatabaseContext = services.GetRequiredService<EventsDatabaseContext>();
             await eventsDatabaseContext.Database.MigrateAsync();
@@ -51,7 +52,7 @@ public static class DatabaseExtensions
         catch (Exception ex)
         {
             var logger = services.GetRequiredService<ILogger<Program>>();
-            logger.LogError(ex, "An error occurred during migration");
+            logger.LogError(ex, "An error occurred during migration or seeding");
         }
     }
 }

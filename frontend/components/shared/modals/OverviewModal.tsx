@@ -1,12 +1,11 @@
 'use client';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion, type HTMLMotionProps } from 'framer-motion';
 
 interface OverviewModalProps {
     children: ReactNode;
     isOpen?: boolean;
-
     motionConfig?: Pick<
         HTMLMotionProps<'div'>,
         'initial' | 'animate' | 'exit' | 'transition'
@@ -25,9 +24,16 @@ const OverviewModal = ({
     children,
     isOpen = true,
     motionConfig = OVERVIEW_MODAL_DEFAULT_MOTION_CONFIG,
-
     onAnimationComplete,
 }: OverviewModalProps) => {
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return null;
+
     const modalRoot = document.getElementById('root');
 
     if (!modalRoot) return null;

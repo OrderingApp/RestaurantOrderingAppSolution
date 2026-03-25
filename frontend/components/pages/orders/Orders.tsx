@@ -10,7 +10,7 @@ import {
 } from '@/helpers/constants/constants';
 import languagePacks from '@/helpers/constants/languagePacks';
 import useLanguage from '@/helpers/hooks/useLanguage';
-import { setQueryParams, toggleQueryParam } from '@/helpers/utils/utils';
+import { getToggleModalUrl, toggleQueryParam } from '@/helpers/utils/utils';
 import { ICONS } from '@/helpers/constants/icons/icons';
 import useFilterOrders from '@/helpers/hooks/useFilterOrders';
 
@@ -25,6 +25,29 @@ import SearchInput from '@/components/shared/Input/SearchInput';
 import clsx from 'clsx';
 import Modal from '@/components/shared/modals/Modal';
 import OrderOptionsModal from '@/components/shared/modals/order-options-modal/OrderOptionsModal';
+
+const buttons = [
+    {
+        value: 'All',
+        iconActive: ICONS.LIST_WHITE,
+        icon: ICONS.LIST,
+    },
+    {
+        value: 'Ongoing',
+        iconActive: ICONS.MENU_OPEN_WHITE,
+        icon: ICONS.MENU_OPEN,
+    },
+    {
+        value: 'PaidAndReadyToPrepare',
+        iconActive: ICONS.CLOSE_WHITE,
+        icon: ICONS.CLOSE,
+    },
+    {
+        value: 'Closed',
+        iconActive: ICONS.TIME_WHITE,
+        icon: ICONS.TIME,
+    },
+];
 
 const Orders = () => {
     const { language } = useLanguage();
@@ -55,24 +78,8 @@ const Orders = () => {
         !!orderId && !isPaymentModalOpen && modal !== 'true';
 
     const toggleModal = () => {
-        const params = new URLSearchParams(searchParams.toString());
-        const isOpen = params.get(SEARCH_PARAMS_NAMES.MODAL) === 'true';
-
-        if (isOpen) {
-            params.delete(SEARCH_PARAMS_NAMES.MODAL);
-            params.delete(SEARCH_PARAMS_NAMES.ORDER_ID);
-            params.delete(SEARCH_PARAMS_NAMES.MENU_ITEM_ID);
-            params.delete(SEARCH_PARAMS_NAMES.USER_DATA);
-            params.delete(SEARCH_PARAMS_NAMES.CATEGORY);
-            params.delete(SEARCH_PARAMS_NAMES.SUBCATEGORY);
-            params.delete(SEARCH_PARAMS_NAMES.TAG);
-            params.delete(SEARCH_PARAMS_NAMES.ORDER_MENU_PAGE);
-        } else {
-            params.set(SEARCH_PARAMS_NAMES.MODAL, 'true');
-        }
-
-        const queryString = params.toString();
-        router.push(queryString ? `${pathname}?${queryString}` : pathname);
+        const newUrl = getToggleModalUrl(searchParams, pathname);
+        router.push(newUrl);
     };
 
     const closeOrderHandler = () => {
@@ -108,58 +115,11 @@ const Orders = () => {
         },
     ];
 
-    const buttons = [
-        {
-            value: 'All',
-            param: SEARCH_PARAMS_NAMES.ORDER_STATUS,
-            iconActive: ICONS.LIST_WHITE,
-            icon: ICONS.LIST,
-        },
-        {
-            value: 'Ongoing',
-            param: SEARCH_PARAMS_NAMES.ORDER_STATUS,
-            iconActive: ICONS.MENU_OPEN_WHITE,
-            icon: ICONS.MENU_OPEN,
-        },
-        {
-            value: 'Paid',
-            param: SEARCH_PARAMS_NAMES.PAYMENT_STATUS,
-            iconActive: ICONS.CLOSE_WHITE,
-            icon: ICONS.CLOSE,
-        },
-        {
-            value: 'Closed',
-            param: SEARCH_PARAMS_NAMES.ORDER_STATUS,
-            iconActive: ICONS.TIME_WHITE,
-            icon: ICONS.TIME,
-        },
-    ];
-
-    const orderStatus = searchParams.get(SEARCH_PARAMS_NAMES.ORDER_STATUS);
-    const paymentStatus = searchParams.get(SEARCH_PARAMS_NAMES.PAYMENT_STATUS);
-    const activeFilter = paymentStatus ?? orderStatus ?? 'All';
-
-    const onFilterClick = (paramName: string, value: string) =>
-        setQueryParams(
-            value === 'All'
-                ? {
-                      [SEARCH_PARAMS_NAMES.ORDER_STATUS]: undefined,
-                      [SEARCH_PARAMS_NAMES.PAYMENT_STATUS]: undefined,
-                  }
-                : {
-                      [SEARCH_PARAMS_NAMES.ORDER_STATUS]:
-                          paramName === SEARCH_PARAMS_NAMES.ORDER_STATUS
-                              ? value
-                              : undefined,
-                      [SEARCH_PARAMS_NAMES.PAYMENT_STATUS]:
-                          paramName === SEARCH_PARAMS_NAMES.PAYMENT_STATUS
-                              ? value
-                              : undefined,
-                  },
-            searchParams,
-            router,
-            pathname
-        );
+    const isActive = (value: string) => {
+        const param = searchParams.get('orderStatus');
+        if (!param || undefined) return 'All';
+        if (param === value) return value;
+    };
 
     const openOrderOptionsModal = (id: string) => {
         toggleQueryParam(

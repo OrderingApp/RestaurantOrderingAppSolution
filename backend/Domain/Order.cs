@@ -14,7 +14,11 @@ public class Order : AuditableEntity
     public decimal Discount { get; set; }
     public decimal? DeliveryPrice { get; set; }
 
+    public decimal PaidAmount { get; set; }
+    public decimal RemainingAmount => Math.Max(0, TotalAmount - PaidAmount);
+
     public OrderStatus Status { get; set; } = OrderStatus.Ongoing;
+    public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Unpaid;
     public OrderType Type { get; set; }
 
     public List<OrderItem> OrderItems { get; set; } = new();
@@ -31,10 +35,16 @@ public class Order : AuditableEntity
 public enum OrderStatus
 {
     Ongoing,
-    PendingPayment,
-    PaidAndReadyToPrepare,
+    Completed,
     Closed,
     Cancelled,
+}
+
+public enum PaymentStatus
+{
+    Unpaid,
+    PartiallyPaid,
+    Paid,
 }
 
 public enum OrderType
