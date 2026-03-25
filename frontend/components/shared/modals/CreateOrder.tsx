@@ -23,6 +23,7 @@ import useQueryOrders from '@/helpers/queries/orders/useQueryOrders';
 import useQueryTables from '@/helpers/queries/tables/useQueryTables';
 import { getAggregatedDineInOrdersForTable } from '@/helpers/utils/orderTransforms';
 import useConfirmDineinBillsMutation from '@/helpers/queries/orders/useConfirmDineinBillsMutation';
+import useQuerySingleOrder from '@/helpers/queries/orders/useQuerySingleOrder';
 import {
     useQueryMenuIngredients,
     useQueryMenuItem,
@@ -76,7 +77,9 @@ const CreateOrder = ({
     const selectedOrderItemId = searchParams.get(
         SEARCH_PARAMS_NAMES.MENU_ITEM_ID
     );
+    const editedOrderId = searchParams.get(SEARCH_PARAMS_NAMES.ORDER_ID);
     const userData = searchParams.get(SEARCH_PARAMS_NAMES.USER_DATA);
+    const isEditMode = skipCustomerForm && !!editedOrderId;
 
     const [selectedId, setSelectedId] = useState('');
 
@@ -85,6 +88,8 @@ const CreateOrder = ({
     const { data: allOrders, isLoading: isOrdersLoading } = useQueryOrders({
         queryKeys: [OrdersItems.BY_TYPE, ORDER_TYPES.DINEIN],
     });
+    const { data: editedOrder, isLoading: isEditedOrderLoading } =
+        useQuerySingleOrder(editedOrderId || '');
     const { data: tables } = useQueryTables();
 
     const tableName =
@@ -93,11 +98,46 @@ const CreateOrder = ({
             : '';
 
     const existingOrdersForTable = useMemo(() => {
-        return getAggregatedDineInOrdersForTable(allOrders || [], tableId);
-    }, [allOrders, tableId]);
+        if (isEditMode) {
+            if (!editedOrder) return [];
 
-    const canAddMultipleBills = allowMultipleBills ?? !!tableId;
-    const isAsideOrdersLoadingForInit = !!tableId && isOrdersLoading;
+            return [
+                {
+                    id: editedOrder.id,
+                    totalAmount: editedOrder.totalAmount,
+                    orderItems: editedOrder.orderItems.map((item) => ({
+                        id: item.id,
+                        price: item.price,
+                        quantity: 1,
+                        discount: item.discount,
+                        annotation: [
+                            ...(item.extraIngredients?.map(
+                                (extra) =>
+                                    `+ ${extra.ingredientName}${extra.quantity > 1 ? ` x${extra.quantity}` : ''}`
+                            ) ?? []),
+                            ...(item.removedIngredients?.map(
+                                (removed) => `- ${removed.name}`
+                            ) ?? []),
+                        ],
+                        annotationClassName: 'text-dark-gray font-normal',
+                        menuItem: {
+                            id: item.menuItem.id,
+                            name: item.menuItem.name,
+                        },
+                    })),
+                },
+            ];
+        }
+
+        return getAggregatedDineInOrdersForTable(allOrders || [], tableId);
+    }, [allOrders, tableId, isEditMode, editedOrder]);
+
+    const canAddMultipleBills = isEditMode
+        ? false
+        : (allowMultipleBills ?? !!tableId);
+    const isAsideOrdersLoadingForInit = isEditMode
+        ? isEditedOrderLoading
+        : !!tableId && isOrdersLoading;
 
     const {
         localBills,
@@ -137,7 +177,8 @@ const CreateOrder = ({
     });
 
     const isAsideOrdersLoading =
-        !!tableId && isOrdersLoading && localBills.length === 0;
+        (isEditMode ? isEditedOrderLoading : !!tableId && isOrdersLoading) &&
+        localBills.length === 0;
 
     const selectedPendingItem = useMemo(() => {
         if (!selectedOrderItemId) return undefined;
@@ -171,11 +212,18 @@ const CreateOrder = ({
     const {
         createOrderPage: {
             asideButtons: { accept, close, discount },
+            extras: { title: extrasTitle, emptyFallback: noExtrasFallback },
         },
     } = languagePacks[language];
 
     const effectiveOrderType =
-        orderType ?? (tableId ? ORDER_TYPES.DINEIN : ORDER_TYPES.TAKEAWAY);
+        orderType ??
+        ((isEditMode
+            ? editedOrder?.orderType
+            : tableId
+              ? ORDER_TYPES.DINEIN
+              : ORDER_TYPES.TAKEAWAY) as ORDER_TYPES | undefined) ??
+        ORDER_TYPES.TAKEAWAY;
 
     const selectedOrderTypeLabel =
         ordersTypes[language].find((type) => type.id === effectiveOrderType)
@@ -243,9 +291,11 @@ const CreateOrder = ({
     const hasPendingChanges = localBills.some(
         (bill) => bill.pendingItems.length > 0
     );
-    const canAcceptBill = selectedOrderItemId
+    const canAcceptBill = isEditMode
         ? true
-        : !!selectedBill && hasPendingChanges;
+        : selectedOrderItemId
+          ? true
+          : !!selectedBill && hasPendingChanges;
 
     const buttons: ButtonProps[] = [
         {
@@ -275,9 +325,8 @@ const CreateOrder = ({
                 // Guard: must have a selected bill
                 if (!selectedBill) return;
 
-                if (skipCustomerForm || tableId) {
-                    // For dine-in orders (tableId present), submit directly to backend.
-                    // When skipCustomerForm is true, also submit directly without opening the customer form.
+                if (tableId) {
+                    // For table context, submit directly to backend.
                     return await confirmDineinBillsMutation.mutateAsync({
                         bills: localBills,
                         tableId,
@@ -287,6 +336,12 @@ const CreateOrder = ({
                         removedIngredientIdsByOrderItemId:
                             getRemovedIngredientIdsPayloadByOrderItemId(),
                     });
+                }
+
+                if (skipCustomerForm) {
+                    // For edit flow from Orders page, allow editing customer data before final save.
+                    toggleUserDataModal();
+                    return;
                 }
 
                 // For non-dine-in or when skipCustomerForm is false, show customer form
@@ -327,6 +382,8 @@ const CreateOrder = ({
                     price: it.price,
                     currency: COMPANYS_CURRENCY,
                     quantity: it.quantity || 1,
+                    annotation: it.annotation,
+                    annotationClassName: it.annotationClassName,
                     onClick: () => {},
                 })),
                 ...localBill.pendingItems.map((item) => {
@@ -385,11 +442,20 @@ const CreateOrder = ({
         );
     };
 
-    // Build orderItems from the selected bill's pending items for CustomerInformationForm
+    // Build orderItems for CustomerInformationForm in API payload shape.
     const orderItems = selectedBillData
         ? selectedBillData.pendingItems.flatMap((item) =>
               Array.from({ length: item.quantity }, () => ({
+                  specialInstructions: '',
+                  discount: item.discount ?? 0,
                   menuItemId: item.menuItemId,
+                  extraIngredients: getExtraIngredients(item.id).map(
+                      (extraIngredient) => ({
+                          ingredientId: extraIngredient.ingredientId,
+                          quantity: extraIngredient.quantity,
+                      })
+                  ),
+                  removedIngredientIds: getRemovedIngredientIds(item.id),
               }))
           )
         : [];
@@ -501,7 +567,7 @@ const CreateOrder = ({
 
                         <section className="mt-6">
                             <h3 className="text-md py-2 text-center border-gray border-t-2 border-b-2 font-semibold ">
-                                Dodatki
+                                {extrasTitle}
                             </h3>
 
                             {selectedExtras.length ? (
@@ -554,7 +620,7 @@ const CreateOrder = ({
                                 </ul>
                             ) : (
                                 <p className="text-sm text-center text-black/70">
-                                    Brak dodatków
+                                    {noExtrasFallback}
                                 </p>
                             )}
                         </section>
@@ -579,7 +645,15 @@ const CreateOrder = ({
             )}
         </Menu>
     ) : (
-        <CustomerInformationForm bill={bill} orderItems={orderItems} />
+        <CustomerInformationForm
+            bill={bill}
+            orderItems={orderItems}
+            editedOrderId={isEditMode ? editedOrderId || undefined : undefined}
+            editedCustomerInformation={
+                isEditMode ? editedOrder?.customerInformation : undefined
+            }
+            editedOrderType={isEditMode ? editedOrder?.orderType : undefined}
+        />
     );
 };
 

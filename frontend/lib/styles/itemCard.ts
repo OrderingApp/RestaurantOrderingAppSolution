@@ -34,5 +34,9 @@ export const itemCardStyles = {
             container: 'border-[#008080] border-2',
             appearance: 'bg-[#008080] text-white',
         },
+        orderClosed: {
+            container: 'border-[#2C5364] border-2',
+            appearance: 'bg-[#2C5364] text-white',
+        },
     },
 };

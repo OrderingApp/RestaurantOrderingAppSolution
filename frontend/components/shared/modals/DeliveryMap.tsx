@@ -46,7 +46,7 @@ const DeliveryMap = ({
     } = languagePacks[language];
 
     const {
-        destination,    
+        destination,
         directions,
         distance,
         deliveryPrice,
@@ -109,7 +109,7 @@ const DeliveryMap = ({
                 );
             }
         };
-    }, [isLoaded]);
+    }, [isLoaded, onAddressChange]);
 
     if (!isLoaded) return <Skeleton />;
 

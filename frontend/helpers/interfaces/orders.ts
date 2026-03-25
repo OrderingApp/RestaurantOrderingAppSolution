@@ -53,6 +53,7 @@ export interface OrderItem {
 }
 
 interface CustomerInformation {
+    id?: string;
     phoneNumber: string;
     additionalInstructions: string | null;
     address?: string | null;
@@ -64,8 +65,12 @@ export interface Order {
     id: string;
     createdAt: string;
     totalAmount: number;
+    paidAmount?: number;
+    unpaidAmount?: number;
+    remainingAmount?: number;
     discount: number;
     orderStatus: OrderStatus;
+    paymentStatus?: PaymentStatus;
     orderType: OrderType;
     tableId: string | null;
     customerInformation: CustomerInformation;
@@ -85,16 +90,22 @@ export interface NotDineInOrder {
 }
 
 export interface OrderDto {
-    createdAt: string;
-    deliveryPrice: number;
+    discount: number;
     customerInformation: {
         phoneNumber: string;
+        additionalInstructions: string;
+        address: string;
         orderCompletionType: OrderCompletionType;
-        additionalInstructions?: string;
         expectedOrderCompletion: string;
-        address?: string;
     };
     orderItems: {
+        specialInstructions: string;
+        discount: number;
         menuItemId: string;
+        extraIngredients: {
+            ingredientId: string;
+            quantity: number;
+        }[];
+        removedIngredientIds: string[];
     }[];
 }

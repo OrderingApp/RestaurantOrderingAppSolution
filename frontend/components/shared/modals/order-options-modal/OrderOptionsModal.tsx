@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+import { toast } from 'sonner';
 
 import {
     ORDER_STATUSES,
@@ -13,19 +14,17 @@ import { ICONS } from '@/helpers/constants/icons/icons';
 import languagePacks from '@/helpers/constants/languagePacks';
 import useLanguage from '@/helpers/hooks/useLanguage';
 import useQuerySingleOrder from '@/helpers/queries/orders/useQuerySingleOrder';
+import useOrderMutation from '@/helpers/queries/orders/useOrdersMutation';
 import { aggregateAndSortOrderItems } from '@/helpers/utils/orderTransforms';
 import { formatPhoneNumber, toggleQueryParam } from '@/helpers/utils/utils';
 import { formatDate } from '@/helpers/utils/dates';
 
-import ActionsBar from './order-options-modal/ActionsBar';
-import InfoView from './order-options-modal/InfoView';
-import SummaryView from './order-options-modal/SummaryView';
-import { getActionButtons } from './order-options-modal/getActionButtons';
-import {
-    VIEWS,
-    type InformationInput,
-    type View,
-} from './order-options-modal/types';
+import AlertDialog from '../AlertDialog';
+import ActionsBar from './ActionsBar';
+import InfoView from './InfoView';
+import SummaryView from './SummaryView';
+import { getActionButtons } from './getActionButtons';
+import { VIEWS, type InformationInput, type View } from './types';
 
 const MODAL_WIDTH = '445px';
 const ORDER_TYPE = 'Takeaway';
@@ -39,6 +38,7 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
     const { data } = useQuerySingleOrder(orderId || '');
 
     const [currentView, setCurrentView] = useState<View>(VIEWS.INFO);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     const paymentStatus = data?.paymentStatus?.toLowerCase();
     const orderStatus = data?.orderStatus?.toLowerCase();
@@ -59,6 +59,12 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
                     unpaid,
                     paidAmount,
                     remainingAmount,
+                },
+                toasts: {
+                    deleteSuccess,
+                    deleteError,
+                    closeSuccess,
+                    closeError,
                 },
             },
         },
@@ -120,11 +126,71 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
         },
     ];
 
-    const closeOrder = () => {
+    const orderKind =
+        data?.orderType === 'Delivery'
+            ? 'Delivery'
+            : data?.orderType === 'dinein'
+              ? 'dinein'
+              : 'Takeaway';
+
+    const { mutate: deleteOrderMutation, isPending: isDeleteOrderPending } =
+        useOrderMutation('delete', orderKind, {
+            redirectOnSettled: false,
+            onSuccess: () => {
+                setIsDeleteDialogOpen(false);
+                onClose();
+                toast.success(deleteSuccess);
+            },
+            onError: () => {
+                setIsDeleteDialogOpen(false);
+                toast.error(deleteError);
+            },
+        });
+
+    const { mutate: closeOrderMutation, isPending: isCloseOrderPending } =
+        useOrderMutation('close', orderKind, {
+            redirectOnSettled: false,
+            onSuccess: () => {
+                onClose();
+                toast.success(closeSuccess);
+            },
+            onError: () => {
+                toast.error(closeError);
+            },
+        });
+
+    const handleCloseOrder = () => {
+        if (!orderId) return;
         if (isClosed) return;
+
+        if (isPaid) {
+            if (isCloseOrderPending) return;
+
+            closeOrderMutation({ id: orderId });
+            return;
+        }
 
         toggleQueryParam(
             SEARCH_PARAMS_NAMES.CLOSE_ORDER,
+            'true',
+            searchParms,
+            router,
+            pathname
+        );
+    };
+
+    const handleDeleteOrder = () => {
+        if (!orderId || isDeleteOrderPending) return;
+
+        deleteOrderMutation({ id: orderId });
+    };
+
+    const handleEditOrder = () => {
+        if (!orderId) return;
+        if (isPaid || isClosed) return;
+
+        toggleQueryParam(
+            SEARCH_PARAMS_NAMES.MODAL,
             'true',
             searchParms,
             router,
@@ -138,9 +204,9 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
         isClosed,
         onShowInfo: () => setCurrentView(VIEWS.INFO),
         onShowSummary: () => setCurrentView(VIEWS.SUMMARY),
-        onCloseOrder: closeOrder,
-        onDeleteOrder: () => {},
-        onEditOrder: () => {},
+        onCloseOrder: handleCloseOrder,
+        onDeleteOrder: () => setIsDeleteDialogOpen(true),
+        onEditOrder: handleEditOrder,
     });
 
     return (
@@ -186,6 +252,12 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
 
                 <ActionsBar view={currentView} buttons={actionButtons} />
             </div>
+
+            <AlertDialog
+                isOpen={isDeleteDialogOpen}
+                onClose={() => setIsDeleteDialogOpen(false)}
+                onConfirm={handleDeleteOrder}
+            />
         </div>
     );
 };

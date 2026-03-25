@@ -147,6 +147,10 @@ export interface languagePack {
                 takeway: string;
                 delivery: string;
             };
+            toasts: {
+                updateSuccess: string;
+                updateError: string;
+            };
             aside: {
                 title: string;
                 buttons: {
@@ -178,6 +182,14 @@ export interface languagePack {
                 status: string;
                 paid: string;
                 unpaid: string;
+                paidAmount: string;
+                remainingAmount: string;
+            };
+            toasts: {
+                deleteSuccess: string;
+                deleteError: string;
+                closeSuccess: string;
+                closeError: string;
             };
         };
     };
@@ -188,6 +200,10 @@ export interface languagePack {
             close: string;
             discount: string;
         };
+        extras: {
+            title: string;
+            emptyFallback: string;
+        };
         confirmation?: string;
         error?: string;
         addOrder: string;
@@ -197,6 +213,10 @@ export interface languagePack {
         inputLabel: string;
         paymentByCard: string;
         paymentByCash: string;
+        alreadyPaidMsg: string;
+        amountRangeError: string;
+        toastPaymentCreated: string;
+        toastPaymentFailed: string;
     };
 
     paymentDetails: {

@@ -20,12 +20,11 @@ import ToggleSwitch from '@/components/shared/toggleSwitch/ToggleSwitch';
 import DetailsAside from '@/components/shared/asides/Details';
 import OrderList from '@/components/shared/lists/orders/OrderList';
 import PaymentDetails from '@/components/shared/modals/PaymentDetails';
-import EditOrder from './EditOrder';
 import CreateOrder from '../../shared/modals/CreateOrder';
 import SearchInput from '@/components/shared/Input/SearchInput';
 import clsx from 'clsx';
 import Modal from '@/components/shared/modals/Modal';
-import OrderOptionsModal from '@/components/shared/modals/OrderOptionsModal';
+import OrderOptionsModal from '@/components/shared/modals/order-options-modal/OrderOptionsModal';
 
 const Orders = () => {
     const { language } = useLanguage();
@@ -52,7 +51,8 @@ const Orders = () => {
     const isCreateOrderModalOpen = modal === 'true' && !orderId;
     const isEditOrderModalOpen = modal === 'true' && !!orderId;
     const isPaymentModalOpen = closeOrder === 'true';
-    const isOrderOptionsModalOpen = !!orderId && !isPaymentModalOpen;
+    const isOrderOptionsModalOpen =
+        !!orderId && !isPaymentModalOpen && modal !== 'true';
 
     const toggleModal = () => {
         const params = new URLSearchParams(searchParams.toString());
@@ -260,7 +260,7 @@ const Orders = () => {
             </OverviewModal>
 
             <OverviewModal isOpen={isEditOrderModalOpen}>
-                <EditOrder toggleModal={toggleModal} />
+                <CreateOrder toggleModal={toggleModal} skipCustomerForm />
             </OverviewModal>
 
             {/* Change detailaside props or change aside ui */}

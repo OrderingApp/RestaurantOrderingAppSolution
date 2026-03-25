@@ -4,15 +4,34 @@ import { OrdersItems } from '@/helpers/utils/queryKeys';
 import { fetchWithParams } from '@/helpers/utils/utils';
 import { useQuery } from '@tanstack/react-query';
 
-const useQueryOrdersByType = (type: string, statuses: string[]) => {
-    const params = new URLSearchParams({
-        orderType: type,
-        date: new Date().toLocaleTimeString(),
-    });
+// 1. Definiujemy interfejs dla parametrów
+export interface UseQueryOrdersByTypeParams {
+    type?: string;
+    statuses?: string[];
+    paymentStatuses?: string[];
+}
+
+// 2. Hook przyjmuje jeden obiekt z destrukturyzacją i domyślnymi wartościami
+const useQueryOrdersByType = ({
+    type,
+    statuses = [],
+    paymentStatuses = [],
+}: UseQueryOrdersByTypeParams) => {
+    const params = new URLSearchParams();
+
+    if (type) params.append('orderType', type);
+
+    // Zawsze dodajemy obecną datę w formacie zgodnym ze Swaggerem
+    params.append('date', new Date().toISOString());
 
     statuses.forEach((status) => params.append('statuses', status));
+    paymentStatuses.forEach((paymentStatus) =>
+        params.append('paymentStatuses', paymentStatus)
+    );
+
     return useQuery({
-        queryKey: [OrdersItems.BY_TYPE, type, statuses],
+        // queryKey reaguje teraz na wszystkie przekazane filtry
+        queryKey: [OrdersItems.BY_TYPE, type, statuses, paymentStatuses],
         queryFn: () =>
             fetchWithParams(
                 BACKEND_PATHS.Orders,

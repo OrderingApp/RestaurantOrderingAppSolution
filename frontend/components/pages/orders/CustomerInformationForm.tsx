@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,6 +24,9 @@ import { getOrderTakewaySchema } from '@/helpers/models/orderTakewayForm';
 import useOrderMutation from '@/helpers/queries/orders/useOrdersMutation';
 import { useLanguage } from '@/providers/LanguageProvider';
 import MobileTimePicker from '@/components/shared/pickers/MobileTimePicker';
+import useAddOrderItemsMutation from '@/helpers/queries/orders/useAddOrderItemsMutation';
+import useUpdateCustomerInformationMutation from '@/helpers/queries/customers/useUpdateCustomerInformationMutation';
+import { OrdersItems } from '@/helpers/utils/queryKeys';
 
 import { useOrdersContext } from '@/providers/OrdersContext';
 import dayjs, { type Dayjs } from 'dayjs';
@@ -43,14 +48,30 @@ interface FormData {
 
 interface CustomerInformationFormProps {
     bill: BillProps[];
-    orderItems: { menuItemId: string }[];
+    orderItems: OrderDto['orderItems'];
+    editedOrderId?: string;
+    editedOrderType?: 'dinein' | 'Takeaway' | 'Delivery';
+    editedCustomerInformation?: {
+        id?: string;
+        phoneNumber: string;
+        additionalInstructions?: string | null;
+        address?: string | null;
+        orderCompletionType?: 'Immediate' | 'Scheduled';
+        expectedOrderCompletion?: string;
+    };
 }
 
 const CustomerInformationForm = ({
     bill,
     orderItems,
+    editedOrderId,
+    editedOrderType,
+    editedCustomerInformation,
 }: CustomerInformationFormProps) => {
-    const [isDelivery, setIsDelivery] = useState(false);
+    const isEditMode = !!editedOrderId;
+    const [isDelivery, setIsDelivery] = useState(
+        editedOrderType === 'Delivery'
+    );
     const [selectedQuickTime, setSelectedQuickTime] = useState<string | null>(
         null
     );
@@ -59,6 +80,7 @@ const CustomerInformationForm = ({
     const router = useRouter();
     const { language } = useLanguage();
     const { deliveryPrice } = useOrdersContext();
+    const queryClient = useQueryClient();
 
     const {
         generic: { errorMsg },
@@ -69,6 +91,7 @@ const CustomerInformationForm = ({
                     fields: { comment, time, phoneNumber, address },
                 },
                 buttons: { takeway, delivery },
+                toasts: { updateSuccess, updateError },
                 aside: {
                     title: asideTitle,
                     buttons: { accept, cancel, discount },
@@ -90,6 +113,10 @@ const CustomerInformationForm = ({
         onSuccess: () => router.push('/orders'),
     });
 
+    const addOrderItemsMutation = useAddOrderItemsMutation();
+    const updateCustomerInformationMutation =
+        useUpdateCustomerInformationMutation();
+
     const {
         handleSubmit,
         register,
@@ -102,13 +129,18 @@ const CustomerInformationForm = ({
 
     const isOrderMutationPending =
         createTakewayOrderMutation.isPending ||
-        createDeliveryOrderMutation.isPending;
+        createDeliveryOrderMutation.isPending ||
+        updateCustomerInformationMutation.isPending ||
+        addOrderItemsMutation.isPending;
 
     const isLoading = isSubmitting || isOrderMutationPending;
 
-    const mutationError = isDelivery
-        ? createDeliveryOrderMutation.error
-        : createTakewayOrderMutation.error;
+    const mutationError =
+        updateCustomerInformationMutation.error ||
+        addOrderItemsMutation.error ||
+        (isDelivery
+            ? createDeliveryOrderMutation.error
+            : createTakewayOrderMutation.error);
 
     const mutationErrorMessage = !mutationError
         ? null
@@ -142,34 +174,123 @@ const CustomerInformationForm = ({
 
     // CHANGE orderCompletionType
 
+    useEffect(() => {
+        if (!isEditMode || !editedCustomerInformation) return;
+
+        setValue('phoneNumber', editedCustomerInformation.phoneNumber || '', {
+            shouldDirty: false,
+            shouldValidate: false,
+        });
+        setValue('address', editedCustomerInformation.address || '', {
+            shouldDirty: false,
+            shouldValidate: false,
+        });
+        setValue(
+            'comment',
+            editedCustomerInformation.additionalInstructions || '',
+            {
+                shouldDirty: false,
+                shouldValidate: false,
+            }
+        );
+
+        const expectedCompletion =
+            editedCustomerInformation.expectedOrderCompletion;
+        if (expectedCompletion) {
+            const parsed = dayjs(expectedCompletion);
+            if (parsed.isValid()) {
+                const hhmm = parsed.format('HH:mm');
+                setValue('time', hhmm, {
+                    shouldDirty: false,
+                    shouldValidate: false,
+                });
+                setTimeValue(parsed);
+            }
+        }
+
+        setSelectedQuickTime(null);
+        setIsDelivery(editedOrderType === 'Delivery');
+    }, [editedCustomerInformation, editedOrderType, isEditMode, setValue]);
+
     const submitFormHandler = async (data: FormData) => {
-        const now = new Date();
-        const dateStr = [
-            now.getFullYear(),
-            String(now.getMonth() + 1).padStart(2, '0'),
-            String(now.getDate()).padStart(2, '0'),
-        ].join('-');
-        const dateTimeStr = `${dateStr}T${data.time}:00`;
-        const orderCompletionType =
-            selectedQuickTime === '10' ? 'Immediate' : 'Scheduled';
+        try {
+            const now = new Date();
+            const dateStr = [
+                now.getFullYear(),
+                String(now.getMonth() + 1).padStart(2, '0'),
+                String(now.getDate()).padStart(2, '0'),
+            ].join('-');
+            const dateTimeStr = `${dateStr}T${data.time}:00`;
+            const orderCompletionType =
+                selectedQuickTime === '10' ? 'Immediate' : 'Scheduled';
 
-        const order: OrderDto = {
-            createdAt: dateTimeStr,
-            customerInformation: {
-                phoneNumber: data.phoneNumber,
-                orderCompletionType,
-                additionalInstructions: data.comment,
-                address: isDelivery ? data.address : '',
-                expectedOrderCompletion: dateTimeStr,
-            },
-            orderItems: orderItems,
-            deliveryPrice: deliveryPrice ? deliveryPrice : 0,
-        };
+            const order: OrderDto = {
+                discount: 0,
+                customerInformation: {
+                    phoneNumber: data.phoneNumber,
+                    orderCompletionType,
+                    additionalInstructions: data.comment || '',
+                    address: isDelivery ? (data.address ?? '') : '',
+                    expectedOrderCompletion: dateTimeStr,
+                },
+                orderItems: orderItems,
+            };
 
-        if (!isDelivery) {
-            await createTakewayOrderMutation.mutateAsync({ data: order });
-        } else {
-            await createDeliveryOrderMutation.mutateAsync({ data: order });
+            if (isEditMode && editedOrderId) {
+                if (!editedCustomerInformation?.id) {
+                    toast.error(updateError || errorMsg);
+                    return;
+                }
+
+                if (orderItems.length > 0) {
+                    await addOrderItemsMutation.mutateAsync({
+                        orderId: editedOrderId,
+                        orderItems,
+                    });
+                }
+
+                await updateCustomerInformationMutation.mutateAsync({
+                    customerInformationId: editedCustomerInformation.id,
+                    data: {
+                        phoneNumber: order.customerInformation.phoneNumber,
+                        additionalInstructions:
+                            order.customerInformation.additionalInstructions,
+                        address: order.customerInformation.address,
+                        orderCompletionType:
+                            order.customerInformation.orderCompletionType,
+                        expectedOrderCompletion:
+                            order.customerInformation.expectedOrderCompletion,
+                    },
+                });
+
+                await Promise.all([
+                    queryClient.invalidateQueries({
+                        queryKey: [OrdersItems.BY_ID, editedOrderId],
+                    }),
+                    queryClient.invalidateQueries({
+                        queryKey: [OrdersItems.BY_TYPE],
+                    }),
+                ]);
+
+                toast.success(updateSuccess);
+                router.push('/orders');
+                return;
+            }
+
+            if (!isDelivery) {
+                await createTakewayOrderMutation.mutateAsync({ data: order });
+            } else {
+                await createDeliveryOrderMutation.mutateAsync({ data: order });
+            }
+        } catch (error) {
+            // Hooks show domain-specific toasts for edit flow; keep a fallback for unexpected create-flow failures.
+            if (!isEditMode) {
+                toast.error(
+                    error instanceof Error && error.message
+                        ? error.message
+                        : errorMsg
+                );
+            }
         }
     };
 
@@ -222,13 +343,13 @@ const CustomerInformationForm = ({
                 <div className="flex gap-5 mt-5">
                     <Button
                         variant={isDelivery ? 'outline' : 'primary'}
-                        disabled={isLoading}
+                        disabled={isLoading || isEditMode}
                         onClick={() => setIsDelivery(false)}
                     >
                         {takeway}
                     </Button>
                     <Button
-                        disabled={isLoading}
+                        disabled={isLoading || isEditMode}
                         onClick={() => setIsDelivery(true)}
                         variant={isDelivery ? 'primary' : 'outline'}
                     >

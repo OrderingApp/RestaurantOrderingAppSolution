@@ -39,6 +39,7 @@ export const COMPANY_INITIAL_GEO_COORDS = {
 };
 
 export const BACKEND_URL = 'http://localhost:5000/api';
+export const BACKEND_URL_PAYMENT = 'http://localhost:5000';
 
 export enum BACKEND_PATHS {
     Areas = 'areas',

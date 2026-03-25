@@ -16,11 +16,7 @@ import { useLanguage } from '@/providers/LanguageProvider';
 import { useQueryReservationsById } from '@/helpers/queries/reservations/useQueryReservations';
 import useReservationMutation from '@/helpers/queries/reservations/useMutationReservation';
 
-import {
-    RESTAURANT_CLOSING_HOUR,
-    RESTAURANT_OPENING_HOUR,
-    SEARCH_PARAMS_NAMES,
-} from '@/helpers/constants/constants';
+import { SEARCH_PARAMS_NAMES } from '@/helpers/constants/constants';
 import { checkMaxAndMinDate, parseIsoDateAndTime } from '@/helpers/utils/dates';
 import languagePacks from '@/helpers/constants/languagePacks';
 import {
