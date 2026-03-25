@@ -290,7 +290,7 @@ const enPack: languagePack = {
                 pendingPayment: 'Pending Payment',
                 cancelled: 'Cancelled',
                 closed: 'Closed',
-                paidAndReadyToPrepare: 'Paid',
+                completed: 'Paid',
             },
         },
         menuItem: {

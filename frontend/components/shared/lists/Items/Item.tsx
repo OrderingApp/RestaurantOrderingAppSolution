@@ -22,6 +22,8 @@ export type ItemProps = {
     price: number;
     currency: Currency; // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onClick: (e: any) => unknown;
+    onSwipeLeft?: () => void;
+    onSwipeRight?: () => void;
     isLastItem?: boolean;
     isSingleItem?: boolean;
     isServed?: boolean;

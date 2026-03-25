@@ -34,7 +34,7 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
 
     const [currentView, setCurrentView] = useState(VIEWS.INFO);
 
-    const isPaid = data?.orderStatus === 'PaidAndReadyToPrepare';
+    const isPaid = data?.orderStatus === 'Completed';
 
     const {
         ordersPage: {

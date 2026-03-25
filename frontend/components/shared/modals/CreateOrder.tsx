@@ -27,10 +27,11 @@ import {
     useQueryMenuIngredients,
     useQueryMenuItem,
 } from '@/helpers/queries/menu-items/useQueryMenuItems';
+import SwipeableRow from '@/components/shared/rows/SwipeableRow';
 import type { AddItemHandler } from '@/components/shared/cards/MenuItem';
 import { formatPriceStr } from '@/helpers/utils/prices';
 import { useCreateOrderLocalBills } from '../../../helpers/hooks/useCreateOrderLocalBills';
-import SwipeableIngredientRow from '../animations/SwipeableIngredientRow';
+import { getIngredientAddAction } from '@/helpers/utils/ingredientActions';
 
 export interface BillProps {
     id: string;
@@ -108,6 +109,8 @@ const CreateOrder = ({
         handleAddNewBill,
         resetBillsState,
         mergeDuplicatePendingItemsForSelectedBill,
+        decrementPendingItemForSelectedBill,
+        incrementPendingItemForSelectedBill,
     } = useCreateOrderLocalBills({
         existingOrdersForTable,
         isAsideOrdersLoading: isAsideOrdersLoadingForInit,
@@ -211,15 +214,60 @@ const CreateOrder = ({
         );
     };
 
+    const addOrRestoreIngredient = ({
+        orderItemId,
+        ingredientId,
+        ingredientName,
+        price,
+        quantity = 1,
+        isBaseIngredient,
+    }: {
+        orderItemId: string;
+        ingredientId: string;
+        ingredientName: string;
+        price: number;
+        quantity?: number;
+        isBaseIngredient: boolean;
+    }) => {
+        const isCurrentlyRemoved =
+            getRemovedIngredientIds(orderItemId).includes(ingredientId);
+        const action = getIngredientAddAction({
+            isBaseIngredient,
+            isCurrentlyRemoved,
+        });
+
+        if (action === 'restore') {
+            restoreIngredientForOrderItem({
+                orderItemId,
+                ingredientId,
+            });
+            return;
+        }
+
+        addExtraIngredient({
+            orderItemId,
+            ingredientId,
+            ingredientName,
+            price,
+            quantity,
+        });
+    };
+
     const handleAddExtraIngredient: AddItemHandler = (ingredient) => {
         if (!selectedOrderItemId) return;
 
-        addExtraIngredient({
+        const isBaseIngredient =
+            selectedMenuItem?.ingredients?.some(
+                (x) => x.id === ingredient.id
+            ) ?? false;
+
+        addOrRestoreIngredient({
             orderItemId: selectedOrderItemId,
             ingredientId: ingredient.id,
             ingredientName: ingredient.name,
             price: ingredient.price,
             quantity: ingredient.quantity,
+            isBaseIngredient,
         });
     };
 
@@ -340,6 +388,29 @@ const CreateOrder = ({
                             ? 'text-dark-gray font-normal'
                             : undefined,
                         onClick: () => toggleSelect(item.id),
+                        onSwipeLeft: () => {
+                            decrementPendingItemForSelectedBill({
+                                orderItemId: item.id,
+                                quantity: 1,
+                            });
+
+                            const isRemovingEntireRow = item.quantity <= 1;
+
+                            if (isRemovingEntireRow) {
+                                clearExtraIngredients(item.id);
+                                clearRemovedIngredients(item.id);
+
+                                if (selectedOrderItemId === item.id) {
+                                    clearSelectedMenuItem();
+                                }
+                            }
+                        },
+                        onSwipeRight: () => {
+                            incrementPendingItemForSelectedBill({
+                                orderItemId: item.id,
+                                quantity: 1,
+                            });
+                        },
                         className:
                             selectedOrderItemId === item.id ? 'bg-red-200' : '',
                     };
@@ -421,9 +492,10 @@ const CreateOrder = ({
                             {selectedMenuItem?.ingredients?.length ? (
                                 <ul className="">
                                     {selectedMenuItem.ingredients.map((ing) => (
-                                        <SwipeableIngredientRow
+                                        <SwipeableRow
                                             key={ing.id}
-                                            className="flex items-center justify-center w-full p-2 odd:bg-primary even:bg-primary-light"
+                                            className="w-full p-2 odd:bg-primary even:bg-primary-light"
+                                            contentClassName="flex items-center justify-center"
                                             onSwipeLeft={() => {
                                                 if (!selectedOrderItemId)
                                                     return;
@@ -437,25 +509,8 @@ const CreateOrder = ({
                                                 if (!selectedOrderItemId)
                                                     return;
 
-                                                const isRemoved =
-                                                    getRemovedIngredientIds(
-                                                        selectedOrderItemId
-                                                    ).includes(ing.id);
-
-                                                if (isRemoved) {
-                                                    restoreIngredientForOrderItem(
-                                                        {
-                                                            orderItemId:
-                                                                selectedOrderItemId,
-                                                            ingredientId:
-                                                                ing.id,
-                                                        }
-                                                    );
-                                                    return;
-                                                }
-
-                                                // Swipe right on a base ingredient adds an extra of the same ingredient (e.g. double cheese)
-                                                addExtraIngredient({
+                                                // Swipe right on a base ingredient restores it if removed; otherwise adds an extra of the same ingredient (e.g. double cheese).
+                                                addOrRestoreIngredient({
                                                     orderItemId:
                                                         selectedOrderItemId,
                                                     ingredientId: ing.id,
@@ -465,6 +520,7 @@ const CreateOrder = ({
                                                             ing.id
                                                         ) ?? 0,
                                                     quantity: 1,
+                                                    isBaseIngredient: true,
                                                 });
                                             }}
                                         >
@@ -479,7 +535,7 @@ const CreateOrder = ({
                                             >
                                                 {ing.name}
                                             </span>
-                                        </SwipeableIngredientRow>
+                                        </SwipeableRow>
                                     ))}
                                 </ul>
                             ) : (
@@ -497,9 +553,10 @@ const CreateOrder = ({
                             {selectedExtras.length ? (
                                 <ul>
                                     {selectedExtras.map((extra) => (
-                                        <SwipeableIngredientRow
+                                        <SwipeableRow
                                             key={extra.ingredientId}
-                                            className="flex items-center justify-center gap-4 w-full p-2 odd:bg-primary even:bg-primary-light"
+                                            className="w-full p-2 odd:bg-primary even:bg-primary-light"
+                                            contentClassName="flex items-center justify-center gap-4"
                                             onSwipeLeft={() => {
                                                 if (!selectedOrderItemId)
                                                     return;
@@ -539,7 +596,7 @@ const CreateOrder = ({
                                                     quantity: extra.quantity,
                                                 })}
                                             </span>
-                                        </SwipeableIngredientRow>
+                                        </SwipeableRow>
                                     ))}
                                 </ul>
                             ) : (

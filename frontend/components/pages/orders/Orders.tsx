@@ -39,7 +39,7 @@ const buttons = [
         icon: ICONS.MENU_OPEN,
     },
     {
-        value: 'PaidAndReadyToPrepare',
+        value: 'Completed',
         iconActive: ICONS.CLOSE_WHITE,
         icon: ICONS.CLOSE,
     },

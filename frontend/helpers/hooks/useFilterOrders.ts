@@ -25,28 +25,22 @@ const useFilterOrders = () => {
 
     const getOrderStatus = () => {
         if (orderStatusParam === 'All') {
-            return [
-                ORDER_STATUSES.ONGOING,
-                ORDER_STATUSES.PAID_AND_READY_TO_PREPARE,
-            ];
+            return [ORDER_STATUSES.ONGOING, ORDER_STATUSES.COMPLETED];
         }
 
         if (orderStatusParam === 'Ongoing') {
             return [ORDER_STATUSES.ONGOING];
         }
 
-        if (orderStatusParam === 'PaidAndReadyToPrepare') {
-            return [ORDER_STATUSES.PAID_AND_READY_TO_PREPARE];
+        if (orderStatusParam === 'Completed') {
+            return [ORDER_STATUSES.COMPLETED];
         }
 
         if (orderStatusParam) {
             return [orderStatusParam];
         }
 
-        return [
-            ORDER_STATUSES.ONGOING,
-            ORDER_STATUSES.PAID_AND_READY_TO_PREPARE,
-        ];
+        return [ORDER_STATUSES.ONGOING, ORDER_STATUSES.COMPLETED];
     };
 
     const { data } = useQueryOrdersByType(orderType, getOrderStatus());

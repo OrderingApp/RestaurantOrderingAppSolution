@@ -11,7 +11,7 @@ export type OrderStatus =
     | 'PendingPayment'
     | 'Cancelled'
     | 'Closed'
-    | 'PaidAndReadyToPrepare';
+    | 'Completed';
 
 export interface ExtraIngredient {
     ingredientId: string;

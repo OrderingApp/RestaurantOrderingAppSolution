@@ -12,7 +12,7 @@ export const getOrderStatus = (
                     ongoing,
                     pendingPayment,
                     cancelled,
-                    paidAndReadyToPrepare,
+                    completed,
                     closed,
                 },
             },
@@ -23,8 +23,8 @@ export const getOrderStatus = (
         case ORDER_STATUSES.ONGOING.toLowerCase():
             return ongoing;
 
-        case ORDER_STATUSES.PAID_AND_READY_TO_PREPARE.toLowerCase():
-            return paidAndReadyToPrepare;
+        case ORDER_STATUSES.COMPLETED.toLowerCase():
+            return completed;
 
         case ORDER_STATUSES.PENDING_PAYMENT.toLowerCase():
             return pendingPayment;
