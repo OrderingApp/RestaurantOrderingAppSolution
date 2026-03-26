@@ -6,6 +6,7 @@ import { ReactNode } from 'react';
 import { SEARCH_PARAMS_NAMES } from '@/helpers/constants/constants';
 import languagePacks from '@/helpers/constants/languagePacks';
 import useLanguage from '@/helpers/hooks/useLanguage';
+import type { OrderKind } from '@/helpers/interfaces/orders';
 import useQuerySingleOrder from '@/helpers/queries/orders/useQuerySingleOrder';
 import { formatPriceStr } from '@/helpers/utils/prices';
 
@@ -41,6 +42,13 @@ const PaymentDetails = ({ children }: { children: ReactNode }) => {
 
     const paidSoFar = Math.max(totalAmount - remainingToPay, 0);
 
+    const orderKind: OrderKind =
+        data?.orderType === 'Delivery'
+            ? 'Delivery'
+            : data?.orderType === 'dinein'
+              ? 'dinein'
+              : 'Takeaway';
+
     const {
         paymentDetails: { bill },
         ordersPage: {
@@ -63,9 +71,9 @@ const PaymentDetails = ({ children }: { children: ReactNode }) => {
             <Modal isOpen={isPaymentOpen} onClose={closePaymentModal}>
                 <Payment
                     onClick={closePaymentModal}
-                    totalAmount={totalAmount}
                     orderId={orderId}
                     remainingAmount={remainingToPay}
+                    orderKind={orderKind}
                 />
             </Modal>
 

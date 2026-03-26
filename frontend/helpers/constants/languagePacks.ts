@@ -213,6 +213,11 @@ export interface languagePack {
         inputLabel: string;
         paymentByCard: string;
         paymentByCash: string;
+        customerAmountLabel: string;
+        orderPriceLabel: string;
+        changeDueLabel: string;
+        confirmCloseOrder: string;
+        exitSummary: string;
         alreadyPaidMsg: string;
         amountRangeError: string;
         toastPaymentCreated: string;

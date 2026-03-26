@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { toast } from 'sonner';
@@ -15,19 +15,33 @@ import languagePacks from '@/helpers/constants/languagePacks';
 import useCreatePaymentMutation, {
     PaymentMethod,
 } from '@/helpers/queries/payments/useCreatePaymentMutation';
-import { CURRENCIES } from '@/helpers/constants/constants';
+import useOrderMutation from '@/helpers/queries/orders/useOrdersMutation';
+import type { OrderKind } from '@/helpers/interfaces/orders';
+import { formatPriceStr } from '@/helpers/utils/prices';
 
 interface PaymentProps {
     onClick: () => void;
-    totalAmount: number;
     orderId: string;
     remainingAmount: number;
+    orderKind: OrderKind;
 }
 
 const MODAL_WIDTH = 445;
 const MODAL_HEIGHT = 445;
+type PaymentView = 'selectMethod' | 'cashSummary';
 
-const Payment = ({ onClick, orderId, remainingAmount }: PaymentProps) => {
+interface CashSummarySnapshot {
+    customerAmount: number;
+    dueAmount: number;
+    changeDue: number;
+}
+
+const Payment = ({
+    onClick,
+    orderId,
+    remainingAmount,
+    orderKind,
+}: PaymentProps) => {
     const router = useRouter();
     const { language } = useLanguage();
     const {
@@ -36,20 +50,41 @@ const Payment = ({ onClick, orderId, remainingAmount }: PaymentProps) => {
             inputLabel,
             paymentByCard,
             paymentByCash,
+            customerAmountLabel,
+            orderPriceLabel,
+            changeDueLabel,
+            confirmCloseOrder,
+            exitSummary,
             alreadyPaidMsg,
             amountRangeError,
             toastPaymentCreated,
             toastPaymentFailed,
+        },
+        ordersPage: {
+            orderOptionsModal: {
+                toasts: { closeSuccess, closeError },
+            },
         },
     } = languagePacks[language];
 
     const [amountInput, setAmountInput] = useState(
         String(Math.max(remainingAmount, 0))
     );
+    const [view, setView] = useState<PaymentView>('selectMethod');
+    const activeMethodRef = useRef<PaymentMethod | null>(null);
+    const [paymentRecorded, setPaymentRecorded] = useState(false);
+    const [cashSummarySnapshot, setCashSummarySnapshot] =
+        useState<CashSummarySnapshot | null>(null);
 
     useEffect(() => {
+        if (view === 'cashSummary') return;
+
         setAmountInput(String(Math.max(remainingAmount, 0)));
-    }, [remainingAmount]);
+        setView('selectMethod');
+        activeMethodRef.current = null;
+        setPaymentRecorded(false);
+        setCashSummarySnapshot(null);
+    }, [remainingAmount, view]);
 
     const parsedAmount = useMemo(() => {
         const normalized = amountInput.replace(',', '.').trim();
@@ -59,35 +94,123 @@ const Payment = ({ onClick, orderId, remainingAmount }: PaymentProps) => {
     }, [amountInput]);
 
     const hasOutstandingAmount = remainingAmount > 0;
-    const isAmountValid =
-        Number.isFinite(parsedAmount) &&
-        parsedAmount > 0 &&
-        parsedAmount <= remainingAmount;
+    const isPositiveAmount = Number.isFinite(parsedAmount) && parsedAmount > 0;
+    const isCardAmountOverLimit =
+        isPositiveAmount && parsedAmount > remainingAmount;
+
+    const changeDue =
+        isPositiveAmount && parsedAmount > remainingAmount
+            ? parsedAmount - remainingAmount
+            : 0;
+
+    const amountForBackend = Math.min(parsedAmount, remainingAmount);
+
+    const formattedRemaining = formatPriceStr({
+        currency: 'pln',
+        price: remainingAmount,
+    });
 
     const { mutate: createPayment, isPending } = useCreatePaymentMutation({
         onSuccess: () => {
             toast.success(toastPaymentCreated);
-            router.push('/orders');
+
+            if (activeMethodRef.current) {
+                setPaymentRecorded(true);
+                return;
+            }
         },
         onError: (error) => {
             const message =
                 error instanceof Error ? error.message : toastPaymentFailed;
             toast.error(message);
+
+            if (activeMethodRef.current) {
+                setView('selectMethod');
+                setPaymentRecorded(false);
+                setCashSummarySnapshot(null);
+                activeMethodRef.current = null;
+            }
         },
     });
 
-    const onPay = (method: PaymentMethod) => {
-        if (!hasOutstandingAmount || !isAmountValid || isPending) return;
-
-        createPayment({
-            orderId,
-            amount: parsedAmount,
-            paymentMethod: method,
+    const { mutate: closeOrderMutation, isPending: isCloseOrderPending } =
+        useOrderMutation('close', orderKind, {
+            redirectOnSettled: false,
+            onSuccess: () => {
+                toast.success(closeSuccess);
+                router.push('/orders');
+            },
+            onError: () => {
+                toast.error(closeError);
+            },
         });
+
+    const closeOrder = () => {
+        if (!orderId || !paymentRecorded || isCloseOrderPending) return;
+
+        closeOrderMutation({ id: orderId });
+    };
+
+    const onPay = (method: PaymentMethod) => {
+        if (!hasOutstandingAmount || isPending) return;
+
+        if (method === 'Card') {
+            if (!isPositiveAmount) return;
+
+            if (isCardAmountOverLimit) {
+                toast.error(
+                    amountRangeError.replace('{max}', formattedRemaining)
+                );
+                return;
+            }
+
+            activeMethodRef.current = 'Card';
+            setPaymentRecorded(false);
+            setCashSummarySnapshot({
+                customerAmount: parsedAmount,
+                dueAmount: remainingAmount,
+                changeDue: 0,
+            });
+            setView('cashSummary');
+
+            createPayment({
+                orderId,
+                amount: parsedAmount,
+                paymentMethod: 'Card',
+            });
+
+            return;
+        }
+
+        if (method === 'Cash') {
+            if (!isPositiveAmount) return;
+
+            activeMethodRef.current = 'Cash';
+            setPaymentRecorded(false);
+            setCashSummarySnapshot({
+                customerAmount: parsedAmount,
+                dueAmount: remainingAmount,
+                changeDue,
+            });
+            setView('cashSummary');
+
+            createPayment({
+                orderId,
+                amount: amountForBackend,
+                paymentMethod: 'Cash',
+            });
+
+            return;
+        }
     };
 
     const btnStyle =
         'w-[198px] h-[98px] flex flex-col justify-center items-center gap-2 shadow-[0px_0px_6px_0px_#00000029] rounded-xl';
+
+    const summaryCustomerAmount =
+        cashSummarySnapshot?.customerAmount ?? parsedAmount;
+    const summaryDueAmount = cashSummarySnapshot?.dueAmount ?? remainingAmount;
+    const summaryChangeDue = cashSummarySnapshot?.changeDue ?? changeDue;
 
     return (
         <div
@@ -105,68 +228,126 @@ const Payment = ({ onClick, orderId, remainingAmount }: PaymentProps) => {
                     <h2 className="text-xl font-bold text-center">{title}</h2>
                     <Image src={dollar} alt="dolar-icon" />
                 </div>
-                <div className="w-full px-10">
-                    <Input
-                        type="number"
-                        label={inputLabel}
-                        min={0.01}
-                        max={remainingAmount}
-                        step="0.01"
-                        value={amountInput}
-                        onChange={(event) => setAmountInput(event.target.value)}
-                        variant="secondary"
-                        inputClassName="w-full"
-                        labelClassName="text-xl font-bold text-center pb-4"
-                    />
-                    {!hasOutstandingAmount && (
-                        <p className="text-center text-sm text-paid mt-3">
-                            {alreadyPaidMsg}
-                        </p>
-                    )}
-                    {hasOutstandingAmount && !isAmountValid && (
-                        <p className="text-center text-sm text-danger mt-3">
-                            {amountRangeError.replace(
-                                '{max}',
-                                remainingAmount.toFixed(2)
+
+                {view === 'selectMethod' ? (
+                    <>
+                        <div className="w-full px-10">
+                            <Input
+                                type="number"
+                                label={inputLabel}
+                                min={0.01}
+                                step="0.01"
+                                value={amountInput}
+                                onChange={(event) =>
+                                    setAmountInput(event.target.value)
+                                }
+                                variant="secondary"
+                                inputClassName="w-full"
+                                labelClassName="text-xl font-bold text-center pb-4"
+                            />
+
+                            {!hasOutstandingAmount && (
+                                <p className="text-center text-sm text-paid mt-3">
+                                    {alreadyPaidMsg}
+                                </p>
                             )}
-                            {CURRENCIES.pln}
-                        </p>
-                    )}
-                </div>
-                <ul className="flex gap-2 mt-2">
-                    <li>
-                        <button
-                            className={btnStyle}
-                            onClick={() => onPay('Card')}
-                            disabled={
-                                !hasOutstandingAmount ||
-                                !isAmountValid ||
-                                isPending
-                            }
-                        >
-                            <p className="text-[10px] font-bold">
-                                {paymentByCard}
-                            </p>
-                            <Image src={paymentCard} alt="card-icon" />
-                        </button>
-                    </li>
-                    <li>
-                        <button
-                            className={btnStyle}
-                            onClick={() => onPay('Cash')}
-                            disabled={
-                                !hasOutstandingAmount ||
-                                !isAmountValid ||
-                                isPending
-                            }
-                        >
-                            <p className="text-[10px] font-bold">
-                                {paymentByCash}
-                            </p>
-                            <Image src={paymentCash} alt="cash-icon" />
-                        </button>
-                    </li>
-                </ul>
+                        </div>
+
+                        <ul className="flex gap-2 mt-2">
+                            <li>
+                                <button
+                                    className={btnStyle}
+                                    onClick={() => onPay('Card')}
+                                    disabled={
+                                        !hasOutstandingAmount ||
+                                        !isPositiveAmount ||
+                                        isPending
+                                    }
+                                >
+                                    <p className="text-[10px] font-bold">
+                                        {paymentByCard}
+                                    </p>
+                                    <Image src={paymentCard} alt="card-icon" />
+                                </button>
+                            </li>
+                            <li>
+                                <button
+                                    className={btnStyle}
+                                    onClick={() => onPay('Cash')}
+                                    disabled={
+                                        !hasOutstandingAmount ||
+                                        !isPositiveAmount ||
+                                        isPending
+                                    }
+                                >
+                                    <p className="text-[10px] font-bold">
+                                        {paymentByCash}
+                                    </p>
+                                    <Image src={paymentCash} alt="cash-icon" />
+                                </button>
+                            </li>
+                        </ul>
+                    </>
+                ) : (
+                    <div className="mt-1 px-6 pb-1 flex-1 flex flex-col justify-between min-h-0">
+                        <div className="rounded-xl border-2 border-gray-300 bg-gray-50 overflow-hidden text-base shadow-sm">
+                            <div className="grid grid-cols-2 border-b border-gray-300">
+                                <span className="px-4 py-2 font-semibold">
+                                    {customerAmountLabel}
+                                </span>
+                                <span className="px-4 py-2 text-right font-bold text-lg">
+                                    {formatPriceStr({
+                                        currency: 'pln',
+                                        price: summaryCustomerAmount,
+                                    })}
+                                </span>
+                            </div>
+                            <div className="grid grid-cols-2 border-b border-gray-300">
+                                <span className="px-4 py-2 font-semibold">
+                                    {orderPriceLabel}
+                                </span>
+                                <span className="px-4 py-2 text-right font-bold text-lg">
+                                    {formatPriceStr({
+                                        currency: 'pln',
+                                        price: summaryDueAmount,
+                                    })}
+                                </span>
+                            </div>
+                            <div className="grid grid-cols-2">
+                                <span className="px-4 py-2 font-semibold text-orange-600">
+                                    {changeDueLabel}
+                                </span>
+                                <span className="px-4 py-2 text-right font-extrabold text-xl text-orange-600">
+                                    {formatPriceStr({
+                                        currency: 'pln',
+                                        price: summaryChangeDue,
+                                    })}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                className="h-12 w-full rounded-lg border border-gray-300 bg-white text-sm font-semibold shadow-sm"
+                                onClick={closeOrder}
+                                disabled={
+                                    isPending ||
+                                    !paymentRecorded ||
+                                    isCloseOrderPending
+                                }
+                            >
+                                {confirmCloseOrder}
+                            </button>
+                            <button
+                                className="h-12 w-full rounded-lg border border-gray-300 bg-white text-sm font-semibold shadow-sm"
+                                onClick={() => router.push('/orders')}
+                                disabled={isPending || isCloseOrderPending}
+                            >
+                                {exitSummary}
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
