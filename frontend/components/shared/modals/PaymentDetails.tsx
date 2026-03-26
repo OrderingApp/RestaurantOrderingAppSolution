@@ -42,13 +42,6 @@ const PaymentDetails = ({ children }: { children: ReactNode }) => {
 
     const paidSoFar = Math.max(totalAmount - remainingToPay, 0);
 
-    const orderKind: OrderKind =
-        data?.orderType === 'Delivery'
-            ? 'Delivery'
-            : data?.orderType === 'dinein'
-              ? 'dinein'
-              : 'Takeaway';
-
     const {
         paymentDetails: { bill },
         ordersPage: {
@@ -73,7 +66,7 @@ const PaymentDetails = ({ children }: { children: ReactNode }) => {
                     onClick={closePaymentModal}
                     orderId={orderId}
                     remainingAmount={remainingToPay}
-                    orderKind={orderKind}
+                    orderKind={data?.orderType as OrderKind}
                 />
             </Modal>
 

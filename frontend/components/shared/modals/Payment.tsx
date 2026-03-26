@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { toast } from 'sonner';
@@ -9,6 +9,7 @@ import paymentCash from '@/public/images/svg/payment-cash.svg';
 import dollar from '@/public/images/svg/dollar.svg';
 
 import Input from '../Input/Input';
+import Button from '../button/Button';
 
 import useLanguage from '@/helpers/hooks/useLanguage';
 import languagePacks from '@/helpers/constants/languagePacks';
@@ -17,7 +18,12 @@ import useCreatePaymentMutation, {
 } from '@/helpers/queries/payments/useCreatePaymentMutation';
 import useOrderMutation from '@/helpers/queries/orders/useOrdersMutation';
 import type { OrderKind } from '@/helpers/interfaces/orders';
-import { formatPriceStr } from '@/helpers/utils/prices';
+import {
+    formatPriceStr,
+    fromCents,
+    parseAmountInputToCents,
+    toCents,
+} from '@/helpers/utils/prices';
 
 interface PaymentProps {
     onClick: () => void;
@@ -68,7 +74,7 @@ const Payment = ({
     } = languagePacks[language];
 
     const [amountInput, setAmountInput] = useState(
-        String(Math.max(remainingAmount, 0))
+        String(fromCents(toCents(Math.max(remainingAmount, 0))))
     );
     const [view, setView] = useState<PaymentView>('selectMethod');
     const activeMethodRef = useRef<PaymentMethod | null>(null);
@@ -76,38 +82,35 @@ const Payment = ({
     const [cashSummarySnapshot, setCashSummarySnapshot] =
         useState<CashSummarySnapshot | null>(null);
 
-    useEffect(() => {
-        if (view === 'cashSummary') return;
+    const parsedAmountInCents = useMemo(
+        () => parseAmountInputToCents(amountInput),
+        [amountInput]
+    );
 
-        setAmountInput(String(Math.max(remainingAmount, 0)));
-        setView('selectMethod');
-        activeMethodRef.current = null;
-        setPaymentRecorded(false);
-        setCashSummarySnapshot(null);
-    }, [remainingAmount, view]);
+    const parsedAmount = Number.isFinite(parsedAmountInCents)
+        ? fromCents(parsedAmountInCents)
+        : NaN;
 
-    const parsedAmount = useMemo(() => {
-        const normalized = amountInput.replace(',', '.').trim();
-        const value = Number(normalized);
+    const remainingAmountInCents = toCents(remainingAmount);
 
-        return Number.isFinite(value) ? value : NaN;
-    }, [amountInput]);
-
-    const hasOutstandingAmount = remainingAmount > 0;
-    const isPositiveAmount = Number.isFinite(parsedAmount) && parsedAmount > 0;
+    const hasOutstandingAmount = remainingAmountInCents > 0;
+    const isPositiveAmount =
+        Number.isFinite(parsedAmountInCents) && parsedAmountInCents > 0;
     const isCardAmountOverLimit =
-        isPositiveAmount && parsedAmount > remainingAmount;
+        isPositiveAmount && parsedAmountInCents > remainingAmountInCents;
 
-    const changeDue =
-        isPositiveAmount && parsedAmount > remainingAmount
-            ? parsedAmount - remainingAmount
+    const changeDueInCents =
+        isPositiveAmount && parsedAmountInCents > remainingAmountInCents
+            ? parsedAmountInCents - remainingAmountInCents
             : 0;
 
-    const amountForBackend = Math.min(parsedAmount, remainingAmount);
+    const amountForBackend = fromCents(
+        Math.min(parsedAmountInCents, remainingAmountInCents)
+    );
 
     const formattedRemaining = formatPriceStr({
         currency: 'pln',
-        price: remainingAmount,
+        price: fromCents(remainingAmountInCents),
     });
 
     const { mutate: createPayment, isPending } = useCreatePaymentMutation({
@@ -151,57 +154,33 @@ const Payment = ({
         closeOrderMutation({ id: orderId });
     };
 
-    const onPay = (method: PaymentMethod) => {
-        if (!hasOutstandingAmount || isPending) return;
+    const handlePayment = (paymentMethod: PaymentMethod) => {
+        if (!hasOutstandingAmount || isPending || !isPositiveAmount) return;
 
-        if (method === 'Card') {
-            if (!isPositiveAmount) return;
+        const isByCash = paymentMethod === 'Cash';
 
-            if (isCardAmountOverLimit) {
-                toast.error(
-                    amountRangeError.replace('{max}', formattedRemaining)
-                );
-                return;
-            }
-
-            activeMethodRef.current = 'Card';
-            setPaymentRecorded(false);
-            setCashSummarySnapshot({
-                customerAmount: parsedAmount,
-                dueAmount: remainingAmount,
-                changeDue: 0,
-            });
-            setView('cashSummary');
-
-            createPayment({
-                orderId,
-                amount: parsedAmount,
-                paymentMethod: 'Card',
-            });
-
+        if (!isByCash && isCardAmountOverLimit) {
+            toast.error(amountRangeError.replace('{max}', formattedRemaining));
             return;
         }
 
-        if (method === 'Cash') {
-            if (!isPositiveAmount) return;
+        activeMethodRef.current = paymentMethod;
 
-            activeMethodRef.current = 'Cash';
-            setPaymentRecorded(false);
-            setCashSummarySnapshot({
-                customerAmount: parsedAmount,
-                dueAmount: remainingAmount,
-                changeDue,
-            });
-            setView('cashSummary');
+        setCashSummarySnapshot({
+            customerAmount: fromCents(parsedAmountInCents),
+            dueAmount: fromCents(remainingAmountInCents),
+            changeDue: isByCash ? fromCents(changeDueInCents) : 0,
+        });
+        setPaymentRecorded(false);
+        setView('cashSummary');
 
-            createPayment({
-                orderId,
-                amount: amountForBackend,
-                paymentMethod: 'Cash',
-            });
-
-            return;
-        }
+        createPayment({
+            orderId,
+            amount: isByCash
+                ? amountForBackend
+                : fromCents(parsedAmountInCents),
+            paymentMethod,
+        });
     };
 
     const btnStyle =
@@ -210,7 +189,8 @@ const Payment = ({
     const summaryCustomerAmount =
         cashSummarySnapshot?.customerAmount ?? parsedAmount;
     const summaryDueAmount = cashSummarySnapshot?.dueAmount ?? remainingAmount;
-    const summaryChangeDue = cashSummarySnapshot?.changeDue ?? changeDue;
+    const summaryChangeDue =
+        cashSummarySnapshot?.changeDue ?? fromCents(changeDueInCents);
 
     return (
         <div
@@ -257,7 +237,7 @@ const Payment = ({
                             <li>
                                 <button
                                     className={btnStyle}
-                                    onClick={() => onPay('Card')}
+                                    onClick={() => handlePayment('Card')}
                                     disabled={
                                         !hasOutstandingAmount ||
                                         !isPositiveAmount ||
@@ -273,7 +253,7 @@ const Payment = ({
                             <li>
                                 <button
                                     className={btnStyle}
-                                    onClick={() => onPay('Cash')}
+                                    onClick={() => handlePayment('Cash')}
                                     disabled={
                                         !hasOutstandingAmount ||
                                         !isPositiveAmount ||
@@ -327,8 +307,10 @@ const Payment = ({
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
-                            <button
-                                className="h-12 w-full rounded-lg border border-gray-300 bg-white text-sm font-semibold shadow-sm"
+                            <Button
+                                variant="primary"
+                                size="md"
+                                className="h-12 w-full rounded-lg border border-gray-300 text-sm font-semibold shadow-sm"
                                 onClick={closeOrder}
                                 disabled={
                                     isPending ||
@@ -337,14 +319,15 @@ const Payment = ({
                                 }
                             >
                                 {confirmCloseOrder}
-                            </button>
-                            <button
-                                className="h-12 w-full rounded-lg border border-gray-300 bg-white text-sm font-semibold shadow-sm"
+                            </Button>
+                            <Button
+                                size="md"
+                                className="h-12 w-full !bg-danger rounded-lg border border-gray-300 text-sm font-semibold shadow-sm"
                                 onClick={() => router.push('/orders')}
                                 disabled={isPending || isCloseOrderPending}
                             >
                                 {exitSummary}
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 )}
