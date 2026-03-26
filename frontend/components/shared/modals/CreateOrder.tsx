@@ -33,6 +33,7 @@ import type { AddItemHandler } from '@/components/shared/cards/MenuItem';
 import { formatPriceStr } from '@/helpers/utils/prices';
 import { useCreateOrderLocalBills } from '../../../helpers/hooks/useCreateOrderLocalBills';
 import { getIngredientAddAction } from '@/helpers/utils/ingredientActions';
+import { getIngredientAnnotations } from '@/helpers/utils/ingredientAnnotations';
 
 export interface BillProps {
     id: string;
@@ -106,31 +107,44 @@ const CreateOrder = ({
                 {
                     id: editedOrder.id,
                     totalAmount: editedOrder.totalAmount,
-                    orderItems: editedOrder.orderItems.map((item) => ({
-                        id: item.id,
-                        price: item.price,
-                        quantity: 1,
-                        discount: item.discount,
-                        annotation: [
-                            ...(item.extraIngredients?.map(
-                                (extra) =>
-                                    `+ ${extra.ingredientName}${extra.quantity > 1 ? ` x${extra.quantity}` : ''}`
-                            ) ?? []),
-                            ...(item.removedIngredients?.map(
-                                (removed) => `- ${removed.name}`
-                            ) ?? []),
-                        ],
-                        annotationClassName: 'text-dark-gray font-normal',
-                        menuItem: {
-                            id: item.menuItem.id,
-                            name: item.menuItem.name,
-                        },
-                    })),
+                    orderItems: editedOrder.orderItems.map((item) => {
+                        const annotation = getIngredientAnnotations(item);
+                        return {
+                            id: item.id,
+                            price: item.price,
+                            quantity: 1,
+                            discount: item.discount,
+                            annotation,
+                            annotationClassName: annotation
+                                ? 'text-dark-gray font-normal'
+                                : undefined,
+                            menuItem: {
+                                id: item.menuItem.id,
+                                name: item.menuItem.name,
+                            },
+                        };
+                    }),
                 },
             ];
         }
 
-        return getAggregatedDineInOrdersForTable(allOrders || [], tableId);
+        const dineInOrders = getAggregatedDineInOrdersForTable(
+            allOrders || [],
+            tableId
+        );
+        return dineInOrders.map((order) => ({
+            ...order,
+            orderItems: order.orderItems.map((item) => {
+                const annotation = getIngredientAnnotations(item);
+                return {
+                    ...item,
+                    annotation,
+                    annotationClassName: annotation
+                        ? 'text-dark-gray font-normal'
+                        : undefined,
+                };
+            }),
+        }));
     }, [allOrders, tableId, isEditMode, editedOrder]);
 
     const canAddMultipleBills = isEditMode

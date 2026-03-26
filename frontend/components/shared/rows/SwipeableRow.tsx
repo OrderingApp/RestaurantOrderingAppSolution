@@ -78,7 +78,9 @@ const SwipeableRow = ({
                 }
                 style={{ transform: `translateX(${swipeX}px)` }}
             >
-                {typeof children === 'function' ? children(renderState) : children}
+                {typeof children === 'function'
+                    ? children(renderState)
+                    : children}
             </div>
 
             {shouldShowAction && (
