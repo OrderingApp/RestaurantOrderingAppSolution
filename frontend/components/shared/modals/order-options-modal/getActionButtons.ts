@@ -12,6 +12,7 @@ export const getActionButtons = ({
     onCloseOrder,
     onDeleteOrder,
     onEditOrder,
+    onSplitBill,
 }: {
     view: View;
     isPaid: boolean;
@@ -21,6 +22,7 @@ export const getActionButtons = ({
     onCloseOrder: () => void;
     onDeleteOrder: () => void;
     onEditOrder: () => void;
+    onSplitBill: () => void;
 }): ActionButton[] => {
     if (view === VIEWS.INFO) {
         const buttons: ActionButton[] = [
@@ -37,6 +39,15 @@ export const getActionButtons = ({
                 onClick: onDeleteOrder,
             },
         ];
+
+        if (!isClosed && !isPaid) {
+            buttons.splice(1, 0, {
+                icon: ICONS.LIST_WHITE,
+                color: '#2B5162',
+                alt: 'split bill',
+                onClick: onSplitBill,
+            });
+        }
 
         if (!isClosed) {
             buttons.splice(1, 0, {

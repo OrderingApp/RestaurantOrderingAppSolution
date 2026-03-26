@@ -229,6 +229,16 @@ export interface languagePack {
         total: string;
     };
 
+    splitBillModal: {
+        billTab: string;
+        addBill: string;
+        chooseBill: string;
+        closeNoChanges: string;
+        splitBill: string;
+        toastSuccess: string;
+        toastError: string;
+        toastNoChanges: string;
+    };
     discountModal: {
         disscountTitle: string;
     };
