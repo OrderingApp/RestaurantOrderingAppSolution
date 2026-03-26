@@ -25,20 +25,30 @@ const useFilterOrders = () => {
     } = params;
 
     const orderType = orderTypeParam || ordersTypes[language][0]?.id;
-    const allPaymentStatuses = Object.values(PAYMENT_STATUSES);
+    const allPaymentStatuses: string[] =
+        Object.values(PAYMENT_STATUSES).map(String);
+
+    const normalizedPaymentStatuses: string[] = paymentStatusParam
+        ? paymentStatusParam
+              .split(',')
+              .map((v) => v.trim())
+              .filter(Boolean)
+              .map((value) =>
+                  allPaymentStatuses.find(
+                      (s) => s.toLowerCase() === value.toLowerCase()
+                  )
+              )
+              .filter((v): v is string => !!v)
+        : [];
 
     const getFilters = () => {
-        if (paymentStatusParam === PAYMENT_STATUSES.PAID) {
-            return {
-                statuses: [ORDER_STATUSES.ONGOING, ORDER_STATUSES.COMPLETED],
-                paymentStatuses: [PAYMENT_STATUSES.PAID],
-            };
-        }
-
         if (orderStatusParam === 'All') {
             return {
                 statuses: [ORDER_STATUSES.ONGOING, ORDER_STATUSES.COMPLETED],
-                paymentStatuses: allPaymentStatuses,
+                paymentStatuses:
+                    normalizedPaymentStatuses.length > 0
+                        ? normalizedPaymentStatuses
+                        : allPaymentStatuses,
             };
         }
 
@@ -62,9 +72,17 @@ const useFilterOrders = () => {
         if (orderStatusParam) {
             return {
                 statuses: [orderStatusParam],
-                paymentStatuses: paymentStatusParam
-                    ? [paymentStatusParam]
-                    : allPaymentStatuses,
+                paymentStatuses:
+                    normalizedPaymentStatuses.length > 0
+                        ? normalizedPaymentStatuses
+                        : allPaymentStatuses,
+            };
+        }
+
+        if (normalizedPaymentStatuses.length > 0) {
+            return {
+                statuses: [ORDER_STATUSES.ONGOING, ORDER_STATUSES.COMPLETED],
+                paymentStatuses: normalizedPaymentStatuses,
             };
         }
 

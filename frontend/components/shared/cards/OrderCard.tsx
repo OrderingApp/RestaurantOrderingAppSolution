@@ -42,10 +42,13 @@ const OrderCard = ({
         },
     } = languagePacks[language];
 
+    const isPaidOrder = paymentStatus === PAYMENT_STATUSES.PAID;
+    const needsPayment = !isPaidOrder;
+
     const isActiveOrder =
-        orderStatus === ORDER_STATUSES.ONGOING &&
-        paymentStatus !== PAYMENT_STATUSES.PAID;
+        orderStatus === ORDER_STATUSES.ONGOING && needsPayment;
     const isClosedOrder = orderStatus === ORDER_STATUSES.CLOSED;
+    const isPaymentOrder = needsPayment && !isActiveOrder && !isClosedOrder;
 
     return (
         <ItemCard
@@ -58,7 +61,9 @@ const OrderCard = ({
                     ? 'orderActive'
                     : isClosedOrder
                       ? 'orderClosed'
-                      : 'orderCompleted'
+                      : isPaymentOrder
+                        ? 'orderPayment'
+                        : 'orderCompleted'
             }
             className={`${className} ${orderType === ORDER_TYPES.DELIVERY ? '!h-[120px]' : ''}`}
             variantClassName={variantClassName}

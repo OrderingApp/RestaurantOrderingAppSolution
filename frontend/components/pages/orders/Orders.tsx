@@ -6,11 +6,16 @@ import Image from 'next/image';
 
 import {
     ordersTypes,
+    PAYMENT_STATUSES,
     SEARCH_PARAMS_NAMES,
 } from '@/helpers/constants/constants';
 import languagePacks from '@/helpers/constants/languagePacks';
 import useLanguage from '@/helpers/hooks/useLanguage';
-import { getToggleModalUrl, toggleQueryParam } from '@/helpers/utils/utils';
+import {
+    getToggleModalUrl,
+    setQueryParams,
+    toggleQueryParam,
+} from '@/helpers/utils/utils';
 import { ICONS } from '@/helpers/constants/icons/icons';
 import useFilterOrders from '@/helpers/hooks/useFilterOrders';
 
@@ -38,7 +43,7 @@ const buttons = [
         icon: ICONS.MENU_OPEN,
     },
     {
-        value: 'Completed',
+        value: PAYMENT_STATUSES.PAID,
         iconActive: ICONS.CLOSE_WHITE,
         icon: ICONS.CLOSE,
     },
@@ -116,12 +121,31 @@ const Orders = () => {
     ];
 
     const activeFilter =
-        searchParams.get(SEARCH_PARAMS_NAMES.ORDER_STATUS) || 'All';
+        searchParams.get(SEARCH_PARAMS_NAMES.PAYMENT_STATUS) ===
+        PAYMENT_STATUSES.PAID
+            ? PAYMENT_STATUSES.PAID
+            : searchParams.get(SEARCH_PARAMS_NAMES.ORDER_STATUS) || 'All';
 
     const onFilterClick = (value: string) => {
-        toggleQueryParam(
-            SEARCH_PARAMS_NAMES.ORDER_STATUS,
-            value,
+        if (value === PAYMENT_STATUSES.PAID) {
+            setQueryParams(
+                {
+                    [SEARCH_PARAMS_NAMES.ORDER_STATUS]: undefined,
+                    [SEARCH_PARAMS_NAMES.PAYMENT_STATUS]: PAYMENT_STATUSES.PAID,
+                },
+                searchParams,
+                router,
+                pathname
+            );
+
+            return;
+        }
+
+        setQueryParams(
+            {
+                [SEARCH_PARAMS_NAMES.ORDER_STATUS]: value,
+                [SEARCH_PARAMS_NAMES.PAYMENT_STATUS]: undefined,
+            },
             searchParams,
             router,
             pathname

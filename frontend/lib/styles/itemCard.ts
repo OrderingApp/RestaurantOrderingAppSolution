@@ -30,6 +30,10 @@ export const itemCardStyles = {
             container: 'border-[#CD5700] border-2',
             appearance: 'bg-[#CD5700] text-white',
         },
+        orderPayment: {
+            container: 'border-[#C70039] border-2',
+            appearance: 'bg-[#C70039] text-white',
+        },
         orderCompleted: {
             container: 'border-[#008080] border-2',
             appearance: 'bg-[#008080] text-white',
