@@ -77,11 +77,12 @@ export enum MENU_CATEGORY_NAMES {
     ALL = 'all',
 }
 
-// TODO: ask whats going on with getStatuses in useFilterOrders and the paid&ready to prepare status
 export enum ORDER_STATUSES {
     ONGOING = 'Ongoing',
     CLOSED = 'Closed',
+    COMPLETED = 'Completed',
     CANCELLED = 'Cancelled',
+    PENDING_PAYMENT = 'Pending Payment',
 }
 
 export enum PAYMENT_STATUSES {

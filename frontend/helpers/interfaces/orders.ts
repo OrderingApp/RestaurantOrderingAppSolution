@@ -4,7 +4,12 @@ export type OrderType = 'dinein' | 'Takeaway' | 'Delivery';
 
 export type OrderCompletionType = 'Immediate' | 'Scheduled';
 
-export type OrderStatus = 'Ongoing' | 'Cancelled' | 'Closed';
+export type OrderStatus =
+    | 'Ongoing'
+    | 'PendingPayment'
+    | 'Cancelled'
+    | 'Closed'
+    | 'Completed';
 
 export type PaymentStatus = 'Unpaid' | 'PartiallyPaid' | 'Paid';
 
@@ -47,7 +52,7 @@ export interface OrderItem {
     price: number;
     discount: number;
     menuItem: MenuItem;
-    removedIngredients?: BaseIngredient[];
+    removedIngredients?: RemovedIngredient[];
     specialInstructions?: string | null;
     extraIngredients?: Ingredient[];
 }

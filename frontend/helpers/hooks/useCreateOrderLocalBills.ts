@@ -281,6 +281,119 @@ export const useCreateOrderLocalBills = ({
         return mergeDuplicatePendingItemsForBill(selectedBill);
     };
 
+    const decrementPendingItemForBill = ({
+        billId,
+        orderItemId,
+        quantity = 1,
+    }: {
+        billId: string;
+        orderItemId: string;
+        quantity?: number;
+    }) => {
+        if (quantity <= 0) return;
+
+        setLocalBills((prev) => {
+            const billIndex = prev.findIndex((bill) => bill.id === billId);
+            if (billIndex === -1) return prev;
+
+            const targetBill = prev[billIndex];
+            const targetItem = targetBill.pendingItems.find(
+                (item) => item.id === orderItemId
+            );
+            if (!targetItem) return prev;
+
+            const nextPendingItems =
+                targetItem.quantity <= quantity
+                    ? targetBill.pendingItems.filter(
+                          (item) => item.id !== orderItemId
+                      )
+                    : targetBill.pendingItems.map((item) =>
+                          item.id === orderItemId
+                              ? {
+                                    ...item,
+                                    quantity: item.quantity - quantity,
+                                }
+                              : item
+                      );
+
+            const nextBills = [...prev];
+            nextBills[billIndex] = {
+                ...targetBill,
+                pendingItems: nextPendingItems,
+            };
+
+            return nextBills;
+        });
+    };
+
+    const decrementPendingItemForSelectedBill = ({
+        orderItemId,
+        quantity = 1,
+    }: {
+        orderItemId: string;
+        quantity?: number;
+    }) => {
+        if (!selectedBill) return;
+        decrementPendingItemForBill({
+            billId: selectedBill,
+            orderItemId,
+            quantity,
+        });
+    };
+
+    const incrementPendingItemForBill = ({
+        billId,
+        orderItemId,
+        quantity = 1,
+    }: {
+        billId: string;
+        orderItemId: string;
+        quantity?: number;
+    }) => {
+        if (quantity <= 0) return;
+
+        setLocalBills((prev) => {
+            const billIndex = prev.findIndex((bill) => bill.id === billId);
+            if (billIndex === -1) return prev;
+
+            const targetBill = prev[billIndex];
+            const targetItem = targetBill.pendingItems.find(
+                (item) => item.id === orderItemId
+            );
+            if (!targetItem) return prev;
+
+            const nextBills = [...prev];
+            nextBills[billIndex] = {
+                ...targetBill,
+                pendingItems: targetBill.pendingItems.map((item) =>
+                    item.id === orderItemId
+                        ? {
+                              ...item,
+                              quantity: item.quantity + quantity,
+                          }
+                        : item
+                ),
+            };
+
+            return nextBills;
+        });
+    };
+
+    const incrementPendingItemForSelectedBill = ({
+        orderItemId,
+        quantity = 1,
+    }: {
+        orderItemId: string;
+        quantity?: number;
+    }) => {
+        if (!selectedBill) return;
+        incrementPendingItemForBill({
+            billId: selectedBill,
+            orderItemId,
+            quantity,
+        });
+    };
+
     const selectedBillData = useMemo(
         () => localBills.find((b) => b.id === selectedBill),
         [localBills, selectedBill]
@@ -297,5 +410,9 @@ export const useCreateOrderLocalBills = ({
         resetBillsState,
         mergeDuplicatePendingItemsForBill,
         mergeDuplicatePendingItemsForSelectedBill,
+        decrementPendingItemForBill,
+        decrementPendingItemForSelectedBill,
+        incrementPendingItemForBill,
+        incrementPendingItemForSelectedBill,
     };
 };

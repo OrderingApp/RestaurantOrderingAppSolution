@@ -16,6 +16,7 @@ const OrderStatusBadge = ({
 
     switch (status.toLowerCase()) {
         case ORDER_STATUSES.ONGOING.toLowerCase():
+        case ORDER_STATUSES.COMPLETED.toLowerCase():
             variant = 'success';
             break;
 

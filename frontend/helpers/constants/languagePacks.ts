@@ -292,7 +292,7 @@ export interface languagePack {
                 pendingPayment: string;
                 cancelled: string;
                 closed: string;
-                paidAndReadyToPrepare: string;
+                completed: string;
             };
         };
         menuItem: {

@@ -16,6 +16,7 @@ import { OrdersItems } from '@/helpers/utils/queryKeys';
 import { useLanguage } from '@/providers/LanguageProvider';
 import languagePacks from '@/helpers/constants/languagePacks';
 import { getAggregatedDineInOrdersForTable } from '@/helpers/utils/orderTransforms';
+import { getIngredientAnnotations } from '@/helpers/utils/ingredientAnnotations';
 
 const Tables = () => {
     const { language } = useLanguage();
@@ -69,13 +70,21 @@ const Tables = () => {
             name: `${receiptLabel} ${index + 1}`,
             price: o.totalAmount || 0,
             currency: 'pln' as keyof typeof CURRENCIES,
-            nestedItems: o.orderItems.map((it) => ({
-                name: it.menuItem.name,
-                price: it.menuItem.price,
-                currency: 'pln' as keyof typeof CURRENCIES,
-                quantity: it.quantity,
-                onClick: () => console.log(`item ${it.menuItem.name} clicked`),
-            })),
+            nestedItems: o.orderItems.map((it) => {
+                const annotation = getIngredientAnnotations(it);
+                return {
+                    name: it.menuItem.name,
+                    price: it.price,
+                    currency: 'pln' as keyof typeof CURRENCIES,
+                    quantity: it.quantity,
+                    annotation,
+                    annotationClassName: annotation
+                        ? 'text-dark-gray font-normal'
+                        : undefined,
+                    onClick: () =>
+                        console.log(`item ${it.menuItem.name} clicked`),
+                };
+            }),
         })),
         onAddNewOrder: toggleCreateOrderModal,
         buttons: detailsMock.buttons,

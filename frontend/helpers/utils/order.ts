@@ -8,7 +8,13 @@ export const getOrderStatus = (
     const {
         entities: {
             order: {
-                statuses: { ongoing, cancelled, closed },
+                statuses: {
+                    ongoing,
+                    pendingPayment,
+                    cancelled,
+                    completed,
+                    closed,
+                },
             },
         },
     } = languagePacks[language];
@@ -17,6 +23,11 @@ export const getOrderStatus = (
         case ORDER_STATUSES.ONGOING.toLowerCase():
             return ongoing;
 
+        case ORDER_STATUSES.COMPLETED.toLowerCase():
+            return completed;
+
+        case ORDER_STATUSES.PENDING_PAYMENT.toLowerCase():
+            return pendingPayment;
         case ORDER_STATUSES.CLOSED.toLowerCase():
             return closed;
 

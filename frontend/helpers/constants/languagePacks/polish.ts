@@ -316,7 +316,7 @@ const plPack: languagePack = {
                 pendingPayment: 'Oczekuje na płatność',
                 cancelled: 'Anulowane',
                 closed: 'Zamknięte',
-                paidAndReadyToPrepare: 'Opłacone',
+                completed: 'Opłacone',
             },
         },
         menuItem: {

@@ -25,22 +25,19 @@ const useFilterOrders = () => {
     } = params;
 
     const orderType = orderTypeParam || ordersTypes[language][0]?.id;
-    const allOrderStatuses = Object.values(ORDER_STATUSES);
     const allPaymentStatuses = Object.values(PAYMENT_STATUSES);
 
     const getFilters = () => {
         if (paymentStatusParam === PAYMENT_STATUSES.PAID) {
             return {
-                statuses: allOrderStatuses.filter(
-                    (status) => status !== ORDER_STATUSES.CLOSED
-                ),
+                statuses: [ORDER_STATUSES.ONGOING, ORDER_STATUSES.COMPLETED],
                 paymentStatuses: [PAYMENT_STATUSES.PAID],
             };
         }
 
         if (orderStatusParam === 'All') {
             return {
-                statuses: [ORDER_STATUSES.ONGOING],
+                statuses: [ORDER_STATUSES.ONGOING, ORDER_STATUSES.COMPLETED],
                 paymentStatuses: allPaymentStatuses,
             };
         }
@@ -55,6 +52,13 @@ const useFilterOrders = () => {
             };
         }
 
+        if (orderStatusParam === ORDER_STATUSES.COMPLETED) {
+            return {
+                statuses: [ORDER_STATUSES.COMPLETED],
+                paymentStatuses: [PAYMENT_STATUSES.PAID],
+            };
+        }
+
         if (orderStatusParam) {
             return {
                 statuses: [orderStatusParam],
@@ -65,7 +69,7 @@ const useFilterOrders = () => {
         }
 
         return {
-            statuses: [ORDER_STATUSES.ONGOING],
+            statuses: [ORDER_STATUSES.ONGOING, ORDER_STATUSES.COMPLETED],
             paymentStatuses: allPaymentStatuses,
         };
     };
@@ -74,6 +78,7 @@ const useFilterOrders = () => {
     const { data } = useQueryOrdersByType({
         type: orderType,
         statuses,
+        paymentStatuses,
     });
 
     const inputValue = searchParams.get(SEARCH_PARAMS_NAMES.NAME);
