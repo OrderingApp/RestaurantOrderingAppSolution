@@ -225,6 +225,14 @@ const CreateOrder = ({
         return map;
     }, [allIngredients]);
 
+    const ingredientNameById = useMemo(() => {
+        const map = new Map<string, string>();
+        for (const ing of allIngredients) {
+            map.set(ing.id, ing.name);
+        }
+        return map;
+    }, [allIngredients]);
+
     const { detailsAside } = languagePacks[language];
     const {
         createOrderPage: {
@@ -440,22 +448,37 @@ const CreateOrder = ({
                 })),
                 ...localBill.pendingItems.map((item) => {
                     const extras = getExtraIngredients(item.id);
+                    const removedIngredientIds = getRemovedIngredientIds(
+                        item.id
+                    );
+                    const removed = removedIngredientIds
+                        .map((id) => ({
+                            id,
+                            name: ingredientNameById.get(id) || 'Unknown',
+                        }))
+                        .filter((r) => r.name !== 'Unknown');
+
                     const extrasTotalPrice = getExtraIngredientsTotalPrice(
                         item.id
                     );
+
+                    const combinedAnnotations = [
+                        ...extras.map(
+                            (x) =>
+                                `+ ${x.ingredientName}${x.quantity > 1 ? ` x${x.quantity}` : ''}`
+                        ),
+                        ...removed.map((r) => `- ${r.name}`),
+                    ];
 
                     return {
                         name: item.name,
                         price: item.price + extrasTotalPrice,
                         currency: COMPANYS_CURRENCY,
                         quantity: item.quantity,
-                        annotation: extras.length
-                            ? extras.map(
-                                  (x) =>
-                                      `+ ${x.ingredientName}${x.quantity > 1 ? ` x${x.quantity}` : ''}`
-                              )
+                        annotation: combinedAnnotations.length
+                            ? combinedAnnotations
                             : undefined,
-                        annotationClassName: extras.length
+                        annotationClassName: combinedAnnotations.length
                             ? 'text-dark-gray font-normal'
                             : undefined,
                         onClick: () => toggleSelect(item.id),

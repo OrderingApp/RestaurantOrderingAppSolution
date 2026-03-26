@@ -20,8 +20,10 @@ export const getIngredientAnnotations = (
             (extra) =>
                 `+ ${extra.ingredientName}${extra.quantity > 1 ? ` x${extra.quantity}` : ''}`
         ) ?? []),
-        ...(item.removedIngredients?.map((removed) => `- ${removed.name}`) ??
-            []),
+        ...(item.removedIngredients?.map(
+            (removed) =>
+                `- ${removed.ingredientName}${removed.quantity > 1 ? ` x${removed.quantity}` : ''}`
+        ) ?? []),
     ];
 
     return annotations.length ? annotations : undefined;

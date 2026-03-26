@@ -52,7 +52,7 @@ export interface OrderItem {
     price: number;
     discount: number;
     menuItem: MenuItem;
-    removedIngredients?: BaseIngredient[];
+    removedIngredients?: RemovedIngredient[];
     specialInstructions?: string | null;
     extraIngredients?: Ingredient[];
 }
