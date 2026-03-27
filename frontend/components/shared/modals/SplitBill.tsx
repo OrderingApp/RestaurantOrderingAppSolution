@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import {
     DndContext,
     DragOverlay,
@@ -17,15 +17,11 @@ import {
 
 import useLanguage from '@/helpers/hooks/useLanguage';
 import languagePacks from '@/helpers/constants/languagePacks';
-import { BACKEND_URL } from '@/helpers/constants/constants';
 import { formatPriceStr } from '@/helpers/utils/prices';
 import type { OrderItem } from '@/helpers/interfaces/orders';
 import { toast } from 'sonner';
 import Button from '../button/Button';
-
-/* ------------------------------------------------------------------ */
-/*  Types                                                              */
-/* ------------------------------------------------------------------ */
+import useSplitOrderMutation from '@/helpers/queries/orders/useSplitOrderMutation';
 
 interface SplitBillItem {
     orderItemId: string;
@@ -47,10 +43,6 @@ interface SplitBillProps {
     orderItems: OrderItem[];
     onSplitSuccess?: () => void;
 }
-
-/* ------------------------------------------------------------------ */
-/*  Helpers                                                            */
-/* ------------------------------------------------------------------ */
 
 const buildExtras = (item: OrderItem): string[] => {
     const extras: string[] = [];
@@ -79,11 +71,27 @@ const buildInitialBill = (orderItems: OrderItem[]): Bill => ({
     })),
 });
 
-/* ------------------------------------------------------------------ */
-/*  Draggable item                                                     */
-/* ------------------------------------------------------------------ */
+const BillItemContent = ({ item }: { item: SplitBillItem }) => {
+    return (
+        <>
+            <div className="flex-1 min-w-0">
+                <p className="font-bold text-base text-gray-900 truncate leading-tight">
+                    {item.name}
+                </p>
+                {item.extras.length > 0 && (
+                    <p className="text-sm text-gray-500 truncate mt-1 leading-tight">
+                        {item.extras.join(', ')}
+                    </p>
+                )}
+            </div>
+            <p className="font-bold text-base text-gray-900 ml-4 shrink-0 leading-tight">
+                {formatPriceStr({ currency: 'pln', price: item.price })}
+            </p>
+        </>
+    );
+};
 
-function DraggableBillItem({
+const DraggableBillItem = ({
     item,
     billId,
     itemIndex,
@@ -91,7 +99,7 @@ function DraggableBillItem({
     item: SplitBillItem;
     billId: string;
     itemIndex: number;
-}) {
+}) => {
     const dragId = `${billId}::${item.orderItemId}`;
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
         id: dragId,
@@ -104,32 +112,16 @@ function DraggableBillItem({
             {...listeners}
             {...attributes}
             style={{ touchAction: 'none' }}
-            className={`flex items-start justify-between px-3 py-2 cursor-grab active:cursor-grabbing select-none transition-opacity ${
+            className={`flex items-start justify-between px-4 py-3 cursor-grab active:cursor-grabbing select-none transition-opacity ${
                 itemIndex % 2 === 0 ? 'bg-[#EBEBEB]' : 'bg-[#D7D7D7]'
             } ${isDragging ? 'opacity-30' : 'opacity-100'}`}
         >
-            <div className="flex-1 min-w-0">
-                <p className="font-bold text-sm text-gray-900 truncate">
-                    {item.name}
-                </p>
-                {item.extras.length > 0 && (
-                    <p className="text-xs text-gray-500 truncate">
-                        {item.extras.join(', ')}
-                    </p>
-                )}
-            </div>
-            <p className="font-bold text-sm text-gray-900 ml-3 shrink-0">
-                {formatPriceStr({ currency: 'pln', price: item.price })}
-            </p>
+            <BillItemContent item={item} />
         </div>
     );
-}
+};
 
-/* ------------------------------------------------------------------ */
-/*  Droppable bill card                                                */
-/* ------------------------------------------------------------------ */
-
-function DroppableBillCard({
+const DroppableBillCard = ({
     bill,
     billIndex,
     labelPrefix,
@@ -141,14 +133,13 @@ function DroppableBillCard({
     labelPrefix: string;
     isSelected: boolean;
     onSelect: () => void;
-}) {
+}) => {
     const { isOver, setNodeRef } = useDroppable({ id: bill.id });
     const label = `${labelPrefix} ${billIndex + 1}`;
 
     return (
         <div
             ref={setNodeRef}
-            onClick={onSelect}
             className={`rounded-2xl transition-all min-h-[180px] flex flex-col shadow-md ${
                 isOver
                     ? 'bg-[#f2fbfb] shadow-lg'
@@ -181,66 +172,22 @@ function DroppableBillCard({
             </div>
         </div>
     );
-}
+};
 
-/* ------------------------------------------------------------------ */
-/*  "Choose bill" drop placeholder                                     */
-/* ------------------------------------------------------------------ */
-
-function ChooseBillDropzone({ label }: { label: string }) {
-    const { isOver, setNodeRef } = useDroppable({ id: '__choose__' });
-
+const DragOverlayContent = ({ item }: { item: SplitBillItem }) => {
     return (
-        <div
-            ref={setNodeRef}
-            className={`rounded-2xl min-h-[180px] flex flex-col transition-all shadow-md ${
-                isOver ? 'bg-[#00808010] shadow-lg' : 'bg-white'
-            }`}
-        >
-            <div className="w-full rounded-t-2xl bg-[#008080] px-4 py-2 text-center text-sm font-semibold text-white">
-                {label}
-            </div>
-            <div className="flex-1" />
+        <div className="bg-white border border-[#008080] rounded-lg px-4 py-3 shadow-xl flex items-start justify-between min-w-[230px]">
+            <BillItemContent item={item} />
         </div>
     );
-}
+};
 
-/* ------------------------------------------------------------------ */
-/*  Overlay during drag                                                */
-/* ------------------------------------------------------------------ */
-
-function DragOverlayContent({ item }: { item: SplitBillItem }) {
-    return (
-        <div className="bg-white border border-[#008080] rounded-lg px-3 py-2 shadow-xl flex items-start justify-between min-w-[200px]">
-            <div className="flex-1 min-w-0">
-                <p className="font-bold text-sm text-gray-900 truncate">
-                    {item.name}
-                </p>
-                {item.extras.length > 0 && (
-                    <p className="text-xs text-gray-500 truncate">
-                        {item.extras.join(', ')}
-                    </p>
-                )}
-            </div>
-            <div className="text-right ml-3 shrink-0">
-                <p className="font-bold text-sm text-gray-900">
-                    {formatPriceStr({ currency: 'pln', price: item.price })}
-                </p>
-            </div>
-        </div>
-    );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Main component                                                     */
-/* ------------------------------------------------------------------ */
-
-export default function SplitBill({
+const SplitBill = ({
     onClose,
     orderId,
     orderItems,
     onSplitSuccess,
-}: SplitBillProps) {
+}: SplitBillProps) => {
     const { language } = useLanguage();
     const t = languagePacks[language].splitBillModal;
 
@@ -250,9 +197,8 @@ export default function SplitBill({
     ]);
     const [selectedBillId, setSelectedBillId] = useState('original');
     const [activeItem, setActiveItem] = useState<SplitBillItem | null>(null);
-    const [isSending, setIsSending] = useState(false);
-
-    const billCounter = useMemo(() => bills.length, [bills]);
+    const { mutateAsync: splitOrder, isPending: isSplitPending } =
+        useSplitOrderMutation();
 
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -260,9 +206,6 @@ export default function SplitBill({
             activationConstraint: { delay: 200, tolerance: 5 },
         })
     );
-
-    // ---- tab helpers ----
-    const activeBillIds = useMemo(() => bills.map((b) => b.id), [bills]);
 
     // ---- add new bill ----
     const handleAddBill = useCallback(() => {
@@ -337,28 +280,19 @@ export default function SplitBill({
             return;
         }
 
-        setIsSending(true);
         try {
-            const res = await fetch(`${BACKEND_URL}/orders/${orderId}/split`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ splitGroups }),
+            await splitOrder({
+                orderId,
+                splitGroups,
             });
-
-            if (!res.ok) {
-                const text = await res.text().catch(() => '');
-                throw new Error(text || t.toastError);
-            }
 
             toast.success(t.toastSuccess);
             onSplitSuccess?.();
             onClose();
         } catch (err) {
             toast.error(err instanceof Error ? err.message : t.toastError);
-        } finally {
-            setIsSending(false);
         }
-    }, [bills, orderId, onClose, onSplitSuccess, t]);
+    }, [bills, onClose, onSplitSuccess, orderId, splitOrder, t]);
 
     // ---- render ----
     return (
@@ -395,25 +329,16 @@ export default function SplitBill({
                 onDragEnd={handleDragEnd}
             >
                 <div className="grid grid-cols-2 gap-4 flex-1 overflow-y-auto overflow-x-visible min-h-0 pb-4 px-1">
-                    {activeBillIds.map((billId) => {
-                        const bill = bills.find((b) => b.id === billId)!;
-                        const globalIdx = bills.indexOf(bill);
-                        return (
-                            <DroppableBillCard
-                                key={billId}
-                                bill={bill}
-                                billIndex={globalIdx}
-                                labelPrefix={t.billTab}
-                                isSelected={selectedBillId === billId}
-                                onSelect={() => setSelectedBillId(billId)}
-                            />
-                        );
-                    })}
-
-                    {/* If there's a "selected" bill that is empty and not visible, show placeholder */}
-                    {bills.length < 2 && (
-                        <ChooseBillDropzone label={t.chooseBill} />
-                    )}
+                    {bills.map((bill, idx) => (
+                        <DroppableBillCard
+                            key={bill.id}
+                            bill={bill}
+                            billIndex={idx}
+                            labelPrefix={t.billTab}
+                            isSelected={selectedBillId === bill.id}
+                            onSelect={() => setSelectedBillId(bill.id)}
+                        />
+                    ))}
                 </div>
 
                 <DragOverlay>
@@ -433,14 +358,16 @@ export default function SplitBill({
                 </Button>
                 <Button
                     onClick={handleSplit}
-                    disabled={isSending}
+                    disabled={isSplitPending}
                     variant="primary"
                     size="md"
                     className="px-8 py-3.5 rounded-xl hover:opacity-90 disabled:opacity-50 text-white text-base font-semibold transition-colors"
                 >
-                    {isSending ? '...' : t.splitBill}
+                    {isSplitPending ? '...' : t.splitBill}
                 </Button>
             </div>
         </div>
     );
-}
+};
+
+export default SplitBill;

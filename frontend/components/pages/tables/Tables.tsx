@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { cn } from '@/lib/utils';
 
@@ -10,8 +10,10 @@ import AsidesView from '@/components/shared/views/Asides';
 import { CURRENCIES, ORDER_TYPES } from '@/helpers/constants/constants';
 import OverviewModal from '@/components/shared/modals/OverviewModal';
 import CreateOrder from '../../shared/modals/CreateOrder';
+import SplitBill from '@/components/shared/modals/SplitBill';
 import useQueryOrders from '@/helpers/queries/orders/useQueryOrders';
 import useQueryAreas from '@/helpers/queries/areas/useAreasQuery';
+import useQuerySingleOrder from '@/helpers/queries/orders/useQuerySingleOrder';
 import { OrdersItems } from '@/helpers/utils/queryKeys';
 import { useLanguage } from '@/providers/LanguageProvider';
 import languagePacks from '@/helpers/constants/languagePacks';
@@ -24,6 +26,10 @@ const Tables = () => {
     const [isPanning, setIsPanning] = useState(false);
     const [currentTableId, setCurrentTableId] = useState<string | null>(null);
     const [currentAreaId, setCurrentAreaId] = useState<string | null>(null);
+    const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+    const [splitBillOrderId, setSplitBillOrderId] = useState<string | null>(
+        null
+    );
 
     const toggleCreateOrderModal = (tableId?: string | Event) => {
         // sometimes this is used as an onClick handler and receives the click event
@@ -36,6 +42,9 @@ const Tables = () => {
         queryKeys: [OrdersItems.BY_TYPE, ORDER_TYPES.DINEIN],
     });
     const { data: areas = [] } = useQueryAreas();
+    const { data: splitBillOrderData } = useQuerySingleOrder(
+        splitBillOrderId || ''
+    );
 
     const activeAreaId =
         currentAreaId && areas.some((area) => area.id === currentAreaId)
@@ -55,12 +64,38 @@ const Tables = () => {
     );
 
     const { detailsAside } = languagePacks[language];
+    const splitBillLabel = languagePacks[language].splitBillModal.splitBill;
+    const isSplitBillOpen = !!splitBillOrderId;
 
     const receiptLabel = detailsAside.receipt;
     const tableName =
         currentTableId && tables
             ? tables.find((t) => t.id === currentTableId)?.name || ''
             : '';
+
+    useEffect(() => {
+        if (!ordersForTable.length) {
+            setSelectedOrderId(null);
+            return;
+        }
+
+        const selectedStillExists = ordersForTable.some(
+            (order) => order.id === selectedOrderId
+        );
+
+        if (!selectedStillExists) {
+            setSelectedOrderId(ordersForTable[0].id);
+        }
+    }, [ordersForTable, selectedOrderId]);
+
+    const handleOpenSplitBill = () => {
+        if (!selectedOrderId) return;
+        setSplitBillOrderId(selectedOrderId);
+    };
+
+    const handleCloseSplitBill = () => {
+        setSplitBillOrderId(null);
+    };
 
     const details = {
         ...detailsMock,
@@ -87,7 +122,16 @@ const Tables = () => {
             }),
         })),
         onAddNewOrder: toggleCreateOrderModal,
-        buttons: detailsMock.buttons,
+        onSelectItem: setSelectedOrderId,
+        selectedItemId: selectedOrderId,
+        buttons: [
+            {
+                children: splitBillLabel,
+                onClick: handleOpenSplitBill,
+                disabled: !selectedOrderId,
+                variant: 'primary' as const,
+            },
+        ],
     };
 
     return (
@@ -153,15 +197,23 @@ const Tables = () => {
                     tableId={currentTableId || undefined}
                 />
             </OverviewModal>
+
+            <OverviewModal isOpen={isSplitBillOpen}>
+                {splitBillOrderId && (
+                    <SplitBill
+                        onClose={handleCloseSplitBill}
+                        orderId={splitBillOrderId}
+                        orderItems={splitBillOrderData?.orderItems ?? []}
+                        onSplitSuccess={handleCloseSplitBill}
+                    />
+                )}
+            </OverviewModal>
         </>
     );
 };
 
-const buttons = [{ children: 'zamknij rachunek' }];
-
 const detailsMock = {
     served: true,
-    buttons: buttons,
 };
 
 const bottomMock = {
