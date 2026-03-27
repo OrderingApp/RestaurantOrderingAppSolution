@@ -251,6 +251,16 @@ const plPack: languagePack = {
         productNumber: 'Numer',
         total: 'Suma',
     },
+    splitBillModal: {
+        billTab: 'Rachunek nr',
+        addBill: 'Dodaj rachunek',
+        chooseBill: 'Wybierz Rachunek',
+        closeNoChanges: 'Zamknij Bez Zmian',
+        splitBill: 'Rozdziel Rachunek',
+        toastSuccess: 'Rachunek został rozdzielony.',
+        toastError: 'Nie udało się rozdzielić rachunku.',
+        toastNoChanges: 'Przenieś pozycje do nowego rachunku aby rozdzielić.',
+    },
     discountModal: {
         disscountTitle: 'Dodaj zniżkę',
     },

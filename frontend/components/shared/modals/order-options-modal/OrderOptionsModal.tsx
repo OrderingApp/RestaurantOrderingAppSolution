@@ -20,6 +20,7 @@ import { formatPhoneNumber, toggleQueryParam } from '@/helpers/utils/utils';
 import { formatDate } from '@/helpers/utils/dates';
 
 import AlertDialog from '../AlertDialog';
+
 import ActionsBar from './ActionsBar';
 import InfoView from './InfoView';
 import SummaryView from './SummaryView';
@@ -29,7 +30,13 @@ import { VIEWS, type InformationInput, type View } from './types';
 const MODAL_WIDTH = '445px';
 const ORDER_TYPE = 'Takeaway';
 
-const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
+const OrderOptionsModal = ({
+    onClose,
+    onSplitBill,
+}: {
+    onClose: () => void;
+    onSplitBill?: () => void;
+}) => {
     const { language } = useLanguage();
     const searchParms = useSearchParams();
     const router = useRouter();
@@ -207,6 +214,7 @@ const OrderOptionsModal = ({ onClose }: { onClose: () => void }) => {
         onCloseOrder: handleCloseOrder,
         onDeleteOrder: () => setIsDeleteDialogOpen(true),
         onEditOrder: handleEditOrder,
+        onSplitBill: () => onSplitBill?.(),
     });
 
     return (

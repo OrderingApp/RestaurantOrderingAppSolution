@@ -250,6 +250,16 @@ const enPack: languagePack = {
         productNumber: 'Number',
         total: 'Total',
     },
+    splitBillModal: {
+        billTab: 'Bill no.',
+        addBill: 'Add bill',
+        chooseBill: 'Choose Bill',
+        closeNoChanges: 'Close Without Changes',
+        splitBill: 'Split Bill',
+        toastSuccess: 'Bill has been split.',
+        toastError: 'Failed to split the bill.',
+        toastNoChanges: 'Move items to a new bill to split.',
+    },
     discountModal: {
         disscountTitle: 'Add discount',
     },

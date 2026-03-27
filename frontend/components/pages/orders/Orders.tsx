@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import Image from 'next/image';
@@ -29,7 +30,9 @@ import CreateOrder from '../../shared/modals/CreateOrder';
 import SearchInput from '@/components/shared/Input/SearchInput';
 import clsx from 'clsx';
 import Modal from '@/components/shared/modals/Modal';
+import SplitBill from '@/components/shared/modals/SplitBill';
 import OrderOptionsModal from '@/components/shared/modals/order-options-modal/OrderOptionsModal';
+import useQuerySingleOrder from '@/helpers/queries/orders/useQuerySingleOrder';
 
 const buttons = [
     {
@@ -67,6 +70,14 @@ const Orders = () => {
         [SEARCH_PARAMS_NAMES.MODAL]: modal,
         [SEARCH_PARAMS_NAMES.CLOSE_ORDER]: closeOrder,
     } = params;
+
+    const [splitBillOrderId, setSplitBillOrderId] = useState<string | null>(
+        null
+    );
+    const isSplitBillOpen = !!splitBillOrderId;
+    const { data: splitBillOrderData } = useQuerySingleOrder(
+        splitBillOrderId || ''
+    );
 
     const { filteredOrders } = useFilterOrders();
 
@@ -172,6 +183,17 @@ const Orders = () => {
         );
     };
 
+    const handleOpenSplitBill = () => {
+        if (orderId) {
+            setSplitBillOrderId(orderId);
+            closeOrderOptionsModal();
+        }
+    };
+
+    const handleCloseSplitBill = () => {
+        setSplitBillOrderId(null);
+    };
+
     return (
         <>
             <div className="flex flex-col h-full p-4 pb-0">
@@ -269,8 +291,22 @@ const Orders = () => {
                 isOpen={isOrderOptionsModalOpen}
                 onClose={closeOrderOptionsModal}
             >
-                <OrderOptionsModal onClose={closeOrderOptionsModal} />
+                <OrderOptionsModal
+                    onClose={closeOrderOptionsModal}
+                    onSplitBill={handleOpenSplitBill}
+                />
             </Modal>
+
+            <OverviewModal isOpen={isSplitBillOpen}>
+                {splitBillOrderId && (
+                    <SplitBill
+                        onClose={handleCloseSplitBill}
+                        orderId={splitBillOrderId}
+                        orderItems={splitBillOrderData?.orderItems ?? []}
+                        onSplitSuccess={handleCloseSplitBill}
+                    />
+                )}
+            </OverviewModal>
         </>
     );
 };
