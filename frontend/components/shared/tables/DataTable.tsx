@@ -45,6 +45,7 @@ interface DataTableProps<TData, TValue> {
     loadingState?: ReactNode;
     isError?: boolean;
     isLoading?: boolean;
+    containerClassName?: string;
 }
 
 export const DataTable = <TData, TValue>({
@@ -59,6 +60,7 @@ export const DataTable = <TData, TValue>({
     loadingState,
     isError,
     isLoading,
+    containerClassName,
 }: DataTableProps<TData, TValue>) => {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [globalFilter, setGlobalFilter] = useState('');
@@ -125,8 +127,8 @@ export const DataTable = <TData, TValue>({
                 />
             )}
 
-            <div className="overflow-hidden rounded-md border">
-                <Table>
+            <div className={clsx('overflow-hidden rounded-md border flex flex-col h-full', containerClassName)}>
+                <Table className="flex-1">
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>

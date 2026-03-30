@@ -4,6 +4,7 @@ import { useLanguage } from '@/providers/LanguageProvider';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import languagePacks from '@/helpers/constants/languagePacks';
 import OrdersTable from './OrdersTable';
+import DaySummaryTab from './DaySummaryTab';
 
 const DaySummary = () => {
     const { language } = useLanguage();
@@ -42,7 +43,15 @@ const DaySummary = () => {
                         <OrdersTable />
                     </section>
                 </TabsContent>
-                <TabsContent value={summary}>WIP: {summary}</TabsContent>
+                <TabsContent value={summary}>
+                    <header>
+                        <h1 className="sr-only">{heading}</h1>
+                    </header>
+
+                    <section>
+                        <DaySummaryTab />
+                    </section>
+                </TabsContent>
             </Tabs>
         </div>
     );
