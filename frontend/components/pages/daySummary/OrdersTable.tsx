@@ -220,6 +220,7 @@ const OrdersTable = () => {
             isLoading={isLoading}
             isError={isError}
             error={error?.message}
+            containerClassName="h-full"
         />
     );
 };

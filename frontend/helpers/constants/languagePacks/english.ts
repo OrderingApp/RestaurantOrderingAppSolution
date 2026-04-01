@@ -296,6 +296,28 @@ const enPack: languagePack = {
             summary: 'Summary',
         },
         heading: 'Orders',
+        summary: {
+            revenueTitle: 'Revenue',
+            revenueByPayment: {
+                card: 'Card',
+                cash: 'Cash',
+                total: 'Total',
+            },
+            productSales: 'Product Sales',
+            mostSoldProducts: 'Most Sold Products',
+            mostSoldCountLabel: 'Count',
+            totalOrdersLabel: 'Total Orders',
+            ordersCountLabel: 'orders',
+            orderTypeLabels: {
+                dineIn: 'Dine in',
+                takeawayDelivery: 'Takeaway/Delivery',
+            },
+            tableColumns: {
+                name: 'Name',
+                qty: 'Qty',
+                price: 'Price',
+            },
+        },
     },
     ordersTable: {
         actions: {

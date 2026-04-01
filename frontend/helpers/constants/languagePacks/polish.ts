@@ -297,6 +297,28 @@ const plPack: languagePack = {
             summary: 'Podsumowanie',
         },
         heading: 'Zamówienia',
+        summary: {
+            revenueTitle: 'Utarg',
+            revenueByPayment: {
+                card: 'Karta',
+                cash: 'Gotówka',
+                total: 'Suma',
+            },
+            productSales: 'Sprzedaż produktów',
+            mostSoldProducts: 'Najczęściej sprzedawane produkty',
+            mostSoldCountLabel: 'Ilość',
+            totalOrdersLabel: 'Łączna liczba zamówień',
+            ordersCountLabel: 'zamówień',
+            orderTypeLabels: {
+                dineIn: 'Na miejscu',
+                takeawayDelivery: 'Wynos/Dowóz',
+            },
+            tableColumns: {
+                name: 'Nazwa',
+                qty: 'Ilość',
+                price: 'Cena',
+            },
+        },
     },
     ordersTable: {
         actions: {

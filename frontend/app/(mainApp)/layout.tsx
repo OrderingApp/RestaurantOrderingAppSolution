@@ -52,7 +52,7 @@ const ProtectedLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
                 </ul>
             </aside>
 
-            <main className="relative bg-light-gray w-full rounded-r-3xl overflow-x-hidden">
+            <main className="relative bg-light-gray w-full rounded-r-3xl overflow-hidden">
                 {children}
             </main>
         </div>
