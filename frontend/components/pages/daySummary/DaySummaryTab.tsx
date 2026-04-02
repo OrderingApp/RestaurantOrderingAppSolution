@@ -131,6 +131,8 @@ const DaySummaryTab = () => {
                 .reduce((sum, order) => sum + order.totalAmount, 0);
         }
 
+        // TODO: IMPORTANT BELOW, HAS TO BE DONE BEFORE ROLLOUT
+        // TODO: ONCE BACKEND UPDATES PAYMENTMETHOD ON ORDER OR CREATES AN ENTRYPOINT FOR DAY SUMMARY TAB WE HAVE TO CHANGE IT
         // Until backend exposes payment method breakdown, keep a temporary 50/50 split.
         stats.cardRevenue = stats.totalRevenue * 0.5;
         stats.cashRevenue = stats.totalRevenue * 0.5;
