@@ -16,6 +16,11 @@ export const camelToKebab = (str: string): string => {
     return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 };
 
+export const paymentBorderColor = (status: string | undefined): string => {
+    if (status === 'Paid') return 'bg-[#2C5364]';
+    return 'bg-[#CD5700]';
+};
+
 /**
  * Capitalizes the first letter of a string.
  * @param str - The string to capitalize.

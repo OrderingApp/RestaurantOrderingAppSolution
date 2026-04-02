@@ -28,12 +28,21 @@ const plPack: languagePack = {
         },
     },
     menuBar: {
-        tables: 'stoliki',
+        main: 'główny',
+        tables: 'sala',
         orders: 'zamówienia',
         menu: 'karta',
         reservations: 'rezerwacje',
-        daySummary: 'podsumowanie dnia',
+        daySummary: 'koniec dnia',
         settings: 'ustawienia',
+    },
+    mainPage: {
+        reservations: 'Rezerwacje',
+        orders: 'Zamówienia',
+        deliveries: 'Dowozy',
+        pickups: 'Odbiory',
+        billCount: 'Ilość Rachunków',
+        asap: 'Jak najszybciej',
     },
     reservationsPage: {
         reservationTitle: 'Sprawdź Rezerwacje',

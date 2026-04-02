@@ -126,9 +126,13 @@ const Reservations = () => {
     };
 
     const executeClose = () => {
-        closeModal();
         clearLocalReservations();
         setShowConfirmClose(false);
+        if (searchParams.get(SEARCH_PARAMS_NAMES.FROM) === 'main') {
+            router.push('/main');
+        } else {
+            closeModal();
+        }
     };
 
     return (

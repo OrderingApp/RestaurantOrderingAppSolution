@@ -1,5 +1,5 @@
 import { Order, OrderItem } from '@/helpers/interfaces/orders';
-import { ORDER_TYPES } from '@/helpers/constants/constants';
+import { ORDER_TYPES, PAYMENT_STATUSES } from '@/helpers/constants/constants';
 
 export type AggregatedOrderItem = OrderItem & {
     quantity: number;
@@ -123,3 +123,12 @@ export const aggregateOrderItems = (orders: Order[]): AggregatedOrder[] =>
             orderItems: aggregateAndSortOrderItems(order.orderItems),
         };
     });
+
+export const aggregatePaymentStatus = (orders: Order[]) => {
+    const statuses = orders.map((o) => o.paymentStatus);
+    if (statuses.some((s) => s === PAYMENT_STATUSES.UNPAID || !s))
+        return PAYMENT_STATUSES.UNPAID;
+    if (statuses.some((s) => s === PAYMENT_STATUSES.PARTIALPAID))
+        return PAYMENT_STATUSES.PARTIALPAID;
+    return PAYMENT_STATUSES.PAID;
+};

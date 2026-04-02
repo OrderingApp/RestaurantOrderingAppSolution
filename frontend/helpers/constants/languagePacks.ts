@@ -36,12 +36,21 @@ export interface languagePack {
         };
     };
     menuBar: {
+        main: string;
         tables: string;
         orders: string;
         menu: string;
         reservations: string;
         daySummary: string;
         settings: string;
+    };
+    mainPage: {
+        reservations: string;
+        orders: string;
+        deliveries: string;
+        pickups: string;
+        billCount: string;
+        asap: string;
     };
     reservationsPage: {
         reservationTitle: string;

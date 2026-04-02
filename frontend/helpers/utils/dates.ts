@@ -128,6 +128,8 @@ export const formatElapsedTime = (elapsedInSeconds: number) => {
     return `${hours}:${minutes}:${seconds}`;
 };
 
+export const todayISO = () => new Date().toISOString().split('T')[0];
+
 export const formatReservationHour = (dateValue?: string) => {
     if (!dateValue) return '--:--';
 
