@@ -54,6 +54,7 @@ export default {
                 served: 'var(--served)',
                 ongoing: 'var(--ongoing)',
                 paid: 'var(--paid)',
+                revenue: 'var(--revenue)',
                 background: 'hsl(var(--background))',
                 foreground: 'hsl(var(--foreground))',
                 card: {

@@ -4,6 +4,7 @@ import { useLanguage } from '@/providers/LanguageProvider';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import languagePacks from '@/helpers/constants/languagePacks';
 import OrdersTable from './OrdersTable';
+import DaySummaryTab from './DaySummaryTab';
 
 const DaySummary = () => {
     const { language } = useLanguage();
@@ -17,8 +18,8 @@ const DaySummary = () => {
     const tabs = [allOrders, summary];
 
     return (
-        <div className="py-8 px-5">
-            <Tabs defaultValue={allOrders}>
+        <div className="py-8 px-5 ">
+            <Tabs defaultValue={allOrders} className="h-full flex flex-col">
                 <nav>
                     <TabsList className="gap-2.5 mb-8">
                         {tabs.map((label) => (
@@ -33,7 +34,10 @@ const DaySummary = () => {
                     </TabsList>
                 </nav>
 
-                <TabsContent value={allOrders}>
+                <TabsContent
+                    value={allOrders}
+                    className="mt-0 flex-1 min-h-0 data-[state=active]:flex data-[state=active]:flex-col"
+                >
                     <header>
                         <h1 className="sr-only">{heading}</h1>
                     </header>
@@ -42,7 +46,18 @@ const DaySummary = () => {
                         <OrdersTable />
                     </section>
                 </TabsContent>
-                <TabsContent value={summary}>WIP: {summary}</TabsContent>
+                <TabsContent
+                    value={summary}
+                    className="mt-0 flex-1 min-h-0 data-[state=active]:flex data-[state=active]:flex-col"
+                >
+                    <header>
+                        <h1 className="sr-only">{heading}</h1>
+                    </header>
+
+                    <section className="h-full min-h-0">
+                        <DaySummaryTab />
+                    </section>
+                </TabsContent>
             </Tabs>
         </div>
     );

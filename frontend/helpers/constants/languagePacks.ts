@@ -280,6 +280,28 @@ export interface languagePack {
             summary: string;
         };
         heading: string;
+        summary: {
+            revenueTitle: string;
+            revenueByPayment: {
+                card: string;
+                cash: string;
+                total: string;
+            };
+            productSales: string;
+            mostSoldProducts: string;
+            mostSoldCountLabel: string;
+            totalOrdersLabel: string;
+            ordersCountLabel: string;
+            orderTypeLabels: {
+                dineIn: string;
+                takeawayDelivery: string;
+            };
+            tableColumns: {
+                name: string;
+                qty: string;
+                price: string;
+            };
+        };
     };
     ordersTable: {
         actions: {

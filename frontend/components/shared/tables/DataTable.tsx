@@ -23,7 +23,6 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-    TableFooter,
 } from '@/components/ui/table';
 import Button from '../button/Button';
 import Input from '../Input/Input';
@@ -36,6 +35,7 @@ import LoadingSpinner from '../states/LoadingSpinner';
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
+    containerClassName?: string;
     pagination?: boolean;
     paginationType?: 'descriptive';
     searchBar?: boolean;
@@ -50,6 +50,7 @@ interface DataTableProps<TData, TValue> {
 export const DataTable = <TData, TValue>({
     columns,
     data,
+    containerClassName,
     pagination,
     paginationType = 'descriptive',
     searchBar,
@@ -125,152 +126,139 @@ export const DataTable = <TData, TValue>({
                 />
             )}
 
-            <div className="overflow-hidden rounded-md border">
-                <Table>
-                    <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead
-                                            key={header.id}
-                                            className="py-3"
-                                        >
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                      header.column.columnDef
-                                                          .header,
-                                                      header.getContext()
-                                                  )}
-                                        </TableHead>
-                                    );
-                                })}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-
-                    <TableBody>
-                        {isLoading ? (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24"
-                                >
-                                    {loadingState ?? (
-                                        <LoadingSpinner className="mx-auto" />
-                                    )}
-                                </TableCell>
-                            </TableRow>
-                        ) : isError ? (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-danger text-center"
-                                >
-                                    {error ?? errorMsg}
-                                </TableCell>
-                            </TableRow>
-                        ) : table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={
-                                        row.getIsSelected() && 'selected'
-                                    }
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
-                                            )}
-                                        </TableCell>
-                                    ))}
+            <div
+                className={clsx(
+                    'overflow-hidden rounded-md border flex flex-col',
+                    containerClassName
+                )}
+            >
+                <div className="flex-1 min-h-0">
+                    <Table>
+                        <TableHeader>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <TableRow key={headerGroup.id}>
+                                    {headerGroup.headers.map((header) => {
+                                        return (
+                                            <TableHead
+                                                key={header.id}
+                                                className="py-3"
+                                            >
+                                                {header.isPlaceholder
+                                                    ? null
+                                                    : flexRender(
+                                                          header.column
+                                                              .columnDef.header,
+                                                          header.getContext()
+                                                      )}
+                                            </TableHead>
+                                        );
+                                    })}
                                 </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-center"
-                                >
-                                    {noResultsFallback ?? noResults}
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
+                            ))}
+                        </TableHeader>
 
-                    {pagination && (
-                        <TableFooter>
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="py-3"
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <Button
-                                            {...PAGINATION_BTN_PROPS}
-                                            onClick={() => table.previousPage()}
-                                            disabled={
-                                                !table.getCanPreviousPage()
+                        <TableBody>
+                            {isLoading ? (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={columns.length}
+                                        className="h-24"
+                                    >
+                                        {loadingState ?? (
+                                            <LoadingSpinner className="mx-auto" />
+                                        )}
+                                    </TableCell>
+                                </TableRow>
+                            ) : isError ? (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={columns.length}
+                                        className="h-24 text-danger text-center"
+                                    >
+                                        {error ?? errorMsg}
+                                    </TableCell>
+                                </TableRow>
+                            ) : table.getRowModel().rows?.length ? (
+                                table.getRowModel().rows.map((row) => (
+                                    <TableRow
+                                        key={row.id}
+                                        data-state={
+                                            row.getIsSelected() && 'selected'
+                                        }
+                                    >
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id}>
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext()
+                                                )}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={columns.length}
+                                        className="h-24 text-center"
+                                    >
+                                        {noResultsFallback ?? noResults}
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
+
+                {pagination && table.getPageCount() > 1 && (
+                    <div className="border-t py-3 px-2">
+                        <div className="flex items-center justify-between">
+                            <Button
+                                {...PAGINATION_BTN_PROPS}
+                                onClick={() => table.previousPage()}
+                                disabled={!table.getCanPreviousPage()}
+                            >
+                                <ChevronLeft
+                                    size={PAGINATION_BTN_CHEVRON_SIZE}
+                                />
+                                {previousPageBtnLabel}
+                            </Button>
+
+                            <div className="flex items-center gap-1">
+                                {getPages().map(
+                                    ({ index, isActive, disabled, label }) => (
+                                        <button
+                                            key={index}
+                                            onClick={() =>
+                                                table.setPageIndex(index)
                                             }
-                                        >
-                                            <ChevronLeft
-                                                size={
-                                                    PAGINATION_BTN_CHEVRON_SIZE
-                                                }
-                                            />
-                                            {previousPageBtnLabel}
-                                        </Button>
-
-                                        <div className="flex items-center gap-1">
-                                            {getPages().map(
-                                                ({
-                                                    index,
-                                                    isActive,
-                                                    disabled,
-                                                    label,
-                                                }) => (
-                                                    <button
-                                                        key={index}
-                                                        onClick={() =>
-                                                            table.setPageIndex(
-                                                                index
-                                                            )
-                                                        }
-                                                        className={clsx(
-                                                            'px-2 py-1 font-semibold',
-                                                            isActive
-                                                                ? 'bg-quaternary text-white rounded-lg'
-                                                                : 'text-dark-gray'
-                                                        )}
-                                                        disabled={disabled}
-                                                    >
-                                                        {label}
-                                                    </button>
-                                                )
+                                            className={clsx(
+                                                'px-2 py-1 font-semibold',
+                                                isActive
+                                                    ? 'bg-quaternary text-white rounded-lg'
+                                                    : 'text-dark-gray'
                                             )}
-                                        </div>
-
-                                        <Button
-                                            {...PAGINATION_BTN_PROPS}
-                                            onClick={() => table.nextPage()}
-                                            disabled={!table.getCanNextPage()}
+                                            disabled={disabled}
                                         >
-                                            {nextPageBtnLabel}
-                                            <ChevronRight
-                                                size={
-                                                    PAGINATION_BTN_CHEVRON_SIZE
-                                                }
-                                            />
-                                        </Button>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        </TableFooter>
-                    )}
-                </Table>
+                                            {label}
+                                        </button>
+                                    )
+                                )}
+                            </div>
+
+                            <Button
+                                {...PAGINATION_BTN_PROPS}
+                                onClick={() => table.nextPage()}
+                                disabled={!table.getCanNextPage()}
+                            >
+                                {nextPageBtnLabel}
+                                <ChevronRight
+                                    size={PAGINATION_BTN_CHEVRON_SIZE}
+                                />
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </div>
         </>
     );
