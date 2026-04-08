@@ -2,6 +2,7 @@ import { ReadonlyURLSearchParams } from 'next/navigation';
 import {
     BACKEND_PATHS,
     BACKEND_URL,
+    PAYMENT_STATUSES,
     SEARCH_PARAMS_NAMES,
 } from '../constants/constants';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
@@ -17,8 +18,8 @@ export const camelToKebab = (str: string): string => {
 };
 
 export const paymentBorderColor = (status: string | undefined): string => {
-    if (status === 'Paid') return 'bg-[#2C5364]';
-    return 'bg-[#CD5700]';
+    if (status === PAYMENT_STATUSES.PAID) return 'bg-primary';
+    return 'bg-warning';
 };
 
 /**

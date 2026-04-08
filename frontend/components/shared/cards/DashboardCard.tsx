@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { Badge as ShadcnBadge } from '@/components/ui/badge';
 
 export const DashboardCard = ({
     borderColor,
@@ -30,12 +31,5 @@ export const Badge = ({
     label: string;
     className?: string;
 }) => (
-    <span
-        className={clsx(
-            'text-white text-xs font-bold px-3 py-1 rounded-md whitespace-nowrap',
-            className
-        )}
-    >
-        {label}
-    </span>
+    <ShadcnBadge className={clsx('rounded-md', className)}>{label}</ShadcnBadge>
 );

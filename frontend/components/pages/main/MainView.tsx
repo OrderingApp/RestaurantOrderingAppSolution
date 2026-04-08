@@ -21,10 +21,11 @@ import useQueryOrders from '@/helpers/queries/orders/useQueryOrders';
 import useQueryOrdersByType from '@/helpers/queries/orders/useQueryOrdersByType';
 import useQueryReservations from '@/helpers/queries/reservations/useQueryReservations';
 import useQueryAreas from '@/helpers/queries/areas/useAreasQuery';
-
-import ReservationsColumn from './ReservationsColumn';
-import DineInOrdersColumn from './DineInOrdersColumn';
-import NonDineInColumn from './NonDineInColumn';
+import ReservationsColumn, {
+    DineInOrdersColumn,
+    NonDineInColumn,
+} from '@/components/shared/columns/Columns';
+import { DashboardClockProvider } from '@/providers/DashboardClockProvider';
 
 const MainView = () => {
     const router = useRouter();
@@ -116,40 +117,42 @@ const MainView = () => {
             </header>
 
             {/* Columns */}
-            <div className="flex-1 grid grid-cols-4 gap-4 px-6 pt-4 pb-4 overflow-hidden">
-                <ReservationsColumn
-                    reservations={reservations}
-                    title={mainPage.reservations}
-                    language={language}
-                    onCardClick={openReservation}
-                />
+            <DashboardClockProvider>
+                <section className="flex-1 grid grid-cols-4 gap-4 px-6 pt-4 pb-4 overflow-hidden">
+                    <ReservationsColumn
+                        reservations={reservations}
+                        title={mainPage.reservations}
+                        language={language}
+                        onCardClick={openReservation}
+                    />
 
-                <DineInOrdersColumn
-                    orders={dineInOrders}
-                    tables={tableNameMap}
-                    title={mainPage.orders}
-                    billCountLabel={mainPage.billCount}
-                    onCardClick={goToTables}
-                />
+                    <DineInOrdersColumn
+                        orders={dineInOrders}
+                        tables={tableNameMap}
+                        title={mainPage.orders}
+                        billCountLabel={mainPage.billCount}
+                        onCardClick={goToTables}
+                    />
 
-                <NonDineInColumn
-                    orders={deliveryOrders}
-                    title={mainPage.deliveries}
-                    type="delivery"
-                    asapLabel={mainPage.asap}
-                    language={language}
-                    onCardClick={openOrderOptions}
-                />
+                    <NonDineInColumn
+                        orders={deliveryOrders}
+                        title={mainPage.deliveries}
+                        type={ORDER_TYPES.DELIVERY}
+                        asapLabel={mainPage.asap}
+                        language={language}
+                        onCardClick={openOrderOptions}
+                    />
 
-                <NonDineInColumn
-                    orders={pickupOrders}
-                    title={mainPage.pickups}
-                    type="pickup"
-                    asapLabel={mainPage.asap}
-                    language={language}
-                    onCardClick={openOrderOptions}
-                />
-            </div>
+                    <NonDineInColumn
+                        orders={pickupOrders}
+                        title={mainPage.pickups}
+                        type={ORDER_TYPES.TAKEAWAY}
+                        asapLabel={mainPage.asap}
+                        language={language}
+                        onCardClick={openOrderOptions}
+                    />
+                </section>
+            </DashboardClockProvider>
         </div>
     );
 };

@@ -33,7 +33,7 @@ const plPack: languagePack = {
         orders: 'zamówienia',
         menu: 'karta',
         reservations: 'rezerwacje',
-        daySummary: 'koniec dnia',
+        daySummary: 'podsumowanie dnia',
         settings: 'ustawienia',
     },
     mainPage: {
