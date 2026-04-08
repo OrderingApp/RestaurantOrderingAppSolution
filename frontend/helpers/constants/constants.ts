@@ -8,6 +8,7 @@ import menuSvg from '@/public/images/svg/menu.svg';
 import calendarSvg from '@/public/images/svg/calendar-white.svg';
 import daySummarySvg from '@/public/images/svg/end-of-day.svg';
 import settingsSvg from '@/public/images/svg/settings.svg';
+import homeSvg from '@/public/images/svg/home.svg';
 
 export const COMPANY_NAME = 'piccolo';
 export const RESTAURANT_OPENING_HOUR = '14:00';
@@ -18,6 +19,7 @@ export const MAX_ITEM_SELECT = 99;
 export const MENU_BAR_ICONS: {
     [K in keyof languagePack['menuBar']]: StaticImport;
 } = {
+    main: homeSvg,
     tables: tablesSvg,
     orders: ordersSvg,
     menu: menuSvg,
@@ -71,6 +73,7 @@ export enum SEARCH_PARAMS_NAMES {
     CLOSE_ORDER = 'closeOrder',
     OPTIONS = 'options',
     USER_DATA = 'userData',
+    FROM = 'from',
 }
 
 export enum MENU_CATEGORY_NAMES {

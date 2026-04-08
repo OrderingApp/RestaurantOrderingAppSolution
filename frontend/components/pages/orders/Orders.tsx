@@ -174,13 +174,17 @@ const Orders = () => {
     };
 
     const closeOrderOptionsModal = () => {
-        toggleQueryParam(
-            SEARCH_PARAMS_NAMES.ORDER_ID,
-            undefined,
-            searchParams,
-            router,
-            pathname
-        );
+        if (searchParams.get(SEARCH_PARAMS_NAMES.FROM) === 'main') {
+            router.push('/main');
+        } else {
+            toggleQueryParam(
+                SEARCH_PARAMS_NAMES.ORDER_ID,
+                undefined,
+                searchParams,
+                router,
+                pathname
+            );
+        }
     };
 
     const handleOpenSplitBill = () => {

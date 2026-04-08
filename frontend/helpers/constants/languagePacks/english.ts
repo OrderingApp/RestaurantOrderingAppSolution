@@ -28,12 +28,21 @@ const enPack: languagePack = {
         },
     },
     menuBar: {
-        tables: 'tables',
+        main: 'main',
+        tables: 'hall',
         orders: 'orders',
         menu: 'menu',
         reservations: 'reservations',
         daySummary: 'day summary',
         settings: 'settings',
+    },
+    mainPage: {
+        reservations: 'Reservations',
+        orders: 'Orders',
+        deliveries: 'Deliveries',
+        pickups: 'Pickups',
+        billCount: 'Number of Bills',
+        asap: 'ASAP',
     },
     reservationsPage: {
         reservationTitle: 'Check Reservations',
