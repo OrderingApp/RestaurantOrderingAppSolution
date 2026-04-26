@@ -36,6 +36,14 @@ export interface languagePack {
         form: loginPageFormFields & {
             submit: string;
             pinLoginFallbackCta: string;
+            keycloakHint: string;
+            keycloakSignInCta: string;
+            pinSubmitting: string;
+            pinError: string;
+            sessionChecking: string;
+            sessionCheckFailed: string;
+            sessionRetryCta: string;
+            missingEnvWarningPrefix: string;
             errors: loginPageFormErrors;
         };
     };

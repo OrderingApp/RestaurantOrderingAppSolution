@@ -1,8 +1,6 @@
 import { z } from 'zod';
 import languagePacks, { LanguageTypes } from '../constants/languagePacks';
 
-const MIN_LOGIN_LENGTH = 3;
-const MIN_PASSWORD_LENGTH = 8;
 const MIN_PIN_LENGTH = 4;
 
 export const getLoginSchema = (
@@ -12,7 +10,7 @@ export const getLoginSchema = (
     const {
         loginPage: {
             form: {
-                errors: { login, password, pin },
+                errors: { pin },
             },
         },
     } = languagePacks[lang];
@@ -34,22 +32,6 @@ export const getLoginSchema = (
                 }
 
                 return;
-            }
-
-            if (!data.login || data.login.trim().length < MIN_LOGIN_LENGTH) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    path: ['login'],
-                    message: login,
-                });
-            }
-
-            if (!data.password || data.password.length < MIN_PASSWORD_LENGTH) {
-                ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
-                    path: ['password'],
-                    message: password,
-                });
             }
         });
 };
