@@ -27,6 +27,16 @@ const enPack: languagePack = {
             submit: 'enter',
             pinLoginFallbackCta:
                 "Don't remember your PIN or wasn't it you logging in today? || Go to the main login page",
+            keycloakHint:
+                'Continue with Keycloak to sign in. After a successful Keycloak login, this device will use PIN mode for 12 hours.',
+            keycloakSignInCta: 'Sign in with Keycloak',
+            pinSubmitting: 'Verifying PIN...',
+            pinError: 'Invalid PIN. Please try again.',
+            sessionChecking: 'Checking login status...',
+            sessionCheckFailed:
+                'Could not verify current login session. Please try again later.',
+            sessionRetryCta: 'Retry session check',
+            missingEnvWarningPrefix: 'Missing auth env vars:',
             errors: {
                 login: 'Please enter at least 3 characters',
                 password: 'Please enter at least 8 characters',

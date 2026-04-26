@@ -27,6 +27,16 @@ const plPack: languagePack = {
             pin: 'wpisz PIN',
             pinLoginFallbackCta:
                 'Nie pamiętasz PIN-u lub to nie Ty dzisiaj się logowałeś? || Przejdź do głównej strony logowania',
+            keycloakHint:
+                'Kontynuuj przez Keycloak, aby się zalogować. Po poprawnym logowaniu przez Keycloak to urządzenie przejdzie w tryb PIN na 12 godzin.',
+            keycloakSignInCta: 'Zaloguj przez Keycloak',
+            pinSubmitting: 'Sprawdzanie PIN-u...',
+            pinError: 'Nieprawidłowy PIN. Spróbuj ponownie.',
+            sessionChecking: 'Sprawdzanie statusu logowania...',
+            sessionCheckFailed:
+                'Nie udało się zweryfikować sesji logowania. Spróbuj ponownie później.',
+            sessionRetryCta: 'Ponów sprawdzenie sesji',
+            missingEnvWarningPrefix: 'Brak wymaganych zmiennych env:',
             errors: {
                 login: 'Login musi mieć co najmniej 3 znaki',
                 password: 'Hasło musi mieć co najmniej 8 znaków',
