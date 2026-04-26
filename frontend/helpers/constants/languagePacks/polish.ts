@@ -16,14 +16,21 @@ const plPack: languagePack = {
         noTableChosen: 'Proszę wybrać stolik',
     },
     loginPage: {
-        appName: 'aplikacja do zamówień',
+        heading: {
+            defaultHeading: 'Logowanie do systemu',
+            userHasBeenAssignedHeading: 'Logowanie',
+        },
         form: {
             login: 'login',
-            submit: 'wejdź',
+            submit: 'zaloguj się',
             password: 'hasło',
+            pin: 'wpisz PIN',
+            pinLoginFallbackCta:
+                'Nie pamiętasz PIN-u lub to nie Ty dzisiaj się logowałeś? || Przejdź do głównej strony logowania',
             errors: {
                 login: 'Login musi mieć co najmniej 3 znaki',
                 password: 'Hasło musi mieć co najmniej 8 znaków',
+                pin: 'PIN musi mieć co najmniej 4 cyfry',
             },
         },
     },
