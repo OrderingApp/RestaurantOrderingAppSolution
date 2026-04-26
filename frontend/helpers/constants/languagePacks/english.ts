@@ -16,14 +16,21 @@ const enPack: languagePack = {
         noTableChosen: 'Please choose a table',
     },
     loginPage: {
-        appName: 'order application',
+        heading: {
+            defaultHeading: 'Login to system',
+            userHasBeenAssignedHeading: 'User login',
+        },
         form: {
             login: 'login',
             password: 'password',
+            pin: 'enter PIN',
             submit: 'enter',
+            pinLoginFallbackCta:
+                "Don't remember your PIN or wasn't it you logging in today? || Go to the main login page",
             errors: {
                 login: 'Please enter at least 3 characters',
                 password: 'Please enter at least 8 characters',
+                pin: 'Please enter at least 4 digits',
             },
         },
     },

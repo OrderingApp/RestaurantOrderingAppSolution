@@ -29,10 +29,14 @@ export interface languagePack {
         noTableChosen?: string;
     };
     loginPage: {
-        appName: string;
+        heading: {
+            defaultHeading: string;
+            userHasBeenAssignedHeading: string;
+        };
         form: loginPageFormFields & {
             submit: string;
-            errors: loginPageFormFields;
+            pinLoginFallbackCta: string;
+            errors: loginPageFormErrors;
         };
     };
     menuBar: {
@@ -382,6 +386,13 @@ interface OrderEntity {
 interface loginPageFormFields {
     login: string;
     password: string;
+    pin: string;
+}
+
+interface loginPageFormErrors {
+    login: string;
+    password: string;
+    pin: string;
 }
 
 interface createReservationPageFormFields {

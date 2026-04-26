@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Titillium_Web } from 'next/font/google';
 
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
@@ -15,14 +15,10 @@ import OrdersProvider from '@/providers/OrdersContext';
 import { Toaster } from 'sonner';
 import { ReservationProvider } from '@/providers/ReservationsContext';
 
-const geistSans = Geist({
-    variable: '--font-geist-sans',
+const titilliumWeb = Titillium_Web({
+    variable: '--font-titillium-web',
     subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-    variable: '--font-geist-mono',
-    subsets: ['latin'],
+    weight: ['400', '700'],
 });
 
 export const generateMetadata = async (): Promise<Metadata> => {
@@ -42,7 +38,7 @@ const RootLayout = async ({
     return (
         <html lang={lang}>
             <body
-                className={`${geistSans.variable} ${geistMono.variable} flex justify-center items-center min-h-screen antialiased bg-page-gradient`}
+                className={`${titilliumWeb.variable} flex justify-center items-center min-h-screen antialiased bg-page-gradient`}
             >
                 <div id="root" className="w-full max-w-[64rem] relative">
                     <QueryProvider>

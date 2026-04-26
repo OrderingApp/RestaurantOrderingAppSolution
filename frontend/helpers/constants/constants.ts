@@ -10,7 +10,7 @@ import daySummarySvg from '@/public/images/svg/end-of-day.svg';
 import settingsSvg from '@/public/images/svg/settings.svg';
 import homeSvg from '@/public/images/svg/home.svg';
 
-export const COMPANY_NAME = 'piccolo';
+export const COMPANY_NAME = 'Piccolo';
 export const RESTAURANT_OPENING_HOUR = '14:00';
 export const RESTAURANT_CLOSING_HOUR = '24:00';
 export const MIN_ITEM_SELECT = 1;
